@@ -1,0 +1,14 @@
+name: Lint Style
+on: [push]
+
+jobs:
+  lint-style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          # Match the Node.js version in any Dockerfile
+          node-version: "12"
+      - run: npm ci
+      - run: npm run style
