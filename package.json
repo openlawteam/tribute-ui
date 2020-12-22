@@ -35,8 +35,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "style": "prettier --check '{spec,src}/**/*.{js,jsx,ts,tsx,css,scss}'",
-    "style:fix": "prettier --write '{spec,src}/**/*.{js,jsx,ts,tsx,css,scss}'"
+    "style": "prettier --check 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
+    "style:fix": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,scss}'"
   },
   "eslintConfig": {
     "extends": [
@@ -60,7 +60,7 @@
     "overrides": [
       {
         "files": [
-          "{src,spec}/**/*.{js,jsx,ts,tsx}"
+          "src/**/*.{js,jsx,ts,tsx}"
         ],
         "options": {
           "singleQuote": true,
