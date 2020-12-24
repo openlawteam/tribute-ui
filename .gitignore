@@ -24,3 +24,7 @@ yarn-error.log*
 
 # Optional eslint cache
 .eslintcache
+
+# .env are local files with key=value pairs loaded
+# as environment variables into Docker, for example.
+.env
