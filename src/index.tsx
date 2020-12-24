@@ -2,9 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {BrowserRouter} from 'react-router-dom';
+import WalletConnectProvider from '@walletconnect/web3-provider';
 
 import {disableReactDevTools} from './util/helpers';
-import {ENVIRONMENT} from './util/config';
+import {ENVIRONMENT, INFURA_PROJECT_ID} from './util/config';
 import {store} from './store';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -19,6 +20,37 @@ ENVIRONMENT === 'production' && disableReactDevTools();
 window.ethereum &&
   window.ethereum.autoRefreshOnNetworkChange &&
   (window.ethereum.autoRefreshOnNetworkChange = false);
+
+// Tell Web3modal what providers we have available.
+// Built-in web browser provider (only one can exist at a time),
+// MetaMask, Brave or Opera is added automatically by Web3modal
+function getProviderOptions() {
+  const providerOptions = {
+    // Injected providers
+    injected: {
+      display: {
+        name: 'MetaMask',
+        description: 'Connect with the provider in your Browser',
+      },
+      package: null,
+    },
+    // WalletConnect provider
+    walletconnect: {
+      display: {
+        name: 'WalletConnect',
+        description: 'Connect with your mobile wallet',
+      },
+      package: WalletConnectProvider,
+      options: {
+        infuraId: INFURA_PROJECT_ID, // required
+        qrcodeModalOptions: {
+          mobileLinks: ['rainbow', 'metamask', 'argent', 'trust'],
+        },
+      },
+    },
+  };
+  return providerOptions;
+}
 
 if (root !== null) {
   ReactDOM.render(
