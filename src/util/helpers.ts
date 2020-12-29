@@ -1,3 +1,15 @@
+export const formatEthereumAddress = (addr: string, maxLength: number = 5) => {
+  if (addr === null) return '---';
+
+  if (typeof addr !== 'undefined' && addr.length > 9) {
+    const firstSegment = addr.substring(0, maxLength);
+    const secondPart = addr.substring(addr.length - 3);
+    return firstSegment + '...' + secondPart;
+  } else {
+    return '---';
+  }
+};
+
 /**
  * disableReactDevTools
  *

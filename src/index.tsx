@@ -6,8 +6,11 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 
 import {disableReactDevTools} from './util/helpers';
 import {ENVIRONMENT, INFURA_PROJECT_ID} from './util/config';
+import {DefaultTheme} from './components/web3/hooks/useWeb3ModalManager';
 import {store} from './store';
 import App from './App';
+import Init, {InitError} from './Init';
+import Web3ModalManager from './components/web3/Web3ModalManager';
 import reportWebVitals from './reportWebVitals';
 
 const root = document.getElementById('root');
@@ -56,7 +59,15 @@ if (root !== null) {
   ReactDOM.render(
     <Provider store={store}>
       <BrowserRouter>
-        <App />
+        <Web3ModalManager
+          providerOptions={getProviderOptions()}
+          defaultTheme={DefaultTheme.LIGHT}>
+          <Init
+            render={({error}) =>
+              error ? <InitError error={error} /> : <App />
+            }
+          />
+        </Web3ModalManager>
       </BrowserRouter>
     </Provider>,
     root
