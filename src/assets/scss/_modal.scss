@@ -1,0 +1,19 @@
+.modal-content {
+  height: calc(100% - (1.5rem * 2)); /* minus the top, bottom margins */
+  margin: 1.5rem auto;
+  max-width: 62.5rem;
+  outline: none;
+}
+
+.modal-overlay {
+  background: rgba(248, 250, 253, 0.8);
+  border: none;
+  left: 0;
+  margin: 0;
+  min-height: 100%;
+  padding: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 10;
+}

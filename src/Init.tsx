@@ -108,7 +108,7 @@ export function InitError(props: InitErrorProps) {
   const {error} = props;
 
   return (
-    <Wrap>
+    <Wrap className="section-wrapper">
       <Header />
 
       <FadeIn>
@@ -119,6 +119,7 @@ export function InitError(props: InitErrorProps) {
           }}>
           <h1 style={{fontSize: '2rem'}}>
             <span
+              className="pulse"
               role="img"
               aria-label="Emoji with eyes crossed out."
               style={{display: 'inline-block'}}>

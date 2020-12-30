@@ -24,8 +24,8 @@ export default function App() {
     <>
       {/** REACT HELMET */}
       <Helmet>
-        <title>Tribute DAO</title>
-        <meta name="description" content="Tribute DAO description TODO" />
+        <title>TRIBUTE dao</title>
+        <meta name="description" content="TRIBUTE dao description TODO" />
       </Helmet>
 
       {/** HEADER */}

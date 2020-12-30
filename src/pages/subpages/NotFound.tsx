@@ -5,12 +5,13 @@ import FadeIn from '../../components/common/FadeIn';
 
 export default function NotFound() {
   return (
-    <Wrap>
+    <Wrap className="section-wrapper">
       <FadeIn>
         <div style={{padding: '2rem', textAlign: 'center', fontSize: '5rem'}}>
           <h3>
             4
             <span
+              className="pulse"
               role="img"
               aria-label="404, not found"
               style={{display: 'inline-block'}}>

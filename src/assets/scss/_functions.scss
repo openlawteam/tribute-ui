@@ -1,0 +1,39 @@
+/**
+ * Translate pixel values to em's
+ * 
+ * $pixels (int): e.g. 1, 1px;
+ * $context: root value; default is 16 for all modern browsers
+ */
+@function em($pixels, $context: 16) {
+  @if (unitless($pixels)) {
+    $pixels: $pixels * 1px;
+  }
+
+  @if (unitless($context)) {
+    $context: $context * 1px;
+  }
+
+  @return $pixels / $context * 1em;
+}
+
+/**
+ * Translate pixel values to relative em's (rem)
+ * 
+ * $pixels (int): e.g. 1, 1px;
+ * $context: root value; default is 16 for all modern browsers
+ */
+@function rem($pixels, $context: 16) {
+  @if (unitless($pixels)) {
+    $pixels: $pixels * 1px;
+  }
+
+  @if (unitless($context)) {
+    $context: $context * 1px;
+  }
+
+  @return $pixels / $context * 1rem;
+}
+
+@function strip-unit($value) {
+  @return $value / ($value * 0 + 1);
+}

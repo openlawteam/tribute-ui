@@ -1,0 +1,111 @@
+@use "./variables" as *; /* load without namespace for convenience */
+@use "./mixins";
+@use './fonts';
+@use "./functions";
+@use './modal'; /* modal styles */
+@use './loader'; /* loader styles */
+
+html {
+  height: 100%;
+  font-size: 100%; /* 16px by default; px value overrides user's browser settings */
+}
+
+html,
+body {
+  color: black;
+  background-color: #f8fafd;
+  font-weight: normal;
+  font-family: $font-body;
+}
+
+body {
+  margin: 0;
+}
+
+/* font */
+
+.font-mono {
+  font-family: $font-mono;
+}
+
+/* color */
+
+@each $name, $color in $colors {
+  .color-#{$name} {
+    color: #{$color};
+  }
+}
+
+/* headings */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $font-header;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* common text */
+
+p {
+  font-size: functions.rem(18);
+}
+
+/* react mount point */
+
+#root {
+  /* sticky footer */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* end sticky footer */
+}
+
+/* header */
+
+header {
+  z-index: 9;
+  position: relative;
+}
+
+/* main */
+
+main {
+  flex: 1; /* sticky footer */
+  z-index: 0; /* header nav needs to appear on top of <main> */
+}
+
+.section-wrapper {
+  flex: 1 1;
+  margin: 0 0.75rem 9rem;
+
+  @media only screen and (min-width: em($bp-lg)) {
+    margin: 0 3rem 9rem;
+  }
+}
+
+/* errors */
+
+.error-message {
+  color: $color-brightsalmon;
+  // the text needs to wrap as the JSON erros can be long
+  word-break: break-word;
+}
+
+/* effects */
+
+.pulse {
+  animation: pulse 0.9s infinite ease-in-out alternate;
+}
+@keyframes pulse {
+  from {
+    transform: scale(0.8);
+  }
+  to {
+    transform: scale(1.2);
+  }
+}

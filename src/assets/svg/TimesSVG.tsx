@@ -3,7 +3,6 @@ export default function TimesSVG() {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
-      className="svg-inline--fa fa-times fa-w-10 fa-3x"
       data-icon="times"
       data-prefix="fal"
       viewBox="0 0 320 512">

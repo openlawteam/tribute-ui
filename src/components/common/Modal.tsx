@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactModal from 'react-modal';
 
-import m from '../../assets/scss/modules/modal.module.scss';
-
 type ModalProps = {
   children: React.ReactNode;
   isOpen: boolean;
@@ -22,12 +20,12 @@ export default function Modal({
     <ReactModal
       key={keyProp}
       ariaHideApp={false}
-      className={`${m['modal-content-wide']}`}
+      className="modal-content"
       isOpen={isOpen}
       onRequestClose={() => {
         isOpenHandler(isOpen);
       }}
-      overlayClassName={`${m['modal-overlay']} org-modal-overlay`}
+      overlayClassName="modal-overlay"
       role="dialog"
       style={
         {

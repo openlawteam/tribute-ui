@@ -13,6 +13,8 @@ import Init, {InitError} from './Init';
 import Web3ModalManager from './components/web3/Web3ModalManager';
 import reportWebVitals from './reportWebVitals';
 
+import './assets/scss/style.scss';
+
 const root = document.getElementById('root');
 
 // disable React dev tools for production

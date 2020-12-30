@@ -30,7 +30,7 @@ export function initContractDaoRegistry(web3Instance: Web3) {
         dispatch({
           type: BLOCKCHAIN_CONTRACTS,
           contracts: {
-            NFTFactory: {
+            DaoRegistry: {
               abi: daoRegistryContract.abi,
               contractAddress,
               instance,
@@ -60,7 +60,7 @@ export function initContractFinancing(web3Instance: Web3) {
         dispatch({
           type: BLOCKCHAIN_CONTRACTS,
           contracts: {
-            NFTFactory: {
+            FinancingContract: {
               abi: financingContract.abi,
               contractAddress,
               instance,
@@ -93,7 +93,7 @@ export function initContractOffchainVoting(web3Instance: Web3) {
         dispatch({
           type: BLOCKCHAIN_CONTRACTS,
           contracts: {
-            NFTFactory: {
+            OffchainVotingContract: {
               abi: offchainVotingContract.abi,
               contractAddress,
               instance,
@@ -123,7 +123,7 @@ export function initContractOnboarding(web3Instance: Web3) {
         dispatch({
           type: BLOCKCHAIN_CONTRACTS,
           contracts: {
-            NFTFactory: {
+            OnboardingContract: {
               abi: onboardingContract.abi,
               contractAddress,
               instance,

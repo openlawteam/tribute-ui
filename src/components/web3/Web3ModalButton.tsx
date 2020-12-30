@@ -13,6 +13,8 @@ import {useWeb3Modal} from './Web3ModalManager';
 import TimesSVG from '../../assets/svg/TimesSVG';
 import WalletSVG from '../../assets/svg/WalletSVG';
 
+// TODO: styles in this component need to be updated (simplify and migrate
+// applicable styles away from these modules)
 import b from '../../assets/scss/modules/buttons.module.scss';
 import m from '../../assets/scss/modules/modal.module.scss';
 import s from '../../assets/scss/modules/web3modalbutton.module.scss';
@@ -246,7 +248,7 @@ function DisplayChainError({
 }: DisplayChainErrorProps): JSX.Element {
   return (
     <>
-      <div className="color-sunny org-notification info">
+      <div className="error-message">
         <small>{defaultChainError}</small>
       </div>
       <div>

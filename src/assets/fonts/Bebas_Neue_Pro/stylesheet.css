@@ -1,0 +1,95 @@
+@font-face {
+  font-family: "Bebas Neue Pro";
+  src: url("BebasNeuePro-Thin.eot");
+  src: local("Bebas Neue Pro Thin"), local("BebasNeuePro-Thin"),
+    url("BebasNeuePro-Thin.eot?#iefix") format("embedded-opentype"),
+    url("BebasNeuePro-Thin.woff2") format("woff2"),
+    url("BebasNeuePro-Thin.woff") format("woff"),
+    url("BebasNeuePro-Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Bebas Neue Pro";
+  src: url("BebasNeuePro-ThinItalic.eot");
+  src: local("Bebas Neue Pro Thin Italic"), local("BebasNeuePro-ThinItalic"),
+    url("BebasNeuePro-ThinItalic.eot?#iefix") format("embedded-opentype"),
+    url("BebasNeuePro-ThinItalic.woff2") format("woff2"),
+    url("BebasNeuePro-ThinItalic.woff") format("woff"),
+    url("BebasNeuePro-ThinItalic.ttf") format("truetype");
+  font-weight: 100;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Bebas Neue Pro";
+  src: url("BebasNeuePro-Light.eot");
+  src: local("Bebas Neue Pro Light"), local("BebasNeuePro-Light"),
+    url("BebasNeuePro-Light.eot?#iefix") format("embedded-opentype"),
+    url("BebasNeuePro-Light.woff2") format("woff2"),
+    url("BebasNeuePro-Light.woff") format("woff"),
+    url("BebasNeuePro-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Bebas Neue Pro";
+  src: url("BebasNeuePro-LightItalic.eot");
+  src: local("Bebas Neue Pro Light Italic"), local("BebasNeuePro-LightItalic"),
+    url("BebasNeuePro-LightItalic.eot?#iefix") format("embedded-opentype"),
+    url("BebasNeuePro-LightItalic.woff2") format("woff2"),
+    url("BebasNeuePro-LightItalic.woff") format("woff"),
+    url("BebasNeuePro-LightItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Bebas Neue Pro";
+  src: url("BebasNeuePro-Regular.eot");
+  src: local("Bebas Neue Pro Regular"), local("BebasNeuePro-Regular"),
+    url("BebasNeuePro-Regular.eot?#iefix") format("embedded-opentype"),
+    url("BebasNeuePro-Regular.woff2") format("woff2"),
+    url("BebasNeuePro-Regular.woff") format("woff"),
+    url("BebasNeuePro-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Bebas Neue Pro";
+  src: url("BebasNeuePro-Italic.eot");
+  src: local("Bebas Neue Pro Italic"), local("BebasNeuePro-Italic"),
+    url("BebasNeuePro-Italic.eot?#iefix") format("embedded-opentype"),
+    url("BebasNeuePro-Italic.woff2") format("woff2"),
+    url("BebasNeuePro-Italic.woff") format("woff"),
+    url("BebasNeuePro-Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Bebas Neue Pro";
+  src: url("BebasNeuePro-Bold.eot");
+  src: local("Bebas Neue Pro Bold"), local("BebasNeuePro-Bold"),
+    url("BebasNeuePro-Bold.eot?#iefix") format("embedded-opentype"),
+    url("BebasNeuePro-Bold.woff2") format("woff2"),
+    url("BebasNeuePro-Bold.woff") format("woff"),
+    url("BebasNeuePro-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Bebas Neue Pro";
+  src: url("BebasNeuePro-BoldItalic.eot");
+  src: local("Bebas Neue Pro Bold Italic"), local("BebasNeuePro-BoldItalic"),
+    url("BebasNeuePro-BoldItalic.eot?#iefix") format("embedded-opentype"),
+    url("BebasNeuePro-BoldItalic.woff2") format("woff2"),
+    url("BebasNeuePro-BoldItalic.woff") format("woff"),
+    url("BebasNeuePro-BoldItalic.ttf") format("truetype");
+  font-weight: bold;
+  font-style: italic;
+}
