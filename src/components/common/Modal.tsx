@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactModal from 'react-modal';
 
+import FadeIn from './FadeIn';
+
 type ModalProps = {
   children: React.ReactNode;
   isOpen: boolean;
@@ -20,7 +22,7 @@ export default function Modal({
     <ReactModal
       key={keyProp}
       ariaHideApp={false}
-      className="modal-content"
+      className="modal-container"
       isOpen={isOpen}
       onRequestClose={() => {
         isOpenHandler(isOpen);
@@ -30,11 +32,12 @@ export default function Modal({
       style={
         {
           overlay: {zIndex: '99'},
-          content: {maxWidth: '34.5rem'},
           ...styleProps,
         } as any
       }>
-      {children}
+      <FadeIn>
+        <div className="modal">{children}</div>
+      </FadeIn>
     </ReactModal>
   );
 }

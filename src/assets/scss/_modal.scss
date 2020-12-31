@@ -1,7 +1,11 @@
-.modal-content {
+@use "./variables" as *; /* load without namespace for convenience */
+@use "./mixins" as *; /* load without namespace for convenience */
+@use "./functions" as *; /* load without namespace for convenience */
+
+.modal-container {
   height: calc(100% - (1.5rem * 2)); /* minus the top, bottom margins */
   margin: 1.5rem auto;
-  max-width: 62.5rem;
+  max-width: 34.5rem;
   outline: none;
 }
 
@@ -16,4 +20,53 @@
   right: 0;
   top: 0;
   z-index: 10;
+}
+
+.modal {
+  margin: 10vh auto 0;
+  position: relative;
+  text-align: center;
+  max-width: 52.5rem;
+  max-height: calc(
+    100vh - 10rem
+  ); /* dynamic height, minus any surrounding margin + padding */
+  background-color: white;
+  border-radius: 15px;
+  border: 2px solid #e2e4e6;
+  padding: 2rem 1rem;
+  overflow-y: scroll;
+
+  @media only screen and (min-width: em($bp-sm)) {
+    padding: 2rem 3.6rem;
+  }
+}
+
+.modal__title {
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  margin-bottom: 2rem;
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    18px,
+    26px
+  ); /* min font-size 1.125rem, max 1.625rem */
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.modal__subtitle {
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+}
+
+.modal__close-button {
+  width: 1rem;
+  position: absolute;
+  right: 1rem;
+  top: 0.5rem;
+  color: black;
+  cursor: pointer;
 }

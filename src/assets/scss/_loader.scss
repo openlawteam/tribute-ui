@@ -1,8 +1,8 @@
-.loader-with-emoji {
+.loader--emoji {
   font-size: 3rem;
-  animation: rotateEffect 1s ease infinite;
+  animation: rotateScaleEffect 1s ease infinite;
 }
-@keyframes rotateEffect {
+@keyframes rotateScaleEffect {
   30% {
     transform: scale(1.2);
   }

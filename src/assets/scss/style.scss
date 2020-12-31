@@ -1,9 +1,15 @@
 @use "./variables" as *; /* load without namespace for convenience */
 @use "./mixins";
 @use './fonts';
-@use "./functions";
+@use "./functions" as *; /* load without namespace for convenience */
+
+@use './logo'; /* logo styles */
+@use './header'; /* header styles */
+@use './nav'; /* nav styles */
 @use './modal'; /* modal styles */
 @use './loader'; /* loader styles */
+@use './walletconnect'; /* wallet connect styles */
+@use './button'; /* button styles */
 
 html {
   height: 100%;
@@ -52,7 +58,11 @@ h6 {
 /* common text */
 
 p {
-  font-size: functions.rem(18);
+  font-size: rem(18);
+}
+
+a {
+  color: black;
 }
 
 /* react mount point */
@@ -63,13 +73,6 @@ p {
   flex-direction: column;
   min-height: 100vh;
   /* end sticky footer */
-}
-
-/* header */
-
-header {
-  z-index: 9;
-  position: relative;
 }
 
 /* main */

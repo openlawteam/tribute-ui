@@ -1,0 +1,61 @@
+@use "./variables" as *; /* load without namespace for convenience */
+@use "./mixins" as *; /* load without namespace for convenience */
+
+.logo-container {
+  line-height: 9em;
+  padding: 1em 3em;
+  width: 100%;
+  z-index: 0;
+
+  &--header {
+    padding: 0 3em;
+  }
+
+  &--center {
+    margin: 0 auto;
+    padding: 1em 0 0;
+    text-align: center;
+  }
+}
+
+.logo {
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    64px,
+    96px
+  ); /* min font-size 4rem, max 6rem */
+
+  color: #070707;
+  font-family: $font-bebas;
+  font-size: 6em;
+  font-weight: bold;
+  letter-spacing: 2px;
+
+  &--small {
+    @include fluid-type(
+      $bp-sm,
+      $bp-xl,
+      24px,
+      30px
+    ); /* min font-size 1.5rem, max 1.875rem */
+  }
+
+  &--medium {
+    @include fluid-type(
+      $bp-sm,
+      $bp-xl,
+      24px,
+      48px
+    ); /* min font-size 1.5rem, max 3rem */
+  }
+
+  &--large {
+    @include fluid-type(
+      $bp-sm,
+      $bp-xl,
+      54px,
+      97px
+    ); /* min font-size 3.375rem, max 6.0625rem */
+  }
+}

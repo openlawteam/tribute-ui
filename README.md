@@ -1,6 +1,13 @@
 # TRIBUTE dao
 
-TODO
+## Local `.env` file
+
+When running locally you'll need a `.env` file in the root directory with the following:
+
+```
+REACT_APP_ENVIRONMENT=localhost
+REACT_APP_INFURA_PROJECT_ID_LOCAL=...
+```
 
 ---
 

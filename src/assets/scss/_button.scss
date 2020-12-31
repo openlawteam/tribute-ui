@@ -1,0 +1,19 @@
+@use "./variables" as *; /* load without namespace for convenience */
+
+.button {
+  background-color: white;
+  border-radius: 12px;
+  border: 1px solid #e3e3e3;
+  color: #070707;
+  font-family: $font-bebas;
+  outline: none;
+  padding: 0.5rem 1.25rem;
+  text-transform: lowercase;
+  letter-spacing: 2px;
+  box-shadow: 0 2px 2px 0 rgba(101, 101, 101, 0.1);
+  position: relative;
+  box-sizing: border-box;
+  font-size: 1.25rem;
+  cursor: pointer;
+  text-align: center;
+}

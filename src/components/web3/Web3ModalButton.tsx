@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {isMobile} from 'react-device-detect';
 
-import FadeIn from '../common/FadeIn';
 import Modal from '../common/Modal';
 import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
 import {svgWalletIcon} from './WalletIcons';
@@ -11,35 +10,13 @@ import {useIsDefaultChain} from '../../hooks';
 import {useWeb3Modal} from './Web3ModalManager';
 
 import TimesSVG from '../../assets/svg/TimesSVG';
-import WalletSVG from '../../assets/svg/WalletSVG';
-
-// TODO: styles in this component need to be updated (simplify and migrate
-// applicable styles away from these modules)
-import b from '../../assets/scss/modules/buttons.module.scss';
-import m from '../../assets/scss/modules/modal.module.scss';
-import s from '../../assets/scss/modules/web3modalbutton.module.scss';
-import sm from '../../assets/scss/modules/sale.module.scss';
 
 type Web3ModalButtonProps = {
-  // determines whether the button is just for triggering wallet
-  // modal and show the account badge
+  // determines whether button should show account badge or custom text to
+  // trigger wallet moodal
   showWalletETHBadge?: boolean;
   customWalletText?: string;
 };
-
-type ModalWrapperProps = {
-  children: React.ReactNode;
-};
-
-function ModalWrapper({children}: ModalWrapperProps): JSX.Element {
-  return (
-    <FadeIn>
-      <div className={`${sm.wrap} ${sm.gradient} ${sm.modalWrap} org-modal`}>
-        <div className={`${sm.sales} ${m['modal-title']} card`}>{children}</div>
-      </div>
-    </FadeIn>
-  );
-}
 
 type ConnectWalletProps = {
   customWalletText?: string;
@@ -64,9 +41,6 @@ function ConnectWallet({
 
   const isWrongNetwork: boolean = networkId !== defaultChain ?? isDefaultChain;
   const displayWalletText: string | undefined = getWalletText();
-  const cssConnectStyle: string = connected
-    ? 'org-connection-ethaddress'
-    : 'org-get-connected-text';
 
   function getWalletText(): string {
     if (isMobile) {
@@ -100,13 +74,14 @@ function ConnectWallet({
       (provider: Record<number, any>) => (
         <button
           key={provider[0]}
-          className={
-            connected && web3Modal?.cachedProvider === provider[0]
-              ? `${s['connected']} org-connected`
-              : ''
-          }
+          className={`walletconnect__options-button 
+            ${
+              connected && web3Modal?.cachedProvider === provider[0]
+                ? 'walletconnect__options-button--connected'
+                : ''
+            }`}
           onClick={async () => await onConnectTo(provider[0])}>
-          <span className={s['wallet-name']}>{provider[1].display.name}</span>
+          <span className="wallet-name">{provider[1].display.name}</span>
 
           <ProviderSVG providerName={provider[0]} />
         </button>
@@ -115,71 +90,53 @@ function ConnectWallet({
 
     return (
       <Modal
-        keyProp={'web3modal'}
+        keyProp="web3modal"
         isOpen={openModal}
         isOpenHandler={() => {
           setOpenModal(false);
         }}>
-        <ModalWrapper>
-          {/* MODEL CLOSE BUTTON */}
-          <span
-            className={`${b['modal-close']} org-modal-close`}
-            onClick={() => {
-              setOpenModal(false);
-            }}>
-            <TimesSVG />
-          </span>
-          <div className="org-connectors-container">
-            {/* TITLE */}
-            <div className="titlebar">
-              <h2 className="titlebar__title org-titlebar__title">
-                Connect Wallet
-              </h2>
-            </div>
+        {/* MODEL CLOSE BUTTON */}
+        <span
+          className="modal__close-button"
+          onClick={() => {
+            setOpenModal(false);
+          }}>
+          <TimesSVG />
+        </span>
+        <div>
+          {/* TITLE */}
+          <div className="modal__title">Connect Wallet</div>
 
-            {/* SUBTITLE */}
-            {connected && isWrongNetwork ? null : (
-              <p
-                className={`${s['select-wallet-instructions']} org-select-wallet-instructions`}>
-                Choose Your Wallet
-              </p>
-            )}
+          {/* SUBTITLE */}
+          {connected && isWrongNetwork ? null : (
+            <div className="modal__subtitle">Choose Your Wallet</div>
+          )}
 
-            {/* CONNECTED ACCOUNT BUTTON LINK */}
-            {account && (
-              <button
-                className={`${s['connected-address']} ${s['connected-address-link-button']} org-connected-address-link-button`}
-                onClick={handleNavigate}>
-                {isMobile ? formatEthereumAddress(account) : account}
-              </button>
-            )}
+          {/* CONNECTED ACCOUNT BUTTON LINK */}
+          {account && (
+            <button
+              className="walletconnect__connected-address-button"
+              onClick={handleNavigate}>
+              {isMobile ? formatEthereumAddress(account) : account}
+            </button>
+          )}
 
-            {/* SHOW; WRONG NETWORK MSG || PROVIDER OPTIONS */}
-            {connected && isWrongNetwork ? (
-              <DisplayChainError defaultChainError={defaultChainError} />
-            ) : (
-              <div
-                className={`${s['options-container']} org-options-container`}
-                style={{
-                  display: 'grid',
-                  gridGap: '1rem',
-                  gridTemplateColumns: '1fr',
-                  margin: 'auto',
-                }}>
-                {displayOptions}
-              </div>
-            )}
+          {/* SHOW; WRONG NETWORK MSG || PROVIDER OPTIONS */}
+          {connected && isWrongNetwork ? (
+            <DisplayChainError defaultChainError={defaultChainError} />
+          ) : (
+            <div className="walletconnect__options">{displayOptions}</div>
+          )}
 
-            {/* DISCONNECT BUTTON LINK */}
-            {connected && (
-              <button
-                className={`${s['disconnect-link-button']} org-disconnect-link-button`}
-                onClick={onDisconnect}>
-                {'Disconnect Wallet'}
-              </button>
-            )}
-          </div>
-        </ModalWrapper>
+          {/* DISCONNECT BUTTON LINK */}
+          {connected && (
+            <button
+              className="walletconnect__disconnect-link-button"
+              onClick={onDisconnect}>
+              {'Disconnect Wallet'}
+            </button>
+          )}
+        </div>
       </Modal>
     );
   }
@@ -187,24 +144,19 @@ function ConnectWallet({
   return (
     <>
       <button
-        className={`${s['get-connected-btn']} ${
-          s['sale-get-connected-btn']
-        } org-get-connected-btn
+        className={`walletconnect__connect-button 
         ${
           isWrongNetwork && connected
-            ? ` ${s['error']} org-get-connected-btn--error`
+            ? 'walletconnect__connect-button--error'
             : ''
         }`}
         onClick={() => {
           setOpenModal(true);
         }}>
-        {!connected && (
-          <WalletSVG
-            className={`${s['get-connected-icon']} org-get-connected-icon`}
-          />
-        )}
-
-        <span className={`${s['connection-ethaddress']} ${cssConnectStyle}`}>
+        <span
+          className={`connect-button-text ${
+            connected ? 'connect-button-text--ethAddress' : ''
+          }`}>
           {displayWalletText || 'Connect'}
         </span>
 
@@ -228,13 +180,7 @@ type ProviderSVGType = {
 function ProviderSVG({providerName}: ProviderSVGType): JSX.Element | null {
   if (!providerName) return null;
   return (
-    <span
-      style={{
-        display: 'inline-block',
-        marginLeft: '.5rem',
-        width: '16px',
-        verticalAlign: 'middle',
-      }}>
+    <span className="walletconnect__wallet-icon">
       {svgWalletIcon[providerName]}
     </span>
   );
