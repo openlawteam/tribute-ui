@@ -42,3 +42,13 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
   [CHAINS.GOERLI]: `https://goerli.etherscan.io`,
   [CHAINS.KOVAN]: `https://kovan.etherscan.io`,
 };
+
+// TODO: add deployed contract addresses when available (we at least need
+// Rinkeby for development)
+export const DAO_REGISTRY_CONTRACT_ADDRESS = {
+  [CHAINS.MAINNET]: '',
+  [CHAINS.ROPSTEN]: '',
+  [CHAINS.RINKEBY]: '',
+  [CHAINS.GOERLI]: '',
+  [CHAINS.KOVAN]: '',
+};

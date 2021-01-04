@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import {Dispatch} from 'redux';
 
 import {Web3State} from '../../util/enums';
+import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../util/config';
 import DaoRegistry from '../../truffle-contracts/DaoRegistry.json';
 import FinancingContract from '../../truffle-contracts/FinancingContract.json';
 import OffchainVotingContract from '../../truffle-contracts/OffchainVotingContract.json';
@@ -20,8 +21,7 @@ export function initContractDaoRegistry(web3Instance: Web3) {
       if (web3Instance) {
         const networkId = await web3Instance.eth.net.getId();
         const daoRegistryContract: Record<string, any> = DaoRegistry;
-        const deployedNetwork: any = daoRegistryContract.networks[networkId];
-        const contractAddress = deployedNetwork.address;
+        const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS[networkId];
         const instance = new web3Instance.eth.Contract(
           daoRegistryContract.abi,
           contractAddress
@@ -48,10 +48,10 @@ export function initContractFinancing(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
     try {
       if (web3Instance) {
-        const networkId = await web3Instance.eth.net.getId();
         const financingContract: Record<string, any> = FinancingContract;
-        const deployedNetwork: any = financingContract.networks[networkId];
-        const contractAddress = deployedNetwork.address;
+        // TODO: call the DaoRegistry smart contract directly or query the
+        // DaoRegistry subgraph to set this address
+        const contractAddress = '';
         const instance = new web3Instance.eth.Contract(
           financingContract.abi,
           contractAddress
@@ -78,13 +78,13 @@ export function initContractOffchainVoting(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
     try {
       if (web3Instance) {
-        const networkId = await web3Instance.eth.net.getId();
         const offchainVotingContract: Record<
           string,
           any
         > = OffchainVotingContract;
-        const deployedNetwork: any = offchainVotingContract.networks[networkId];
-        const contractAddress = deployedNetwork.address;
+        // TODO: call the DaoRegistry smart contract directly or query the
+        // DaoRegistry subgraph to set this address
+        const contractAddress = '';
         const instance = new web3Instance.eth.Contract(
           offchainVotingContract.abi,
           contractAddress
@@ -111,10 +111,10 @@ export function initContractOnboarding(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
     try {
       if (web3Instance) {
-        const networkId = await web3Instance.eth.net.getId();
         const onboardingContract: Record<string, any> = OnboardingContract;
-        const deployedNetwork: any = onboardingContract.networks[networkId];
-        const contractAddress = deployedNetwork.address;
+        // TODO: call the DaoRegistry smart contract directly or query the
+        // DaoRegistry subgraph to set this address
+        const contractAddress = '';
         const instance = new web3Instance.eth.Contract(
           onboardingContract.abi,
           contractAddress
