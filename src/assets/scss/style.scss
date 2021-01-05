@@ -85,6 +85,47 @@ main {
   }
 }
 
+/* page header */
+
+.titlebar {
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+
+.titlebar__title {
+  @include mixins.fluid-type(
+    $bp-sm,
+    $bp-xl,
+    18px,
+    24px
+  ); /* min font-size 1.125rem, max 1.5rem */
+  display: inline-block;
+  letter-spacing: 2px;
+  margin: 3.6rem 0;
+  position: relative;
+  text-align: center;
+
+  @media only screen and (min-width: em($bp-lg)) {
+    max-width: 50%;
+  }
+}
+
+.titlebar__action {
+  @extend %button;
+
+  display: block;
+  font-size: 1rem;
+  margin: 0 auto 2rem;
+  padding: 0.5rem 1rem;
+
+  @media only screen and (min-width: em($bp-xl)) {
+    position: absolute;
+    right: 0;
+    top: 110px;
+  }
+}
+
 /* errors */
 
 .error-message {

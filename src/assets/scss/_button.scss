@@ -2,7 +2,7 @@
 
 %button {
   background-color: $color-background-primary;
-  border-radius: 12px;
+  border-radius: 15px;
   border: 1px solid $color-border-primary;
   color: $color-primary;
   font-family: $font-accent;
@@ -10,7 +10,6 @@
   padding: 0.5rem 1.25rem;
   text-transform: lowercase;
   letter-spacing: 1px;
-  box-shadow: 0 2px 2px 0 $color-shadow-primary;
   position: relative;
   box-sizing: border-box;
   font-size: 1.25rem;

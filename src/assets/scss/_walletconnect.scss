@@ -84,16 +84,18 @@
 .walletconnect__connect-button {
   @extend %button;
 
+  border-radius: 12px;
+  box-shadow: 0 2px 2px 0 $color-shadow-primary;
   display: flex;
   align-items: center;
   justify-content: center;
 
   &--error {
     color: $color-brightsalmon;
-    font-size: 1rem;
+    font-size: 0.85rem;
 
     > span:first-of-type {
-      margin-right: 18px;
+      margin-right: 12px;
     }
   }
 
