@@ -10,6 +10,8 @@
 @use "./loader"; /* loader styles */
 @use "./walletconnect"; /* wallet connect styles */
 @use "./button"; /* button styles */
+@use "./form"; /* form styles */
+@use "./input"; /* input styles */
 
 html {
   height: 100%;
@@ -53,6 +55,11 @@ h6 {
 
 p {
   font-size: rem(18);
+  line-height: 2;
+
+  @media only screen and (max-width: em($bp-sm)) {
+    line-height: 1.5;
+  }
 }
 
 a {
@@ -102,12 +109,16 @@ main {
   ); /* min font-size 1.125rem, max 1.5rem */
   display: inline-block;
   letter-spacing: 2px;
-  margin: 3.6rem 0;
+  margin: 3.5rem 0;
   position: relative;
   text-align: center;
 
   @media only screen and (min-width: em($bp-lg)) {
     max-width: 50%;
+  }
+
+  @media only screen and (max-width: em($bp-sm)) {
+    margin: 2rem 0;
   }
 }
 

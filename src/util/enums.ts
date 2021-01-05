@@ -26,3 +26,16 @@ export enum NetworkNames {
   ROPSTEN = 'ropsten',
   MAINNET = 'mainnet',
 }
+
+export enum FormFieldErrors {
+  REQUIRED = 'This field is required.',
+  INVALID_ETHEREUM_ADDRESS = 'The ethereum address is invalid.',
+}
+
+export enum Web3TxStatus {
+  STANDBY = 'STANDBY',
+  AWAITING_CONFIRM = 'AWAITING_CONFIRM',
+  PENDING = 'PENDING',
+  FULFILLED = 'FULFILLED',
+  REJECTED = 'REJECTED',
+}
