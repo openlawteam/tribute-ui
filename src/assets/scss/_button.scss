@@ -1,19 +1,23 @@
 @use "./variables" as *; /* load without namespace for convenience */
 
-.button {
-  background-color: white;
+%button {
+  background-color: $color-background-primary;
   border-radius: 12px;
-  border: 1px solid #e3e3e3;
-  color: #070707;
-  font-family: $font-bebas;
+  border: 1px solid $color-border-primary;
+  color: $color-primary;
+  font-family: $font-accent;
   outline: none;
   padding: 0.5rem 1.25rem;
   text-transform: lowercase;
-  letter-spacing: 2px;
-  box-shadow: 0 2px 2px 0 rgba(101, 101, 101, 0.1);
+  letter-spacing: 1px;
+  box-shadow: 0 2px 2px 0 $color-shadow-primary;
   position: relative;
   box-sizing: border-box;
   font-size: 1.25rem;
   cursor: pointer;
   text-align: center;
+}
+
+.button {
+  @extend %button;
 }

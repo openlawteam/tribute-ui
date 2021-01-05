@@ -26,11 +26,11 @@
     96px
   ); /* min font-size 4rem, max 6rem */
 
-  color: #070707;
-  font-family: $font-bebas;
+  color: $color-primary;
+  font-family: $font-accent;
   font-size: 6em;
   font-weight: bold;
-  letter-spacing: 2px;
+  letter-spacing: 6px;
 
   &--small {
     @include fluid-type(

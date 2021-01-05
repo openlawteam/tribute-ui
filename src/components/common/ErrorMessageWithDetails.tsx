@@ -26,7 +26,7 @@ export default function ErrorMessageWithDetails(
             style={{cursor: 'pointer', outline: 'none'}}>
             <small>Details</small>
           </summary>
-          <p className="error-message font-mono">
+          <p className="error-message">
             <small>{error.message}</small>
           </p>
         </details>

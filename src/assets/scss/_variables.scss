@@ -3,7 +3,7 @@ $font-system-sans: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
   sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 $font-body: "Roboto", sans-serif;
 $font-header: "Roboto", sans-serif;
-$font-bebas: "Bebas Neue Pro", sans-serif;
+$font-accent: "Share Tech Mono", monospace;
 $font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
   "Courier New", monospace;
 $font-serif: "Times New Roman", Times, "Georgia", serif;
@@ -23,6 +23,7 @@ $color-deepsmoke: #212121;
 $color-fadedsky: #5da8d2;
 $color-hotpink: #e83adc;
 $color-keylargo: #31cde7;
+$color-lightgreen: #83e5a4;
 $color-lilac: #4952a5;
 $color-litesmoke: #939393;
 $color-offwhite: #fafafa;
@@ -30,6 +31,13 @@ $color-purple: #742f9e;
 $color-royal: #076ad2;
 $color-sunny: #f5f650;
 $color-wiltedlilac: #828092;
+
+$color-primary: #3c6b7e;
+$color-primary-hover: #2498bd;
+$color-background-page: #f8fafd;
+$color-background-primary: #ffffff;
+$color-border-primary: #c3d6dc;
+$color-shadow-primary: rgba(102, 136, 160, 0.1);
 
 $colors: (
   "babyblue": $color-babyblue,
@@ -42,6 +50,7 @@ $colors: (
   "fadedsky": $color-fadedsky,
   "hotpink": $color-hotpink,
   "keylargo": $color-keylargo,
+  "lightgreen": $color-lightgreen,
   "lilac": $color-lilac,
   "litesmoke": $color-litesmoke,
   "offwhite": $color-offwhite,

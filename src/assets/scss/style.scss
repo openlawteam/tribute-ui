@@ -1,15 +1,15 @@
 @use "./variables" as *; /* load without namespace for convenience */
 @use "./mixins";
-@use './fonts';
+@use "./fonts";
 @use "./functions" as *; /* load without namespace for convenience */
 
-@use './logo'; /* logo styles */
-@use './header'; /* header styles */
-@use './nav'; /* nav styles */
-@use './modal'; /* modal styles */
-@use './loader'; /* loader styles */
-@use './walletconnect'; /* wallet connect styles */
-@use './button'; /* button styles */
+@use "./logo"; /* logo styles */
+@use "./header"; /* header styles */
+@use "./nav"; /* nav styles */
+@use "./modal"; /* modal styles */
+@use "./loader"; /* loader styles */
+@use "./walletconnect"; /* wallet connect styles */
+@use "./button"; /* button styles */
 
 html {
   height: 100%;
@@ -18,20 +18,14 @@ html {
 
 html,
 body {
-  color: black;
-  background-color: #f8fafd;
+  color: $color-primary;
+  background-color: $color-background-page;
   font-weight: normal;
   font-family: $font-body;
 }
 
 body {
   margin: 0;
-}
-
-/* font */
-
-.font-mono {
-  font-family: $font-mono;
 }
 
 /* color */
@@ -62,7 +56,7 @@ p {
 }
 
 a {
-  color: black;
+  color: $color-primary;
 }
 
 /* react mount point */

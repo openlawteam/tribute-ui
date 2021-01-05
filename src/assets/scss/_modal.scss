@@ -30,9 +30,9 @@
   max-height: calc(
     100vh - 10rem
   ); /* dynamic height, minus any surrounding margin + padding */
-  background-color: white;
+  background-color: $color-background-primary;
   border-radius: 15px;
-  border: 2px solid #e2e4e6;
+  border: 2px solid $color-border-primary;
   padding: 2rem 1rem;
   overflow-y: scroll;
 
@@ -53,7 +53,6 @@
     26px
   ); /* min font-size 1.125rem, max 1.625rem */
   letter-spacing: 5px;
-  text-transform: uppercase;
   font-weight: bold;
 }
 
@@ -67,6 +66,6 @@
   position: absolute;
   right: 1rem;
   top: 0.5rem;
-  color: black;
+  color: $color-primary;
   cursor: pointer;
 }

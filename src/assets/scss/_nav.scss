@@ -31,16 +31,14 @@
     display: inline-flex;
 
     a {
-      font-size: 1.25rem;
-      font-family: $font-bebas;
+      font-size: 1.125rem;
       letter-spacing: 2px;
-      color: #070707;
       text-decoration: none;
       text-transform: lowercase;
 
       &.active,
       &:hover {
-        color: #2498bd;
+        color: $color-primary-hover;
       }
     }
 
@@ -69,7 +67,6 @@
 }
 
 .nav__hamburger {
-  color: black;
   display: inline-block;
   margin-right: 2rem;
   outline: none;
@@ -77,7 +74,7 @@
 
   &:hover {
     cursor: pointer;
-    opacity: 0.7;
+    color: $color-primary-hover;
   }
 }
 
@@ -103,7 +100,7 @@
 }
 
 .nav-modal {
-  background-color: #f8fafd;
+  background-color: $color-background-page;
   height: 100%;
   position: fixed;
   top: 0;
@@ -117,14 +114,14 @@
     margin: 2rem 0 0 3rem;
 
     a {
-      font-size: 1.25rem;
-      color: #070707;
+      font-size: 1.125rem;
+      letter-spacing: 2px;
       text-decoration: none;
       text-transform: uppercase;
 
       &.active,
       &:hover {
-        color: #2498bd;
+        color: $color-primary-hover;
       }
     }
 
@@ -142,7 +139,7 @@
   -webkit-appearance: none;
   background: transparent;
   border: none;
-  color: black;
+  color: $color-primary;
   cursor: pointer;
 }
 
@@ -155,7 +152,7 @@
   justify-content: center;
 
   & > button {
-    width: 12rem;
+    width: 13rem;
     margin: 0 auto 1rem;
   }
 }
