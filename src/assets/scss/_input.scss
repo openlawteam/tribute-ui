@@ -26,18 +26,6 @@ textarea::placeholder {
   opacity: 0.7;
 }
 
-input[type="text"],
-input[type="number"],
-textarea {
-  // transition: border 0.25s ease;
-
-  // &:focus {
-  //   border-color: $color-babyblue;
-  //   box-shadow: 0 0 0 1px $color-babyblue inset;
-  //   transition: box-shadow 0.25s ease;
-  // }
-}
-
 /* change autocomplete styles */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
