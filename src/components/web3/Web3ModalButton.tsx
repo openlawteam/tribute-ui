@@ -28,9 +28,17 @@ function ConnectWallet({
   customWalletText,
   showWalletETHBadge,
 }: ConnectWalletProps): JSX.Element {
+  /**
+   * Selectors
+   */
+
   const chainId = useSelector(
     (s: StoreState) => s.blockchain && s.blockchain.defaultChain
   );
+
+  /**
+   * Hooks
+   */
 
   const {
     account,
@@ -43,10 +51,24 @@ function ConnectWallet({
   } = useWeb3Modal();
 
   const {defaultChain, defaultChainError, isDefaultChain} = useIsDefaultChain();
+
+  /**
+   * State
+   */
+
   const [openModal, setOpenModal] = useState<boolean>(false);
 
+  /**
+   * Variables
+   */
+
   const isWrongNetwork: boolean = networkId !== defaultChain ?? isDefaultChain;
+  const isChainGanache = chainId === CHAINS.GANACHE;
   const displayWalletText: string | undefined = getWalletText();
+
+  /**
+   * Functions
+   */
 
   function getWalletText(): string {
     if (isMobile) {
@@ -88,9 +110,7 @@ function ConnectWallet({
             }`}
           onClick={async () => await onConnectTo(provider[0])}
           // disable WalletConnect button on Ganache network
-          disabled={
-            chainId === CHAINS.GANACHE && provider[0] === 'walletconnect'
-          }>
+          disabled={isChainGanache && provider[0] === 'walletconnect'}>
           <span className="wallet-name">{provider[1].display.name}</span>
 
           <ProviderSVG providerName={provider[0]} />
@@ -127,7 +147,7 @@ function ConnectWallet({
             <button
               className="walletconnect__connected-address-button"
               onClick={handleNavigate}
-              disabled={chainId === CHAINS.GANACHE}>
+              disabled={isChainGanache}>
               {isMobile ? truncateEthAddress(account) : account}
             </button>
           )}

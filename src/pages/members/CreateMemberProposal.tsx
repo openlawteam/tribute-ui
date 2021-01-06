@@ -121,7 +121,7 @@ export default function CreateMemberProposal() {
 
   const createMemberError = submitError || txError;
   const isConnected = connected && account;
-  const isChainGanache = chainId !== CHAINS.GANACHE;
+  const isChainGanache = chainId === CHAINS.GANACHE;
 
   /**
    * @note From the docs: "Read the formState before render to subscribe the form state through Proxy"
@@ -258,7 +258,7 @@ export default function CreateMemberProposal() {
                 return <FadeIn key={message}>{message}</FadeIn>;
               }}
             />
-            {isChainGanache && (
+            {!isChainGanache && (
               <small>
                 <a
                   href={txEtherscanURL}
@@ -274,7 +274,7 @@ export default function CreateMemberProposal() {
         return (
           <>
             <div>Proposal submitted!</div>
-            {isChainGanache && (
+            {!isChainGanache && (
               <small>
                 <a
                   href={txEtherscanURL}
