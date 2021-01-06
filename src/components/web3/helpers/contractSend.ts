@@ -1,66 +1,57 @@
-import {Web3TxStatus} from '../../../util/enums';
-
-export type ContractSendType = {
-  txHash?: string;
-  txStatus: string;
-  receipt?: Record<string, any>;
-  error?: Error;
-};
+import {Contract, SendOptions} from 'web3-eth-contract/types';
+import {TransactionReceipt} from 'web3-core/types';
 
 /**
  * contractSend
  *
  * Returns the resolved transaction receipt or error
  *
- * @param {any} contractInstance
- * @param {any} methodArguments
  * @param {string} methodName
+ * @param {Record<string, any>} contractInstanceMethods An object of the methods for the Web3 contract instance.
+ * @param {any[]} methodArguments An array of any arguments for the contract's method.
  * @param {Record<string, any>} txArguments
- * @param {(txHash: string) => void} callback
- * @returns {Promise<ContractSendType>} Resolved transaction receipt or error
+ * @param {(txHash: string) => void} onProcess Callback which runs after a txHash has been received,
+ *   but before the transaction is complete.
+ * @returns {Promise<TransactionReceipt>} Resolved or rejected transaction.
  */
 export async function contractSend(
   methodName: string,
-  contractInstance: any,
-  methodArguments: any, // args passed as an array
-  txArguments: Record<string, any>,
-  callback: (txHash: string) => void // callback; return txHash
-): Promise<ContractSendType> {
-  return new Promise<ContractSendType>((resolve, reject) => {
-    // estimate gas limit for transaction
-    contractInstance[methodName](...methodArguments)
-      .estimateGas({from: txArguments.from})
-      .then((gas: number) => {
-        contractInstance[methodName](...methodArguments)
-          .send({
-            ...txArguments,
-            gas,
-          })
-          .on('transactionHash', function (txHash: string) {
-            // return transaction hash
-            callback(txHash);
-          })
-          .on('receipt', function (receipt: Record<string, any>) {
-            // return transaction receipt; contains event returnValues
-            resolve({
-              receipt,
-              txStatus: Web3TxStatus.FULFILLED,
-            } as ContractSendType);
-          })
-          .on('error', (error: Error) => {
-            // return transaction error
-            reject({
-              error,
-              txStatus: Web3TxStatus.REJECTED,
-            } as ContractSendType);
-          });
-      })
-      .catch((error: Error) => {
-        // return estimateGas error
-        reject({
-          error,
-          txStatus: Web3TxStatus.REJECTED,
-        } as ContractSendType);
+  contractInstanceMethods: typeof Contract.prototype.methods,
+  methodArguments: any[],
+  txArguments: SendOptions,
+  onProcess: (txHash: string) => void
+): Promise<TransactionReceipt> {
+  // Promisify so we can both `reject()` inside .on('error') and from transactions.
+  return new Promise<TransactionReceipt>(async (resolve, reject) => {
+    try {
+      const method = contractInstanceMethods[methodName];
+
+      // estimate gas limit for transaction
+      const gas = await method(...methodArguments).estimateGas({
+        from: txArguments.from,
+        value: txArguments.value,
       });
+
+      await method(...methodArguments)
+        .send({
+          ...txArguments,
+          gas,
+        })
+        .on('transactionHash', function (txHash: string) {
+          // Call onProcess with transaction hash
+          onProcess(txHash);
+        })
+        .on('receipt', function (receipt: TransactionReceipt) {
+          // resolve on transaction receipt; contains event returnValues
+          resolve(receipt);
+        })
+        .on('error', (error: Error) => {
+          // reject on transaction error
+          reject(error);
+        });
+    } catch (error) {
+      // reject on estimate gas or transaction error
+      reject(error);
+    }
   });
 }
