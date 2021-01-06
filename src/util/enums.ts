@@ -1,9 +1,13 @@
-export enum Web3State {
-  Connected = 'Wallet connected',
-  Error = 'Error connecting to wallet',
-  NoWallet = 'No wallet found',
-  Locked = 'Wallet disconnected',
-}
+/**
+ * FOR HIGH REUSE ENUMS
+ *
+ * For any other more specific enum types, co-locate them in either:
+ *
+ * 1) The actual code file.
+ * 2) In a type file in the location of the code files which mainly use the types.
+ *
+ * @see https://kentcdodds.com/blog/colocation
+ */
 
 /**
  * @see https://chainid.network/
@@ -31,12 +35,4 @@ export enum FormFieldErrors {
   REQUIRED = 'This field is required.',
   INVALID_ETHEREUM_ADDRESS = 'The ethereum address is invalid.',
   INVALID_NUMBER = 'The value is not a number.',
-}
-
-export enum Web3TxStatus {
-  STANDBY = 'STANDBY',
-  AWAITING_CONFIRM = 'AWAITING_CONFIRM',
-  PENDING = 'PENDING',
-  FULFILLED = 'FULFILLED',
-  REJECTED = 'REJECTED',
 }

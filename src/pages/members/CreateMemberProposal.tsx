@@ -1,33 +1,30 @@
 import React, {useState, useCallback, useEffect} from 'react';
 import {useSelector} from 'react-redux';
 import {useForm} from 'react-hook-form';
-import {useHistory} from 'react-router-dom';
+// import {useHistory} from 'react-router-dom';
 import Web3 from 'web3';
 
-import {FormFieldErrors, Web3TxStatus} from '../../util/enums';
-import {isEthAddressValid} from '../../util/validation';
 import {
   getValidationError,
   stripFormatNumber,
   formatNumber,
-  dontCloseWindowWarning,
   formatDecimal,
 } from '../../util/helpers';
-import {
-  StoreState,
-  MetaMaskRPCError,
-  SmartContractItem,
-} from '../../util/types';
-import {contractSend} from '../../components/web3/helpers';
-import {ETHERSCAN_URLS, CHAINS} from '../../util/config';
+import {CHAINS} from '../../util/config';
+import {FormFieldErrors} from '../../util/enums';
+import {isEthAddressValid} from '../../util/validation';
+import {SHARES_ADDRESS} from '../../components/web3/config';
+import {StoreState, MetaMaskRPCError} from '../../util/types';
+import {useContractSend} from '../../components/web3/hooks/useContractSend';
 import {useETHGasPrice, useIsDefaultChain} from '../../hooks';
 import {useWeb3Modal} from '../../components/web3/Web3ModalManager';
-import Wrap from '../../components/common/Wrap';
+import {Web3TxStatus} from '../../components/web3/types';
+import CycleMessage from '../../components/feedback/CycleMessage';
+import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
-import CycleMessage from '../../components/feedback/CycleMessage';
-import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
+import Wrap from '../../components/common/Wrap';
 
 enum Fields {
   ethAddress = 'ethAddress',
@@ -80,6 +77,14 @@ export default function CreateMemberProposal() {
   const {isDefaultChain, defaultChainError} = useIsDefaultChain();
   const {connected, account} = useWeb3Modal();
   const gasPrices = useETHGasPrice();
+  const {
+    txError,
+    txEtherscanURL,
+    txIsPromptOpen,
+    // txReceipt,
+    txSend,
+    txStatus,
+  } = useContractSend();
 
   /**
    * External hooks
@@ -89,18 +94,13 @@ export default function CreateMemberProposal() {
     mode: 'onBlur',
     reValidateMode: 'onChange',
   });
-  const history = useHistory();
+  // const history = useHistory();
 
   /**
    * State
    */
 
-  const [submitStatus, setSubmitStatus] = useState<Web3TxStatus>(
-    Web3TxStatus.STANDBY
-  );
   const [submitError, setSubmitError] = useState<Error>();
-  const [isPromptOpen, setIsPromptOpen] = useState<boolean>(false);
-  const [etherscanURL, setEtherscanURL] = useState<string>('');
   const [
     userAccountBalance,
     setUserAccountBalance,
@@ -119,7 +119,9 @@ export default function CreateMemberProposal() {
     triggerValidation,
   } = form;
 
+  const createMemberError = submitError || txError;
   const isConnected = connected && account;
+  const isChainGanache = chainId !== CHAINS.GANACHE;
 
   /**
    * @note From the docs: "Read the formState before render to subscribe the form state through Proxy"
@@ -128,10 +130,10 @@ export default function CreateMemberProposal() {
   const {isValid} = formState;
 
   const isInProcessOrDone =
-    submitStatus === Web3TxStatus.AWAITING_CONFIRM ||
-    submitStatus === Web3TxStatus.PENDING ||
-    submitStatus === Web3TxStatus.FULFILLED ||
-    isPromptOpen;
+    txStatus === Web3TxStatus.AWAITING_CONFIRM ||
+    txStatus === Web3TxStatus.PENDING ||
+    txStatus === Web3TxStatus.FULFILLED ||
+    txIsPromptOpen;
 
   /**
    * Cached callbacks
@@ -168,15 +170,12 @@ export default function CreateMemberProposal() {
         eth: web3Instance.utils.fromWei(accountBalanceInWei),
       });
     } catch (error) {
-      console.error(error);
-
       setUserAccountBalance(undefined);
     }
   }
 
   // TODO: Need to hook this to smart contract and snapshot.
-  function handleSubmit(values: FormInputs) {
-    console.log('submitted');
+  async function handleSubmit(values: FormInputs) {
     try {
       if (!isConnected) {
         throw new Error(
@@ -188,118 +187,58 @@ export default function CreateMemberProposal() {
         throw new Error(defaultChainError);
       }
 
-      // smart contract call to submit proposal
-      setSubmitStatus(Web3TxStatus.AWAITING_CONFIRM);
-      // activate "don't close window" warning
-      const unsubscribeDontCloseWindow = dontCloseWindowWarning();
+      if (!OnboardingContract) {
+        throw new Error('No OnboardingContract');
+      }
 
-      const handleProcessingTx = (txHash: string) => {
-        if (!txHash) return;
+      if (!DaoRegistryContract) {
+        throw new Error('No DaoRegistryContract');
+      }
 
-        setIsPromptOpen(false);
-        setSubmitStatus(Web3TxStatus.PENDING);
-        if (chainId !== CHAINS.GANACHE) {
-          setEtherscanURL(`${ETHERSCAN_URLS[chainId]}/tx/${txHash}`);
-        }
+      const {ethAddress, ethAmount} = values;
+      const ethAmountInWei = Web3.utils.toWei(
+        stripFormatNumber(ethAmount),
+        'ether'
+      );
+
+      const onboardArguments: OnboardArguments = [
+        DaoRegistryContract.contractAddress,
+        ethAddress,
+        // @note Eventually remove and get from shared tribute/laoland lib's
+        SHARES_ADDRESS,
+        ethAmountInWei,
+      ];
+
+      const txArguments = {
+        from: account || '',
+        value: ethAmountInWei,
+        // Set a fast gas price
+        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      try {
-        if (!OnboardingContract) {
-          throw new Error('No OnboardingContract');
-        }
+      // Execute contract call for `onboard`
+      /* const receipt =  */ await txSend(
+        'onboard',
+        OnboardingContract.instance.methods,
+        onboardArguments,
+        txArguments,
+        // We don't need to do anything in this scope.
+        () => {}
+      );
 
-        if (!DaoRegistryContract) {
-          throw new Error('No DaoRegistryContract');
-        }
+      // @todo Figure out what's needed after transaction is successful
+      // to go to newly created member proposal details page.
 
-        setSubmitError(undefined);
-        setEtherscanURL('');
-        setIsPromptOpen(true);
-
-        const {ethAddress, ethAmount} = values;
-        const ethAmountInWei = Web3.utils.toWei(
-          stripFormatNumber(ethAmount),
-          'ether'
-        );
-        const onboardArguments: OnboardArguments = [
-          (DaoRegistryContract as SmartContractItem).contractAddress,
-          ethAddress,
-          '0x0000000000000000000000000000000000000000', // ETH onboarding
-          ethAmountInWei,
-        ];
-        const txArguments = {
-          from: account,
-          to: OnboardingContract.contractAddress,
-          value: ethAmountInWei,
-          // Set a fast gas price
-          ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
-        };
-
-        /**
-         * OnboardingContract
-         *
-         * Execute contract call for `onboard`
-         */
-        contractSend(
-          'onboard',
-          OnboardingContract.instance.methods,
-          onboardArguments,
-          txArguments,
-          handleProcessingTx
-        )
-          .then(({txStatus, receipt, error}) => {
-            if (txStatus === Web3TxStatus.FULFILLED) {
-              if (!receipt) return;
-
-              // Tx `receipt` resolved; tx went through.
-              setSubmitStatus(Web3TxStatus.FULFILLED);
-
-              // TODO: Figure out what's needed after transaction is successful
-              // to go to newly created member proposal details page.
-
-              // go to MemberDetails page for newly created member proposal
-              // setTimeout(() => history.push(`/members/${proposalId}`), 2000);
-            }
-
-            if (txStatus === Web3TxStatus.REJECTED) {
-              if (!error) return;
-              setSubmitError(error);
-              setSubmitStatus(Web3TxStatus.REJECTED);
-
-              // If user closed modal (MetaMask error code 4001)
-              // or via WalletConnect, which only provides a message and no code
-              setIsPromptOpen(false);
-
-              unsubscribeDontCloseWindow();
-            }
-          })
-          .catch(({error}) => {
-            setSubmitError(error);
-            setSubmitStatus(Web3TxStatus.REJECTED);
-
-            // If user closed modal (MetaMask error code 4001)
-            // or via WalletConnect, which only provides a message and no code
-            setIsPromptOpen(false);
-
-            unsubscribeDontCloseWindow();
-          });
-
-        unsubscribeDontCloseWindow();
-      } catch (error) {
-        setIsPromptOpen(false);
-        setSubmitError(error);
-        setSubmitStatus(Web3TxStatus.REJECTED);
-
-        unsubscribeDontCloseWindow();
-      }
+      // go to MemberDetails page for newly created member proposal
+      // history.push(`/members/${proposalId}`);
     } catch (error) {
+      // Set any errors from Web3 utils or explicitly set above.
       setSubmitError(error);
-      setSubmitStatus(Web3TxStatus.REJECTED);
     }
   }
 
   function renderSubmitStatus() {
-    switch (submitStatus) {
+    switch (txStatus) {
       case Web3TxStatus.AWAITING_CONFIRM:
         return 'Awaiting your confirmation\u2026';
       case Web3TxStatus.PENDING:
@@ -319,10 +258,10 @@ export default function CreateMemberProposal() {
                 return <FadeIn key={message}>{message}</FadeIn>;
               }}
             />
-            {chainId !== CHAINS.GANACHE && (
+            {isChainGanache && (
               <small>
                 <a
-                  href={etherscanURL}
+                  href={txEtherscanURL}
                   rel="noopener noreferrer"
                   target="_blank">
                   view progress
@@ -335,10 +274,10 @@ export default function CreateMemberProposal() {
         return (
           <>
             <div>Proposal submitted!</div>
-            {chainId !== CHAINS.GANACHE && (
+            {isChainGanache && (
               <small>
                 <a
-                  href={etherscanURL}
+                  href={txEtherscanURL}
                   rel="noopener noreferrer"
                   target="_blank">
                   view transaction
@@ -480,10 +419,10 @@ export default function CreateMemberProposal() {
             handleSubmit(getValues());
           }}
           type="submit">
-          {submitStatus === Web3TxStatus.PENDING ||
-          submitStatus === Web3TxStatus.AWAITING_CONFIRM ? (
+          {txStatus === Web3TxStatus.PENDING ||
+          txStatus === Web3TxStatus.AWAITING_CONFIRM ? (
             <Loader />
-          ) : submitStatus === Web3TxStatus.FULFILLED ? (
+          ) : txStatus === Web3TxStatus.FULFILLED ? (
             'Done'
           ) : (
             'Submit'
@@ -496,14 +435,15 @@ export default function CreateMemberProposal() {
         </div>
 
         {/* SUBMIT ERROR */}
-        {submitError && (submitError as MetaMaskRPCError).code !== 4001 && (
-          <div className="form__submit-error-container">
-            <ErrorMessageWithDetails
-              renderText="Something went wrong while submitting the proposal."
-              error={submitError}
-            />
-          </div>
-        )}
+        {createMemberError &&
+          (createMemberError as MetaMaskRPCError).code !== 4001 && (
+            <div className="form__submit-error-container">
+              <ErrorMessageWithDetails
+                renderText="Something went wrong while submitting the proposal."
+                error={createMemberError}
+              />
+            </div>
+          )}
       </form>
     </RenderWrapper>
   );

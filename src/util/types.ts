@@ -1,10 +1,8 @@
 import Web3 from 'web3/types';
-import {AbiItem} from 'web3-utils/types';
-import {Contract as Web3Contract} from 'web3-eth-contract/types';
 import {ThunkDispatch} from 'redux-thunk';
 import {Action} from 'redux';
 
-import {Web3State} from './enums';
+import {SmartContracts, Web3State} from '../components/web3/types';
 
 /**
  * FOR HIGH REUSE TYPES
@@ -18,19 +16,6 @@ import {Web3State} from './enums';
  */
 
 export type EnvironmentName = 'localhost' | 'development' | 'production';
-
-export type SmartContractItem = {
-  instance: Web3Contract;
-  abi: AbiItem[];
-  contractAddress: string;
-};
-
-export type SmartContracts = {
-  DaoRegistryContract: SmartContractItem;
-  FinancingContract: SmartContractItem;
-  OffchainVotingContract: SmartContractItem;
-  OnboardingContract: SmartContractItem;
-};
 
 export interface BlockchainState {
   connectedAddress?: string;
