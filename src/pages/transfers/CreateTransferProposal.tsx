@@ -24,7 +24,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
     <Wrap className="section-wrapper">
       <FadeIn>
         <div className="titlebar">
-          <h2 className="titlebar__title">Transfer</h2>
+          <h2 className="titlebar__title">Transfer Proposal</h2>
         </div>
 
         {/* RENDER CHILDREN */}

@@ -15,12 +15,14 @@ export type SmartContractItem = {
 };
 
 export type SmartContracts = {
-  NFTFactory: SmartContractItem;
-  NFT: SmartContractItem;
+  DaoRegistryContract: SmartContractItem;
+  FinancingContract: SmartContractItem;
+  OffchainVotingContract: SmartContractItem;
+  OnboardingContract: SmartContractItem;
 };
 
 export interface BlockchainState {
-  connectedAddress?: string | null;
+  connectedAddress?: string;
   contracts?: SmartContracts;
   defaultChain: number;
   walletAuthenticated: boolean;
@@ -31,6 +33,13 @@ export interface BlockchainState {
 
 export type StoreState = {
   blockchain: BlockchainState;
+};
+
+export type ContractSendType = {
+  txHash?: string;
+  txStatus: string;
+  receipt?: Record<string, any>;
+  error?: Error;
 };
 
 // HELPERS

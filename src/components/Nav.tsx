@@ -84,22 +84,22 @@ export default function Nav() {
                 <nav role="navigation" id="navigation">
                   <ul className="nav__list">
                     <li tabIndex={0}>
-                      <NavLink exact to="/members">
+                      <NavLink to="/members">
                         <span>Members</span>
                       </NavLink>
                     </li>
                     <li tabIndex={0}>
-                      <NavLink exact to="/governance-proposals">
+                      <NavLink to="/governance-proposals">
                         <span>Governance</span>
                       </NavLink>
                     </li>
                     <li tabIndex={0}>
-                      <NavLink exact to="/transfers">
+                      <NavLink to="/transfers">
                         <span>Transfer</span>
                       </NavLink>
                     </li>
                     <li tabIndex={0}>
-                      <NavLink exact to="/tributes">
+                      <NavLink to="/tributes">
                         <span>Tribute</span>
                       </NavLink>
                     </li>
@@ -174,7 +174,7 @@ export default function Nav() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink exact to="/members">
+                    <NavLink to="/members">
                       <span>Members</span>
                     </NavLink>
                   </li>
@@ -182,7 +182,7 @@ export default function Nav() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink exact to="/governance-proposals">
+                    <NavLink to="/governance-proposals">
                       <span>Governance</span>
                     </NavLink>
                   </li>
@@ -190,7 +190,7 @@ export default function Nav() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink exact to="/transfers">
+                    <NavLink to="/transfers">
                       <span>Transfer</span>
                     </NavLink>
                   </li>
@@ -198,7 +198,7 @@ export default function Nav() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink exact to="/tributes">
+                    <NavLink to="/tributes">
                       <span>Tribute</span>
                     </NavLink>
                   </li>

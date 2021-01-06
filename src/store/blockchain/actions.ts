@@ -30,7 +30,7 @@ export function initContractDaoRegistry(web3Instance: Web3) {
         dispatch({
           type: BLOCKCHAIN_CONTRACTS,
           contracts: {
-            DaoRegistry: {
+            DaoRegistryContract: {
               abi: daoRegistryContract.abi,
               contractAddress,
               instance,
