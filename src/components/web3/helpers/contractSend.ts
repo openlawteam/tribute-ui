@@ -1,5 +1,11 @@
-import {ContractSendType} from '../types';
-import {Web3TxStatus} from '../enums';
+import {Web3TxStatus} from '../../../util/enums';
+
+export type ContractSendType = {
+  txHash?: string;
+  txStatus: string;
+  receipt?: Record<string, any>;
+  error?: Error;
+};
 
 /**
  * contractSend

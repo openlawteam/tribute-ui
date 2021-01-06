@@ -6,6 +6,17 @@ import {Action} from 'redux';
 
 import {Web3State} from './enums';
 
+/**
+ * FOR HIGH REUSE TYPES
+ *
+ * For any other more specific types, co-locate them in either:
+ *
+ * 1) The actual code file.
+ * 2) In a type file in the location of the code files which mainly use the types.
+ *
+ * @see https://kentcdodds.com/blog/colocation
+ */
+
 export type EnvironmentName = 'localhost' | 'development' | 'production';
 
 export type SmartContractItem = {
@@ -33,13 +44,6 @@ export interface BlockchainState {
 
 export type StoreState = {
   blockchain: BlockchainState;
-};
-
-export type ContractSendType = {
-  txHash?: string;
-  txStatus: string;
-  receipt?: Record<string, any>;
-  error?: Error;
 };
 
 // HELPERS

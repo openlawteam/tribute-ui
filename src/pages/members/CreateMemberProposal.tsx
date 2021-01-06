@@ -10,7 +10,6 @@ import {
   getValidationError,
   stripFormatNumber,
   formatNumber,
-  contractSend,
   dontCloseWindowWarning,
   formatDecimal,
 } from '../../util/helpers';
@@ -19,6 +18,7 @@ import {
   MetaMaskRPCError,
   SmartContractItem,
 } from '../../util/types';
+import {contractSend} from '../../components/web3/helpers';
 import {ETHERSCAN_URLS, CHAINS} from '../../util/config';
 import {useETHGasPrice, useIsDefaultChain} from '../../hooks';
 import {useWeb3Modal} from '../../components/web3/Web3ModalManager';
