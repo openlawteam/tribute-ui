@@ -65,6 +65,10 @@
   padding: 0.5rem;
   cursor: pointer;
   outline: none;
+
+  &:disabled {
+    cursor: initial;
+  }
 }
 
 .walletconnect__disconnect-link-button {

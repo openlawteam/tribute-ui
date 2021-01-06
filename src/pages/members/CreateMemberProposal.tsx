@@ -19,7 +19,7 @@ import {
   MetaMaskRPCError,
   SmartContractItem,
 } from '../../util/types';
-import {ETHERSCAN_URLS} from '../../util/config';
+import {ETHERSCAN_URLS, CHAINS} from '../../util/config';
 import {useETHGasPrice, useIsDefaultChain} from '../../hooks';
 import {useWeb3Modal} from '../../components/web3/Web3ModalManager';
 import Wrap from '../../components/common/Wrap';
@@ -198,7 +198,9 @@ export default function CreateMemberProposal() {
 
         setIsPromptOpen(false);
         setSubmitStatus(Web3TxStatus.PENDING);
-        setEtherscanURL(`${ETHERSCAN_URLS[chainId]}/tx/${txHash}`);
+        if (chainId !== CHAINS.GANACHE) {
+          setEtherscanURL(`${ETHERSCAN_URLS[chainId]}/tx/${txHash}`);
+        }
       };
 
       try {
@@ -317,22 +319,32 @@ export default function CreateMemberProposal() {
                 return <FadeIn key={message}>{message}</FadeIn>;
               }}
             />
-            <small>
-              <a href={etherscanURL} rel="noopener noreferrer" target="_blank">
-                view progress
-              </a>
-            </small>
+            {chainId !== CHAINS.GANACHE && (
+              <small>
+                <a
+                  href={etherscanURL}
+                  rel="noopener noreferrer"
+                  target="_blank">
+                  view progress
+                </a>
+              </small>
+            )}
           </>
         );
       case Web3TxStatus.FULFILLED:
         return (
           <>
             <div>Proposal submitted!</div>
-            <small>
-              <a href={etherscanURL} rel="noopener noreferrer" target="_blank">
-                view transaction
-              </a>
-            </small>
+            {chainId !== CHAINS.GANACHE && (
+              <small>
+                <a
+                  href={etherscanURL}
+                  rel="noopener noreferrer"
+                  target="_blank">
+                  view transaction
+                </a>
+              </small>
+            )}
           </>
         );
       default:

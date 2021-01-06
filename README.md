@@ -7,7 +7,11 @@ When running locally you'll need a `.env` file in the root directory with the fo
 ```
 REACT_APP_ENVIRONMENT=localhost
 REACT_APP_INFURA_PROJECT_ID_LOCAL=...
+REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS=...
 ```
+
+`REACT_APP_INFURA_PROJECT_ID_LOCAL` can be the same value you use for LAO local development.
+`REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS` is the address of the `DaoRegistry` smart contract deployed to your Ganache private network.
 
 ---
 

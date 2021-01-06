@@ -7,10 +7,10 @@ import {
 } from '../actions';
 
 import {BlockchainState} from '../../util/types';
-import {CHAINS, ENVIRONMENT} from '../../util/config';
+import {DEFAULT_CHAIN} from '../../util/config';
 
 const initialState = {
-  defaultChain: ENVIRONMENT === 'production' ? CHAINS.MAINNET : CHAINS.RINKEBY,
+  defaultChain: DEFAULT_CHAIN,
   walletAuthenticated: false,
 };
 

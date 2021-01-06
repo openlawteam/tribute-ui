@@ -1,13 +1,15 @@
 import React, {useState} from 'react';
+import {useSelector} from 'react-redux';
 import {isMobile} from 'react-device-detect';
 
+import {formatEthereumAddress} from '../../util/helpers';
+import {ETHERSCAN_URLS, CHAINS} from '../../util/config';
+import {StoreState} from '../../util/types';
+import {useIsDefaultChain} from '../../hooks';
+import {useWeb3Modal} from './Web3ModalManager';
 import Modal from '../common/Modal';
 import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
 import {svgWalletIcon} from './WalletIcons';
-import {formatEthereumAddress} from '../../util/helpers';
-import {ETHERSCAN_URLS} from '../../util/config';
-import {useIsDefaultChain} from '../../hooks';
-import {useWeb3Modal} from './Web3ModalManager';
 
 import TimesSVG from '../../assets/svg/TimesSVG';
 
@@ -26,6 +28,10 @@ function ConnectWallet({
   customWalletText,
   showWalletETHBadge,
 }: ConnectWalletProps): JSX.Element {
+  const chainId = useSelector(
+    (s: StoreState) => s.blockchain && s.blockchain.defaultChain
+  );
+
   const {
     account,
     connected,
@@ -116,7 +122,8 @@ function ConnectWallet({
           {account && (
             <button
               className="walletconnect__connected-address-button"
-              onClick={handleNavigate}>
+              onClick={handleNavigate}
+              disabled={chainId === CHAINS.GANACHE}>
               {isMobile ? formatEthereumAddress(account) : account}
             </button>
           )}
