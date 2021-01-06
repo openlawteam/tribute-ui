@@ -86,7 +86,11 @@ function ConnectWallet({
                 ? 'walletconnect__options-button--connected'
                 : ''
             }`}
-          onClick={async () => await onConnectTo(provider[0])}>
+          onClick={async () => await onConnectTo(provider[0])}
+          // disable WalletConnect button on Ganache network
+          disabled={
+            chainId === CHAINS.GANACHE && provider[0] === 'walletconnect'
+          }>
           <span className="wallet-name">{provider[1].display.name}</span>
 
           <ProviderSVG providerName={provider[0]} />
