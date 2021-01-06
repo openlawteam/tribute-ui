@@ -10,7 +10,7 @@ export default function CreateGovernanceProposal() {
 
   return (
     <RenderWrapper>
-      <div>CreateGovernanceProposal TODO</div>
+      <div>CreateGovernanceProposal @todo</div>
     </RenderWrapper>
   );
 }

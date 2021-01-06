@@ -11,7 +11,7 @@ export default function Transfers() {
 
   return (
     <RenderWrapper>
-      <div>Transfers TODO</div>
+      <div>Transfers @todo</div>
     </RenderWrapper>
   );
 }

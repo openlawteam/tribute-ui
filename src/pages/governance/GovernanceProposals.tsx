@@ -11,7 +11,7 @@ export default function GovernanceProposals() {
 
   return (
     <RenderWrapper>
-      <div>GovernanceProposals TODO</div>
+      <div>GovernanceProposals @todo</div>
     </RenderWrapper>
   );
 }

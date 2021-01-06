@@ -11,7 +11,7 @@ export default function TransferDetails() {
 
   return (
     <RenderWrapper>
-      <div>TransferDetails TODO</div>
+      <div>TransferDetails @todo</div>
     </RenderWrapper>
   );
 }

@@ -121,7 +121,7 @@ export default function CreateMemberProposal() {
 
   const createMemberError = submitError || txError;
   const isConnected = connected && account;
-  const isChainGanache = chainId !== CHAINS.GANACHE;
+  const isChainGanache = chainId === CHAINS.GANACHE;
 
   /**
    * @note From the docs: "Read the formState before render to subscribe the form state through Proxy"
@@ -174,7 +174,7 @@ export default function CreateMemberProposal() {
     }
   }
 
-  // TODO: Need to hook this to smart contract and snapshot.
+  // @todo Need to hook this to smart contract and snapshot.
   async function handleSubmit(values: FormInputs) {
     try {
       if (!isConnected) {
@@ -258,7 +258,7 @@ export default function CreateMemberProposal() {
                 return <FadeIn key={message}>{message}</FadeIn>;
               }}
             />
-            {isChainGanache && (
+            {!isChainGanache && (
               <small>
                 <a
                   href={txEtherscanURL}
@@ -274,7 +274,7 @@ export default function CreateMemberProposal() {
         return (
           <>
             <div>Proposal submitted!</div>
-            {isChainGanache && (
+            {!isChainGanache && (
               <small>
                 <a
                   href={txEtherscanURL}
@@ -317,7 +317,7 @@ export default function CreateMemberProposal() {
     );
   }
 
-  // TODO: Consider adding check to see if user ethereum address is either
+  // @todo Consider adding check to see if user ethereum address is either
   // already a member or has a pending member proposal.
 
   return (
