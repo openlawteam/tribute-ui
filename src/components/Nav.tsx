@@ -159,7 +159,7 @@ export default function Nav() {
 
                 <div className="nav-modal__walletconnect-button-container">
                   <Web3ModalButton showWalletETHBadge />
-                  {/* TODO: display Join button only if user is not a member */}
+                  {/* @todo Display Join button only if user is not a member */}
                   <button
                     className="button"
                     onClick={() => {
@@ -206,7 +206,7 @@ export default function Nav() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    {/* TODO: add docs link when it's ready */}
+                    {/* @todo Add docs link when it's ready */}
                     {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                     <a href="#" rel="noopener noreferrer" target="_blank">
                       <span>Help</span>

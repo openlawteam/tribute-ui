@@ -11,7 +11,7 @@ export default function MemberDetails() {
 
   return (
     <RenderWrapper>
-      <div>MemberDetails TODO</div>
+      <div>MemberDetails @todo</div>
     </RenderWrapper>
   );
 }

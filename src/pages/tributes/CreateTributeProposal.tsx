@@ -10,7 +10,7 @@ export default function CreateTributeProposal() {
 
   return (
     <RenderWrapper>
-      <div>CreateTributeProposal TODO</div>
+      <div>CreateTributeProposal @todo</div>
     </RenderWrapper>
   );
 }

@@ -174,7 +174,7 @@ export default function CreateMemberProposal() {
     }
   }
 
-  // TODO: Need to hook this to smart contract and snapshot.
+  // @todo Need to hook this to smart contract and snapshot.
   async function handleSubmit(values: FormInputs) {
     try {
       if (!isConnected) {
@@ -317,7 +317,7 @@ export default function CreateMemberProposal() {
     );
   }
 
-  // TODO: Consider adding check to see if user ethereum address is either
+  // @todo Consider adding check to see if user ethereum address is either
   // already a member or has a pending member proposal.
 
   return (

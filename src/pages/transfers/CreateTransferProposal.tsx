@@ -10,7 +10,7 @@ export default function CreateTransferProposal() {
 
   return (
     <RenderWrapper>
-      <div>CreateTransferProposal TODO</div>
+      <div>CreateTransferProposal @todo</div>
     </RenderWrapper>
   );
 }

@@ -11,7 +11,7 @@ export default function Tributes() {
 
   return (
     <RenderWrapper>
-      <div>Tributes TODO</div>
+      <div>Tributes @todo</div>
     </RenderWrapper>
   );
 }
