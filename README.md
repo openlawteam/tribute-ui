@@ -1,6 +1,8 @@
 # TRIBUTE dao
 
-## Local `.env` file
+## Developer Setup
+
+### Local `.env` File
 
 When running locally you'll need a `.env` file in the root directory with the following:
 
@@ -12,6 +14,12 @@ REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS=...
 
 `REACT_APP_INFURA_PROJECT_ID_LOCAL` can be the same value you use for LAO local development.
 `REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS` is the address of the `DaoRegistry` smart contract deployed to your Ganache private network.
+
+### Ganache Workspace Setup
+
+When you set up your Ganache network workspace in the [Ganache GUI app](https://www.trufflesuite.com/ganache), change the Network ID to `1337`. That is necessary in order to connect MetaMask to your Ganache network. The DApp is configured for Ganache to be `chainId` `1337`.
+
+**Remember**: After you deploy the `DaoRegistry` smart contract on your local Ganache network you must include the deployed contract's address in your local root `.env` file.
 
 ---
 
