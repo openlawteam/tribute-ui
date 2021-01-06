@@ -1,5 +1,4 @@
 export * from './chooseRandom';
-export * from './contractSend';
 export * from './disableReactDevTools';
 export * from './dontCloseWindowWarning';
 export * from './formatDecimal';
