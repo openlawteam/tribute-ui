@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {isMobile} from 'react-device-detect';
 
-import {formatEthereumAddress} from '../../util/helpers';
+import {truncateEthAddress} from '../../util/helpers';
 import {ETHERSCAN_URLS, CHAINS} from '../../util/config';
 import {StoreState} from '../../util/types';
 import {useIsDefaultChain} from '../../hooks';
@@ -51,13 +51,13 @@ function ConnectWallet({
   function getWalletText(): string {
     if (isMobile) {
       if (account) {
-        return formatEthereumAddress(account);
+        return truncateEthAddress(account);
       } else {
         return 'Connect';
       }
     } else {
       if (showWalletETHBadge && account) {
-        return formatEthereumAddress(account);
+        return truncateEthAddress(account);
       } else {
         return customWalletText || '';
       }
@@ -124,7 +124,7 @@ function ConnectWallet({
               className="walletconnect__connected-address-button"
               onClick={handleNavigate}
               disabled={chainId === CHAINS.GANACHE}>
-              {isMobile ? formatEthereumAddress(account) : account}
+              {isMobile ? truncateEthAddress(account) : account}
             </button>
           )}
 
