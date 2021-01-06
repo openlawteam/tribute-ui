@@ -40,7 +40,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
     <Wrap className="section-wrapper">
       <FadeIn>
         <div className="titlebar">
-          <h2 className="titlebar__title">Membership Proposal</h2>
+          <h2 className="titlebar__title">Members</h2>
           <button
             className="titlebar__action org-titlebar__action"
             onClick={viewAll}>

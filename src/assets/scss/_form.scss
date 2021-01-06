@@ -1,15 +1,10 @@
 @use "./variables" as *; /* load without namespace for convenience */
-@use "./mixins" as *; /* load without namespace for convenience */
 @use "./functions" as *; /* load without namespace for convenience */
 
 %row {
   display: flex;
-  justify-content: space-between;
-  margin: 2rem 0 2rem 0;
-
-  &:last-child {
-    margin-bottom: 1.5rem;
-  }
+  justify-content: flex-start;
+  margin: 2rem 0;
 
   @media only screen and (min-width: em($bp-md)) {
     align-items: baseline;
@@ -32,6 +27,13 @@
   p:first-child {
     margin-top: 0;
   }
+}
+
+.form__description--unauthorized {
+  @extend .form__description;
+
+  text-align: center;
+  color: $color-brightsalmon;
 }
 
 .form {
@@ -72,16 +74,48 @@
   width: 100%;
 }
 
+.form__input-row-fieldwrap--narrow {
+  @extend .form__input-row-fieldwrap;
+
+  flex: 0 0 calc(50% - 0.5rem);
+}
+
+.form button[type="submit"] {
+  min-width: 7.1rem;
+  margin: 2.5rem auto 1.125rem;
+}
+
+.form__submit-error-container {
+  text-align: center;
+}
+
+.form__submit-status-container {
+  text-align: center;
+  height: 3rem;
+  max-width: 25rem;
+  margin: 0 auto;
+}
+
+.form__input-description {
+  font-size: 1.125rem;
+  margin-left: 2rem;
+}
+
 /* @MEDIA QUERIES */
 
-@include size-tablet-down {
+@media only screen and (max-width: em($bp-md)) {
   .form__input-row {
     flex-direction: column;
+    margin: 1rem 0;
+  }
 
-    .form__input-row-fieldwrap {
-      flex-basis: auto;
-      width: 100%;
-    }
+  .form__input-row-fieldwrap {
+    flex-basis: auto;
+    width: 100%;
+  }
+
+  .form__input-description {
+    margin: 0.5rem 0 0;
   }
 }
 
@@ -96,7 +130,8 @@
 
   .form__description p,
   .form__input-row-label,
-  .form .error-message {
+  .form .error-message,
+  .form__input-description {
     font-size: 1rem;
   }
 }

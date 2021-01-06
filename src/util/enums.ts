@@ -30,6 +30,7 @@ export enum NetworkNames {
 export enum FormFieldErrors {
   REQUIRED = 'This field is required.',
   INVALID_ETHEREUM_ADDRESS = 'The ethereum address is invalid.',
+  INVALID_NUMBER = 'The value is not a number.',
 }
 
 export enum Web3TxStatus {

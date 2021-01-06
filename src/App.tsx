@@ -53,7 +53,7 @@ export default function App() {
             <Route
               key="member-details"
               exact
-              path="/members/:ethereumAddress"
+              path="/members/:proposalId"
               render={() => <MemberDetails />}
             />,
             <Route
@@ -71,7 +71,7 @@ export default function App() {
             <Route
               key="transfer-details"
               exact
-              path="/transfers/:uuid"
+              path="/transfers/:proposalId"
               render={() => <TransferDetails />}
             />,
             <Route
@@ -89,7 +89,7 @@ export default function App() {
             <Route
               key="tribute-details"
               exact
-              path="/tributes/:uuid"
+              path="/tributes/:proposalId"
               render={() => <TributeDetails />}
             />,
             <Route
@@ -107,7 +107,7 @@ export default function App() {
             <Route
               key="governance-proposal-details"
               exact
-              path="/governance-proposals/:uuid"
+              path="/governance-proposals/:proposalId"
               render={() => <GovernanceProposalDetails />}
             />,
             <Route

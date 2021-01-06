@@ -1,6 +1,25 @@
 @use "./variables" as *; /* load without namespace for convenience */
 @use "./functions" as *; /* load without namespace for convenience */
 
+%prefix-suffix-base {
+  align-items: center;
+  background: $color-background-primary;
+  color: $color-primary;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: 1.25rem;
+  font-weight: bold;
+  height: calc(100% - 4px);
+  justify-content: center;
+  margin: 0;
+  padding: 0 0.5em;
+  position: absolute;
+  top: 1px;
+  width: 2.4em;
+  word-break: break-word;
+  z-index: 0;
+}
+
 input[type="text"],
 input[type="number"],
 textarea,
@@ -41,11 +60,32 @@ select:-webkit-autofill:focus {
   -webkit-text-fill-color: $color-primary;
 }
 
+.input__suffix-wrap {
+  position: relative;
+}
+
+.input__suffix[type="text"],
+.input__suffix[type="number"] {
+  padding-right: 4em;
+}
+
+.input__suffix-item {
+  @extend %prefix-suffix-base;
+
+  border-radius: 0 15px 15px 0;
+  right: 1px;
+}
+
 @media only screen and (max-width: em($bp-sm)) {
   input[type="text"],
   input[type="number"],
   textarea,
   select {
+    font-size: 1rem;
+    padding: 0.8rem;
+  }
+
+  .input__suffix-item {
     font-size: 1rem;
   }
 }
