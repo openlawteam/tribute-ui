@@ -5,7 +5,7 @@ import {BrowserRouter} from 'react-router-dom';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 
 import {disableReactDevTools} from './util/helpers';
-import {ENVIRONMENT, INFURA_PROJECT_ID} from './util/config';
+import {ENVIRONMENT, INFURA_PROJECT_ID} from './config';
 import {DefaultTheme} from './components/web3/hooks/useWeb3ModalManager';
 import {store} from './store';
 import App from './App';

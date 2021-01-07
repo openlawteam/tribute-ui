@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {TransactionReceipt} from 'web3-core/types';
 
-import {CHAINS, ETHERSCAN_URLS} from '../../../util/config';
+import {CHAINS, ETHERSCAN_URLS} from '../../../config';
 import {contractSend} from '../helpers';
 import {dontCloseWindowWarning} from '../../../util/helpers';
 import {StoreState} from '../../../util/types';

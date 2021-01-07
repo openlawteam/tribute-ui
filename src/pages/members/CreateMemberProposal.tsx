@@ -10,10 +10,10 @@ import {
   formatNumber,
   formatDecimal,
 } from '../../util/helpers';
-import {CHAINS} from '../../util/config';
+import {CHAINS} from '../../config';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
-import {SHARES_ADDRESS} from '../../components/web3/config';
+import {SHARES_ADDRESS} from '../../config';
 import {StoreState, MetaMaskRPCError} from '../../util/types';
 import {useContractSend} from '../../components/web3/hooks/useContractSend';
 import {useETHGasPrice, useIsDefaultChain} from '../../hooks';

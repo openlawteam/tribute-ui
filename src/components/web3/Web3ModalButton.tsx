@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 import {isMobile} from 'react-device-detect';
 
 import {truncateEthAddress} from '../../util/helpers';
-import {ETHERSCAN_URLS, CHAINS} from '../../util/config';
+import {ETHERSCAN_URLS, CHAINS} from '../../config';
 import {StoreState} from '../../util/types';
 import {useIsDefaultChain} from '../../hooks';
 import {useWeb3Modal} from './Web3ModalManager';
