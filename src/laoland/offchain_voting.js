@@ -1,5 +1,8 @@
-// Whole-script strict mode syntax
-'use strict';
+/**
+ * @note THIS HAS BEEN COPIED AND SLIGHTLY ALTERED FROM LAOLAND.
+ *
+ * @see https://raw.githubusercontent.com/openlawteam/laoland/bec8f490582456e1b964e604d46ec324408bbf2a/utils/offchain_voting.js
+ */
 
 /**
 MIT License
@@ -24,10 +27,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+const {default: Web3} = require('web3');
+
 const {MerkleTree} = require('./merkleTree.js');
 const {SHARES} = require('./DaoFactory.js');
-const sha3 = web3.utils.sha3;
 const sigUtil = require('eth-sig-util');
+
+const sha3 = Web3.utils.sha3;
 
 function getMessageERC712Hash(m, verifyingContract, actionId, chainId) {
   const message = prepareMessage(m);
@@ -409,7 +415,8 @@ async function prepareVoteResult(votes, dao, actionId, chainId, snapshot) {
   return {voteResultTree: tree, votes: leaves};
 }
 
-function prepareVoteProposalData(data) {
+// @note Parts from original. Adds Web3 dependency injection.
+function prepareVoteProposalData(data, web3) {
   return web3.eth.abi.encodeParameter(
     {
       ProposalMessage: {
