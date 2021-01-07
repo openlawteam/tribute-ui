@@ -6,8 +6,8 @@ import {
   setConnectedAddress,
   walletAuthenticated,
 } from './store/actions';
-import {useInitContracts} from './hooks';
 import {ReduxDispatch} from './util/types';
+import {useInitContracts} from './components/web3/hooks';
 import {useWeb3Modal} from './components/web3/Web3ModalManager';
 import ErrorMessageWithDetails from './components/common/ErrorMessageWithDetails';
 import FadeIn from './components/common/FadeIn';

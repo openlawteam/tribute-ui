@@ -10,13 +10,16 @@ import {
   formatNumber,
   formatDecimal,
 } from '../../util/helpers';
+import {
+  useContractSend,
+  useETHGasPrice,
+  useIsDefaultChain,
+} from '../../components/web3/hooks';
 import {CHAINS} from '../../config';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {SHARES_ADDRESS} from '../../config';
 import {StoreState, MetaMaskRPCError} from '../../util/types';
-import {useContractSend} from '../../components/web3/hooks/useContractSend';
-import {useETHGasPrice, useIsDefaultChain} from '../../hooks';
 import {useWeb3Modal} from '../../components/web3/Web3ModalManager';
 import {Web3TxStatus} from '../../components/web3/types';
 import CycleMessage from '../../components/feedback/CycleMessage';

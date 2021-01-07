@@ -1,9 +1,9 @@
 import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {useWeb3Modal} from '../components/web3/Web3ModalManager';
-import {CHAIN_NAME} from '../config';
-import {StoreState} from '../util/types';
+import {useWeb3Modal} from '../Web3ModalManager';
+import {CHAIN_NAME} from '../../../config';
+import {StoreState} from '../../../util/types';
 
 /**
  * useIsDefaultChain
@@ -15,7 +15,7 @@ import {StoreState} from '../util/types';
  *  isDefaultChain: boolean
  * }
  */
-export default function useIsDefaultChain(): {
+export function useIsDefaultChain(): {
   defaultChain: number;
   defaultChainError: string;
   isDefaultChain: boolean;
