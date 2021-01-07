@@ -2,7 +2,7 @@ import Web3 from 'web3';
 import {Dispatch} from 'redux';
 
 import {ContractAdapterNames, Web3State} from '../../components/web3/types';
-import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../util/config';
+import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../config';
 import {getAdapterAddress} from '../../components/web3/helpers/getAdapterAddress';
 import {StoreState} from '../../util/types';
 import DaoRegistry from '../../truffle-contracts/DaoRegistry.json';

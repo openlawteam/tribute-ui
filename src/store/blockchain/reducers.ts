@@ -7,7 +7,7 @@ import {
 } from '../actions';
 
 import {BlockchainState} from '../../util/types';
-import {DEFAULT_CHAIN} from '../../util/config';
+import {DEFAULT_CHAIN} from '../../config';
 
 const initialState = {
   defaultChain: DEFAULT_CHAIN,

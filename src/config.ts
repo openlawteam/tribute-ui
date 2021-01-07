@@ -1,4 +1,8 @@
-import {EnvironmentName} from './types';
+import {EnvironmentName} from './util/types';
+
+/**
+ * Global DApp Config
+ */
 
 const {
   REACT_APP_ENVIRONMENT,
@@ -61,3 +65,40 @@ export const DEFAULT_CHAIN =
     : REACT_APP_ENVIRONMENT === 'development'
     ? CHAINS.RINKEBY
     : CHAINS.GANACHE; // "localhost" environment defaults to your Ganache private network
+
+/**
+ * These addresses are important as the contracts use them in their configs.
+ *
+ * @todo Remove and use future npm package to get these values for moloch v3
+ *
+ * @see https://github.com/openlawteam/laoland/blob/9e0e03616a00e41e666351e146ee109b9fe37fb2/utils/DaoFactory.js
+ */
+export const GUILD_ADDRESS: string =
+  '0x000000000000000000000000000000000000dead';
+export const TOTAL_ADDRESS: string =
+  '0x000000000000000000000000000000000000babe';
+export const SHARES_ADDRESS: string =
+  '0x00000000000000000000000000000000000FF1CE';
+export const LOOT_ADDRESS: string =
+  '0x00000000000000000000000000000000B105F00D';
+export const ETH_TOKEN_ADDRESS: string =
+  '0x0000000000000000000000000000000000000000';
+export const DAI_TOKEN_ADDRESS: string =
+  '0x95b58a6bff3d14b7db2f5cb5f0ad413dc2940658';
+
+/**
+ * Space is a unique key (typically a contract address)
+ * used by Moloch and Snapshot for building core proposal data.
+ *
+ * It is also used inside a Snapshot Hub for matching a `space`
+ * with its own proposals and votes.
+ */
+export const SPACES: Record<EnvironmentName, string> = {
+  development: '',
+  // @todo Get local Docker snapshot and "registered" space set up.
+  localhost: 'tributedao',
+  production: '',
+};
+
+// Defaults to `localhost` space if `ENVIRONMENT` is `undefined`.
+export const SPACE: string = SPACES[ENVIRONMENT || 'localhost'];
