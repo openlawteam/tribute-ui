@@ -27,11 +27,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-const {default: Web3} = require('web3');
+import Web3 from 'web3';
+
+import {SHARES_ADDRESS} from '../config';
+
+const sigUtil = require('eth-sig-util');
 
 const {MerkleTree} = require('./merkleTree.js');
-const {SHARES} = require('./DaoFactory.js');
-const sigUtil = require('eth-sig-util');
 
 const sha3 = Web3.utils.sha3;
 
@@ -385,7 +387,7 @@ async function prepareVoteResult(votes, dao, actionId, chainId, snapshot) {
     sortedVotes.map(async (vote) => {
       const weight = await dao.getPriorAmount(
         vote.payload.account,
-        SHARES,
+        SHARES_ADDRESS,
         snapshot
       );
       return Object.assign(vote, {weight});
