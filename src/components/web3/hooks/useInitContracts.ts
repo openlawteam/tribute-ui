@@ -50,6 +50,7 @@ export function useInitContracts() {
             dispatch(initContractOffchainVoting(web3Instance as Web3))
           )
           .then(() => dispatch(initContractOnboarding(web3Instance as Web3)));
+        // @todo Add inits for Transfer and Tribute when ready
       }
     } catch (error) {
       throw error;
