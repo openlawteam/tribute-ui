@@ -36,7 +36,7 @@ const SECONDARY_URL = 'https://www.etherchain.org/api/gasPriceOracle';
  *
  * @returns {GasPrices}
  */
-export default function useETHGasPrice() {
+export function useETHGasPrice() {
   /**
    * State
    */

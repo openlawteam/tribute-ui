@@ -7,17 +7,17 @@ import {
   initContractFinancing,
   initContractOffchainVoting,
   initContractOnboarding,
-} from '../store/actions';
+} from '../../../store/actions';
 
-import {useWeb3Modal} from '../components/web3/Web3ModalManager';
-import {StoreState, ReduxDispatch} from '../util/types';
+import {useWeb3Modal} from '../Web3ModalManager';
+import {StoreState, ReduxDispatch} from '../../../util/types';
 
 /**
  * useInitContracts()
  *
  * Initates contracts used in the app
  */
-export default function useInitContracts() {
+export function useInitContracts() {
   const {web3Instance, networkId} = useWeb3Modal();
 
   const defaultChain = useSelector(

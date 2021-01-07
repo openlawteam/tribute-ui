@@ -2,14 +2,14 @@ import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {isMobile} from 'react-device-detect';
 
-import {truncateEthAddress} from '../../util/helpers';
 import {ETHERSCAN_URLS, CHAINS} from '../../config';
 import {StoreState} from '../../util/types';
-import {useIsDefaultChain} from '../../hooks';
-import {useWeb3Modal} from './Web3ModalManager';
-import Modal from '../common/Modal';
-import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
 import {svgWalletIcon} from './WalletIcons';
+import {truncateEthAddress} from '../../util/helpers';
+import {useIsDefaultChain} from './hooks';
+import {useWeb3Modal} from './Web3ModalManager';
+import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
+import Modal from '../common/Modal';
 
 import TimesSVG from '../../assets/svg/TimesSVG';
 
