@@ -2,9 +2,9 @@ import {useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Web3 from 'web3';
 
+// @todo Add inits for Transfer and Tribute when ready
 import {
   initContractDaoRegistry,
-  initContractFinancing,
   initContractOffchainVoting,
   initContractOnboarding,
 } from '../../../store/actions';
@@ -46,7 +46,6 @@ export function useInitContracts() {
       if (networkId === defaultChain) {
         // init contracts
         reduxDispatch(initContractDaoRegistry(web3Instance as Web3))
-          .then(() => dispatch(initContractFinancing(web3Instance as Web3)))
           .then(() =>
             dispatch(initContractOffchainVoting(web3Instance as Web3))
           )

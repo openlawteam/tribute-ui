@@ -6,7 +6,6 @@ import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../config';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {StoreState} from '../../util/types';
 import DaoRegistry from '../../truffle-contracts/DaoRegistry.json';
-import FinancingContract from '../../truffle-contracts/FinancingContract.json';
 import OffchainVotingContract from '../../truffle-contracts/OffchainVotingContract.json';
 import OnboardingContract from '../../truffle-contracts/OnboardingContract.json';
 
@@ -16,6 +15,8 @@ export const BLOCKCHAIN_WALLET_AUTHENTICATED =
 export const BLOCKCHAIN_WEB3_INSTANCE = 'BLOCKCHAIN_WEB3_INSTANCE';
 export const BLOCKCHAIN_WEB3_STATE = 'BLOCKCHAIN_WEB3_STATE';
 export const CONNECTED_ADDRESS = 'CONNECTED_ADDRESS';
+
+// @todo Add inits for Transfer and Tribute when ready
 
 export function initContractDaoRegistry(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
@@ -34,42 +35,6 @@ export function initContractDaoRegistry(web3Instance: Web3) {
           contracts: {
             DaoRegistryContract: {
               abi: daoRegistryContract.abi,
-              contractAddress,
-              instance,
-            },
-          },
-        });
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-}
-
-export function initContractFinancing(web3Instance: Web3) {
-  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
-    try {
-      if (web3Instance) {
-        const financingContract: Record<string, any> = FinancingContract;
-        /**
-         * Get address via DAO Registry.
-         *
-         * @note The `DaoRegistryContract` must be set in Redux first.
-         */
-        const contractAddress = await getAdapterAddress(
-          ContractAdapterNames.financing,
-          getState().blockchain.contracts?.DaoRegistryContract.instance
-        );
-        const instance = new web3Instance.eth.Contract(
-          financingContract.abi,
-          contractAddress
-        );
-
-        dispatch({
-          type: BLOCKCHAIN_CONTRACTS,
-          contracts: {
-            FinancingContract: {
-              abi: financingContract.abi,
               contractAddress,
               instance,
             },

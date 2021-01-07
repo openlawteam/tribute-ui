@@ -13,9 +13,9 @@ export type SmartContractItem = {
   contractAddress: string;
 };
 
+// @todo Add 'TransferContract and 'TributeContract' when ready
 export type SmartContracts = {
   DaoRegistryContract: SmartContractItem;
-  FinancingContract: SmartContractItem;
   OffchainVotingContract: SmartContractItem;
   OnboardingContract: SmartContractItem;
 };
@@ -75,6 +75,7 @@ export type CoreProposalVoteChoices = [VoteChoices.yes, VoteChoices.no];
  * WEB3 ENUMS
  */
 
+// @todo Add 'transfer' and 'tribute' when ready
 export enum ContractAdapterNames {
   configuration = 'configuration',
   financing = 'financing',
