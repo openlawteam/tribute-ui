@@ -1,9 +1,7 @@
 import React, {useState} from 'react';
-import {useSelector} from 'react-redux';
 import {isMobile} from 'react-device-detect';
 
 import {ETHERSCAN_URLS, CHAINS} from '../../config';
-import {StoreState} from '../../util/types';
 import {svgWalletIcon} from './WalletIcons';
 import {truncateEthAddress} from '../../util/helpers';
 import {useIsDefaultChain} from './hooks';
@@ -28,14 +26,6 @@ function ConnectWallet({
   customWalletText,
   showWalletETHBadge,
 }: ConnectWalletProps): JSX.Element {
-  /**
-   * Selectors
-   */
-
-  const chainId = useSelector(
-    (s: StoreState) => s.blockchain && s.blockchain.defaultChain
-  );
-
   /**
    * Hooks
    */
@@ -63,7 +53,7 @@ function ConnectWallet({
    */
 
   const isWrongNetwork: boolean = networkId !== defaultChain ?? isDefaultChain;
-  const isChainGanache = chainId === CHAINS.GANACHE;
+  const isChainGanache = networkId === CHAINS.GANACHE;
   const displayWalletText: string | undefined = getWalletText();
 
   /**
