@@ -29,4 +29,4 @@ yarn-error.log*
 # as environment variables into Docker, for example.
 .env
 # We need the `[..]/test/.env` for tests
-!client/src/test/.env
+!src/test/.env
