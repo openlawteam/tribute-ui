@@ -9,7 +9,7 @@ import {
   initContractOnboarding,
 } from '../../../store/actions';
 
-import {useWeb3Modal} from '../Web3ModalManager';
+import {useWeb3Modal} from '.';
 import {StoreState, ReduxDispatch} from '../../../util/types';
 
 /**

@@ -8,7 +8,7 @@ import {
 } from './store/actions';
 import {ReduxDispatch} from './util/types';
 import {useInitContracts} from './components/web3/hooks';
-import {useWeb3Modal} from './components/web3/Web3ModalManager';
+import {useWeb3Modal} from './components/web3/hooks';
 import ErrorMessageWithDetails from './components/common/ErrorMessageWithDetails';
 import FadeIn from './components/common/FadeIn';
 import Header from './components/Header';

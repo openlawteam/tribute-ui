@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {useWeb3Modal} from '../Web3ModalManager';
+import {useWeb3Modal} from '.';
 import {CHAIN_NAME} from '../../../config';
 import {StoreState} from '../../../util/types';
 
