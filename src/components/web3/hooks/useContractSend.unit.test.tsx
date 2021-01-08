@@ -62,7 +62,6 @@ describe('useContractSend unit tests', () => {
   });
 
   test('should return correct datass', async () => {
-    console.log('useWeb3Modal', useWeb3ModalToMock.useWeb3Modal);
     const result = setupHook({
       hook: useContractSend,
       hookArgs: [null],
@@ -71,7 +70,6 @@ describe('useContractSend unit tests', () => {
         useWallet: true,
       },
     }) as ReturnType<typeof useContractSend>;
-    console.log('useWeb3Modal', useWeb3ModalToMock.useWeb3Modal);
 
     // assert initial state
     expect(result.txError).toBe(undefined);
