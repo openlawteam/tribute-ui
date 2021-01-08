@@ -28,3 +28,5 @@ yarn-error.log*
 # .env are local files with key=value pairs loaded
 # as environment variables into Docker, for example.
 .env
+# We need the `[..]/test/.env` for tests
+!client/src/test/.env
