@@ -18,40 +18,55 @@ import {StoreState, ReduxDispatch} from '../../../util/types';
  * Initates contracts used in the app
  */
 export function useInitContracts() {
-  const {web3Instance, networkId} = useWeb3Modal();
+  /**
+   * Selectors
+   */
 
   const defaultChain = useSelector(
     (s: StoreState) => s.blockchain && s.blockchain.defaultChain
   );
 
-  const dispatch = useDispatch();
-  const reduxDispatch = useDispatch<ReduxDispatch>();
+  /**
+   * Their hooks
+   */
+
+  const {web3Instance, networkId} = useWeb3Modal();
+  const dispatch = useDispatch<ReduxDispatch>();
+
+  /**
+   * Cached callbacks
+   */
 
   const initContractsCached = useCallback(initContracts, [
+    defaultChain,
     dispatch,
     networkId,
-    defaultChain,
-    reduxDispatch,
     web3Instance,
   ]);
+
+  /**
+   * Functions
+   */
 
   /**
    * Init contracts
    *
    * If we are connected to the correct network, init contracts
    */
-  function initContracts() {
+  async function initContracts() {
     try {
-      // only if connected to the default chain; init contracts
-      if (networkId === defaultChain) {
-        // init contracts
-        reduxDispatch(initContractDaoRegistry(web3Instance as Web3))
-          .then(() =>
-            dispatch(initContractOffchainVoting(web3Instance as Web3))
-          )
-          .then(() => dispatch(initContractOnboarding(web3Instance as Web3)));
-        // @todo Add inits for Transfer and Tribute when ready
+      if (networkId !== defaultChain) {
+        throw new Error(
+          'Could not init contracts. You may be connected to the wrong chain.'
+        );
       }
+
+      // Init contracts
+      await dispatch(initContractDaoRegistry(web3Instance as Web3));
+      await dispatch(initContractOffchainVoting(web3Instance as Web3));
+      await dispatch(initContractOnboarding(web3Instance as Web3));
+
+      // @todo Add inits for Transfer and Tribute when ready
     } catch (error) {
       throw error;
     }
