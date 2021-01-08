@@ -1,4 +1,4 @@
-import React, {createContext, useContext} from 'react';
+import React, {createContext} from 'react';
 import Web3 from 'web3';
 
 import useWeb3ModalManager, {DefaultTheme} from './hooks/useWeb3ModalManager';
@@ -85,16 +85,4 @@ export default function Web3ModalManager({
       {children}
     </Web3ModalContext.Provider>
   );
-}
-
-/**
- * useWeb3Modal(): Web3ModalContextValue
- *
- * Internal hook to access wallet connectivity and connected state.
- *
- * @example
- * const {account, connected, networkId, ...} = useWeb3Modal();
- */
-export function useWeb3Modal(): Web3ModalContextValue {
-  return useContext(Web3ModalContext);
 }

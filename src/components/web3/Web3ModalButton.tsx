@@ -7,7 +7,7 @@ import {StoreState} from '../../util/types';
 import {svgWalletIcon} from './WalletIcons';
 import {truncateEthAddress} from '../../util/helpers';
 import {useIsDefaultChain} from './hooks';
-import {useWeb3Modal} from './Web3ModalManager';
+import {useWeb3Modal} from './hooks';
 import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
 import Modal from '../common/Modal';
 
