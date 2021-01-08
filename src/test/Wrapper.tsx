@@ -8,11 +8,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import thunk from 'redux-thunk';
 import Web3 from 'web3';
 
-import {
-  initWeb3Instance,
-  setConnectedAddress,
-  walletAuthenticated,
-} from '../store/actions';
+import {setConnectedAddress, walletAuthenticated} from '../store/actions';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from './helpers';
 import {ReduxDispatch} from '../util/types';
 import Init, {InitError} from '../Init';
@@ -96,7 +92,6 @@ export default function Wrapper(
     dispatch,
     onUseWallet,
     useWallet,
-    web3Instance,
   ]);
 
   /**
@@ -113,8 +108,6 @@ export default function Wrapper(
    */
 
   function setupWallet() {
-    dispatch(initWeb3Instance(web3Instance));
-
     if (useWallet) {
       // Set Redux store state
       dispatch(walletAuthenticated(true));

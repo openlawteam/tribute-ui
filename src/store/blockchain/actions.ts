@@ -12,7 +12,6 @@ import OnboardingContract from '../../truffle-contracts/OnboardingContract.json'
 export const BLOCKCHAIN_CONTRACTS = 'BLOCKCHAIN_CONTRACTS';
 export const BLOCKCHAIN_WALLET_AUTHENTICATED =
   'BLOCKCHAIN_WALLET_AUTHENTICATED';
-export const BLOCKCHAIN_WEB3_INSTANCE = 'BLOCKCHAIN_WEB3_INSTANCE';
 export const BLOCKCHAIN_WEB3_STATE = 'BLOCKCHAIN_WEB3_STATE';
 export const CONNECTED_ADDRESS = 'CONNECTED_ADDRESS';
 
@@ -119,13 +118,6 @@ export function initContractOnboarding(web3Instance: Web3) {
     } catch (error) {
       console.error(error);
     }
-  };
-}
-
-export function initWeb3Instance(instance: Web3) {
-  return {
-    type: BLOCKCHAIN_WEB3_INSTANCE,
-    web3Instance: instance,
   };
 }
 
