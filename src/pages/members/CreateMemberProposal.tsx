@@ -56,9 +56,6 @@ export default function CreateMemberProposal() {
    * Selectors
    */
 
-  const chainId = useSelector(
-    (s: StoreState) => s.blockchain && s.blockchain.defaultChain
-  );
   const OnboardingContract = useSelector(
     (state: StoreState) =>
       state.blockchain.contracts &&
@@ -78,7 +75,7 @@ export default function CreateMemberProposal() {
    */
 
   const {isDefaultChain, defaultChainError} = useIsDefaultChain();
-  const {connected, account} = useWeb3Modal();
+  const {connected, account, networkId} = useWeb3Modal();
   const gasPrices = useETHGasPrice();
   const {
     txError,
@@ -124,7 +121,7 @@ export default function CreateMemberProposal() {
 
   const createMemberError = submitError || txError;
   const isConnected = connected && account;
-  const isChainGanache = chainId === CHAINS.GANACHE;
+  const isChainGanache = networkId === CHAINS.GANACHE;
 
   /**
    * @note From the docs: "Read the formState before render to subscribe the form state through Proxy"
