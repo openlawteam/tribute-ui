@@ -1,4 +1,3 @@
-import Web3 from 'web3/types';
 import {ThunkDispatch} from 'redux-thunk';
 import {Action} from 'redux';
 
@@ -21,7 +20,6 @@ export interface BlockchainState {
   connectedAddress?: string;
   contracts?: SmartContracts;
   walletAuthenticated: boolean;
-  web3Instance?: Web3;
   web3State?: Web3State;
 }
 

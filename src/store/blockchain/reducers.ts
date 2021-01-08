@@ -1,7 +1,6 @@
 import {
   BLOCKCHAIN_CONTRACTS,
   BLOCKCHAIN_WALLET_AUTHENTICATED,
-  BLOCKCHAIN_WEB3_INSTANCE,
   BLOCKCHAIN_WEB3_STATE,
   CONNECTED_ADDRESS,
 } from '../actions';
@@ -23,8 +22,6 @@ export default function reducer(
       return smartContracts(state, payload);
     case BLOCKCHAIN_WALLET_AUTHENTICATED:
       return walletAuthenticated(state, payload);
-    case BLOCKCHAIN_WEB3_INSTANCE:
-      return web3Instance(state, payload);
     case BLOCKCHAIN_WEB3_STATE:
       return web3State(state, payload);
     case CONNECTED_ADDRESS:
@@ -47,10 +44,6 @@ function walletAuthenticated(
   {walletAuthenticated}: any
 ) {
   return {...state, walletAuthenticated};
-}
-
-function web3Instance(state: BlockchainState, {web3Instance}: any) {
-  return {...state, web3Instance};
 }
 
 function web3State(state: BlockchainState, {web3State}: any) {
