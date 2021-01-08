@@ -66,16 +66,13 @@ export default function CreateMemberProposal() {
       state.blockchain.contracts &&
       state.blockchain.contracts.DaoRegistryContract
   );
-  const web3Instance = useSelector(
-    (state: StoreState) => state.blockchain.web3Instance
-  );
 
   /**
    * Hooks
    */
 
   const {defaultChainError} = useIsDefaultChain();
-  const {connected, account, networkId} = useWeb3Modal();
+  const {connected, account, networkId, web3Instance} = useWeb3Modal();
   const gasPrices = useETHGasPrice();
   const {
     txError,
