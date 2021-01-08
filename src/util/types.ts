@@ -19,7 +19,6 @@ export type EnvironmentName = 'localhost' | 'development' | 'production';
 export interface BlockchainState {
   connectedAddress?: string;
   contracts?: SmartContracts;
-  walletAuthenticated: boolean;
   web3State?: Web3State;
 }
 

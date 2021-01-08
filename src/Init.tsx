@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
 
-import {setConnectedAddress, walletAuthenticated} from './store/actions';
+import {setConnectedAddress} from './store/actions';
 import {ReduxDispatch} from './util/types';
 import {useInitContracts, useIsDefaultChain} from './components/web3/hooks';
 import {useWeb3Modal} from './components/web3/hooks';
@@ -67,11 +67,6 @@ export default function Init(props: InitProps) {
   /**
    * Effects
    */
-
-  // Set wallet auth
-  useEffect(() => {
-    dispatch(walletAuthenticated(connected === true));
-  }, [connected, dispatch]);
 
   // Set the address of the connected user
   useEffect(() => {
