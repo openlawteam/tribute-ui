@@ -1,6 +1,5 @@
 import {useCallback} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import Web3 from 'web3';
+import {useDispatch} from 'react-redux';
 
 // @todo Add inits for Transfer and Tribute when ready
 import {
@@ -8,9 +7,9 @@ import {
   initContractOffchainVoting,
   initContractOnboarding,
 } from '../../../store/actions';
-
 import {useWeb3Modal} from '.';
-import {StoreState, ReduxDispatch} from '../../../util/types';
+import {ReduxDispatch} from '../../../util/types';
+import {useIsDefaultChain} from './useIsDefaultChain';
 
 /**
  * useInitContracts()
@@ -19,18 +18,11 @@ import {StoreState, ReduxDispatch} from '../../../util/types';
  */
 export function useInitContracts() {
   /**
-   * Selectors
-   */
-
-  const defaultChain = useSelector(
-    (s: StoreState) => s.blockchain && s.blockchain.defaultChain
-  );
-
-  /**
    * Their hooks
    */
 
-  const {web3Instance, networkId} = useWeb3Modal();
+  const {isDefaultChain} = useIsDefaultChain();
+  const {web3Instance} = useWeb3Modal();
   const dispatch = useDispatch<ReduxDispatch>();
 
   /**
@@ -38,9 +30,8 @@ export function useInitContracts() {
    */
 
   const initContractsCached = useCallback(initContracts, [
-    defaultChain,
+    isDefaultChain,
     dispatch,
-    networkId,
     web3Instance,
   ]);
 
@@ -55,16 +46,12 @@ export function useInitContracts() {
    */
   async function initContracts() {
     try {
-      if (networkId !== defaultChain) {
-        throw new Error(
-          'Could not init contracts. You may be connected to the wrong chain.'
-        );
-      }
+      if (!isDefaultChain) return;
 
       // Init contracts
-      await dispatch(initContractDaoRegistry(web3Instance as Web3));
-      await dispatch(initContractOffchainVoting(web3Instance as Web3));
-      await dispatch(initContractOnboarding(web3Instance as Web3));
+      await dispatch(initContractDaoRegistry(web3Instance));
+      await dispatch(initContractOffchainVoting(web3Instance));
+      await dispatch(initContractOnboarding(web3Instance));
 
       // @todo Add inits for Transfer and Tribute when ready
     } catch (error) {

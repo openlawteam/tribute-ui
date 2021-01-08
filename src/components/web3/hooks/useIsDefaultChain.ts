@@ -1,9 +1,7 @@
 import {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
 
 import {useWeb3Modal} from '.';
-import {CHAIN_NAME} from '../../../config';
-import {StoreState} from '../../../util/types';
+import {CHAIN_NAME, DEFAULT_CHAIN} from '../../../config';
 
 /**
  * useIsDefaultChain
@@ -17,29 +15,43 @@ import {StoreState} from '../../../util/types';
  */
 export function useIsDefaultChain(): {
   defaultChain: number;
-  defaultChainError: string;
+  defaultChainError: Error | undefined;
   isDefaultChain: boolean;
 } {
-  const {networkId} = useWeb3Modal();
-  const defaultChain = useSelector(
-    (state: StoreState) => state.blockchain.defaultChain
-  );
+  /**
+   * Our hooks
+   */
+
+  const {networkId, connected} = useWeb3Modal();
+
+  /**
+   * State
+   */
 
   const [isDefaultChain, setIsDefaultChain] = useState<boolean>(false);
-  const [defaultChainError, setDefaultChainError] = useState<string>('');
+  const [defaultChainError, setDefaultChainError] = useState<Error>();
+
+  /**
+   * Effects
+   */
 
   useEffect(() => {
-    setIsDefaultChain(networkId === defaultChain);
+    setIsDefaultChain(networkId === DEFAULT_CHAIN);
 
-    if (networkId !== defaultChain) {
+    if (connected && networkId !== DEFAULT_CHAIN) {
       setDefaultChainError(
-        `Please connect to the ${CHAIN_NAME[defaultChain]}.`
+        new Error(`Please connect to the ${CHAIN_NAME[DEFAULT_CHAIN]}.`)
       );
+
+      return;
     }
-  }, [networkId, defaultChain]);
+
+    // If we make it here, reset after running checks.
+    setDefaultChainError(undefined);
+  }, [connected, networkId]);
 
   return {
-    defaultChain,
+    defaultChain: DEFAULT_CHAIN,
     defaultChainError,
     isDefaultChain,
   };

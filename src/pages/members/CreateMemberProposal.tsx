@@ -56,9 +56,6 @@ export default function CreateMemberProposal() {
    * Selectors
    */
 
-  const chainId = useSelector(
-    (s: StoreState) => s.blockchain && s.blockchain.defaultChain
-  );
   const OnboardingContract = useSelector(
     (state: StoreState) =>
       state.blockchain.contracts &&
@@ -77,8 +74,8 @@ export default function CreateMemberProposal() {
    * Hooks
    */
 
-  const {isDefaultChain, defaultChainError} = useIsDefaultChain();
-  const {connected, account} = useWeb3Modal();
+  const {defaultChainError} = useIsDefaultChain();
+  const {connected, account, networkId} = useWeb3Modal();
   const gasPrices = useETHGasPrice();
   const {
     txError,
@@ -124,7 +121,7 @@ export default function CreateMemberProposal() {
 
   const createMemberError = submitError || txError;
   const isConnected = connected && account;
-  const isChainGanache = chainId === CHAINS.GANACHE;
+  const isChainGanache = networkId === CHAINS.GANACHE;
 
   /**
    * @note From the docs: "Read the formState before render to subscribe the form state through Proxy"
@@ -184,10 +181,6 @@ export default function CreateMemberProposal() {
         throw new Error(
           'No user account was found. Please makes sure your wallet is connected.'
         );
-      }
-
-      if (!isDefaultChain) {
-        throw new Error(defaultChainError);
       }
 
       if (!OnboardingContract) {
@@ -310,11 +303,11 @@ export default function CreateMemberProposal() {
   }
 
   // Render wrong network message if user is on wrong network
-  if (!isDefaultChain) {
+  if (defaultChainError) {
     return (
       <RenderWrapper>
         <div className="form__description--unauthorized">
-          <p>{defaultChainError}</p>
+          <p>{defaultChainError.message}</p>
         </div>
       </RenderWrapper>
     );

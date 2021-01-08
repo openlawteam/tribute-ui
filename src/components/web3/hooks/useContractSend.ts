@@ -1,11 +1,10 @@
 import {useState} from 'react';
-import {useSelector} from 'react-redux';
 import {TransactionReceipt} from 'web3-core/types';
 
 import {CHAINS, ETHERSCAN_URLS} from '../../../config';
 import {contractSend} from '../helpers';
 import {dontCloseWindowWarning} from '../../../util/helpers';
-import {StoreState} from '../../../util/types';
+import {useWeb3Modal} from './useWeb3Modal';
 import {Web3TxStatus} from '../types';
 
 type UseContractSendReturn = {
@@ -34,12 +33,10 @@ export function useContractSend(): UseContractSendReturn {
   const [txStatus, setTxStatus] = useState<Web3TxStatus>(Web3TxStatus.STANDBY);
 
   /**
-   * Selectors
+   * Our hooks
    */
 
-  const chainId = useSelector(
-    (s: StoreState) => s.blockchain && s.blockchain.defaultChain
-  );
+  const {networkId} = useWeb3Modal();
 
   /**
    * Functions
@@ -51,8 +48,8 @@ export function useContractSend(): UseContractSendReturn {
       setTxIsPromptOpen(false);
 
       // Ganache transactions do not show on Etherscan.
-      if (chainId !== CHAINS.GANACHE) {
-        setTxEtherscanURL(`${ETHERSCAN_URLS[chainId]}/tx/${txHash}`);
+      if (networkId && networkId !== CHAINS.GANACHE) {
+        setTxEtherscanURL(`${ETHERSCAN_URLS[networkId]}/tx/${txHash}`);
       }
 
       callback(txHash);
