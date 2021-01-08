@@ -1,9 +1,8 @@
 import {useReducer, useCallback, useEffect} from 'react';
-import {useSelector} from 'react-redux';
 import Web3 from 'web3';
 import Web3Modal from 'web3modal';
 
-import {StoreState} from '../../../util/types';
+import {DEFAULT_CHAIN} from '../../../config';
 import {NetworkNames, NetworkIDs} from '../../../util/enums';
 
 type NetworkNameType = NetworkNames;
@@ -114,9 +113,7 @@ export default function useWeb3ModalManager({
   const [state, dispatch] = useReducer(reducer, {});
 
   const web3ModalTheme = defaultTheme;
-  const web3ModalChain =
-    useSelector((s: StoreState) => s.blockchain && s.blockchain.defaultChain) ||
-    defaultChain;
+  const web3ModalChain = defaultChain || DEFAULT_CHAIN;
 
   /**
    * @note

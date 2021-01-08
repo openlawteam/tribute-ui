@@ -1,9 +1,7 @@
 import {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
 
 import {useWeb3Modal} from '.';
-import {CHAIN_NAME} from '../../../config';
-import {StoreState} from '../../../util/types';
+import {CHAIN_NAME, DEFAULT_CHAIN} from '../../../config';
 
 /**
  * useIsDefaultChain
@@ -21,25 +19,22 @@ export function useIsDefaultChain(): {
   isDefaultChain: boolean;
 } {
   const {networkId} = useWeb3Modal();
-  const defaultChain = useSelector(
-    (state: StoreState) => state.blockchain.defaultChain
-  );
 
   const [isDefaultChain, setIsDefaultChain] = useState<boolean>(false);
   const [defaultChainError, setDefaultChainError] = useState<string>('');
 
   useEffect(() => {
-    setIsDefaultChain(networkId === defaultChain);
+    setIsDefaultChain(networkId === DEFAULT_CHAIN);
 
-    if (networkId !== defaultChain) {
+    if (networkId !== DEFAULT_CHAIN) {
       setDefaultChainError(
-        `Please connect to the ${CHAIN_NAME[defaultChain]}.`
+        `Please connect to the ${CHAIN_NAME[DEFAULT_CHAIN]}.`
       );
     }
-  }, [networkId, defaultChain]);
+  }, [networkId]);
 
   return {
-    defaultChain,
+    defaultChain: DEFAULT_CHAIN,
     defaultChainError,
     isDefaultChain,
   };
