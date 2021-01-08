@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
 
 import {
@@ -55,42 +55,50 @@ export default function Init(props: InitProps) {
   const {account, connected, provider, web3Instance} = useWeb3Modal();
 
   /**
+   * Cached callbacks
+   */
+
+  const handleInitContractsCached = useCallback(handleInitContracts, [
+    initContracts,
+  ]);
+
+  /**
    * Effects
    */
 
-  // Here we check for wallet connection changes and init updates
-  // to the app contracts, web3, wallet connected state, and wallet address
+  // Set web3 instance
   useEffect(() => {
-    const selectedAddress: string = account?.toLowerCase() ?? '';
-
-    // init contracts if connected or reset connection state
-    if (connected && selectedAddress) {
-      initContracts();
-    }
-
-    // set web3 instance
     web3Instance && dispatch(initWeb3Instance(web3Instance));
+  }, [dispatch, web3Instance]);
 
-    // set wallet auth
-    dispatch(walletAuthenticated(connected === true));
-
-    // set the address of the connected user
-    dispatch(setConnectedAddress(selectedAddress));
-  }, [account, connected, dispatch, initContracts, web3Instance]);
-
-  // Init the contracts used in the dApp,
-  // we do not need to wait for it to be ready
+  // Set wallet auth
   useEffect(() => {
-    try {
-      connected && provider && web3Instance && initContracts();
-    } catch (error) {
-      setError(error);
-    }
-  }, [connected, provider, web3Instance, initContracts]);
+    dispatch(walletAuthenticated(connected === true));
+  }, [connected, dispatch]);
+
+  // Set the address of the connected user
+  useEffect(() => {
+    dispatch(setConnectedAddress(account?.toLowerCase() ?? ''));
+  }, [account, dispatch]);
+
+  // Init the contracts used in the dApp
+  useEffect(() => {
+    connected && provider && web3Instance && handleInitContractsCached();
+  }, [connected, handleInitContractsCached, provider, web3Instance]);
 
   /**
    * Functions
    */
+
+  async function handleInitContracts() {
+    try {
+      await initContracts();
+
+      setError(undefined);
+    } catch (error) {
+      setError(error);
+    }
+  }
 
   // Render children
   return render({error});
