@@ -144,7 +144,9 @@ function ConnectWallet({
 
           {/* SHOW; WRONG NETWORK MSG || PROVIDER OPTIONS */}
           {connected && isWrongNetwork ? (
-            <DisplayChainError defaultChainError={defaultChainError} />
+            <DisplayChainError
+              defaultChainError={defaultChainError?.message || ''}
+            />
           ) : (
             <div className="walletconnect__options">{displayOptions}</div>
           )}

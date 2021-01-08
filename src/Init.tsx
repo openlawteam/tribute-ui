@@ -7,7 +7,7 @@ import {
   walletAuthenticated,
 } from './store/actions';
 import {ReduxDispatch} from './util/types';
-import {useInitContracts} from './components/web3/hooks';
+import {useInitContracts, useIsDefaultChain} from './components/web3/hooks';
 import {useWeb3Modal} from './components/web3/hooks';
 import ErrorMessageWithDetails from './components/common/ErrorMessageWithDetails';
 import FadeIn from './components/common/FadeIn';
@@ -47,12 +47,18 @@ export default function Init(props: InitProps) {
   const [error, setError] = useState<Error>();
 
   /**
-   * External Hooks
+   * Their Hooks
    */
 
   const dispatch = useDispatch<ReduxDispatch>();
+
+  /**
+   * Our hooks
+   */
+
   const {initContracts} = useInitContracts();
   const {account, connected, provider, web3Instance} = useWeb3Modal();
+  const {defaultChainError} = useIsDefaultChain();
 
   /**
    * Cached callbacks
@@ -86,6 +92,10 @@ export default function Init(props: InitProps) {
     connected && provider && web3Instance && handleInitContractsCached();
   }, [connected, handleInitContractsCached, provider, web3Instance]);
 
+  useEffect(() => {
+    setError(defaultChainError);
+  }, [defaultChainError]);
+
   /**
    * Functions
    */
@@ -93,8 +103,6 @@ export default function Init(props: InitProps) {
   async function handleInitContracts() {
     try {
       await initContracts();
-
-      setError(undefined);
     } catch (error) {
       setError(error);
     }

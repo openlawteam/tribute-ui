@@ -30,8 +30,8 @@ export function useInitContracts() {
    */
 
   const initContractsCached = useCallback(initContracts, [
-    dispatch,
     isDefaultChain,
+    dispatch,
     web3Instance,
   ]);
 
@@ -46,11 +46,7 @@ export function useInitContracts() {
    */
   async function initContracts() {
     try {
-      if (!isDefaultChain) {
-        throw new Error(
-          'Could not init contracts. You may be connected to the wrong chain.'
-        );
-      }
+      if (!isDefaultChain) return;
 
       // Init contracts
       await dispatch(initContractDaoRegistry(web3Instance));

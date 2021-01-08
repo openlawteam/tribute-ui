@@ -74,7 +74,7 @@ export default function CreateMemberProposal() {
    * Hooks
    */
 
-  const {isDefaultChain, defaultChainError} = useIsDefaultChain();
+  const {defaultChainError} = useIsDefaultChain();
   const {connected, account, networkId} = useWeb3Modal();
   const gasPrices = useETHGasPrice();
   const {
@@ -181,10 +181,6 @@ export default function CreateMemberProposal() {
         throw new Error(
           'No user account was found. Please makes sure your wallet is connected.'
         );
-      }
-
-      if (!isDefaultChain) {
-        throw new Error(defaultChainError);
       }
 
       if (!OnboardingContract) {
@@ -307,11 +303,11 @@ export default function CreateMemberProposal() {
   }
 
   // Render wrong network message if user is on wrong network
-  if (!isDefaultChain) {
+  if (defaultChainError) {
     return (
       <RenderWrapper>
         <div className="form__description--unauthorized">
-          <p>{defaultChainError}</p>
+          <p>{defaultChainError.message}</p>
         </div>
       </RenderWrapper>
     );

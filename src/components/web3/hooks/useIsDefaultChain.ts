@@ -15,23 +15,40 @@ import {CHAIN_NAME, DEFAULT_CHAIN} from '../../../config';
  */
 export function useIsDefaultChain(): {
   defaultChain: number;
-  defaultChainError: string;
+  defaultChainError: Error | undefined;
   isDefaultChain: boolean;
 } {
-  const {networkId} = useWeb3Modal();
+  /**
+   * Our hooks
+   */
+
+  const {networkId, connected} = useWeb3Modal();
+
+  /**
+   * State
+   */
 
   const [isDefaultChain, setIsDefaultChain] = useState<boolean>(false);
-  const [defaultChainError, setDefaultChainError] = useState<string>('');
+  const [defaultChainError, setDefaultChainError] = useState<Error>();
+
+  /**
+   * Effects
+   */
 
   useEffect(() => {
     setIsDefaultChain(networkId === DEFAULT_CHAIN);
 
-    if (networkId !== DEFAULT_CHAIN) {
+    if (connected && networkId !== DEFAULT_CHAIN) {
       setDefaultChainError(
-        `Please connect to the ${CHAIN_NAME[DEFAULT_CHAIN]}.`
+        new Error(`Please connect to the ${CHAIN_NAME[DEFAULT_CHAIN]}.`)
       );
+
+      return;
     }
-  }, [networkId]);
+
+    // If we make it here, reset after running checks.
+    setDefaultChainError(undefined);
+  }, [connected, networkId]);
 
   return {
     defaultChain: DEFAULT_CHAIN,
