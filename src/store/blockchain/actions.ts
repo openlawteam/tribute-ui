@@ -10,8 +10,6 @@ import OffchainVotingContract from '../../truffle-contracts/OffchainVotingContra
 import OnboardingContract from '../../truffle-contracts/OnboardingContract.json';
 
 export const BLOCKCHAIN_CONTRACTS = 'BLOCKCHAIN_CONTRACTS';
-export const BLOCKCHAIN_WALLET_AUTHENTICATED =
-  'BLOCKCHAIN_WALLET_AUTHENTICATED';
 export const BLOCKCHAIN_WEB3_STATE = 'BLOCKCHAIN_WEB3_STATE';
 export const CONNECTED_ADDRESS = 'CONNECTED_ADDRESS';
 
@@ -135,13 +133,6 @@ export function setConnectedAddress(selectedAddress: string | null) {
         ? web3State(Web3State.Connected)
         : web3State(Web3State.Locked)
     );
-  };
-}
-
-export function walletAuthenticated(isAuthenticated: boolean) {
-  return {
-    type: BLOCKCHAIN_WALLET_AUTHENTICATED,
-    walletAuthenticated: isAuthenticated,
   };
 }
 
