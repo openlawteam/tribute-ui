@@ -3,10 +3,14 @@ import {composeWithDevTools} from 'redux-devtools-extension/logOnlyInProduction'
 import {MemoryRouter} from 'react-router-dom';
 import {provider as Web3Provider} from 'web3-core/types';
 import {Provider} from 'react-redux';
-
 import React, {useCallback, useEffect, useState} from 'react';
 import thunk from 'redux-thunk';
 import Web3 from 'web3';
+
+import * as useWeb3ModalToMock from '../components/web3/hooks/useWeb3Modal';
+import {CHAINS as mockChains} from '../config';
+// @note We rename `CHAINS->mockChains` due to Jest rule in `mockImplementation`.
+import {getWeb3Instance} from './helpers';
 
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from './helpers';
 import {ReduxDispatch} from '../util/types';
@@ -96,6 +100,29 @@ export default function Wrapper(
   /**
    * Effects
    */
+
+  // @note We rename `web3->mockWeb3` due to Jest rule in `mockImplementation`.
+  const mockWeb3 = web3Instance;
+
+  const useWeb3ModalMock =
+    useWallet &&
+    jest.spyOn(useWeb3ModalToMock, 'useWeb3Modal').mockImplementation(() => ({
+      account: '0x0',
+      connected: true,
+      providerOptions: {},
+      onConnectTo: () => {},
+      onDisconnect: () => {},
+      networkId: mockChains['GANACHE'],
+      provider: mockWeb3Provider,
+      web3Instance: mockWeb3,
+      web3Modal: null,
+    }));
+
+  useEffect(() => {
+    return () => {
+      useWeb3ModalMock && useWeb3ModalMock.mockRestore();
+    };
+  }, [useWeb3ModalMock]);
 
   // Set up Web3-related Redux state
   useEffect(() => {
