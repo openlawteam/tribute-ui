@@ -8,7 +8,6 @@ import React, {useCallback, useEffect, useState} from 'react';
 import thunk from 'redux-thunk';
 import Web3 from 'web3';
 
-import {setConnectedAddress} from '../store/actions';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from './helpers';
 import {ReduxDispatch} from '../util/types';
 import Init, {InitError} from '../Init';
@@ -109,9 +108,6 @@ export default function Wrapper(
 
   function setupWallet() {
     if (useWallet) {
-      // Set Redux store state
-      dispatch(setConnectedAddress(DEFAULT_ETH_ADDRESS));
-
       onUseWallet && onUseWallet(dispatch);
     }
   }

@@ -1,8 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {useDispatch} from 'react-redux';
 
-import {setConnectedAddress} from './store/actions';
-import {ReduxDispatch} from './util/types';
 import {useInitContracts, useIsDefaultChain} from './components/web3/hooks';
 import {useWeb3Modal} from './components/web3/hooks';
 import ErrorMessageWithDetails from './components/common/ErrorMessageWithDetails';
@@ -43,17 +40,11 @@ export default function Init(props: InitProps) {
   const [error, setError] = useState<Error>();
 
   /**
-   * Their Hooks
-   */
-
-  const dispatch = useDispatch<ReduxDispatch>();
-
-  /**
    * Our hooks
    */
 
   const {initContracts} = useInitContracts();
-  const {account, connected, provider, web3Instance} = useWeb3Modal();
+  const {/* account, */ connected, provider, web3Instance} = useWeb3Modal();
   const {defaultChainError} = useIsDefaultChain();
 
   /**
@@ -67,11 +58,6 @@ export default function Init(props: InitProps) {
   /**
    * Effects
    */
-
-  // Set the address of the connected user
-  useEffect(() => {
-    dispatch(setConnectedAddress(account?.toLowerCase() ?? ''));
-  }, [account, dispatch]);
 
   // Init the contracts used in the dApp
   useEffect(() => {

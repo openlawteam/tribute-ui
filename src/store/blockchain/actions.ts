@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import {Dispatch} from 'redux';
 
-import {ContractAdapterNames, Web3State} from '../../components/web3/types';
+import {ContractAdapterNames} from '../../components/web3/types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../config';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {StoreState} from '../../util/types';
@@ -10,10 +10,11 @@ import OffchainVotingContract from '../../truffle-contracts/OffchainVotingContra
 import OnboardingContract from '../../truffle-contracts/OnboardingContract.json';
 
 export const BLOCKCHAIN_CONTRACTS = 'BLOCKCHAIN_CONTRACTS';
-export const BLOCKCHAIN_WEB3_STATE = 'BLOCKCHAIN_WEB3_STATE';
-export const CONNECTED_ADDRESS = 'CONNECTED_ADDRESS';
 
-// @todo Add inits for Transfer and Tribute when ready
+/**
+ * @todo Rename this Redux state slice to be `contracts` - more focused.
+ * @todo Add inits for Transfer and Tribute when ready
+ */
 
 export function initContractDaoRegistry(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
@@ -116,29 +117,5 @@ export function initContractOnboarding(web3Instance: Web3) {
     } catch (error) {
       console.error(error);
     }
-  };
-}
-
-/**
- * setConnectedAddress
- *
- * @param {string} selectedAddress
- *
- */
-export function setConnectedAddress(selectedAddress: string | null) {
-  return async function (dispatch: any) {
-    dispatch({type: CONNECTED_ADDRESS, connectedAddress: selectedAddress});
-    dispatch(
-      selectedAddress
-        ? web3State(Web3State.Connected)
-        : web3State(Web3State.Locked)
-    );
-  };
-}
-
-export function web3State(web3State: string) {
-  return {
-    type: BLOCKCHAIN_WEB3_STATE,
-    web3State,
   };
 }
