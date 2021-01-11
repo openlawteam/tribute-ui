@@ -223,6 +223,8 @@ export default function CreateMemberProposal() {
       // to go to newly created member proposal details page.
 
       // go to MemberDetails page for newly created member proposal
+      // @todo adjust `proposalId` to whatever is necessary for how we handle
+      // proposal identifiers (e.g., hash, uuid)
       // history.push(`/members/${proposalId}`);
     } catch (error) {
       // Set any errors from Web3 utils or explicitly set above.

@@ -91,7 +91,7 @@
 }
 
 .walletconnect__connect-button {
-  @extend %button;
+  @extend .button;
 
   border-radius: 12px;
   box-shadow: 0 2px 2px 0 $color-shadow-primary;

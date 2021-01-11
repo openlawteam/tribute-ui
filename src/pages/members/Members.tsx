@@ -1,68 +1,72 @@
 import React from 'react';
+import {useHistory} from 'react-router-dom';
 
+import {truncateEthAddress} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
 import ProposalCard from '../../components/snapshot/ProposalCard';
+import {
+  fakeMemberProposalsVoting,
+  fakeMemberProposalsPassed,
+  FakeMemberProposals,
+} from '../../components/snapshot/_mockData';
 
-const dummyProposals = [
-  {
-    name: '0xA089E0684BD87Be6e3F343e224Da191C500883Ec',
-    body:
-      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
-  },
-  {
-    name: '0xE7deBE6565CD01b6152B345B689A15Eb710D21e6',
-    body:
-      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
-  },
-  {
-    name: '0x80C6CF52720BeD578D3E446199516CB816F67e37',
-    body:
-      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
-  },
-  {
-    name: '0xE00BcCddD33E9578904570409E0283C0ef511472',
-    body:
-      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
-  },
-  {
-    name: '0x3D1AaFD15850544b358738c89afC4608F8351D2C',
-    body:
-      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
-  },
-  {
-    name: '0x9b5D3d12055B7b70E839e12417a2B9cE5ED9965c',
-    body:
-      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
-  },
-];
+enum ProposalHeaderNames {
+  VOTING = 'New Member Voting',
+  PASSED = 'Members',
+}
 
 export default function Members() {
+  /**
+   * External hooks
+   */
+
+  const history = useHistory();
+
   /**
    * Variables
    */
 
-  const votingProposals = renderProposalCards(dummyProposals);
+  const votingProposals = renderProposalCards(
+    fakeMemberProposalsVoting,
+    ProposalHeaderNames.VOTING
+  );
+  const passedProposals = renderProposalCards(
+    fakeMemberProposalsPassed,
+    ProposalHeaderNames.PASSED
+  );
 
   /**
    * Functions
    */
 
   function renderProposalCards(
-    proposals: {name: string; body: string}[],
+    proposals: FakeMemberProposals[],
     headerName?: string
   ) {
     return proposals.map((proposal) => {
-      const renderVerbose = headerName === 'New Member Voting';
+      const renderVerbose = headerName === ProposalHeaderNames.VOTING;
 
       return (
         <ProposalCard
           key={proposal.name}
-          name={proposal.name}
+          onClick={handleClickProposalDetails(proposal.name)} // @todo Replace placeholder argument
+          name={truncateEthAddress(proposal.name, 7)}
+          snapshotProposal={proposal.snapshotProposal}
           shouldRenderVerbose={renderVerbose}
         />
       );
     });
+  }
+
+  // @todo adjust `proposalId` to whatever is necessary for how we handle
+  // proposal identifiers (e.g., hash, uuid)
+  function handleClickProposalDetails(proposalId: string) {
+    return () => {
+      if (!proposalId) return;
+
+      history.push(`/members/${proposalId}`);
+    };
   }
 
   /**
@@ -72,9 +76,16 @@ export default function Members() {
   return (
     <RenderWrapper>
       <section className="grid--fluid grid-container">
+        {/* VOTING PROPOSALS */}
         <>
-          <div className="grid__header">New Member Voting</div>
+          <div className="grid__header">{ProposalHeaderNames.VOTING}</div>
           <div className="grid__cards">{votingProposals}</div>
+        </>
+
+        {/* PASSED PROPOSALS (MEMBERS) */}
+        <>
+          <div className="grid__header">{ProposalHeaderNames.PASSED}</div>
+          <div className="grid__cards">{passedProposals}</div>
         </>
       </section>
     </RenderWrapper>
