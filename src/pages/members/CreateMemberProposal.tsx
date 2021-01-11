@@ -57,14 +57,10 @@ export default function CreateMemberProposal() {
    */
 
   const OnboardingContract = useSelector(
-    (state: StoreState) =>
-      state.blockchain.contracts &&
-      state.blockchain.contracts.OnboardingContract
+    (state: StoreState) => state.contracts?.OnboardingContract
   );
   const DaoRegistryContract = useSelector(
-    (state: StoreState) =>
-      state.blockchain.contracts &&
-      state.blockchain.contracts.DaoRegistryContract
+    (state: StoreState) => state.contracts?.DaoRegistryContract
   );
 
   /**

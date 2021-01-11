@@ -13,13 +13,6 @@ export type SmartContractItem = {
   contractAddress: string;
 };
 
-// @todo Add 'TransferContract and 'TributeContract' when ready
-export type SmartContracts = {
-  DaoRegistryContract: SmartContractItem;
-  OffchainVotingContract: SmartContractItem;
-  OnboardingContract: SmartContractItem;
-};
-
 // PROPOSALS
 
 /**

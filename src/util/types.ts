@@ -1,7 +1,7 @@
 import {ThunkDispatch} from 'redux-thunk';
 import {Action} from 'redux';
 
-import {SmartContracts, Web3State} from '../components/web3/types';
+import {SmartContractItem} from '../components/web3/types';
 
 /**
  * FOR HIGH REUSE TYPES
@@ -16,14 +16,14 @@ import {SmartContracts, Web3State} from '../components/web3/types';
 
 export type EnvironmentName = 'localhost' | 'development' | 'production';
 
-export interface BlockchainState {
-  connectedAddress?: string;
-  contracts?: SmartContracts;
-  web3State?: Web3State;
+export interface ContractsState {
+  DaoRegistryContract: SmartContractItem | null;
+  OnboardingContract: SmartContractItem | null;
+  OffchainVotingContract: SmartContractItem | null;
 }
 
 export type StoreState = {
-  blockchain: BlockchainState;
+  contracts: ContractsState;
 };
 
 // HELPERS
