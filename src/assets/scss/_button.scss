@@ -1,20 +1,14 @@
 @use "./variables" as *; /* load without namespace for convenience */
 
 %button {
-  background-color: $color-background-primary;
-  border-radius: 15px;
-  border: 1px solid $color-border-primary;
   color: $color-primary;
-  font-family: $font-accent;
   outline: none;
-  padding: 0.6rem 1.25rem;
-  text-transform: lowercase;
   letter-spacing: 1px;
   position: relative;
   box-sizing: border-box;
-  font-size: 1.25rem;
   cursor: pointer;
   text-align: center;
+  padding: 0.6rem 1.25rem;
 
   &:disabled {
     cursor: not-allowed;
@@ -24,4 +18,23 @@
 
 .button {
   @extend %button;
+
+  background-color: $color-background-primary;
+  border-radius: 15px;
+  border: 1px solid $color-border-primary;
+  font-family: $font-accent;
+  text-transform: lowercase;
+  font-size: 1.25rem;
+}
+
+.button--secondary {
+  @extend %button;
+
+  background-color: #f4f4f4;
+  border: none;
+  border-radius: 12px;
+  font-family: $font-body;
+  text-transform: uppercase;
+  font-size: 1.125rem;
+  font-weight: 500;
 }

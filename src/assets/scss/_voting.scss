@@ -1,0 +1,121 @@
+@use "./variables" as *; /* load without namespace for convenience */
+@use "./mixins" as *; /* load without namespace for convenience */
+
+.votingstatus-container {
+  display: flex;
+  margin-top: 3.5rem;
+  justify-content: center;
+  align-items: center;
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    14px,
+    16px
+  ); /* min font-size 0.875rem, max 1rem */
+
+  svg {
+    flex-shrink: 0;
+    margin-right: 1rem;
+  }
+}
+
+.votingstatus {
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    13px,
+    14.4px
+  ); /* min font-size 0.8125rem, max 0.9rem */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.votingstatus__timer {
+  font-family: $font-mono;
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    13px,
+    14.4px
+  ); /* min font-size 0.8125rem, max 0.9rem */
+  margin-left: 0.5rem;
+}
+
+// voting bar styles
+
+$bar-height: 14px;
+
+%vote-segment {
+  display: block;
+  position: absolute;
+  height: $bar-height;
+  transition: 0.4s linear;
+}
+
+.votingbar-container {
+  position: relative;
+  margin-top: 2rem;
+
+  flex: 1 1 100%;
+}
+
+.votingbar {
+  border-radius: 12px;
+  height: $bar-height;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  box-sizing: border-box;
+  background-color: #f4f4f4;
+
+  &__segment--yes {
+    @extend %vote-segment;
+
+    left: 0;
+    background-color: #96c0d6;
+  }
+
+  &__segment--no {
+    @extend %vote-segment;
+
+    right: 0;
+    background-color: #e5a2a2;
+  }
+}
+
+.votingbar__percentages {
+  font-size: 1rem;
+  margin: 1rem 0 0.5rem;
+  position: relative;
+  // height: 20px;
+
+  .yes-percent {
+    position: relative;
+    left: 22%;
+  }
+
+  .no-percent {
+    position: absolute;
+    right: 22%;
+  }
+
+  .yes-check {
+    position: absolute;
+    left: 10%;
+    transform: translateY(-4px);
+
+    @media only screen and (max-width: $bp-sm) {
+      left: 0;
+    }
+  }
+
+  .no-check {
+    position: absolute;
+    right: 10%;
+    transform: translateY(-4px);
+
+    @media only screen and (max-width: $bp-sm) {
+      right: 0;
+    }
+  }
+}

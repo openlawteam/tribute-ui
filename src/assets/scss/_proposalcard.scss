@@ -1,0 +1,51 @@
+@use "./variables" as *; /* load without namespace for convenience */
+@use "./mixins" as *; /* load without namespace for convenience */
+@use "./button";
+
+.proposalcard {
+  background-color: $color-background-primary;
+  border-radius: 12px;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 2px 2px 0 $color-shadow-primary;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.proposalcard__title {
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    16px,
+    20px
+  ); /* min font-size 1rem, max 1.25rem */
+  line-height: 1.6;
+  text-align: center;
+  font-weight: normal;
+
+  &:last-child {
+    margin: 0;
+  }
+}
+
+.proposalcard__button {
+  @extend .button--secondary;
+
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    16px,
+    18px
+  ); /* min font-size 1rem, max 1.125rem */
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+// hide elements that are only displayed in the proposal details view
+.proposalcard {
+  .votingstatus-container svg {
+    display: none;
+  }
+}

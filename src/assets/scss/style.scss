@@ -12,6 +12,9 @@
 @use "./button"; /* button styles */
 @use "./form"; /* form styles */
 @use "./input"; /* input styles */
+@use "./grid"; /* grid styles */
+@use "./proposalcard"; /* proposal card styles */
+@use "./voting"; /* voting styles */
 
 html {
   height: 100%;
@@ -135,7 +138,7 @@ main {
 }
 
 .titlebar__action {
-  @extend %button;
+  @extend .button;
 
   display: block;
   font-size: 1rem;
