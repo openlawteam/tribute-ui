@@ -36,3 +36,10 @@ export enum FormFieldErrors {
   INVALID_ETHEREUM_ADDRESS = 'The ethereum address is invalid.',
   INVALID_NUMBER = 'The value is not a number.',
 }
+
+export enum ProposalHeaderNames {
+  FAILED = 'Failed',
+  PASSED = 'Passed',
+  REQUESTS = 'Proposals',
+  VOTING = 'Voting',
+}
