@@ -36,9 +36,7 @@ export default function Routes() {
         <Route
           key="member-details"
           exact
-          // @todo adjust `proposalId` to whatever is necessary for how we
-          // handle proposal identifiers (e.g., hash, uuid)
-          path="/members/:proposalId"
+          path="/members/:proposalHash"
           render={() => <MemberDetails />}
         />,
         <Route
@@ -56,9 +54,7 @@ export default function Routes() {
         <Route
           key="transfer-details"
           exact
-          // @todo adjust `proposalId` to whatever is necessary for how we
-          // handle proposal identifiers (e.g., hash, uuid)
-          path="/transfers/:proposalId"
+          path="/transfers/:proposalHash"
           render={() => <TransferDetails />}
         />,
         <Route
@@ -76,9 +72,7 @@ export default function Routes() {
         <Route
           key="tribute-details"
           exact
-          // @todo adjust `proposalId` to whatever is necessary for how we
-          // handle proposal identifiers (e.g., hash, uuid)
-          path="/tributes/:proposalId"
+          path="/tributes/:proposalHash"
           render={() => <TributeDetails />}
         />,
         <Route
@@ -96,9 +90,7 @@ export default function Routes() {
         <Route
           key="governance-proposal-details"
           exact
-          // @todo adjust `proposalId` to whatever is necessary for how we
-          // handle proposal identifiers (e.g., hash, uuid)
-          path="/governance-proposals/:proposalId"
+          path="/governance-proposals/:proposalHash"
           render={() => <GovernanceProposalDetails />}
         />,
         <Route key="notfound" exact path="/404" render={() => <NotFound />} />,

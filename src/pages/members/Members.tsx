@@ -1,20 +1,17 @@
 import React from 'react';
 import {useHistory} from 'react-router-dom';
 
-import {truncateEthAddress} from '../../util/helpers';
+import {ProposalHeaderNames} from '../../util/enums';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
 import ProposalCard from '../../components/snapshot/ProposalCard';
 import {
   fakeMemberProposalsVoting,
+  fakeMemberProposalsRequest,
   fakeMemberProposalsPassed,
-  FakeMemberProposals,
+  fakeMemberProposalsFailed,
+  FakeProposal,
 } from '../../components/snapshot/_mockData';
-
-enum ProposalHeaderNames {
-  VOTING = 'New Member Voting',
-  PASSED = 'Members',
-}
 
 export default function Members() {
   /**
@@ -27,45 +24,32 @@ export default function Members() {
    * Variables
    */
 
-  const votingProposals = renderProposalCards(
-    fakeMemberProposalsVoting,
-    ProposalHeaderNames.VOTING
-  );
-  const passedProposals = renderProposalCards(
-    fakeMemberProposalsPassed,
-    ProposalHeaderNames.PASSED
-  );
+  const votingProposals = renderProposalCards(fakeMemberProposalsVoting);
+  const requestProposals = renderProposalCards(fakeMemberProposalsRequest);
+  const passedProposals = renderProposalCards(fakeMemberProposalsPassed);
+  const failedProposals = renderProposalCards(fakeMemberProposalsFailed);
 
   /**
    * Functions
    */
 
-  function renderProposalCards(
-    proposals: FakeMemberProposals[],
-    headerName?: string
-  ) {
+  function renderProposalCards(proposals: FakeProposal[]) {
     return proposals.map((proposal) => {
-      const renderVerbose = headerName === ProposalHeaderNames.VOTING;
-
       return (
         <ProposalCard
-          key={proposal.name}
-          onClick={handleClickProposalDetails(proposal.name)} // @todo Replace placeholder argument
-          name={truncateEthAddress(proposal.name, 7)}
+          key={proposal.snapshotProposal.hash}
+          onClick={handleClickProposalDetails(proposal.snapshotProposal.hash)}
           snapshotProposal={proposal.snapshotProposal}
-          shouldRenderVerbose={renderVerbose}
         />
       );
     });
   }
 
-  // @todo adjust `proposalId` to whatever is necessary for how we handle
-  // proposal identifiers (e.g., hash, uuid)
-  function handleClickProposalDetails(proposalId: string) {
+  function handleClickProposalDetails(proposalHash: string) {
     return () => {
-      if (!proposalId) return;
+      if (!proposalHash) return;
 
-      history.push(`/members/${proposalId}`);
+      history.push(`/members/${proposalHash}`);
     };
   }
 
@@ -77,16 +61,36 @@ export default function Members() {
     <RenderWrapper>
       <section className="grid--fluid grid-container">
         {/* VOTING PROPOSALS */}
-        <>
-          <div className="grid__header">{ProposalHeaderNames.VOTING}</div>
-          <div className="grid__cards">{votingProposals}</div>
-        </>
+        {votingProposals.length > 0 && (
+          <>
+            <div className="grid__header">{ProposalHeaderNames.VOTING}</div>
+            <div className="grid__cards">{votingProposals}</div>
+          </>
+        )}
 
-        {/* PASSED PROPOSALS (MEMBERS) */}
-        <>
-          <div className="grid__header">{ProposalHeaderNames.PASSED}</div>
-          <div className="grid__cards">{passedProposals}</div>
-        </>
+        {/* PENDING PROPOSALS (DRAFTS, NOT SPONSORED) */}
+        {requestProposals.length > 0 && (
+          <>
+            <div className="grid__header">{ProposalHeaderNames.REQUESTS}</div>
+            <div className="grid__cards">{requestProposals}</div>
+          </>
+        )}
+
+        {/* PASSED PROPOSALS */}
+        {passedProposals.length > 0 && (
+          <>
+            <div className="grid__header">{ProposalHeaderNames.PASSED}</div>
+            <div className="grid__cards">{passedProposals}</div>
+          </>
+        )}
+
+        {/* FAILED PROPOSALS */}
+        {failedProposals.length > 0 && (
+          <>
+            <div className="grid__header">{ProposalHeaderNames.FAILED}</div>
+            <div className="grid__cards">{failedProposals}</div>
+          </>
+        )}
       </section>
     </RenderWrapper>
   );

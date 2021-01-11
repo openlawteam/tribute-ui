@@ -1,10 +1,9 @@
+import {truncateEthAddress} from '../../util/helpers';
 import VotingStatus from '../../components/snapshot/VotingStatus';
 
 type ProposalCardProps = {
   buttonText?: string;
-  name: string;
-  onClick: (proposalId: string) => void;
-  shouldRenderVerbose?: boolean;
+  onClick: (proposalHash: string) => void;
   snapshotProposal?: any; // placeholder prop
 };
 
@@ -19,24 +18,16 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
    * Variables
    */
 
-  const {
-    name,
-    shouldRenderVerbose = true,
-    buttonText = 'View Proposal',
-    snapshotProposal,
-    onClick,
-  } = props;
+  const {buttonText = 'View Proposal', snapshotProposal, onClick} = props;
 
   /**
    * Functions
    */
 
-  // @todo adjust `proposalId` to whatever is necessary for how we handle
-  // proposal identifiers (e.g., hash, uuid)
   function handleClick() {
-    const proposalId = name;
+    const proposalHash = snapshotProposal.hash;
 
-    onClick(proposalId);
+    onClick(proposalHash);
   }
 
   /**
@@ -46,18 +37,15 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
   return (
     <div className="proposalcard" onClick={handleClick}>
       {/* TITLE */}
-      <h3 className="proposalcard__title">{name}</h3>
+      <h3 className="proposalcard__title">
+        {truncateEthAddress(snapshotProposal.name, 7)}
+      </h3>
 
-      {/* SHOW THE VOTING PROGRESS BAR & BUTTON. DEFAULTS to `true` */}
-      {shouldRenderVerbose && (
-        <>
-          {/* STATUS */}
-          <VotingStatus snapshotProposal={snapshotProposal} />
+      {/* VOTING PROGRESS STATUS AND BAR */}
+      <VotingStatus snapshotProposal={snapshotProposal} />
 
-          {/* BUTTON (no click handler) */}
-          <button className="proposalcard__button">{buttonText}</button>
-        </>
-      )}
+      {/* BUTTON (no click handler) */}
+      <button className="proposalcard__button">{buttonText}</button>
     </div>
   );
 }
