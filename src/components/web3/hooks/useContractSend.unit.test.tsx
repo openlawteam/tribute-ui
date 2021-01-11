@@ -1,97 +1,113 @@
 import {waitFor} from '@testing-library/react';
+import {renderHook, act} from '@testing-library/react-hooks';
+import Web3 from 'web3';
 
-import * as useWeb3ModalToMock from './useWeb3Modal';
-import {CHAINS as mockChains} from '../../../config';
-// @note We rename `CHAINS->mockChains` due to Jest rule in `mockImplementation`.
-import {getWeb3Instance, setupHook} from '../../../test/helpers';
+import {DEFAULT_ETH_ADDRESS, setupHook} from '../../../test/helpers';
+import {ethEstimateGas} from '../../../test/web3Responses/estimateGas';
+import {ethGasPrice} from '../../../test/web3Responses/gasPrice';
+import {getTransactionReceipt} from '../../../test/web3Responses/getTransactionReceipt';
+import {sendTransaction} from '../../../test/web3Responses/sendTransaction';
 import {useContractSend} from '.';
 import {Web3TxStatus} from '../types';
 
 describe('useContractSend unit tests', () => {
-  test('should return correct data', async () => {
-    // // @note We rename `web3->mockWeb3` due to Jest rule in `mockImplementation`.
-    // const {web3: mockWeb3, mockWeb3Provider} = getWeb3Instance();
-
-    // jest
-    //   .spyOn(useWeb3ModalToMock, 'useWeb3Modal')
-    //   .mockImplementationOnce(() => ({
-    //     account: '0x0',
-    //     connected: true,
-    //     providerOptions: {},
-    //     onConnectTo: () => {},
-    //     onDisconnect: () => {},
-    //     networkId: mockChains['GANACHE'],
-    //     provider: mockWeb3Provider,
-    //     web3Instance: mockWeb3,
-    //     web3Modal: null,
-    //   }));
-
-    // console.log('useWeb3Modal', useWeb3ModalToMock.useWeb3Modal);
-
-    const result = setupHook({
-      hook: useContractSend,
-      hookArgs: [null],
+  test('should return correct data when calling txSend', async () => {
+    /**
+     * @note Not using our `setupHook` this to extract hook data, we will use `renderHook` for this hook test.
+     *   But we still need access to a contract ABI to test `contractSend` properly.
+     *   Hence, the access of the Redux `contract` state.
+     */
+    const {store, mockWeb3Provider, web3Instance} = setupHook({
       wrapperProps: {
         useInit: true,
         useWallet: true,
       },
-    }) as ReturnType<typeof useContractSend>;
+    });
+
+    await waitFor(() => {
+      expect(store.getState().contracts.OnboardingContract).not.toBe(null);
+    });
+
+    const {result, waitForNextUpdate} = renderHook(() => useContractSend());
+
+    const spyOnProcess = jest.fn();
 
     // assert initial state
-    expect(result.txError).toBe(undefined);
-    expect(result.txEtherscanURL).toBe('');
-    expect(result.txIsPromptOpen).toBe(false);
-    expect(result.txReceipt).toBe(undefined);
-    expect(result.txSend).toBeInstanceOf(Function);
-    expect(result.txStatus).toBe(Web3TxStatus.STANDBY);
+    expect(result.current.txError).toBe(undefined);
+    expect(result.current.txEtherscanURL).toBe('');
+    expect(result.current.txIsPromptOpen).toBe(false);
+    expect(result.current.txReceipt).toBe(undefined);
+    expect(result.current.txSend).toBeInstanceOf(Function);
+    expect(result.current.txStatus).toBe(Web3TxStatus.STANDBY);
 
-    // assert result txSend
-    // await waitFor(async () => {
-    //   const cool = await result.txSend(
-    //     'test',
-    //     undefined,
-    //     undefined,
-    //     undefined,
-    //     () => {}
-    //   );
+    // Call txSend
+    act(() => {
+      mockWeb3Provider.injectResult(...ethEstimateGas(web3Instance));
+      mockWeb3Provider.injectResult(...ethGasPrice(web3Instance));
+      mockWeb3Provider.injectResult(...sendTransaction());
+      mockWeb3Provider.injectResult(...getTransactionReceipt());
 
-    //   console.log('vool', cool);
+      result.current.txSend(
+        'onboard',
+        store.getState().contracts.OnboardingContract?.instance.methods,
+        [
+          DEFAULT_ETH_ADDRESS,
+          DEFAULT_ETH_ADDRESS,
+          DEFAULT_ETH_ADDRESS,
+          Web3.utils.toWei('1', 'ether'),
+        ],
+        {
+          from: DEFAULT_ETH_ADDRESS,
+          value: Web3.utils.toWei('1', 'ether'),
+        },
+        spyOnProcess
+      );
+    });
 
-    //   expect(result.txError).toBe(undefined);
-    // });
-  });
+    // assert awaiting confirmation state
+    expect(result.current.txError).toBe(undefined);
+    expect(result.current.txEtherscanURL).toBe('');
+    expect(result.current.txIsPromptOpen).toBe(true);
+    expect(result.current.txReceipt).toBe(undefined);
+    expect(result.current.txSend).toBeInstanceOf(Function);
+    expect(result.current.txStatus).toBe(Web3TxStatus.AWAITING_CONFIRM);
 
-  test('should return correct datass', async () => {
-    const result = setupHook({
-      hook: useContractSend,
-      hookArgs: [null],
-      wrapperProps: {
-        useInit: true,
-        useWallet: true,
-      },
-    }) as ReturnType<typeof useContractSend>;
+    await waitForNextUpdate();
 
-    // assert initial state
-    expect(result.txError).toBe(undefined);
-    expect(result.txEtherscanURL).toBe('');
-    expect(result.txIsPromptOpen).toBe(false);
-    expect(result.txReceipt).toBe(undefined);
-    expect(result.txSend).toBeInstanceOf(Function);
-    expect(result.txStatus).toBe(Web3TxStatus.STANDBY);
+    // assert pending state
+    expect(result.current.txError).toBe(undefined);
+    expect(result.current.txEtherscanURL).toBe('');
+    expect(result.current.txIsPromptOpen).toBe(false);
+    expect(result.current.txReceipt).toBe(undefined);
+    expect(result.current.txSend).toBeInstanceOf(Function);
+    expect(result.current.txStatus).toBe(Web3TxStatus.PENDING);
 
-    // assert result txSend
-    // await waitFor(async () => {
-    //   const cool = await result.txSend(
-    //     'test',
-    //     undefined,
-    //     undefined,
-    //     undefined,
-    //     () => {}
-    //   );
+    await waitForNextUpdate();
 
-    //   console.log('vool', cool);
+    // assert OK state
+    expect(result.current.txError).toBe(undefined);
+    expect(result.current.txEtherscanURL).toBe('');
+    expect(result.current.txIsPromptOpen).toBe(false);
+    expect(result.current.txReceipt).toStrictEqual({
+      blockHash:
+        '0xc6ef2fc5426d6ad6fd9e2a26abeab0aa2411b7ab17f30a99d3cb96aed1d1055b',
+      blockNumber: 11,
+      contractAddress: null,
+      cumulativeGasUsed: 13244,
+      events: {},
+      gasUsed: 1244,
+      logsBloom: DEFAULT_ETH_ADDRESS,
+      status: true,
+      transactionHash:
+        '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331',
+      transactionIndex: 1,
+    });
+    expect(result.current.txSend).toBeInstanceOf(Function);
+    expect(result.current.txStatus).toBe(Web3TxStatus.FULFILLED);
 
-    //   expect(result.txError).toBe(undefined);
-    // });
+    // assert onProcess callback was called with txHash
+    expect(spyOnProcess.mock.calls[0][0]).toBe(
+      '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331'
+    );
   });
 });
