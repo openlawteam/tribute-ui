@@ -1,7 +1,7 @@
 import {combineReducers} from 'redux';
 
-import blockchain from './blockchain/reducers';
+import contracts from './contracts/reducers';
 
 export default combineReducers({
-  blockchain,
+  contracts,
 });
