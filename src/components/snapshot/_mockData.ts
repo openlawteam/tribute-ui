@@ -1,3 +1,6 @@
+// @todo delete this file when no longer needed. (Fake data needed for
+// placeholder components to render styles)
+
 export type FakeMemberProposals = {
   name: string;
   body: string;
