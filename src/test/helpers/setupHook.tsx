@@ -1,6 +1,10 @@
 import {render} from '@testing-library/react';
 
-import Wrapper from '../Wrapper';
+import Wrapper, {WrapperReturnProps} from '../Wrapper';
+
+type SetupHookReturn = {
+  result: any;
+} & WrapperReturnProps;
 
 /**
  * setupHook
@@ -22,23 +26,34 @@ export function setupHook({
   hookArgs,
   wrapperProps,
 }: {
-  hook: (p?: any) => any;
+  hook?: (p?: any) => any;
   hookArgs?: any;
   wrapperProps?: Parameters<typeof Wrapper>[0];
-}) {
-  let returnVal: any;
+}): SetupHookReturn {
+  let returnVal: Partial<SetupHookReturn> = {};
 
   function TestComponent() {
-    returnVal = hook(...hookArgs);
+    returnVal = {...returnVal, result: hook && hook(...hookArgs)};
 
     return null;
   }
 
   render(
-    <Wrapper {...wrapperProps}>
-      <TestComponent />
-    </Wrapper>
+    <Wrapper
+      {...wrapperProps}
+      render={(p) => {
+        returnVal = {...returnVal, ...p};
+
+        return (
+          <>
+            <TestComponent />
+
+            {wrapperProps?.render && wrapperProps.render(p)}
+          </>
+        );
+      }}
+    />
   );
 
-  return returnVal;
+  return returnVal as SetupHookReturn;
 }
