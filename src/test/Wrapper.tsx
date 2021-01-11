@@ -1,38 +1,27 @@
-import {applyMiddleware, createStore, Store} from 'redux';
-import {composeWithDevTools} from 'redux-devtools-extension/logOnlyInProduction';
+import {Store} from 'redux';
 import {MemoryRouter} from 'react-router-dom';
 import {provider as Web3Provider} from 'web3-core/types';
 import {Provider} from 'react-redux';
-import React, {useCallback, useEffect, useState} from 'react';
-import thunk from 'redux-thunk';
+import React, {useEffect, useMemo, useState} from 'react';
 import Web3 from 'web3';
 
-import * as useWeb3ModalToMock from '../components/web3/hooks/useWeb3Modal';
-import {CHAINS as mockChains} from '../config';
-// @note We rename `CHAINS->mockChains` due to Jest rule in `mockImplementation`.
-import {getWeb3Instance} from './helpers';
-
-import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from './helpers';
-import {ReduxDispatch} from '../util/types';
-import Init, {InitError} from '../Init';
-import rootReducer from '../store/reducers';
 import {
   Web3ModalContext,
   Web3ModalContextValue,
 } from '../components/web3/Web3ModalManager';
+import * as useWeb3ModalToMock from '../components/web3/hooks/useWeb3Modal';
+import * as getAdapterAddressToMock from '../components/web3/helpers/getAdapterAddress';
+import {CHAINS as mockChains} from '../config';
+import {DEFAULT_ETH_ADDRESS, FakeHttpProvider, getNewStore} from './helpers';
+import Init, {InitError} from '../Init';
 
-type WrapperReturnProps = {
+export type WrapperReturnProps = {
   mockWeb3Provider: FakeHttpProvider;
   store: Store;
   web3Instance: Web3;
 };
 
 type WrapperProps = {
-  /**
-   * A callback which will run once the wallet is initiated.
-   * i.e. Good for timing conflict issues with <Init /> on wallet setup.
-   */
-  onUseWallet?: (dispatch: ReduxDispatch) => void;
   /**
    * Use the `<Init />` component to wrap the child component.
    */
@@ -51,9 +40,6 @@ type WrapperProps = {
   web3ModalContext?: Web3ModalContextValue;
 };
 
-const getNewStore = () =>
-  createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
-
 /**
  * Similar to our app code, `<Wrapper />` provides a wrapper for tests which need the following to run:
  *
@@ -64,12 +50,7 @@ const getNewStore = () =>
 export default function Wrapper(
   props: WrapperProps & React.PropsWithChildren<React.ReactNode>
 ) {
-  const {
-    onUseWallet,
-    useInit = false,
-    useWallet = false,
-    web3ModalContext,
-  } = props;
+  const {useInit = false, useWallet = false, web3ModalContext} = props;
 
   /**
    * State
@@ -82,67 +63,60 @@ export default function Wrapper(
   );
 
   /**
-   * Variables
-   */
-
-  const dispatch = store.dispatch as ReduxDispatch;
-
-  /**
-   * Cached callbacks
-   */
-
-  const setupWalletCached = useCallback(setupWallet, [
-    dispatch,
-    onUseWallet,
-    useWallet,
-  ]);
-
-  /**
-   * Effects
+   * Cached values
    */
 
   // @note We rename `web3->mockWeb3` due to Jest rule in `mockImplementation`.
   const mockWeb3 = web3Instance;
 
-  const useWeb3ModalMock =
-    useWallet &&
-    jest.spyOn(useWeb3ModalToMock, 'useWeb3Modal').mockImplementation(() => ({
-      account: '0x0',
-      connected: true,
-      providerOptions: {},
-      onConnectTo: () => {},
-      onDisconnect: () => {},
-      networkId: mockChains['GANACHE'],
-      provider: mockWeb3Provider,
-      web3Instance: mockWeb3,
-      web3Modal: null,
-    }));
+  // If `useWallet` is enabled it will mock the `useWeb3Modal` response so we can test tx's.
+  const useWeb3ModalMock = useMemo(() => {
+    if (!useWallet) return;
+
+    return jest
+      .spyOn(useWeb3ModalToMock, 'useWeb3Modal')
+      .mockImplementation(() => ({
+        account: DEFAULT_ETH_ADDRESS,
+        connected: true,
+        providerOptions: {},
+        onConnectTo: () => {},
+        onDisconnect: () => {},
+        networkId: mockChains['GANACHE'],
+        provider: mockWeb3Provider,
+        web3Instance: mockWeb3,
+        web3Modal: null,
+      }));
+  }, [mockWeb3, mockWeb3Provider, useWallet]);
+
+  // If `useWallet` is enabled it will mock the `getAdapterAddress` response so we can init contracts.
+  const getAdapterAddressMock = useMemo(() => {
+    if (!useWallet) return;
+
+    return jest
+      .spyOn(getAdapterAddressToMock, 'getAdapterAddress')
+      .mockImplementation(() => Promise.resolve(DEFAULT_ETH_ADDRESS));
+  }, [useWallet]);
+
+  /**
+   * Effects
+   */
 
   useEffect(() => {
     return () => {
-      useWeb3ModalMock && useWeb3ModalMock.mockRestore();
+      // When `<Wrapper />` unmounts, restore the original function.
+      useWeb3ModalMock?.mockRestore();
     };
   }, [useWeb3ModalMock]);
 
-  // Set up Web3-related Redux state
   useEffect(() => {
-    setupWalletCached();
-  }, [setupWalletCached]);
+    return () => {
+      // When `<Wrapper />` unmounts, restore the original function.
+      getAdapterAddressMock?.mockRestore();
+    };
+  }, [getAdapterAddressMock]);
 
   /**
    * Functions
-   */
-
-  function setupWallet() {
-    if (useWallet) {
-      onUseWallet && onUseWallet(dispatch);
-    }
-  }
-
-  /**
-   * An optional Web3 provider for mocking. We pass it in so a test
-   * can use the original provider (i.e. if using FakeHttpProvider).
-   * @todo
    */
 
   function getRenderReturnProps(): WrapperReturnProps {
@@ -162,12 +136,7 @@ export default function Wrapper(
       <Init
         render={({error}) =>
           !error ? (
-            <>
-              {/* @note Needs to run after Init b/c of useInitContracts */}
-              {setupWalletCached()}
-
-              {childrenToRender}
-            </>
+            <>{childrenToRender}</>
           ) : error ? (
             <InitError error={error} />
           ) : null
