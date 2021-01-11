@@ -1,1 +1,1 @@
-export * from './blockchain/actions';
+export * from './contracts/actions';
