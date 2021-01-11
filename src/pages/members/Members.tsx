@@ -61,28 +61,36 @@ export default function Members() {
     <RenderWrapper>
       <section className="grid--fluid grid-container">
         {/* VOTING PROPOSALS */}
-        <>
-          <div className="grid__header">{ProposalHeaderNames.VOTING}</div>
-          <div className="grid__cards">{votingProposals}</div>
-        </>
+        {votingProposals.length > 0 && (
+          <>
+            <div className="grid__header">{ProposalHeaderNames.VOTING}</div>
+            <div className="grid__cards">{votingProposals}</div>
+          </>
+        )}
 
         {/* PENDING PROPOSALS (DRAFTS, NOT SPONSORED) */}
-        <>
-          <div className="grid__header">{ProposalHeaderNames.REQUESTS}</div>
-          <div className="grid__cards">{requestProposals}</div>
-        </>
+        {requestProposals.length > 0 && (
+          <>
+            <div className="grid__header">{ProposalHeaderNames.REQUESTS}</div>
+            <div className="grid__cards">{requestProposals}</div>
+          </>
+        )}
 
         {/* PASSED PROPOSALS */}
-        <>
-          <div className="grid__header">{ProposalHeaderNames.PASSED}</div>
-          <div className="grid__cards">{passedProposals}</div>
-        </>
+        {passedProposals.length > 0 && (
+          <>
+            <div className="grid__header">{ProposalHeaderNames.PASSED}</div>
+            <div className="grid__cards">{passedProposals}</div>
+          </>
+        )}
 
         {/* FAILED PROPOSALS */}
-        <>
-          <div className="grid__header">{ProposalHeaderNames.FAILED}</div>
-          <div className="grid__cards">{failedProposals}</div>
-        </>
+        {failedProposals.length > 0 && (
+          <>
+            <div className="grid__header">{ProposalHeaderNames.FAILED}</div>
+            <div className="grid__cards">{failedProposals}</div>
+          </>
+        )}
       </section>
     </RenderWrapper>
   );
