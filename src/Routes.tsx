@@ -14,6 +14,8 @@ import TributeDetails from './pages/tributes/TributeDetails';
 import CreateGovernanceProposal from './pages/governance/CreateGovernanceProposal';
 import GovernanceProposals from './pages/governance/GovernanceProposals';
 import GovernanceProposalDetails from './pages/governance/GovernanceProposalDetails';
+import Members from './pages/members/Members';
+import MemberProfile from './pages/members/MemberProfile';
 import NotFound from './pages/subpages/NotFound';
 
 export default function Routes() {
@@ -92,6 +94,18 @@ export default function Routes() {
           exact
           path="/governance-proposals/:proposalHash"
           render={() => <GovernanceProposalDetails />}
+        />,
+        <Route
+          key="members"
+          exact
+          path="/members"
+          render={() => <Members />}
+        />,
+        <Route
+          key="member-profile"
+          exact
+          path="/members/:ethereumAddress"
+          render={() => <MemberProfile />}
         />,
         <Route key="notfound" exact path="/404" render={() => <NotFound />} />,
         <Route

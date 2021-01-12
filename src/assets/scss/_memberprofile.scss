@@ -1,8 +1,7 @@
 @use "./variables" as *; /* load without namespace for convenience */
 @use "./mixins" as *; /* load without namespace for convenience */
-@use "./button";
 
-.proposaldetails__header {
+.memberprofile__header {
   display: inline-block;
   @include fluid-type(
     $bp-sm,
@@ -13,7 +12,7 @@
   letter-spacing: 1px;
 }
 
-.proposaldetails {
+.memberprofile {
   background-color: $color-background-primary;
   padding: 1rem;
   display: flex;
@@ -28,7 +27,7 @@
   }
 }
 
-.proposaldetails__content {
+.memberprofile__left-column {
   padding: 1.5rem 5rem 1.5rem 1.5rem;
   flex: 0 55%;
   min-width: 55%;
@@ -67,7 +66,7 @@
   }
 }
 
-.proposaldetails__status {
+.memberprofile__right-column {
   padding: 1.5rem 2rem;
   flex: 0 45%;
 
@@ -77,41 +76,5 @@
 
   @include size-down-down {
     padding: 0.5rem;
-  }
-}
-
-.proposaldetails__button-container {
-  margin: 2rem 0;
-}
-
-.proposaldetails__button {
-  @extend .button--secondary;
-
-  @include fluid-type(
-    $bp-sm,
-    $bp-xl,
-    16px,
-    18px
-  ); /* min font-size 1rem, max 1.125rem */
-  width: 100%;
-  margin: 1rem auto;
-  display: block;
-
-  @include size-medium-down {
-    max-width: 20rem;
-  }
-}
-
-.proposaldetails__amount {
-  text-align: center;
-  margin-bottom: 2.5rem;
-
-  span {
-    background-color: $color-background-secondary;
-    border-radius: 12px;
-    padding: 0.5rem 1.5rem;
-    display: inline-block;
-    font-size: 0.9rem;
-    font-weight: 500;
   }
 }

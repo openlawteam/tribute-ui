@@ -3,7 +3,7 @@ import {useHistory, useParams} from 'react-router-dom';
 
 import {truncateEthAddress} from '../../util/helpers';
 import {
-  fakeMemberProposals,
+  fakeMembershipProposals,
   FakeProposal,
 } from '../../components/proposals/_mockData';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
@@ -26,7 +26,7 @@ export default function MembershipDetails() {
    */
 
   // @todo replace with actual proposal fetch and proposal exists check
-  const memberProposal: FakeProposal | undefined = fakeMemberProposals.find(
+  const memberProposal: FakeProposal | undefined = fakeMembershipProposals.find(
     (proposal) => proposal.snapshotProposal.hash === proposalHash.toLowerCase()
   );
 
@@ -45,20 +45,25 @@ export default function MembershipDetails() {
    * Render
    */
 
-  return (
-    <RenderWrapper>
-      <ProposalDetails
-        proposal={memberProposal as FakeProposal}
-        name={truncateEthAddress(
-          (memberProposal as FakeProposal).snapshotProposal.name,
-          7
-        )}
-        renderActions={() => (
-          <ProposalActions proposal={memberProposal as FakeProposal} />
-        )}
-      />
-    </RenderWrapper>
-  );
+  if (memberProposal) {
+    return (
+      <RenderWrapper>
+        <ProposalDetails
+          proposal={memberProposal as FakeProposal}
+          name={truncateEthAddress(
+            (memberProposal as FakeProposal).snapshotProposal.name,
+            7
+          )}
+          renderActions={() => (
+            <ProposalActions proposal={memberProposal as FakeProposal} />
+          )}
+        />
+      </RenderWrapper>
+    );
+  }
+
+  // Render nothing. Should never reach this case.
+  return <></>;
 }
 
 function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {

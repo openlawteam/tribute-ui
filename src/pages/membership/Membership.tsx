@@ -7,10 +7,10 @@ import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
 import ProposalCard from '../../components/proposals/ProposalCard';
 import {
-  fakeMemberProposalsVoting,
-  fakeMemberProposalsRequest,
-  fakeMemberProposalsPassed,
-  fakeMemberProposalsFailed,
+  fakeMembershipProposalsVoting,
+  fakeMembershipProposalsRequest,
+  fakeMembershipProposalsPassed,
+  fakeMembershipProposalsFailed,
   FakeProposal,
 } from '../../components/proposals/_mockData';
 
@@ -25,10 +25,10 @@ export default function Membership() {
    * Variables
    */
 
-  const votingProposals = renderProposalCards(fakeMemberProposalsVoting);
-  const requestProposals = renderProposalCards(fakeMemberProposalsRequest);
-  const passedProposals = renderProposalCards(fakeMemberProposalsPassed);
-  const failedProposals = renderProposalCards(fakeMemberProposalsFailed);
+  const votingProposals = renderProposalCards(fakeMembershipProposalsVoting);
+  const requestProposals = renderProposalCards(fakeMembershipProposalsRequest);
+  const passedProposals = renderProposalCards(fakeMembershipProposalsPassed);
+  const failedProposals = renderProposalCards(fakeMembershipProposalsFailed);
 
   /**
    * Functions
