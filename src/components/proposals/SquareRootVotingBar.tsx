@@ -5,7 +5,7 @@ type SquareRootVotingBarProps = {
   noShares: number;
   totalShares: number;
   votingExpired: boolean;
-  showPercentages?: boolean;
+  showPercentages: boolean;
 };
 
 export default function SquareRootVotingBar({
@@ -13,7 +13,7 @@ export default function SquareRootVotingBar({
   noShares = 0,
   totalShares,
   votingExpired,
-  showPercentages = true,
+  showPercentages,
 }: SquareRootVotingBarProps) {
   /**
    * Variables

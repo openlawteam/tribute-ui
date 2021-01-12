@@ -41,7 +41,7 @@ export default function Nav() {
   );
 
   /**
-   * External hooks
+   * Their hooks
    */
 
   const location = useLocation();

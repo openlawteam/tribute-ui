@@ -1,9 +1,9 @@
 @use "./variables" as *; /* load without namespace for convenience */
 @use "./mixins" as *; /* load without namespace for convenience */
+@use "./functions" as *; /* load without namespace for convenience */
 
 .votingstatus-container {
   display: flex;
-  margin-top: 3.5rem;
   justify-content: center;
   align-items: center;
   @include fluid-type(
@@ -66,7 +66,7 @@ $bar-height: 14px;
   padding: 0;
   position: relative;
   box-sizing: border-box;
-  background-color: #f4f4f4;
+  background-color: $color-background-secondary;
 
   &__segment--yes {
     @extend %vote-segment;
@@ -87,7 +87,6 @@ $bar-height: 14px;
   font-size: 1rem;
   margin: 1rem 0 0.5rem;
   position: relative;
-  // height: 20px;
 
   .yes-percent {
     position: relative;
@@ -102,9 +101,8 @@ $bar-height: 14px;
   .yes-check {
     position: absolute;
     left: 10%;
-    transform: translateY(-4px);
 
-    @media only screen and (max-width: $bp-sm) {
+    @media only screen and (max-width: em($bp-sm)) {
       left: 0;
     }
   }
@@ -112,9 +110,8 @@ $bar-height: 14px;
   .no-check {
     position: absolute;
     right: 10%;
-    transform: translateY(-4px);
 
-    @media only screen and (max-width: $bp-sm) {
+    @media only screen and (max-width: em($bp-sm)) {
       right: 0;
     }
   }

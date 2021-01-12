@@ -4,7 +4,7 @@
 
 .proposalcard {
   background-color: $color-background-primary;
-  border-radius: 12px;
+  border-radius: 15px;
   padding: 2rem;
   position: relative;
   box-shadow: 0 2px 2px 0 $color-shadow-primary;
@@ -43,9 +43,12 @@
   margin-top: 1.5rem;
 }
 
-// hide elements that are only displayed in the proposal details view
 .proposalcard {
-  .votingstatus-container svg {
-    display: none;
+  .votingstatus-container {
+    margin-top: 3.5rem;
+    // hide element that is only displayed in the proposal details view
+    svg {
+      display: none;
+    }
   }
 }

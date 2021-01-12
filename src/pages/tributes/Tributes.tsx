@@ -18,7 +18,7 @@ export default function Tributes() {
 
 function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
   /**
-   * External hooks
+   * Their hooks
    */
 
   const history = useHistory();
@@ -41,9 +41,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
       <FadeIn>
         <div className="titlebar">
           <h2 className="titlebar__title">Tributes</h2>
-          <button
-            className="titlebar__action org-titlebar__action"
-            onClick={goToNewProposal}>
+          <button className="titlebar__action" onClick={goToNewProposal}>
             Provide Tribute
           </button>
         </div>

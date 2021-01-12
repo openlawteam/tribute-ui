@@ -1,24 +1,69 @@
-import React from 'react';
-import {useHistory} from 'react-router-dom';
+import React, {useEffect} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
 
+import {truncateEthAddress} from '../../util/helpers';
+import {
+  fakeMemberProposals,
+  FakeProposal,
+} from '../../components/proposals/_mockData';
+import ProposalDetails from '../../components/proposals/ProposalDetails';
+import ProposalActions from '../../components/proposals/ProposalActions';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
 
 export default function MemberDetails() {
+  /**
+   * Their hooks
+   */
+
+  // Get hash for fetching the proposal.
+  // @todo Use this to check that proposal exists.
+  const {proposalHash} = useParams<{proposalHash: string}>();
+  const history = useHistory();
+
+  /**
+   * Variables
+   */
+
+  // @todo replace with actual proposal fetch and proposal exists check
+  const memberProposal: FakeProposal | undefined = fakeMemberProposals.find(
+    (proposal) => proposal.snapshotProposal.hash === proposalHash.toLowerCase()
+  );
+
+  /**
+   * Effects
+   */
+
+  // Navigate to 404
+  useEffect(() => {
+    if (!memberProposal) {
+      history.push('/404');
+    }
+  }, [history, memberProposal]);
+
   /**
    * Render
    */
 
   return (
     <RenderWrapper>
-      <div>MemberDetails @todo</div>
+      <ProposalDetails
+        proposal={memberProposal as FakeProposal}
+        name={truncateEthAddress(
+          (memberProposal as FakeProposal).snapshotProposal.name,
+          7
+        )}
+        renderActions={() => (
+          <ProposalActions proposal={memberProposal as FakeProposal} />
+        )}
+      />
     </RenderWrapper>
   );
 }
 
 function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
   /**
-   * External hooks
+   * Their hooks
    */
 
   const history = useHistory();
@@ -41,9 +86,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
       <FadeIn>
         <div className="titlebar">
           <h2 className="titlebar__title">Members</h2>
-          <button
-            className="titlebar__action org-titlebar__action"
-            onClick={viewAll}>
+          <button className="titlebar__action" onClick={viewAll}>
             View all
           </button>
         </div>

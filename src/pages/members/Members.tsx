@@ -2,20 +2,21 @@ import React from 'react';
 import {useHistory} from 'react-router-dom';
 
 import {ProposalHeaderNames} from '../../util/enums';
+import {truncateEthAddress} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
-import ProposalCard from '../../components/snapshot/ProposalCard';
+import ProposalCard from '../../components/proposals/ProposalCard';
 import {
   fakeMemberProposalsVoting,
   fakeMemberProposalsRequest,
   fakeMemberProposalsPassed,
   fakeMemberProposalsFailed,
   FakeProposal,
-} from '../../components/snapshot/_mockData';
+} from '../../components/proposals/_mockData';
 
 export default function Members() {
   /**
-   * External hooks
+   * Their hooks
    */
 
   const history = useHistory();
@@ -39,7 +40,8 @@ export default function Members() {
         <ProposalCard
           key={proposal.snapshotProposal.hash}
           onClick={handleClickProposalDetails(proposal.snapshotProposal.hash)}
-          snapshotProposal={proposal.snapshotProposal}
+          proposal={proposal}
+          name={truncateEthAddress(proposal.snapshotProposal.name, 7)}
         />
       );
     });
@@ -59,7 +61,7 @@ export default function Members() {
 
   return (
     <RenderWrapper>
-      <section className="grid--fluid grid-container">
+      <div className="grid--fluid grid-container">
         {/* VOTING PROPOSALS */}
         {votingProposals.length > 0 && (
           <>
@@ -91,7 +93,7 @@ export default function Members() {
             <div className="grid__cards">{failedProposals}</div>
           </>
         )}
-      </section>
+      </div>
     </RenderWrapper>
   );
 }

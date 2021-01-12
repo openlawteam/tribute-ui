@@ -30,7 +30,7 @@
 .button--secondary {
   @extend %button;
 
-  background-color: #f4f4f4;
+  background-color: $color-background-secondary;
   border: none;
   border-radius: 12px;
   font-family: $font-body;

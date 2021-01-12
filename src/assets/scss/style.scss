@@ -15,6 +15,7 @@
 @use "./grid"; /* grid styles */
 @use "./proposalcard"; /* proposal card styles */
 @use "./voting"; /* voting styles */
+@use "./proposaldetails"; /* proposal details styles */
 
 html {
   height: 100%;
@@ -100,10 +101,15 @@ main {
 
 .section-wrapper {
   flex: 1 1;
-  margin: 0 0.75rem 9rem;
+  margin: 0 auto 9rem;
+  max-width: 75rem; // 1200px
 
-  @media only screen and (min-width: em($bp-lg)) {
-    margin: 0 3rem 9rem;
+  @media only screen and (max-width: calc(75rem + 4rem)) {
+    margin: 0 2rem 9rem;
+  }
+
+  @media only screen and (max-width: $bp-sm) {
+    margin: 0 1rem 9rem;
   }
 }
 
@@ -148,7 +154,7 @@ main {
   @media only screen and (min-width: em($bp-xl)) {
     position: absolute;
     right: 0;
-    top: 110px;
+    top: 130px;
   }
 }
 

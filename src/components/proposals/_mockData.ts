@@ -312,3 +312,10 @@ export const fakeMemberProposalsFailed: FakeProposal[] = [
     },
   },
 ];
+
+export const fakeMemberProposals = [
+  ...fakeMemberProposalsVoting,
+  ...fakeMemberProposalsRequest,
+  ...fakeMemberProposalsPassed,
+  ...fakeMemberProposalsFailed,
+];
