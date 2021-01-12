@@ -16,12 +16,12 @@ import {
   useIsDefaultChain,
 } from '../../components/web3/hooks';
 import {CHAINS} from '../../config';
+import {Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {SHARES_ADDRESS} from '../../config';
 import {StoreState, MetaMaskRPCError} from '../../util/types';
 import {useWeb3Modal} from '../../components/web3/hooks';
-import {Web3TxStatus} from '../../components/web3/types';
 import CycleMessage from '../../components/feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';

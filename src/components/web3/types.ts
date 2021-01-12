@@ -79,6 +79,16 @@ export enum ContractAdapterNames {
   voting = 'voting',
 }
 
+// @todo Add more as the need arises.
+export enum ContractDAOConfigKeys {
+  offchainVotingGracePeriod = 'offchainvoting.gracePeriod',
+  offchainVotingStakingAmount = 'offchainvoting.stakingAmount',
+  offchainVotingVotingPeriod = 'offchainvoting.votingPeriod',
+  votingGracePeriod = 'voting.gracePeriod',
+  votingStakingAmount = 'voting.stakingAmount',
+  votingVotingPeriod = 'voting.votingPeriod',
+}
+
 export enum VoteChoices {
   no = 'no',
   yes = 'yes',
