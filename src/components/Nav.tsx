@@ -5,6 +5,7 @@ import Media from 'react-media';
 import {NavLink, useLocation, useHistory} from 'react-router-dom';
 
 import Web3ModalButton from './web3/Web3ModalButton';
+import {useWeb3Modal} from './web3/hooks';
 import {ModalLogo} from './logo';
 import TimesSVG from '../assets/svg/TimesSVG';
 import HamburgerSVG from '../assets/svg/HamburgerSVG';
@@ -46,6 +47,12 @@ export default function Nav() {
 
   const location = useLocation();
   const history = useHistory();
+
+  /**
+   * Our hooks
+   */
+
+  const {account} = useWeb3Modal();
 
   /**
    * Variables
@@ -212,6 +219,18 @@ export default function Nav() {
                       <span>Help</span>
                     </a>
                   </li>
+                  {/* @todo Display Profile link only if user is an active member */}
+                  {account && (
+                    <li
+                      className="link-separated"
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to={`/members/${account}`}>
+                        <span>Profile</span>
+                      </NavLink>
+                    </li>
+                  )}
                 </ul>
               </div>
             </nav>
