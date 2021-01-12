@@ -100,6 +100,21 @@ export default function Membership() {
 
 function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
   /**
+   * Their hooks
+   */
+
+  const history = useHistory();
+
+  /**
+   * Functions
+   */
+
+  function viewMembers(event: React.MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    history.push('/members');
+  }
+
+  /**
    * Render
    */
 
@@ -108,6 +123,9 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
       <FadeIn>
         <div className="titlebar">
           <h2 className="titlebar__title">Membership</h2>
+          <button className="titlebar__action" onClick={viewMembers}>
+            View members
+          </button>
         </div>
         {/* RENDER CHILDREN */}
         {props.children}
