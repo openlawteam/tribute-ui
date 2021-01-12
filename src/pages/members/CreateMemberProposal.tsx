@@ -80,7 +80,7 @@ export default function CreateMemberProposal() {
   } = useContractSend();
 
   /**
-   * External hooks
+   * Their hooks
    */
 
   const form = useForm<FormInputs>({

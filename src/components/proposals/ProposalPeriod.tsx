@@ -6,11 +6,12 @@ type ProposalPeriodProps = {
 };
 
 export default function ProposalPeriod(props: ProposalPeriodProps) {
+  const {startPeriod, endPeriod} = props;
+
   /**
    * Variables
    */
 
-  const {startPeriod, endPeriod} = props;
   const getTimeRemaining = (endtime: Date) => {
     const t =
       Date.parse(endtime.toString()) - Date.parse(new Date().toString());

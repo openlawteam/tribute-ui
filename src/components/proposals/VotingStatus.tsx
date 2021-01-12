@@ -1,25 +1,29 @@
 import {useState, useEffect} from 'react';
 
+import {FakeProposal} from './_mockData';
 import ProposalPeriod from './ProposalPeriod';
 import SquareRootVotingBar from './SquareRootVotingBar';
 
 import StopwatchSVG from '../../assets/svg/StopwatchSVG';
 
 type VotingStatusProps = {
-  snapshotProposal: any; // placeholder prop
+  proposal: FakeProposal; // placeholder prop
+  showPercentages?: boolean;
 };
 
-export default function VotingStatus(props: VotingStatusProps) {
+export default function VotingStatus({
+  proposal,
+  showPercentages = true,
+}: VotingStatusProps) {
   /**
    * Variables
    */
 
-  // placeholders values to be able to render styles
-  const {snapshotProposal} = props;
-  const votingStartSeconds = snapshotProposal.start;
-  const votingEndSeconds = snapshotProposal.end;
-  const yesShares = snapshotProposal.yesShares;
-  const noShares = snapshotProposal.noShares;
+  // placeholder values to be able to render mockups with styles
+  const votingStartSeconds = proposal.snapshotProposal.start;
+  const votingEndSeconds = proposal.snapshotProposal.end;
+  const yesShares = proposal.snapshotProposal.yesShares;
+  const noShares = proposal.snapshotProposal.noShares;
   const totalShares = 10000000;
 
   /**
@@ -37,6 +41,25 @@ export default function VotingStatus(props: VotingStatusProps) {
    * Effects
    */
 
+  // Actively check if voting has started
+  useEffect(() => {
+    // If the value is already `true`, then exit.
+    if (hasVotingStarted) return;
+
+    // Check if voting has started every 1 second
+    const intervalID = setInterval(() => {
+      const hasStartedCheck = Math.ceil(Date.now() / 1000) > votingStartSeconds;
+
+      if (!hasStartedCheck) return;
+
+      setHasVotingStarted(hasStartedCheck);
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalID);
+    };
+  }, [hasVotingStarted, votingStartSeconds]);
+
   // Actively check if voting has ended
   useEffect(() => {
     // If the value is already `true`, then exit.
@@ -44,19 +67,17 @@ export default function VotingStatus(props: VotingStatusProps) {
 
     // Check if voting has started/ended every 1 second
     const intervalID = setInterval(() => {
-      const hasStartedCheck = Math.ceil(Date.now() / 1000) > votingStartSeconds;
       const hasEndedCheck = Math.ceil(Date.now() / 1000) > votingEndSeconds;
 
-      if (!hasEndedCheck || !hasStartedCheck) return;
+      if (!hasEndedCheck) return;
 
-      setHasVotingStarted(hasStartedCheck);
       setHasVotingEnded(hasEndedCheck);
     }, 1000);
 
     return () => {
       clearInterval(intervalID);
     };
-  }, [hasVotingEnded, votingEndSeconds, hasVotingStarted, votingStartSeconds]);
+  }, [hasVotingEnded, votingEndSeconds]);
 
   /**
    * Functions
@@ -78,12 +99,11 @@ export default function VotingStatus(props: VotingStatusProps) {
     <>
       <div className="votingstatus-container">
         <StopwatchSVG />
-
-        {/* STATUS WHEN NOT SPONSORED (assumes voting starts upon sponsorship) */}
+        {/* STATUS WHEN NOT SPONSORED */}
+        {/* @todo Assumes voting starts upon sponsorship. There will probably be another data point to condition this on. */}
         {!hasVotingStarted && (
           <span className="votingstatus">Pending Sponsor</span>
         )}
-
         {/* CLOCK WHILE IN VOTING */}
         {hasVotingStarted && !hasVotingEnded && (
           <ProposalPeriod
@@ -91,10 +111,8 @@ export default function VotingStatus(props: VotingStatusProps) {
             endPeriod={new Date(votingEndSeconds * 1000)}
           />
         )}
-
         {/* STATUSES ON VOTING ENDED */}
         {getDidVotePass() && <span className="votingstatus">Approved</span>}
-
         {getDidVotePass() === false && (
           <span className="votingstatus">Failed</span>
         )}
@@ -106,7 +124,7 @@ export default function VotingStatus(props: VotingStatusProps) {
         noShares={noShares}
         totalShares={totalShares}
         votingExpired={hasVotingEnded}
-        showPercentages={false}
+        showPercentages={showPercentages}
       />
     </>
   );

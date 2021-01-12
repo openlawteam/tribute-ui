@@ -1,0 +1,118 @@
+@use "./variables" as *; /* load without namespace for convenience */
+@use "./mixins" as *; /* load without namespace for convenience */
+@use "./functions" as *; /* load without namespace for convenience */
+@use "./button";
+
+.proposaldetails__header {
+  display: inline-block;
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    18px,
+    20px
+  ); /* min font-size 1.125rem, max 1.25rem */
+  letter-spacing: 1px;
+}
+
+.proposaldetails {
+  background-color: $color-background-primary;
+  padding: 1rem;
+  display: flex;
+  flex: 1 100%;
+  margin: 2rem 0;
+  border: 1px solid $color-border-secondary;
+  border-radius: 15px;
+  box-shadow: 0 2px 2px 0 $color-shadow-primary;
+
+  @include size-medium-down {
+    flex-direction: column;
+  }
+}
+
+.proposaldetails__content {
+  padding: 1.5rem 5rem 1.5rem 1.5rem;
+  flex: 0 55%;
+  min-width: 55%;
+  word-break: break-word;
+
+  p {
+    @include fluid-type(
+      $bp-sm,
+      $bp-xl,
+      16px,
+      18px
+    ); /* min font-size 1rem, max 1.125rem */
+
+    white-space: pre-line;
+  }
+
+  // content title
+  h3 {
+    @include fluid-type(
+      $bp-sm,
+      $bp-xl,
+      20px,
+      28px
+    ); /* min font-size 1.25rem, max 1.75rem */
+    font-weight: bold;
+    margin: 0 0 1.5rem;
+    letter-spacing: 1px;
+  }
+
+  @include size-medium-down {
+    padding: 1rem;
+  }
+
+  @include size-down-down {
+    padding: 0.5rem;
+  }
+}
+
+.proposaldetails__status {
+  padding: 1.5rem 2rem;
+  flex: 0 45%;
+
+  @include size-medium-down {
+    padding: 1rem;
+  }
+
+  @include size-down-down {
+    padding: 0.5rem;
+  }
+}
+
+.proposaldetails__button-container {
+  margin: 2rem 0;
+}
+
+.proposaldetails__button {
+  @extend .button--secondary;
+
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    16px,
+    18px
+  ); /* min font-size 1rem, max 1.125rem */
+  width: 100%;
+  margin: 1rem auto;
+  display: block;
+
+  @include size-medium-down {
+    max-width: 20rem;
+  }
+}
+
+.proposaldetails__amount {
+  text-align: center;
+  margin-bottom: 2.5rem;
+
+  span {
+    background-color: $color-background-secondary;
+    border-radius: 12px;
+    padding: 0.5rem 1.5rem;
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+}

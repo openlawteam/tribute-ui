@@ -1,8 +1,8 @@
 export default function StopwatchSVG(props: any) {
   return (
     <svg
-      width="21px"
-      height="24px"
+      width="20px"
+      height="20px"
       viewBox="0 0 21 24"
       version="1.1"
       {...props}>

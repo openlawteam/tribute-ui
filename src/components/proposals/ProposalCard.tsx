@@ -1,10 +1,11 @@
-import {truncateEthAddress} from '../../util/helpers';
-import VotingStatus from '../../components/snapshot/VotingStatus';
+import {FakeProposal} from './_mockData';
+import VotingStatus from './VotingStatus';
 
 type ProposalCardProps = {
   buttonText?: string;
   onClick: (proposalHash: string) => void;
-  snapshotProposal?: any; // placeholder prop
+  proposal: FakeProposal; // placeholder prop
+  name: string;
 };
 
 /**
@@ -14,18 +15,14 @@ type ProposalCardProps = {
  * @returns {JSX.Element}
  */
 export default function ProposalCard(props: ProposalCardProps): JSX.Element {
-  /**
-   * Variables
-   */
-
-  const {buttonText = 'View Proposal', snapshotProposal, onClick} = props;
+  const {buttonText = 'View Proposal', proposal, onClick, name} = props;
 
   /**
    * Functions
    */
 
   function handleClick() {
-    const proposalHash = snapshotProposal.hash;
+    const proposalHash = proposal.snapshotProposal.hash;
 
     onClick(proposalHash);
   }
@@ -37,12 +34,10 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
   return (
     <div className="proposalcard" onClick={handleClick}>
       {/* TITLE */}
-      <h3 className="proposalcard__title">
-        {truncateEthAddress(snapshotProposal.name, 7)}
-      </h3>
+      <h3 className="proposalcard__title">{name}</h3>
 
       {/* VOTING PROGRESS STATUS AND BAR */}
-      <VotingStatus snapshotProposal={snapshotProposal} />
+      <VotingStatus proposal={proposal} />
 
       {/* BUTTON (no click handler) */}
       <button className="proposalcard__button">{buttonText}</button>
