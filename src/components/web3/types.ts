@@ -59,7 +59,7 @@ export type CoreProposalData = {
   type: CoreProposalType;
 };
 
-export type CoreProposalType = 'proposal' | 'result' | 'vote';
+export type CoreProposalType = 'draft' | 'proposal' | 'result' | 'vote';
 
 // Ordered vote choices. Do not change the indexes!
 export type CoreProposalVoteChoices = [VoteChoices.yes, VoteChoices.no];

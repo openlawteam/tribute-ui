@@ -112,7 +112,7 @@ export function useBuildAndSignProposalData(): UseBuildAndSignProposalDataReturn
         sig: '',
         space: SPACE,
         timestamp: nowTimestamp,
-        type: 'proposal',
+        type: 'draft',
       };
 
       const signature = await Web3JsSigner(web3Instance, account)(
