@@ -1,17 +1,15 @@
-import {InjectResultOptions} from '../helpers/FakeHttpProvider';
+import {TestWeb3ResponseArgs, TestWeb3ResponseReturn} from './types';
 
 /**
  * sendTransaction
  *
- * Mocks eth_sendtransaction
- *
- * @returns {[string, InjectResultOptions]}
- *
+ * @param {TestWeb3ResponseArgs}
+ * @returns {TestWeb3ResponseReturn<string>}
  * @see https://eth.wiki/json-rpc/API#eth_sendtransaction
  */
-export const sendTransaction = (): [string, InjectResultOptions] => {
-  return [
-    '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331',
-    {rpcMethodName: 'eth_sendTransaction'},
-  ];
-};
+export const sendTransaction = ({
+  result,
+}: TestWeb3ResponseArgs): TestWeb3ResponseReturn<string> => [
+  result ?? '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331',
+  {rpcMethodName: 'eth_sendTransaction'},
+];
