@@ -14,7 +14,7 @@ import {
   FakeProposal,
 } from '../../components/proposals/_mockData';
 
-export default function Members() {
+export default function Membership() {
   /**
    * Their hooks
    */
@@ -51,7 +51,7 @@ export default function Members() {
     return () => {
       if (!proposalHash) return;
 
-      history.push(`/members/${proposalHash}`);
+      history.push(`/membership/${proposalHash}`);
     };
   }
 
@@ -107,7 +107,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
     <Wrap className="section-wrapper">
       <FadeIn>
         <div className="titlebar">
-          <h2 className="titlebar__title">Members</h2>
+          <h2 className="titlebar__title">Membership</h2>
         </div>
         {/* RENDER CHILDREN */}
         {props.children}

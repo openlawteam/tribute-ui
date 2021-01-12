@@ -84,8 +84,8 @@ export default function Nav() {
                 <nav role="navigation" id="navigation">
                   <ul className="nav__list">
                     <li tabIndex={0}>
-                      <NavLink to="/members">
-                        <span>Members</span>
+                      <NavLink to="/membership">
+                        <span>Membership</span>
                       </NavLink>
                     </li>
                     <li tabIndex={0}>
@@ -174,8 +174,8 @@ export default function Nav() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink to="/members">
-                      <span>Members</span>
+                    <NavLink to="/membership">
+                      <span>Membership</span>
                     </NavLink>
                   </li>
                   <li

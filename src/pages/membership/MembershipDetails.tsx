@@ -11,7 +11,7 @@ import ProposalActions from '../../components/proposals/ProposalActions';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
 
-export default function MemberDetails() {
+export default function MembershipDetails() {
   /**
    * Their hooks
    */
@@ -74,7 +74,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
 
   function viewAll(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
-    history.push('/members');
+    history.push('/membership');
   }
 
   /**
@@ -85,7 +85,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
     <Wrap className="section-wrapper">
       <FadeIn>
         <div className="titlebar">
-          <h2 className="titlebar__title">Members</h2>
+          <h2 className="titlebar__title">Membership</h2>
           <button className="titlebar__action" onClick={viewAll}>
             View all
           </button>
