@@ -54,6 +54,7 @@ describe('useContractSend unit tests', () => {
         store.getState().contracts.OnboardingContract?.instance.methods,
         [
           DEFAULT_ETH_ADDRESS,
+          Web3.utils.sha3('Test Proposal ID'),
           DEFAULT_ETH_ADDRESS,
           DEFAULT_ETH_ADDRESS,
           Web3.utils.toWei('1', 'ether'),
