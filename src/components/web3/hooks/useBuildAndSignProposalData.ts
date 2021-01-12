@@ -2,9 +2,10 @@ import {useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {CoreProposalData, Web3TxStatus} from '../types';
-import {SPACE} from '../../../config';
+import {DEFAULT_CHAIN, SPACE} from '../../../config';
 import {StoreState} from '../../../util/types';
-import {VOTE_CHOICES, VOTE_LENGTH_SECONDS} from '../config';
+import {useWeb3Modal} from './useWeb3Modal';
+import {VOTE_CHOICES} from '../config';
 
 const {Web3JsSigner} = require('../../../laoland/offchain_voting');
 
@@ -39,7 +40,7 @@ type UseBuildAndSignProposalDataReturn = {
  *
  * @note
  * The decision to make this a hook seems correct for the React context which it is used.
- * It's a pain to have a function that requires so many dependencies, so hooks help us keep
+ * It's a pain to have a pure function that requires so many dependencies, so hooks help us keep
  * the usage uncluttered and less annoying.
  *
  * @returns {Promise<BuildAndSignProposalDataReturn>} An object with the proposal data and the ERC712 signature string.
@@ -49,23 +50,18 @@ export function useBuildAndSignProposalData(): UseBuildAndSignProposalDataReturn
    * Selectors
    */
 
-  const account = useSelector((s: StoreState) => s.blockchain.connectedAddress);
-  const web3Instance = useSelector(
-    (s: StoreState) => s.blockchain.web3Instance
-  );
-  const chainId = useSelector(
-    (s: StoreState) => s.blockchain && s.blockchain.defaultChain
-  );
   const onboardingAddress = useSelector(
-    (state: StoreState) =>
-      state.blockchain.contracts &&
-      state.blockchain.contracts.OnboardingContract.contractAddress
+    (state: StoreState) => state.contracts.OnboardingContract?.contractAddress
   );
   const daoRegistryAddress = useSelector(
-    (state: StoreState) =>
-      state.blockchain.contracts &&
-      state.blockchain.contracts.DaoRegistryContract.contractAddress
+    (state: StoreState) => state.contracts.DaoRegistryContract?.contractAddress
   );
+
+  /**
+   * Our hooks
+   */
+
+  const {account, web3Instance} = useWeb3Modal();
 
   /**
    * State
@@ -111,7 +107,10 @@ export function useBuildAndSignProposalData(): UseBuildAndSignProposalDataReturn
         payload: {
           body,
           choices: VOTE_CHOICES,
-          end: end || Math.floor(nowTimestamp / 1000 + VOTE_LENGTH_SECONDS),
+          // @todo Need to get vote length from the DAO.
+          end:
+            end ||
+            Math.floor(nowTimestamp / 1000 + 180 /* @note for development */),
           name,
           snapshot: blockNumber,
           start: Math.floor(nowTimestamp / 1000),
@@ -127,8 +126,15 @@ export function useBuildAndSignProposalData(): UseBuildAndSignProposalDataReturn
         proposalData,
         daoRegistryAddress,
         onboardingAddress,
-        chainId
+        /**
+         * So we don't have the wrong chain, using the environemnt config value,
+         * instead of the dynamic `networkId` from `useWeb3Modal`.
+         */
+        DEFAULT_CHAIN
       );
+
+      // Set the signature
+      proposalData.sig = signature;
 
       setProposalData(proposalData);
       setProposalSignature(signature);
