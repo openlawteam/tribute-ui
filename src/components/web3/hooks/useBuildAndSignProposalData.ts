@@ -18,18 +18,12 @@ type BuildAndSignProposalDataParam = {
   name: CoreProposalData['payload']['name'];
 };
 
-type BuildAndSignProposalDataReturn = {
-  proposalData: CoreProposalData;
-  signature: string;
-};
-
 type UseBuildAndSignProposalDataReturn = {
   buildAndSignProposalData: (
     d: BuildAndSignProposalDataParam
-  ) => Promise<BuildAndSignProposalDataReturn>;
+  ) => Promise<CoreProposalData>;
   proposalData: CoreProposalData | undefined;
   proposalDataStatus: Web3TxStatus;
-  proposalSignature: BuildAndSignProposalDataReturn['signature'];
 };
 
 /**
@@ -68,7 +62,6 @@ export function useBuildAndSignProposalData(): UseBuildAndSignProposalDataReturn
    */
 
   const [proposalData, setProposalData] = useState<CoreProposalData>();
-  const [proposalSignature, setProposalSignature] = useState<string>('');
   const [proposalDataStatus, setProposalDataStatus] = useState<Web3TxStatus>(
     Web3TxStatus.STANDBY
   );
@@ -87,7 +80,7 @@ export function useBuildAndSignProposalData(): UseBuildAndSignProposalDataReturn
    */
   async function buildAndSignProposalData(
     partialProposalData: BuildAndSignProposalDataParam
-  ): Promise<BuildAndSignProposalDataReturn> {
+  ): Promise<CoreProposalData> {
     try {
       if (!web3Instance) {
         throw new Error('No Web3 instance was found.');
@@ -137,13 +130,9 @@ export function useBuildAndSignProposalData(): UseBuildAndSignProposalDataReturn
       proposalData.sig = signature;
 
       setProposalData(proposalData);
-      setProposalSignature(signature);
       setProposalDataStatus(Web3TxStatus.FULFILLED);
 
-      return {
-        proposalData,
-        signature,
-      };
+      return proposalData;
     } catch (error) {
       throw error;
     }
@@ -153,6 +142,5 @@ export function useBuildAndSignProposalData(): UseBuildAndSignProposalDataReturn
     buildAndSignProposalData,
     proposalData,
     proposalDataStatus,
-    proposalSignature,
   };
 }
