@@ -2,11 +2,13 @@ import {waitFor} from '@testing-library/react';
 import {renderHook, act} from '@testing-library/react-hooks';
 import Web3 from 'web3';
 
+import {
+  ethEstimateGas,
+  ethGasPrice,
+  getTransactionReceipt,
+  sendTransaction,
+} from '../../../test/web3Responses';
 import {DEFAULT_ETH_ADDRESS, setupHook} from '../../../test/helpers';
-import {ethEstimateGas} from '../../../test/web3Responses/estimateGas';
-import {ethGasPrice} from '../../../test/web3Responses/gasPrice';
-import {getTransactionReceipt} from '../../../test/web3Responses/getTransactionReceipt';
-import {sendTransaction} from '../../../test/web3Responses/sendTransaction';
 import {useContractSend} from '.';
 import {Web3TxStatus} from '../types';
 
@@ -42,10 +44,10 @@ describe('useContractSend unit tests', () => {
 
     // Call txSend
     act(() => {
-      mockWeb3Provider.injectResult(...ethEstimateGas(web3Instance));
-      mockWeb3Provider.injectResult(...ethGasPrice(web3Instance));
-      mockWeb3Provider.injectResult(...sendTransaction());
-      mockWeb3Provider.injectResult(...getTransactionReceipt());
+      mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
+      mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
+      mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
 
       result.current.txSend(
         'onboard',

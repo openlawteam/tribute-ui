@@ -1,12 +1,16 @@
-import Web3 from 'web3';
+import {TestWeb3ResponseArgs, TestWeb3ResponseReturn} from './types';
 
-import {InjectResultOptions} from '../helpers/FakeHttpProvider';
-
-export const ethGasPrice = (
-  web3Instance: Web3
-): [string, InjectResultOptions] => {
-  return [
-    web3Instance.eth.abi.encodeParameter('uint256', 8049999872),
-    {rpcMethodName: 'eth_gasPrice'},
-  ];
-};
+/**
+ * ethGasPrice
+ *
+ * @param {TestWeb3ResponseArgs}
+ * @returns {TestWeb3ResponseReturn<string>}
+ * @see https://eth.wiki/json-rpc/API#eth_gasprice
+ */
+export const ethGasPrice = ({
+  result,
+  web3Instance,
+}: TestWeb3ResponseArgs): TestWeb3ResponseReturn<string> => [
+  web3Instance.eth.abi.encodeParameter('uint256', result ?? 8049999872),
+  {rpcMethodName: 'eth_gasPrice'},
+];
