@@ -1,18 +1,10 @@
-import React from 'react';
 import {useHistory} from 'react-router-dom';
 
-import {ProposalHeaderNames} from '../../util/enums';
 import {truncateEthAddress} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
-import ProposalCard from '../../components/proposals/ProposalCard';
-import {
-  fakeMemberProposalsVoting,
-  fakeMemberProposalsRequest,
-  fakeMemberProposalsPassed,
-  fakeMemberProposalsFailed,
-  FakeProposal,
-} from '../../components/proposals/_mockData';
+import MemberCard from './MemberCard';
+import {fakeMembers, FakeMember} from './_mockData';
 
 export default function Members() {
   /**
@@ -25,33 +17,30 @@ export default function Members() {
    * Variables
    */
 
-  const votingProposals = renderProposalCards(fakeMemberProposalsVoting);
-  const requestProposals = renderProposalCards(fakeMemberProposalsRequest);
-  const passedProposals = renderProposalCards(fakeMemberProposalsPassed);
-  const failedProposals = renderProposalCards(fakeMemberProposalsFailed);
+  const activeMembers = renderMemberCards(fakeMembers);
 
   /**
    * Functions
    */
 
-  function renderProposalCards(proposals: FakeProposal[]) {
-    return proposals.map((proposal) => {
+  function renderMemberCards(members: FakeMember[]) {
+    return members.map((member) => {
       return (
-        <ProposalCard
-          key={proposal.snapshotProposal.hash}
-          onClick={handleClickProposalDetails(proposal.snapshotProposal.hash)}
-          proposal={proposal}
-          name={truncateEthAddress(proposal.snapshotProposal.name, 7)}
+        <MemberCard
+          key={member.address}
+          onClick={handleClickMemberProfile(member.address)}
+          member={member}
+          name={truncateEthAddress(member.address, 7)}
         />
       );
     });
   }
 
-  function handleClickProposalDetails(proposalHash: string) {
+  function handleClickMemberProfile(ethereumAddress: string) {
     return () => {
-      if (!proposalHash) return;
+      if (!ethereumAddress) return;
 
-      history.push(`/members/${proposalHash}`);
+      history.push(`/members/${ethereumAddress}`);
     };
   }
 
@@ -62,37 +51,11 @@ export default function Members() {
   return (
     <RenderWrapper>
       <div className="grid--fluid grid-container">
-        {/* VOTING PROPOSALS */}
-        {votingProposals.length > 0 && (
-          <>
-            <div className="grid__header">{ProposalHeaderNames.VOTING}</div>
-            <div className="grid__cards">{votingProposals}</div>
-          </>
-        )}
-
-        {/* PENDING PROPOSALS (DRAFTS, NOT SPONSORED) */}
-        {requestProposals.length > 0 && (
-          <>
-            <div className="grid__header">{ProposalHeaderNames.REQUESTS}</div>
-            <div className="grid__cards">{requestProposals}</div>
-          </>
-        )}
-
-        {/* PASSED PROPOSALS */}
-        {passedProposals.length > 0 && (
-          <>
-            <div className="grid__header">{ProposalHeaderNames.PASSED}</div>
-            <div className="grid__cards">{passedProposals}</div>
-          </>
-        )}
-
-        {/* FAILED PROPOSALS */}
-        {failedProposals.length > 0 && (
-          <>
-            <div className="grid__header">{ProposalHeaderNames.FAILED}</div>
-            <div className="grid__cards">{failedProposals}</div>
-          </>
-        )}
+        {/* ACTIVE MEMBERS */}
+        <>
+          <div className="grid__header">Active Members</div>
+          <div className="grid__cards">{activeMembers}</div>
+        </>
       </div>
     </RenderWrapper>
   );

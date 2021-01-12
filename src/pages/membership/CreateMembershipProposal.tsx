@@ -51,7 +51,7 @@ type UserAccountBalance = {
   eth: string;
 };
 
-export default function CreateMemberProposal() {
+export default function CreateMembershipProposal() {
   /**
    * Selectors
    */
@@ -219,7 +219,7 @@ export default function CreateMemberProposal() {
       // to go to newly created member proposal details page.
 
       // go to MemberDetails page for newly created member proposal
-      // history.push(`/members/${proposalHash}`);
+      // history.push(`/membership/${proposalHash}`);
     } catch (error) {
       // Set any errors from Web3 utils or explicitly set above.
       setSubmitError(error);

@@ -2,9 +2,9 @@ import React from 'react';
 import {Redirect, Route, Switch} from 'react-router-dom';
 
 import GetStarted from './pages/start/GetStarted';
-import CreateMemberProposal from './pages/members/CreateMemberProposal';
-import Members from './pages/members/Members';
-import MemberDetails from './pages/members/MemberDetails';
+import CreateMembershipProposal from './pages/membership/CreateMembershipProposal';
+import Membership from './pages/membership/Membership';
+import MembershipDetails from './pages/membership/MembershipDetails';
 import CreateTransferProposal from './pages/transfers/CreateTransferProposal';
 import Transfers from './pages/transfers/Transfers';
 import TransferDetails from './pages/transfers/TransferDetails';
@@ -14,6 +14,8 @@ import TributeDetails from './pages/tributes/TributeDetails';
 import CreateGovernanceProposal from './pages/governance/CreateGovernanceProposal';
 import GovernanceProposals from './pages/governance/GovernanceProposals';
 import GovernanceProposalDetails from './pages/governance/GovernanceProposalDetails';
+import Members from './pages/members/Members';
+import MemberProfile from './pages/members/MemberProfile';
 import NotFound from './pages/subpages/NotFound';
 
 export default function Routes() {
@@ -25,19 +27,19 @@ export default function Routes() {
           key="join"
           exact
           path="/join"
-          render={() => <CreateMemberProposal />}
+          render={() => <CreateMembershipProposal />}
         />,
         <Route
-          key="members"
+          key="membership"
           exact
-          path="/members"
-          render={() => <Members />}
+          path="/membership"
+          render={() => <Membership />}
         />,
         <Route
-          key="member-details"
+          key="membership-details"
           exact
-          path="/members/:proposalHash"
-          render={() => <MemberDetails />}
+          path="/membership/:proposalHash"
+          render={() => <MembershipDetails />}
         />,
         <Route
           key="transfer"
@@ -92,6 +94,18 @@ export default function Routes() {
           exact
           path="/governance-proposals/:proposalHash"
           render={() => <GovernanceProposalDetails />}
+        />,
+        <Route
+          key="members"
+          exact
+          path="/members"
+          render={() => <Members />}
+        />,
+        <Route
+          key="member-profile"
+          exact
+          path="/members/:ethereumAddress"
+          render={() => <MemberProfile />}
         />,
         <Route key="notfound" exact path="/404" render={() => <NotFound />} />,
         <Route

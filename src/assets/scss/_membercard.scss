@@ -1,0 +1,30 @@
+@use "./variables" as *; /* load without namespace for convenience */
+@use "./mixins" as *; /* load without namespace for convenience */
+
+.membercard {
+  background-color: $color-background-primary;
+  border-radius: 15px;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 2px 2px 0 $color-shadow-primary;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.membercard__title {
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    16px,
+    20px
+  ); /* min font-size 1rem, max 1.25rem */
+  line-height: 1.6;
+  text-align: center;
+  font-weight: normal;
+
+  &:last-child {
+    margin: 0;
+  }
+}

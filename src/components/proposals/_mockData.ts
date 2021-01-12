@@ -13,7 +13,7 @@ export type FakeProposal = {
   };
 };
 
-export const fakeMemberProposalsVoting: FakeProposal[] = [
+export const fakeMembershipProposalsVoting: FakeProposal[] = [
   {
     snapshotProposal: {
       hash: 'dc5abd65bacfe1fa2d1ad3dd8fdb213e902c3b63a4f6b57c467e50dca1f913da',
@@ -21,7 +21,7 @@ export const fakeMemberProposalsVoting: FakeProposal[] = [
       body:
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
       start: 1610350810,
-      end: 1610610010,
+      end: 1611085505,
       yesShares: 0,
       noShares: 0,
     },
@@ -33,7 +33,7 @@ export const fakeMemberProposalsVoting: FakeProposal[] = [
       body:
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
       start: 1610350810,
-      end: 1610610010,
+      end: 1611085505,
       yesShares: 4500000,
       noShares: 0,
     },
@@ -45,7 +45,7 @@ export const fakeMemberProposalsVoting: FakeProposal[] = [
       body:
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
       start: 1610350810,
-      end: 1610610010,
+      end: 1611085505,
       yesShares: 0,
       noShares: 3500000,
     },
@@ -57,7 +57,7 @@ export const fakeMemberProposalsVoting: FakeProposal[] = [
       body:
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
       start: 1610350810,
-      end: 1610610010,
+      end: 1611085505,
       yesShares: 7000000,
       noShares: 2500000,
     },
@@ -69,7 +69,7 @@ export const fakeMemberProposalsVoting: FakeProposal[] = [
       body:
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
       start: 1610350810,
-      end: 1610610010,
+      end: 1611085505,
       yesShares: 3500000,
       noShares: 5500000,
     },
@@ -81,14 +81,14 @@ export const fakeMemberProposalsVoting: FakeProposal[] = [
       body:
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
       start: 1610350810,
-      end: 1610610010,
+      end: 1611085505,
       yesShares: 5000000,
       noShares: 5000000,
     },
   },
 ];
 
-export const fakeMemberProposalsRequest: FakeProposal[] = [
+export const fakeMembershipProposalsRequest: FakeProposal[] = [
   {
     snapshotProposal: {
       hash: 'a28b59b9dce2132657c9db537f73063c01f33e04cc9ddf70ce61bfbc4690b16b',
@@ -163,7 +163,7 @@ export const fakeMemberProposalsRequest: FakeProposal[] = [
   },
 ];
 
-export const fakeMemberProposalsPassed: FakeProposal[] = [
+export const fakeMembershipProposalsPassed: FakeProposal[] = [
   {
     snapshotProposal: {
       hash: '3ba30491a6cf748cf3d0ecbb0961627bab8589eaef90726b0aa95f0839f95b44',
@@ -238,7 +238,7 @@ export const fakeMemberProposalsPassed: FakeProposal[] = [
   },
 ];
 
-export const fakeMemberProposalsFailed: FakeProposal[] = [
+export const fakeMembershipProposalsFailed: FakeProposal[] = [
   {
     snapshotProposal: {
       hash: '1531a1656c7cb51414606bbe69795f0b9c7c624d3b74b539880e08eab6e5ad95',
@@ -313,9 +313,9 @@ export const fakeMemberProposalsFailed: FakeProposal[] = [
   },
 ];
 
-export const fakeMemberProposals = [
-  ...fakeMemberProposalsVoting,
-  ...fakeMemberProposalsRequest,
-  ...fakeMemberProposalsPassed,
-  ...fakeMemberProposalsFailed,
+export const fakeMembershipProposals = [
+  ...fakeMembershipProposalsVoting,
+  ...fakeMembershipProposalsRequest,
+  ...fakeMembershipProposalsPassed,
+  ...fakeMembershipProposalsFailed,
 ];
