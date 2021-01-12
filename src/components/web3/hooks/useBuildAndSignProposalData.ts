@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {CoreProposalData, Web3TxStatus} from '../types';
+import {CoreProposalData, CoreProposalType, Web3TxStatus} from '../types';
 import {DEFAULT_CHAIN, SPACE} from '../../../config';
 import {StoreState} from '../../../util/types';
 import {useWeb3Modal} from './useWeb3Modal';
@@ -11,10 +11,6 @@ const {Web3JsSigner} = require('../../../laoland/offchain_voting');
 
 type BuildAndSignProposalDataParam = {
   body: CoreProposalData['payload']['body'];
-  /**
-   * For custom vote `end`; otherwise defaults to environment's config value.
-   */
-  end?: CoreProposalData['payload']['end'];
   name: CoreProposalData['payload']['name'];
 };
 
@@ -88,11 +84,7 @@ export function useBuildAndSignProposalData(): UseBuildAndSignProposalDataReturn
 
       setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
 
-      const {body, end, name} = partialProposalData;
-
-      const blockNumber: string = (
-        await web3Instance.eth.getBlockNumber()
-      ).toString();
+      const {body, name} = partialProposalData;
 
       const nowTimestamp: number = Math.floor(Date.now() / 1000);
 
@@ -100,19 +92,13 @@ export function useBuildAndSignProposalData(): UseBuildAndSignProposalDataReturn
         payload: {
           body,
           choices: VOTE_CHOICES,
-          // @todo Need to get vote length from the DAO.
-          end:
-            end ||
-            Math.floor(nowTimestamp / 1000 + 180 /* @note for development */),
           name,
-          snapshot: blockNumber,
-          start: Math.floor(nowTimestamp / 1000),
         },
         // Set to empty until we obtain the signature.
         sig: '',
         space: SPACE,
         timestamp: nowTimestamp,
-        type: 'draft',
+        type: CoreProposalType.draft,
       };
 
       const signature = await Web3JsSigner(web3Instance, account)(

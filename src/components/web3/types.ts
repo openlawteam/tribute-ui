@@ -23,6 +23,9 @@ export type CoreProposalPayload = {
   name: string;
   body: string;
   choices: CoreProposalVoteChoices;
+};
+
+export type SponsorProposalPayload = {
   /**
    * Date timestamp in seconds
    */
@@ -35,6 +38,7 @@ export type CoreProposalPayload = {
    * ETH block number coerced to `string`.
    */
   snapshot: string;
+  type: CoreProposalType.proposal;
 };
 
 // Required by both Moloch and Snapshot proposals
@@ -58,8 +62,6 @@ export type CoreProposalData = {
   timestamp: number;
   type: CoreProposalType;
 };
-
-export type CoreProposalType = 'draft' | 'proposal' | 'result' | 'vote';
 
 // Ordered vote choices. Do not change the indexes!
 export type CoreProposalVoteChoices = [VoteChoices.yes, VoteChoices.no];
@@ -91,6 +93,13 @@ export enum ContractDAOConfigKeys {
   votingGracePeriod = 'voting.gracePeriod',
   votingStakingAmount = 'voting.stakingAmount',
   votingVotingPeriod = 'voting.votingPeriod',
+}
+
+export enum CoreProposalType {
+  draft = 'draft',
+  proposal = 'proposal',
+  result = 'result',
+  vote = 'vote',
 }
 
 export enum VoteChoices {
