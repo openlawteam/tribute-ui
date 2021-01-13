@@ -5,15 +5,28 @@ import {Contract as Web3Contract} from 'web3-eth-contract/types';
  * WEB3 TYPES
  */
 
+// -----------------------------
 // CONTRACTS
+// -----------------------------
 
 export type SmartContractItem = {
+  /**
+   * Web3 `Contract` instance
+   */
   instance: Web3Contract;
+  /**
+   * Contract JSON ABI
+   */
   abi: AbiItem[];
+  /**
+   * Address of the instantiated contract
+   */
   contractAddress: string;
 };
 
+// -----------------------------
 // PROPOSALS
+// -----------------------------
 
 export type CoreProposalRequestBody = {
   /**
@@ -35,9 +48,22 @@ export type CoreProposalRequestBody = {
  * Required by both Moloch and Snapshot proposals
  */
 export type CoreProposalDataPayload = {
-  name: string;
+  /**
+   * Descriptive text content to describe the Draft/Proposal.
+   */
   body: string;
+  /**
+   * Voting choices
+   */
   choices: CoreProposalVoteChoices;
+  /**
+   * Any other stringifiable information about the Draft/Proposal
+   */
+  metadata: Record<string, any>;
+  /**
+   * Name of a Draft/Proposal
+   */
+  name: string;
 };
 
 export type SponsorProposalPayload = {
@@ -53,11 +79,22 @@ export type SponsorProposalPayload = {
    * ETH block number coerced to `string`.
    */
   snapshot: string;
-  type: CoreProposalType.proposal;
 };
 
 // Required by both Moloch and Snapshot proposals
 export type CoreProposalData = {
+  /**
+   * An adapter's contract address (i.e. for `Onboarding.sol`).
+   * For signature ERC712 verification. Value is not stored.
+   */
+  actionId: string;
+  /**
+   * For signature ERC712 verification. Value is not stored.
+   */
+  chainId: number;
+  /**
+   * The core content of a Snapshot Draft/Proposal.
+   */
   payload: CoreProposalDataPayload;
   /**
    * The ERC712 signature `string` returned from a signing function.
@@ -75,7 +112,16 @@ export type CoreProposalData = {
    * Date timestamp in seconds
    */
   timestamp: number;
+  /**
+   * Unique string (typically a contract address) which is coupled to a `space`.
+   */
+  token: string;
   type: CoreProposalType;
+  /**
+   * The main contract address (i.e. for `DaoRegistry.sol`).
+   * For signature ERC712 verification. Value is not stored.
+   */
+  verifyingContract: string;
 };
 
 // Ordered vote choices. Do not change the indexes!
