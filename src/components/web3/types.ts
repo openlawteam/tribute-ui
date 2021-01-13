@@ -88,10 +88,6 @@ export type CoreProposalData = {
    */
   payload: CoreProposalDataPayload;
   /**
-   * The ERC712 signature `string` returned from a signing function.
-   */
-  sig: string;
-  /**
    * Space is a unique key (typically a contract address)
    * used by Moloch and Snapshot for building core proposal data.
    *
