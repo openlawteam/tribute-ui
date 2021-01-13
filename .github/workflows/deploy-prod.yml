@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: build
-          key: node-modules-${{ hashFiles('build') }}
+          key: build-${{ hashFiles('build') }}
 
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
