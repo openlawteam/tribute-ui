@@ -31,6 +31,36 @@ const transitionClosingStyles: Record<string, any> = {
   exited: {right: 0, opacity: 1},
 };
 
+// Nav links displayed on the landing page and main pages
+export function NavLinks() {
+  return (
+    <nav role="navigation" id="navigation">
+      <ul className="nav__list">
+        <li tabIndex={0}>
+          <NavLink to="/membership">
+            <span>Membership</span>
+          </NavLink>
+        </li>
+        <li tabIndex={0}>
+          <NavLink to="/governance-proposals">
+            <span>Governance</span>
+          </NavLink>
+        </li>
+        <li tabIndex={0}>
+          <NavLink to="/transfers">
+            <span>Transfer</span>
+          </NavLink>
+        </li>
+        <li tabIndex={0}>
+          <NavLink to="/tributes">
+            <span>Tribute</span>
+          </NavLink>
+        </li>
+      </ul>
+    </nav>
+  );
+}
+
 export default function Nav() {
   /**
    * State
@@ -87,32 +117,7 @@ export default function Nav() {
           <div className="nav-header">
             <div className="nav-header__menu-container">
               {/* NAV */}
-              {!isIndexPath && (
-                <nav role="navigation" id="navigation">
-                  <ul className="nav__list">
-                    <li tabIndex={0}>
-                      <NavLink to="/membership">
-                        <span>Membership</span>
-                      </NavLink>
-                    </li>
-                    <li tabIndex={0}>
-                      <NavLink to="/governance-proposals">
-                        <span>Governance</span>
-                      </NavLink>
-                    </li>
-                    <li tabIndex={0}>
-                      <NavLink to="/transfers">
-                        <span>Transfer</span>
-                      </NavLink>
-                    </li>
-                    <li tabIndex={0}>
-                      <NavLink to="/tributes">
-                        <span>Tribute</span>
-                      </NavLink>
-                    </li>
-                  </ul>
-                </nav>
-              )}
+              {!isIndexPath && <NavLinks />}
 
               <div tabIndex={0} className="nav__hamburger-wrapper">
                 <div

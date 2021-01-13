@@ -1,0 +1,60 @@
+@use "./mixins" as *; /* load without namespace for convenience */
+
+.landing {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  margin: 0 2rem 0;
+
+  @include size-medium-down {
+    padding-top: 0;
+  }
+}
+
+.landing__subtitle {
+  > p {
+    font-size: 1.5rem;
+    text-align: center;
+
+    @include size-medium-down {
+      font-size: 1.15rem;
+      margin-top: 0;
+    }
+  }
+}
+
+.landing__img {
+  span {
+    background: red;
+    display: block;
+    height: 250px;
+    width: 250px;
+  }
+}
+
+.landing__button {
+  > button {
+    font-size: 1.5rem;
+    padding: 1rem 4rem;
+    margin: 2.5rem 0 1rem;
+  }
+}
+
+.landing__navlinks .nav__list {
+  display: inline-flex;
+  flex-direction: row;
+
+  > li {
+    margin: 1.5rem;
+    text-align: center;
+
+    @include size-medium-down {
+      margin: 1.5rem 0 0;
+    }
+  }
+
+  @include size-medium-down {
+    flex-direction: column;
+  }
+}
