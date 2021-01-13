@@ -40,11 +40,14 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install
 
-      - name: Create production build in deploy-preview context
-        # if: steps.cache-build.outputs.cache-hit != 'true'
-        uses: netlify/actions/cli@master
-        with:
-          args: build --context deploy-preview
+      - name: Create production build
+        run: npm run build
+
+      # - name: Create production build in deploy-preview context
+      #   # if: steps.cache-build.outputs.cache-hit != 'true'
+      #   uses: netlify/actions/cli@master
+      #   with:
+      #     args: build --context deploy-preview
 
       - name: Deploy to Netlify preview site
         uses: netlify/actions/cli@master
