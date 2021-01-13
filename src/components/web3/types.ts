@@ -34,7 +34,7 @@ export type CoreProposalRequestBody = {
  * For the proposal `payload` key.
  * Required by both Moloch and Snapshot proposals
  */
-export type CoreProposalPayload = {
+export type CoreProposalDataPayload = {
   name: string;
   body: string;
   choices: CoreProposalVoteChoices;
@@ -58,7 +58,7 @@ export type SponsorProposalPayload = {
 
 // Required by both Moloch and Snapshot proposals
 export type CoreProposalData = {
-  payload: CoreProposalPayload;
+  payload: CoreProposalDataPayload;
   /**
    * The ERC712 signature `string` returned from a signing function.
    */
