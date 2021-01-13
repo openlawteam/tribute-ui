@@ -25,6 +25,8 @@ type UseBuildAndSignProposalDataReturn = {
 /**
  * useBuildAndSignProposalData
  *
+ * @todo THIS FILE IS NOT PRODUCTION-READY (it is a WIP)!
+ *
  * React hook which returns a function, and its data, to builds the proposal data for submission
  * to Moloch v3 and Snapshot and signs it (ERC712).
  *
