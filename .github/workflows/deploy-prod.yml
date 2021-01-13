@@ -37,6 +37,7 @@ jobs:
         with:
           path: build
           key: build-${{ github.run_id }}
+          restore-keys: build-
 
       - name: Create production build
         if: steps.cache-build.outputs.cache-hit != 'true'
