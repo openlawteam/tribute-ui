@@ -15,6 +15,21 @@ export type SmartContractItem = {
 
 // PROPOSALS
 
+export type CoreProposalRequestBody = {
+  /**
+   * The address of the submitting user.
+   */
+  address: string;
+  /**
+   * Stringified JSON message of `CoreProposalData`
+   */
+  msg: string;
+  /**
+   * Resulting hash of a Web3 wallet signature (e.g. ERC712; `eth.personal.sign`)
+   */
+  sig: string;
+};
+
 /**
  * For the proposal `payload` key.
  * Required by both Moloch and Snapshot proposals
