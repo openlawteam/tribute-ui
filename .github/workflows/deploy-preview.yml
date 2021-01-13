@@ -29,19 +29,19 @@ jobs:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
 
-      - name: Cache build
-        id: cache-build
-        uses: actions/cache@v2
-        with:
-          path: build
-          key: build-preview-${{ hashFiles('**/build') }}
+      # - name: Cache build
+      #   id: cache-build
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: build
+      #     key: build-preview-${{ hashFiles('**/build') }}
 
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install
 
       - name: Create production build in deploy-preview context
-        if: steps.cache-build.outputs.cache-hit != 'true'
+        # if: steps.cache-build.outputs.cache-hit != 'true'
         uses: netlify/actions/cli@master
         with:
           args: build --context deploy-preview
