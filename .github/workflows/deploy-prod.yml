@@ -53,4 +53,4 @@ jobs:
       - name: Deploy to Netlify production site
         uses: netlify/actions/cli@master
         with:
-          args: deploy --dir=build --prod --message="${{ steps.tag-name.outputs.tag_name }}"
+          args: deploy --dir=build --prod --message='${{ steps.tag-name.outputs.tag_name }}'

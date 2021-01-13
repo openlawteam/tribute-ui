@@ -53,4 +53,4 @@ jobs:
       - name: Deploy to Netlify develop site
         uses: netlify/actions/cli@master
         with:
-          args: deploy --dir=build --alias=develop --message="${{ steps.sha-short.outputs.sha_short }}-${{ github.event.head_commit.message }}"
+          args: deploy --dir=build --alias=develop --message='${{ steps.sha-short.outputs.sha_short }}-${{ github.event.head_commit.message }}'
