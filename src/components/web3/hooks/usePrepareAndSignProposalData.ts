@@ -17,8 +17,8 @@ type PrepareAndSignProposalDataParam = {
 
 type UsePrepareAndSignProposalDataReturn = {
   prepareAndSignProposalData: (
-    d: PrepareAndSignProposalDataParam,
-    a: string
+    partialProposalData: PrepareAndSignProposalDataParam,
+    adapterAddress: string
   ) => Promise<{
     data: CoreProposalData;
     signature: string;
@@ -121,6 +121,7 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
       };
 
       // Sign
+      // @todo USE LAOLAND CLIENT EXMAPLE CODE FOR SIGNING. THIS DOES NOT WORK.
       const signature = await Web3JsSigner(web3Instance, account)(
         proposalData,
         daoRegistryAddress,
