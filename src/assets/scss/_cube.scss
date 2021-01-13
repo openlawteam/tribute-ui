@@ -1,37 +1,74 @@
+@use "./mixins" as *; /* load without namespace for convenience */
+
 $cubeHeight: 396px;
 $cubeWidth: 348px;
 $faceSize: $cubeWidth / 2;
 
-%cube-segment {
-  display: block;
+%cube-background {
+  content: "";
   position: absolute;
-  width: $faceSize;
-  height: $faceSize;
+  width: 100%;
+  height: 100%;
+  background: url(../images/mirage.gif) 0 0 repeat;
+  background-size: 11rem 13rem;
+
+  @include size-medium-down {
+    background-size: 5.5rem 6.5rem;
+  }
 }
 
 .cube {
   position: relative;
   height: $cubeHeight;
   width: $cubeWidth;
-}
 
-.cube__segment--right,
-.cube__segment--left,
-.cube__segment--top {
-  width: $faceSize;
-  height: $faceSize;
-
-  background: url(../images/mirage.gif) no-repeat 0 0;
-  background-size: 11rem 13rem;
+  @include size-medium-down {
+    height: $cubeHeight / 2;
+    width: $cubeWidth / 2;
+  }
 }
 
 .cube__segment--right,
 .cube__segment--left,
 .cube__segment--top {
   position: absolute;
+  height: $faceSize;
+  width: $faceSize;
+
+  @include size-medium-down {
+    height: $faceSize / 2;
+    width: $faceSize / 2;
+  }
+
+  &::before {
+    @extend %cube-background;
+  }
+}
+
+.cube__segment--top {
+  $left: 87px;
+  $top: 14px;
+
+  -webkit-transform: skew(60deg, -30deg) scale(1, -0.575);
+  -moz-transform: skew(60deg, -30deg) scale(1, -0.575);
+  -o-transform: skew(60deg, -30deg) scale(1, -0.575);
+  -ms-transform: skew(60deg, -30deg) scale(1, -0.575);
+  transform: skew(60deg, -30deg) scale(1, -0.575);
+
+  left: $left;
+  top: $top;
+
+  @include size-medium-down {
+    left: $left / 2;
+    top: $top / 2;
+  }
 }
 
 .cube__segment--left {
+  $top: 152px;
+  $width: 174px;
+  $height: 195px;
+
   -webkit-transform: skew(0deg, 30deg);
   -moz-transform: skew(0deg, 30deg);
   -o-transform: skew(0deg, 30deg);
@@ -42,28 +79,35 @@ $faceSize: $cubeWidth / 2;
   top: 152px;
   width: 174px;
   height: 195px;
+
+  @include size-medium-down {
+    top: $top / 2;
+    width: $width / 2;
+    height: $height / 2;
+  }
 }
 
 .cube__segment--right {
+  $left: 175px;
+  $top: 151px;
+  $width: 174px;
+  $height: 195px;
+
   -webkit-transform: skew(0deg, -30deg);
   -moz-transform: skew(0deg, -30deg);
   -o-transform: skew(0deg, -30deg);
   -ms-transform: skew(0deg, -30deg);
   transform: skew(0deg, -30deg);
 
-  left: 175px;
-  top: 151px;
-  width: 174px;
-  height: 195px;
-}
+  left: $left;
+  top: $top;
+  width: $width;
+  height: $height;
 
-.cube__segment--top {
-  -webkit-transform: skew(60deg, -30deg) scale(1, -0.58);
-  -moz-transform: skew(60deg, -30deg) scale(1, -0.58);
-  -o-transform: skew(60deg, -30deg) scale(1, -0.58);
-  -ms-transform: skew(60deg, -30deg) scale(1, -0.58);
-  transform: skew(60deg, -30deg) scale(1, -0.575);
-
-  top: 14px;
-  left: 87px;
+  @include size-medium-down {
+    left: $left / 2;
+    top: $top / 2;
+    width: $width / 2;
+    height: $height / 2;
+  }
 }
