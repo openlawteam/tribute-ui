@@ -68,15 +68,15 @@ export type CoreProposalDataPayload = {
    */
   name: string;
   /**
-   * Date timestamp in seconds
+   * Date timestamp in seconds. Not used for `type: draft`.
    */
   start?: number;
   /**
-   * Date timestamp in seconds
+   * Date timestamp in seconds. Not used for `type: draft`.
    */
   end?: number;
   /**
-   * ETH block number coerced to `string`.
+   * ETH block number coerced to `string`. Not used for `type: draft`.
    */
   snapshot?: string;
 };
