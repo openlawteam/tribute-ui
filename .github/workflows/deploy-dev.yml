@@ -1,9 +1,11 @@
-name: Netlify production deployment
+name: Netlify develop deployment
 
-on:
-  push:
-    tags:
-      - v*
+# on:
+#   push:
+#     branches:
+#       - main
+
+on: [push]
 
 jobs:
   deploy:
@@ -30,27 +32,27 @@ jobs:
         uses: actions/cache@v2
         with:
           path: build
-          key: build-prod-${{ hashFiles('**/build') }}
+          key: build-dev-${{ hashFiles('**/build') }}
 
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install
 
-      - name: Create production build in production context
+      - name: Create production build in develop context
         if: steps.cache-build.outputs.cache-hit != 'true'
         uses: netlify/actions/cli@master
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         with:
-          args: build --context production
+          args: build --context develop
           secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
 
-      - name: Deploy to Netlify production site
+      - name: Deploy to Netlify develop site
         uses: netlify/actions/cli@master
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         with:
-          args: deploy --dir=build --prod --message=${{ github.sha }}-${{ github.event.release.tag_name }}
+          args: deploy --dir=build --alias=develop --message=${{ github.sha }}-${{ github.event.head_commit.message }}
           secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
