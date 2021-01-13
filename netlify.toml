@@ -9,7 +9,7 @@
   # the root directory if a base has not been set.
   publish = "build/"
   # Default build command.
-  command = "CI='' npm run build"
+  command = "CI= npm run build"
 
 # Production context
 [context.production.environment]
