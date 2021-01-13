@@ -1,9 +1,11 @@
+@use "./variables" as *; /* load without namespace for convenience */
 @use "./mixins" as *; /* load without namespace for convenience */
 
 .landing {
   align-items: center;
   display: flex;
   flex-direction: column;
+  font-family: $font-mono;
   padding: 1rem;
   margin: 0 2rem 0;
 
@@ -14,7 +16,7 @@
 
 .landing__subtitle {
   > p {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     text-align: center;
 
     @include size-medium-down {
@@ -25,12 +27,7 @@
 }
 
 .landing__img {
-  span {
-    background: red;
-    display: block;
-    height: 250px;
-    width: 250px;
-  }
+  margin-top: 2rem;
 }
 
 .landing__button {
@@ -44,10 +41,21 @@
 .landing__navlinks .nav__list {
   display: inline-flex;
   flex-direction: row;
+  font-size: 1.2rem;
+  text-transform: lowercase;
 
   > li {
     margin: 1.5rem;
     text-align: center;
+
+    a {
+      text-decoration: none;
+
+      &.active,
+      &:hover {
+        color: $color-primary-hover;
+      }
+    }
 
     @include size-medium-down {
       margin: 1.5rem 0 0;

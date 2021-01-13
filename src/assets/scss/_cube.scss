@@ -1,0 +1,69 @@
+$cubeHeight: 396px;
+$cubeWidth: 348px;
+$faceSize: $cubeWidth / 2;
+
+%cube-segment {
+  display: block;
+  position: absolute;
+  width: $faceSize;
+  height: $faceSize;
+}
+
+.cube {
+  position: relative;
+  height: $cubeHeight;
+  width: $cubeWidth;
+}
+
+.cube__segment--right,
+.cube__segment--left,
+.cube__segment--top {
+  width: $faceSize;
+  height: $faceSize;
+
+  background: url(../images/mirage.gif) no-repeat 0 0;
+  background-size: 11rem 13rem;
+}
+
+.cube__segment--right,
+.cube__segment--left,
+.cube__segment--top {
+  position: absolute;
+}
+
+.cube__segment--left {
+  -webkit-transform: skew(0deg, 30deg);
+  -moz-transform: skew(0deg, 30deg);
+  -o-transform: skew(0deg, 30deg);
+  -ms-transform: skew(0deg, 30deg);
+  transform: skew(0deg, 30deg);
+
+  left: 0px;
+  top: 152px;
+  width: 174px;
+  height: 195px;
+}
+
+.cube__segment--right {
+  -webkit-transform: skew(0deg, -30deg);
+  -moz-transform: skew(0deg, -30deg);
+  -o-transform: skew(0deg, -30deg);
+  -ms-transform: skew(0deg, -30deg);
+  transform: skew(0deg, -30deg);
+
+  left: 175px;
+  top: 151px;
+  width: 174px;
+  height: 195px;
+}
+
+.cube__segment--top {
+  -webkit-transform: skew(60deg, -30deg) scale(1, -0.58);
+  -moz-transform: skew(60deg, -30deg) scale(1, -0.58);
+  -o-transform: skew(60deg, -30deg) scale(1, -0.58);
+  -ms-transform: skew(60deg, -30deg) scale(1, -0.58);
+  transform: skew(60deg, -30deg) scale(1, -0.575);
+
+  top: 14px;
+  left: 87px;
+}
