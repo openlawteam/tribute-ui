@@ -28,7 +28,10 @@ export type SmartContractItem = {
 // PROPOSALS
 // -----------------------------
 
-export type CoreProposalRequestBody = {
+/**
+ * JSON request data to stringify for `POST` to Snapshot Hub.
+ */
+export type SnapshotProposalRequestBody = {
   /**
    * The address of the submitting user.
    */
@@ -36,7 +39,7 @@ export type CoreProposalRequestBody = {
   /**
    * Stringified JSON message of `CoreProposalData`
    */
-  msg: string;
+  msg: CoreProposalData;
   /**
    * Resulting hash of a Web3 wallet signature (e.g. ERC712; `eth.personal.sign`)
    */
@@ -64,34 +67,22 @@ export type CoreProposalDataPayload = {
    * Name of a Draft/Proposal
    */
   name: string;
-};
-
-export type SponsorProposalPayload = {
   /**
    * Date timestamp in seconds
    */
-  start: number;
+  start?: number;
   /**
    * Date timestamp in seconds
    */
-  end: number;
+  end?: number;
   /**
    * ETH block number coerced to `string`.
    */
-  snapshot: string;
+  snapshot?: string;
 };
 
 // Required by both Moloch and Snapshot proposals
 export type CoreProposalData = {
-  /**
-   * An adapter's contract address (i.e. for `Onboarding.sol`).
-   * For signature ERC712 verification. Value is not stored.
-   */
-  actionId: string;
-  /**
-   * For signature ERC712 verification. Value is not stored.
-   */
-  chainId: number;
   /**
    * The core content of a Snapshot Draft/Proposal.
    */
@@ -116,7 +107,22 @@ export type CoreProposalData = {
    * Unique string (typically a contract address) which is coupled to a `space`.
    */
   token: string;
+  /**
+   * Snapshot entity type
+   */
   type: CoreProposalType;
+
+  // ERC712 Signature SIGNING-SPECIFIC DATA. NOT STORED IN SNAPSHOT.
+
+  /**
+   * An adapter's contract address (i.e. for `Onboarding.sol`).
+   * For signature ERC712 verification. Value is not stored.
+   */
+  actionId: string;
+  /**
+   * For signature ERC712 verification. Value is not stored.
+   */
+  chainId: number;
   /**
    * The main contract address (i.e. for `DaoRegistry.sol`).
    * For signature ERC712 verification. Value is not stored.
