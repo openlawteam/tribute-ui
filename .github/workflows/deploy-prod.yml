@@ -1,9 +1,14 @@
-name: Lint style
+name: Netlify production deployment
+
+# on:
+#   push:
+#     tags:
+#       - "v*"
 
 on: [push]
 
 jobs:
-  lint-style:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,5 +31,13 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install
 
-      - name: Run prettier check
-        run: npm run style
+      - name: Cache build
+        id: cache-build
+        uses: actions/cache@v2
+        with:
+          path: build
+          key: build-${{ github.run_id }}
+
+      - name: Create production build
+        if: steps.cache-build.outputs.cache-hit != 'true'
+        run: npm run build
