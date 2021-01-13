@@ -1,11 +1,13 @@
 name: Netlify develop deployment
 
-# on:
-#   push:
-#     branches:
-#       - main
+on:
+  push:
+    branches:
+      - main
 
-on: [push]
+env:
+  NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+  NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
 jobs:
   deploy:
@@ -41,16 +43,14 @@ jobs:
       - name: Create production build in develop context
         if: steps.cache-build.outputs.cache-hit != 'true'
         uses: netlify/actions/cli@master
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         with:
           args: build --context develop
 
+      - name: Get sha for deploy message
+        id: sha-short
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
       - name: Deploy to Netlify develop site
         uses: netlify/actions/cli@master
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         with:
-          args: deploy --dir=build --alias=develop --message="${{ github.sha }}-${{ github.event.head_commit.message }}"
+          args: deploy --dir=build --alias=develop --message="${{ steps.sha-short.outputs.sha_short }}-${{ github.event.head_commit.message }}"

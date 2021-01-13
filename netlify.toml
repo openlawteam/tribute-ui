@@ -20,3 +20,9 @@
 [context.develop.environment]
   REACT_APP_ENVIRONMENT = "development"
   # REACT_APP_INFURA_PROJECT_ID_DEV is set in Netlify UI.
+
+# Deploy Preview context: all deploys generated from a pull/merge request to
+# `main` branch will inherit these settings.
+[context.deploy-preview.environment]
+  REACT_APP_ENVIRONMENT = "development"
+  # REACT_APP_INFURA_PROJECT_ID_DEV is set in Netlify UI.

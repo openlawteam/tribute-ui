@@ -1,9 +1,9 @@
-name: Netlify production deployment
+name: Netlify preview deployment
 
 on:
-  push:
-    tags:
-      - v*
+  pull_request:
+    branches:
+      - main
 
 env:
   NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -34,23 +34,19 @@ jobs:
         uses: actions/cache@v2
         with:
           path: build
-          key: build-prod-${{ hashFiles('**/build') }}
+          key: build-preview-${{ hashFiles('**/build') }}
 
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install
 
-      - name: Create production build in production context
+      - name: Create production build in deploy-preview context
         if: steps.cache-build.outputs.cache-hit != 'true'
         uses: netlify/actions/cli@master
         with:
-          args: build --context production
+          args: build --context deploy-preview
 
-      - name: Get tag name for deploy message
-        id: tag-name
-        run: echo "::set-output name=tag_name::${GITHUB_REF/refs\/tags\//}"
-
-      - name: Deploy to Netlify production site
+      - name: Deploy to Netlify preview site
         uses: netlify/actions/cli@master
         with:
-          args: deploy --dir=build --prod --message="${{ steps.tag-name.outputs.tag_name }}"
+          args: deploy --dir=build --alias=deploy-preview-${{ github.event.pull_request.number }} --message="${{ github.event.pull_request.number }}-${{ github.event.pull_request.title }}"
