@@ -34,7 +34,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: build
-          key: build-preview-${{ hashFiles('**/build') }}
+          key: build-preview-${{ github.event.pull_request.number }}-${{ hashFiles('**/build') }}
 
       - name: Create production build
         if: steps.cache-build.outputs.cache-hit != 'true'
