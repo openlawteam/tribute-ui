@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  deploy-preview:
     runs-on: ubuntu-latest
 
     steps:
