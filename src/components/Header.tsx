@@ -16,9 +16,12 @@ export default function Header() {
    * Functions
    */
 
-  // Render the location with or without a link depending on `location`
+  // Don't display header if we're on the index page
+  if (isIndexPath) return null;
+
+  // Render the location with a link
   function RenderLogo(props: React.PropsWithChildren<any>) {
-    return isIndexPath ? props.children : <Link to="/">{props.children}</Link>;
+    return <Link to="/">{props.children}</Link>;
   }
 
   return (
