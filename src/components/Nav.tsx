@@ -35,7 +35,7 @@ const transitionClosingStyles: Record<string, any> = {
 export function NavLinks() {
   return (
     <nav role="navigation" id="navigation">
-      <ul className="nav__list">
+      <ul className="nav__list" data-testid="nav__list">
         <li tabIndex={0}>
           <NavLink to="/membership">
             <span>Membership</span>

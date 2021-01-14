@@ -16,15 +16,20 @@ describe('App unit tests', () => {
     await waitFor(() => {
       // Header
       expect(screen.getByText(/TRIBUTE/)).toBeInTheDocument();
-      // Burger icon
-      expect(screen.getByLabelText(/menu/i)).toBeInTheDocument();
+
+      // Subtitle
       expect(
-        screen.getByRole('button', {name: /connect/i})
+        screen.getByText(/for the ongoing development of moloch v3/i)
       ).toBeInTheDocument();
 
-      // Content
-      // @todo Need to update this
-      expect(screen.getByText(/GetStarted @todo/i)).toBeInTheDocument();
+      // Cube image
+      expect(screen.getByTestId('cube')).toBeInTheDocument();
+
+      // Join button
+      expect(screen.getByRole('button', {name: /join/i})).toBeInTheDocument();
+
+      // Navigation
+      expect(screen.getByRole(/navigation/)).toBeInTheDocument();
     });
   });
 

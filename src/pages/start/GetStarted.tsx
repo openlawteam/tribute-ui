@@ -26,7 +26,7 @@ export default function GetStarted() {
           </div>
 
           <div className="landing__img">
-            <div className="cube">
+            <div className="cube" data-testid="cube">
               <div className="cube__segment--top"></div>
               <div className="cube__segment--left"></div>
               <div className="cube__segment--right"></div>
