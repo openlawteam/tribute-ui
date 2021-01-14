@@ -32,6 +32,10 @@ jobs:
       - name: Create production build
         run: REACT_APP_ENVIRONMENT=production REACT_APP_INFURA_PROJECT_ID_PROD=${{ secrets.REACT_APP_INFURA_PROJECT_ID_PROD }} npm run build
 
+      - name: Get sha for deploy message
+        id: sha-short
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
       - name: Get tag name for deploy message
         id: tag-name
         run: echo "::set-output name=tag_name::${GITHUB_REF/refs\/tags\//}"
@@ -42,4 +46,4 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         with:
-          args: deploy --dir=build --prod --message='${{ steps.tag-name.outputs.tag_name }}'
+          args: deploy --dir=build --prod --message='${{ steps.sha-short.outputs.sha_short }}-${{ steps.tag-name.outputs.tag_name }}'
