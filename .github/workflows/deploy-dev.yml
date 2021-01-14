@@ -5,10 +5,6 @@ on:
     branches:
       - main
 
-env:
-  NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-  NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -29,22 +25,12 @@ jobs:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
 
-      - name: Cache build
-        id: cache-build
-        uses: actions/cache@v2
-        with:
-          path: build
-          key: build-dev-${{ hashFiles('**/build') }}
-
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install
 
-      - name: Create production build in develop context
-        if: steps.cache-build.outputs.cache-hit != 'true'
-        uses: netlify/actions/cli@master
-        with:
-          args: build --context develop
+      - name: Create production build
+        run: REACT_APP_ENVIRONMENT=development REACT_APP_INFURA_PROJECT_ID_DEV=${{ secrets.REACT_APP_INFURA_PROJECT_ID_DEV }} npm run build
 
       - name: Get sha for deploy message
         id: sha-short
@@ -52,5 +38,8 @@ jobs:
 
       - name: Deploy to Netlify develop site
         uses: netlify/actions/cli@master
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         with:
           args: deploy --dir=build --alias=develop --message='${{ steps.sha-short.outputs.sha_short }}-${{ github.event.head_commit.message }}'

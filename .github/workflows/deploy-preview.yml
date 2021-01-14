@@ -29,15 +29,7 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install
 
-      - name: Cache build
-        id: cache-build
-        uses: actions/cache@v2
-        with:
-          path: build
-          key: build-preview-${{ github.event.pull_request.number }}-${{ hashFiles('**/build') }}
-
       - name: Create production build
-        if: steps.cache-build.outputs.cache-hit != 'true'
         run: REACT_APP_ENVIRONMENT=development REACT_APP_INFURA_PROJECT_ID_DEV=${{ secrets.REACT_APP_INFURA_PROJECT_ID_DEV }} npm run build
 
       - name: Deploy to Netlify preview site
