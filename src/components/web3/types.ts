@@ -127,7 +127,7 @@ export type CoreProposalData = {
 };
 
 // Ordered vote choices. Do not change the indexes!
-export type CoreProposalVoteChoices = [VoteChoices.yes, VoteChoices.no];
+export type CoreProposalVoteChoices = [VoteChoices.Yes, VoteChoices.No];
 
 /**
  * WEB3 ENUMS
@@ -161,13 +161,12 @@ export enum ContractDAOConfigKeys {
 export enum CoreProposalType {
   draft = 'draft',
   proposal = 'proposal',
-  result = 'result',
   vote = 'vote',
 }
 
 export enum VoteChoices {
-  no = 'no',
-  yes = 'yes',
+  No = 'No',
+  Yes = 'Yes',
 }
 
 export enum Web3State {

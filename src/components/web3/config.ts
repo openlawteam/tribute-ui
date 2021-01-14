@@ -6,6 +6,6 @@ import {CoreProposalVoteChoices, VoteChoices} from './types';
 
 // Vote choices should be "yes", "no" unless Moloch v3 contracts change.
 export const VOTE_CHOICES: CoreProposalVoteChoices = [
-  VoteChoices.yes,
-  VoteChoices.no,
+  VoteChoices.Yes,
+  VoteChoices.No,
 ];
