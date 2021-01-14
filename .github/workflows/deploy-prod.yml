@@ -1,0 +1,49 @@
+name: Netlify production deployment
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+
+      - name: Cache node modules
+        id: cache-node-modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm install
+
+      - name: Create production build
+        run: REACT_APP_ENVIRONMENT=production REACT_APP_INFURA_PROJECT_ID_PROD=${{ secrets.REACT_APP_INFURA_PROJECT_ID_PROD }} npm run build
+
+      - name: Get sha for deploy message
+        id: sha-short
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Get tag name for deploy message
+        id: tag-name
+        run: echo "::set-output name=tag_name::${GITHUB_REF/refs\/tags\//}"
+
+      - name: Deploy to Netlify production site
+        uses: netlify/actions/cli@master
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        with:
+          args: deploy --dir=build --prod --message='${{ steps.sha-short.outputs.sha_short }}-${{ steps.tag-name.outputs.tag_name }}'

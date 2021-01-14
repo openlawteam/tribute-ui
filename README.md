@@ -21,6 +21,22 @@ When you set up your Ganache network workspace in the [Ganache GUI app](https://
 
 **Remember**: After you deploy the `DaoRegistry` smart contract on your local Ganache network you must include the deployed contract's address in your local root `.env` file.
 
+## Netlify Deployments
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/fc474fa4-9853-4dc0-a910-281167e7fdfc/deploy-status)](https://app.netlify.com/sites/tributedao/deploys)
+
+Deployments to production and develop environments are handled automatically via Netlify and GH actions:
+
+- `Netlify preview deployment`: pull_request (non-draft) to `main` branch -> https://deploy-preview-[PR#]--tributedao.netlify.app
+
+- `Netlify develop deployment`: push to `main` branch -> https://develop--tributedao.netlify.app
+
+- `Netlify production deployment`: push `v*` tag (will presumably be part of a release) -> https://tributedao.netlify.app
+
+_Note for this deployment implementation with a single `main` branch to work, the Netlify automatic builds/deploys are stopped (you'll see evidence of that in the [Netlify project UI](https://app.netlify.com/sites/tributedao/overview)). They are now handled through these GH actions and Netlify CLI. See @note in `netlify.toml` for more info._
+
+For production deployments, simply run `npm run release` and follow the interactive UI in your console. The release script runs [np](https://github.com/sindresorhus/np). We have initially configured `np` (in `package.json`) to automatically handle only versioning, release drafts, and git tagging. We can enable additional features as needed, such as publishing to npm.
+
 ---
 
 # Getting Started with Create React App
