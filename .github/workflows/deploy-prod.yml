@@ -30,7 +30,10 @@ jobs:
         run: npm install
 
       - name: Create production build
-        run: REACT_APP_ENVIRONMENT=production REACT_APP_INFURA_PROJECT_ID_PROD=${{ secrets.REACT_APP_INFURA_PROJECT_ID_PROD }} npm run build
+        env:
+          REACT_APP_ENVIRONMENT: production
+          REACT_APP_INFURA_PROJECT_ID_PROD: ${{ secrets.REACT_APP_INFURA_PROJECT_ID_PROD }}
+        run: npm run build
 
       - name: Get sha for deploy message
         id: sha-short
