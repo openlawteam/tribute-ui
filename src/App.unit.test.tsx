@@ -16,18 +16,14 @@ describe('App unit tests', () => {
     await waitFor(() => {
       // Header
       expect(screen.getByText(/TRIBUTE/)).toBeInTheDocument();
-
       // Subtitle
       expect(
         screen.getByText(/for the ongoing development of moloch v3/i)
       ).toBeInTheDocument();
-
       // Cube image
       expect(screen.getByTestId('cube')).toBeInTheDocument();
-
       // Join button
       expect(screen.getByRole('button', {name: /join/i})).toBeInTheDocument();
-
       // Navigation
       expect(screen.getByRole(/navigation/)).toBeInTheDocument();
     });
