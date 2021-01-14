@@ -35,7 +35,7 @@ Deployments to production and develop environments are handled automatically via
 
 _Note for this deployment implementation with a single `main` branch to work, the Netlify automatic builds/deploys are stopped (you'll see evidence of that in the [Netlify project UI](https://app.netlify.com/sites/tributedao/overview)). They are now handled through these GH actions and Netlify CLI. See @note in `netlify.toml` for more info._
 
-For production deployments, simply run `npm run release` to handle versioning, changelog generation, and git tagging. The release script runs [standard-version](https://github.com/conventional-changelog/standard-version). After you run standard-version, you can review your release state, correct mistakes, and push the new git tag when you're ready to deploy: `git push --follow-tags origin main`.
+For production deployments, simply run `npm run release` and follow the interactive UI in your console. The release script runs [np](https://github.com/sindresorhus/np). We have initially configured `np` (in `package.json`) to automatically handle only versioning, release drafts, and git tagging. We can enable additional features as needed, such as publishing to npm.
 
 ---
 
