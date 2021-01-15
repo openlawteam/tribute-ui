@@ -139,6 +139,7 @@ export enum ContractAdapterNames {
   financing = 'financing',
   guildkick = 'guildkick',
   managing = 'managing',
+  offchainvoting = 'offchainvoting',
   onboarding = 'onboarding',
   ragequit = 'ragequit',
   voting = 'voting',
