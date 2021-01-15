@@ -38,6 +38,10 @@ type WrapperProps = {
    * Web3 modal manager context options
    */
   web3ModalContext?: Web3ModalContextValue;
+  /**
+   * Option to Mock provider.request from MetaMask
+   */
+  mockMetaMaskRequest?: boolean;
 };
 
 /**
@@ -50,7 +54,12 @@ type WrapperProps = {
 export default function Wrapper(
   props: WrapperProps & React.PropsWithChildren<React.ReactNode>
 ) {
-  const {useInit = false, useWallet = false, web3ModalContext} = props;
+  const {
+    useInit = false,
+    useWallet = false,
+    web3ModalContext,
+    mockMetaMaskRequest = false,
+  } = props;
 
   /**
    * State
@@ -114,6 +123,17 @@ export default function Wrapper(
       getAdapterAddressMock?.mockRestore();
     };
   }, [getAdapterAddressMock]);
+
+  useEffect(() => {
+    // @note For signing ERC712 with MetaMask's API provider.request
+    mockMetaMaskRequest &&
+      ((mockWeb3Provider as any).request = async () =>
+        web3Instance.eth.abi.encodeParameter('uint256', 123));
+
+    return () => {
+      mockMetaMaskRequest && delete (mockWeb3Provider as any).request;
+    };
+  }, [mockMetaMaskRequest, mockWeb3Provider, web3Instance.eth.abi]);
 
   /**
    * Functions

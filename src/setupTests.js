@@ -10,7 +10,7 @@ require('dotenv').config({
   path: `${path.resolve(process.cwd(), 'src/test/.env')}`,
 });
 
-// const {server} = require('./test/server');
+const {server} = require('./test/server');
 
 /**
  * setupTests.js
@@ -29,9 +29,9 @@ require('dotenv').config({
  */
 
 beforeAll(() => {
-  // server.listen({
-  //   onUnhandledRequest: 'warn',
-  // });
+  server.listen({
+    onUnhandledRequest: 'warn',
+  });
 
   /**
    * Mock window.matchMedia which is not supported in JSDOM.
@@ -63,5 +63,5 @@ beforeAll(() => {
 // If you need to add a handler after calling setupServer for some specific test
 // this will remove that handler for the rest of them
 // (which is important for test isolation):
-// afterEach(() => server.resetHandlers());
-// afterAll(() => server.close());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
