@@ -199,7 +199,7 @@ export default function CreateMembershipProposal() {
           metadata: {},
         },
         ContractAdapterNames.onboarding,
-        SnapshotType.proposal
+        SnapshotType.draft
       );
 
       const {ethAddress, ethAmount} = values;
