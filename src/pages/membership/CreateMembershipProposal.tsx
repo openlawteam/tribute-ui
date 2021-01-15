@@ -21,6 +21,7 @@ import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {SHARES_ADDRESS} from '../../config';
+import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {StoreState, MetaMaskRPCError} from '../../util/types';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import CycleMessage from '../../components/feedback/CycleMessage';
@@ -29,8 +30,6 @@ import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
 import Wrap from '../../components/common/Wrap';
-import {SnapshotType} from '@openlaw/snapshot-js-erc712';
-import {getDefaultProposalBody} from '../../components/web3/helpers';
 
 enum Fields {
   ethAddress = 'ethAddress',
@@ -196,10 +195,7 @@ export default function CreateMembershipProposal() {
       await prepareAndSignProposalData(
         {
           name: account,
-          body: getDefaultProposalBody(
-            account,
-            ContractAdapterNames.onboarding
-          ),
+          body: `Membership for ${account}.`,
           metadata: {},
         },
         ContractAdapterNames.onboarding,
