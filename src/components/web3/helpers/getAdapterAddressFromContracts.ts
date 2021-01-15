@@ -20,6 +20,8 @@ function getContractAddressOrThrow(contract: SmartContractItem | null): string {
  *
  * Gets an adapter's address by its name (`type ContractAdapterNames`) from the Redux contracts state slice.
  *
+ * @note This is mainly for Adapters which submit proposals other than voting, so we have not included voting.
+ *
  * @param {string} name
  * @param {StoreState['contracts']} contracts
  */
