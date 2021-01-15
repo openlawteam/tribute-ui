@@ -118,6 +118,10 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
         throw new Error('No "SNAPSHOT_HUB_API_URL" was found.');
       }
 
+      if (type === SnapshotType.vote) {
+        throw new Error('Handling for type "vote" is not implemented.');
+      }
+
       setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       const adapterAddress = getAdapterAddressFromContracts(
@@ -179,7 +183,7 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
 
       setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
       setProposalData(proposalData);
-      setProposalSignature('signature');
+      setProposalSignature(signature);
 
       return {
         data: message,
