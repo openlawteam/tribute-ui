@@ -14,9 +14,10 @@ import {
   useContractSend,
   useETHGasPrice,
   useIsDefaultChain,
+  usePrepareAndSignProposalData,
 } from '../../components/web3/hooks';
 import {CHAINS} from '../../config';
-import {Web3TxStatus} from '../../components/web3/types';
+import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {SHARES_ADDRESS} from '../../config';
@@ -28,6 +29,8 @@ import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
 import Wrap from '../../components/common/Wrap';
+import {SnapshotType} from '@openlaw/snapshot-js-erc712';
+import {getDefaultProposalBody} from '../../components/web3/helpers';
 
 enum Fields {
   ethAddress = 'ethAddress',
@@ -78,6 +81,8 @@ export default function CreateMembershipProposal() {
     txSend,
     txStatus,
   } = useContractSend();
+
+  const {prepareAndSignProposalData} = usePrepareAndSignProposalData();
 
   /**
    * Their hooks
@@ -177,12 +182,29 @@ export default function CreateMembershipProposal() {
       }
 
       if (!OnboardingContract) {
-        throw new Error('No OnboardingContract');
+        throw new Error('No OnboardingContract found.');
       }
 
       if (!DaoRegistryContract) {
-        throw new Error('No DaoRegistryContract');
+        throw new Error('No DaoRegistryContract found.');
       }
+
+      if (!account) {
+        throw new Error('No account found.');
+      }
+
+      await prepareAndSignProposalData(
+        {
+          name: account,
+          body: getDefaultProposalBody(
+            account,
+            ContractAdapterNames.onboarding
+          ),
+          metadata: {},
+        },
+        ContractAdapterNames.onboarding,
+        SnapshotType.proposal
+      );
 
       const {ethAddress, ethAmount} = values;
       const ethAmountInWei = Web3.utils.toWei(
