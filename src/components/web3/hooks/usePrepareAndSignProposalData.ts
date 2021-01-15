@@ -1,29 +1,43 @@
 import {useState} from 'react';
 import {useSelector} from 'react-redux';
+import {
+  buildDraftMessage,
+  buildProposalMessage,
+  getDomainDefinition,
+  getSpace,
+  signMessage,
+  SnapshotDraftData,
+  SnapshotProposalData,
+  SnapshotType,
+} from '@openlaw/snapshot-js-erc712';
 
-import {CoreProposalData, CoreProposalType, Web3TxStatus} from '../types';
-import {DEFAULT_CHAIN, SPACE} from '../../../config';
+import {
+  ContractAdapterNames,
+  ContractDAOConfigKeys,
+  Web3TxStatus,
+} from '../types';
+import {DEFAULT_CHAIN, SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
+import {getAdapterAddressFromContracts, getDAOConfigEntry} from '../helpers';
+import {PRIMARY_TYPE_ERC712} from '../config';
 import {StoreState} from '../../../util/types';
 import {useWeb3Modal} from './useWeb3Modal';
-import {VOTE_CHOICES} from '../config';
-
-const {Web3JsSigner} = require('../../../laoland/offchain_voting');
 
 type PrepareAndSignProposalDataParam = {
-  body: CoreProposalData['payload']['body'];
-  name: CoreProposalData['payload']['name'];
-  metadata: CoreProposalData['payload']['metadata'];
+  body: SnapshotProposalData['payload']['body'];
+  name: SnapshotProposalData['payload']['name'];
+  metadata: SnapshotProposalData['payload']['metadata'];
 };
 
 type UsePrepareAndSignProposalDataReturn = {
   prepareAndSignProposalData: (
     partialProposalData: PrepareAndSignProposalDataParam,
-    adapterAddress: string
+    adapterName: ContractAdapterNames,
+    type: SnapshotProposalData['type']
   ) => Promise<{
-    data: CoreProposalData;
+    data: SnapshotDraftData;
     signature: string;
   }>;
-  proposalData: CoreProposalData | undefined;
+  proposalData: SnapshotDraftData | undefined;
   proposalDataError: Error | undefined;
   proposalDataStatus: Web3TxStatus;
   proposalSignature: string;
@@ -35,11 +49,7 @@ type UsePrepareAndSignProposalDataReturn = {
  * @todo THIS FILE IS NOT PRODUCTION-READY (it is untested)!
  *
  * React hook which prepares proposal data for submission
- * to Moloch v3 and Snapshot and signs it (ERC712).
- *
- * @note
- * The decision to make this a hook (instead of a helper function) seems correct for the React context which it is used.
- * If needed, we can always extract `function prepareAndSignProposalData` into its own helper and use it here.
+ * to Snapshot and Moloch v3 and signs it (ERC712)
  *
  * @returns {Promise<BuildAndSignProposalDataReturn>} An object with the proposal data and the ERC712 signature string.
  */
@@ -51,18 +61,22 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
   const daoRegistryAddress = useSelector(
     (state: StoreState) => state.contracts.DaoRegistryContract?.contractAddress
   );
+  const daoRegistryInstance = useSelector(
+    (state: StoreState) => state.contracts.DaoRegistryContract?.instance
+  );
+  const contracts = useSelector((state: StoreState) => state.contracts);
 
   /**
    * Our hooks
    */
 
-  const {account, web3Instance} = useWeb3Modal();
+  const {account, provider, web3Instance} = useWeb3Modal();
 
   /**
    * State
    */
 
-  const [proposalData, setProposalData] = useState<CoreProposalData>();
+  const [proposalData, setProposalData] = useState<SnapshotDraftData>();
   const [proposalDataError, setProposalDataError] = useState<Error>();
   const [proposalSignature, setProposalSignature] = useState<string>('');
   const [proposalDataStatus, setProposalDataStatus] = useState<Web3TxStatus>(
@@ -79,14 +93,16 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
    * Builds the proposal data for submission to Moloch v3 and Snapshot and signs it (ERC712).
    *
    * @param {PrepareAndSignProposalDataParam}
-   * @param {string} adapterAddress - An adapter's contract address this data is related to.
+   * @param {adapterName} ContractAdapterNames - An adapter's contract address this data is related to.
+   *   @note Does not accept voting adapter names.
    * @returns {Promise<BuildAndSignProposalDataReturn>} An object with the proposal data and the ERC712 signature string.
    */
   async function prepareAndSignProposalData(
     partialProposalData: PrepareAndSignProposalDataParam,
-    adapterAddress: string
+    adapterName: ContractAdapterNames,
+    type: SnapshotType
   ): Promise<{
-    data: CoreProposalData;
+    data: SnapshotDraftData;
     signature: string;
   }> {
     try {
@@ -98,47 +114,75 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
         throw new Error('No "DaoRegistry" address was found.');
       }
 
+      if (!SNAPSHOT_HUB_API_URL) {
+        throw new Error('No "SNAPSHOT_HUB_API_URL" was found.');
+      }
+
       setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
 
-      const {body, name} = partialProposalData;
-      const nowTimestamp: number = Math.floor(Date.now() / 1000);
+      const adapterAddress = getAdapterAddressFromContracts(
+        adapterName,
+        contracts
+      );
+      const {body, name, metadata} = partialProposalData;
 
-      // Shape data
-      const proposalData: CoreProposalData = {
+      const {data: snapshotSpace} = await getSpace(SNAPSHOT_HUB_API_URL, SPACE);
+
+      const snapshot: number = await web3Instance.eth.getBlockNumber();
+
+      const votingTimeSeconds: number = parseInt(
+        await getDAOConfigEntry(
+          ContractDAOConfigKeys.offchainVotingVotingPeriod,
+          daoRegistryInstance
+        )
+      );
+
+      const commonData = {
+        name,
+        body,
+        metadata,
+        token: snapshotSpace.token,
+        space: SPACE,
         actionId: adapterAddress,
         chainId: DEFAULT_CHAIN,
-        payload: {
-          body,
-          choices: VOTE_CHOICES,
-          name,
-          metadata: {},
-        },
-        space: SPACE,
-        timestamp: nowTimestamp,
-        token: daoRegistryAddress,
-        type: CoreProposalType.draft,
         verifyingContract: daoRegistryAddress,
       };
 
-      // Sign
-      // @todo USE LAOLAND CLIENT EXMAPLE CODE FOR SIGNING. THIS DOES NOT WORK.
-      const signature = await Web3JsSigner(web3Instance, account)(
-        proposalData,
+      // Check proposal type and get appropriate message
+      const draftMessage =
+        type === 'draft'
+          ? await buildDraftMessage(commonData, SNAPSHOT_HUB_API_URL)
+          : await buildProposalMessage(
+              {
+                ...commonData,
+                votingTimeSeconds,
+                snapshot,
+              },
+              SNAPSHOT_HUB_API_URL
+            );
+
+      const {domain, types} = getDomainDefinition(
+        draftMessage,
         daoRegistryAddress,
         adapterAddress,
-        /**
-         * So we don't get the wrong chain, we get the environemnt config value,
-         * instead of the dynamic `networkId` from `useWeb3Modal`.
-         */
         DEFAULT_CHAIN
       );
 
+      const dataToSign = JSON.stringify({
+        types: types,
+        domain: domain,
+        primaryType: PRIMARY_TYPE_ERC712,
+        message: draftMessage,
+      });
+
+      const signature = await signMessage(provider, account, dataToSign);
+
       setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
       setProposalData(proposalData);
-      setProposalSignature(signature);
+      setProposalSignature('signature');
 
       return {
-        data: proposalData,
+        data: draftMessage as any,
         signature,
       };
     } catch (error) {
