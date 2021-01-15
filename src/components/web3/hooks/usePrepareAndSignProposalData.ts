@@ -149,7 +149,7 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
       };
 
       // Check proposal type and get appropriate message
-      const draftMessage =
+      const message =
         type === 'draft'
           ? await buildDraftMessage(commonData, SNAPSHOT_HUB_API_URL)
           : await buildProposalMessage(
@@ -162,7 +162,7 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
             );
 
       const {domain, types} = getDomainDefinition(
-        draftMessage,
+        message,
         daoRegistryAddress,
         adapterAddress,
         DEFAULT_CHAIN
@@ -172,7 +172,7 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
         types: types,
         domain: domain,
         primaryType: PRIMARY_TYPE_ERC712,
-        message: draftMessage,
+        message: message,
       });
 
       const signature = await signMessage(provider, account, dataToSign);
@@ -182,7 +182,7 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
       setProposalSignature('signature');
 
       return {
-        data: draftMessage as any,
+        data: message,
         signature,
       };
     } catch (error) {
