@@ -179,10 +179,12 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
         message: message,
       });
 
+      setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
+
       const signature = await signMessage(provider, account, dataToSign);
 
-      setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
-      setProposalData(proposalData);
+      setProposalDataStatus(Web3TxStatus.FULFILLED);
+      setProposalData(message);
       setProposalSignature(signature);
 
       return {
