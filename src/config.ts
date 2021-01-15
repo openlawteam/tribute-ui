@@ -101,7 +101,7 @@ export const DAI_TOKEN_ADDRESS: string =
 export const SPACES: Record<EnvironmentName, string> = {
   development: '',
   // @todo Get local Docker snapshot and "registered" space set up.
-  localhost: 'tributedao',
+  localhost: 'thelao',
   production: '',
 };
 
