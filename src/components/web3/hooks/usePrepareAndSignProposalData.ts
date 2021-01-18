@@ -7,6 +7,8 @@ import {
   getSpace,
   signMessage,
   SnapshotDraftData,
+  SnapshotMessageBase,
+  SnapshotMessageProposal,
   SnapshotProposalData,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
@@ -26,6 +28,11 @@ type PrepareAndSignProposalDataParam = {
   body: SnapshotProposalData['payload']['body'];
   name: SnapshotProposalData['payload']['name'];
   metadata: SnapshotProposalData['payload']['metadata'];
+  /**
+   * Helpful for Proposal types when hashes between created Drafts
+   * and yet to be created Proposals need to match.
+   */
+  timestamp?: SnapshotProposalData['timestamp'];
 };
 
 type UsePrepareAndSignProposalDataReturn = {
@@ -88,6 +95,39 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
    */
 
   /**
+   * A wrapper to clearly separate the running of functions
+   * specific to Proposals.
+   *
+   * @param {SnapshotMessageBase & Partial<SnapshotMessageProposal>} commonData
+   * @returns {Promise<SnapshotProposalData>}
+   */
+  async function buildProposalMessageHelper(
+    commonData: SnapshotMessageBase & Partial<SnapshotMessageProposal>
+  ): Promise<SnapshotProposalData> {
+    if (!SNAPSHOT_HUB_API_URL) {
+      throw new Error('No "SNAPSHOT_HUB_API_URL" was found.');
+    }
+
+    const snapshot: number = await web3Instance.eth.getBlockNumber();
+
+    const votingTimeSeconds: number = parseInt(
+      await getDAOConfigEntry(
+        ContractDAOConfigKeys.offchainVotingVotingPeriod,
+        daoRegistryInstance
+      )
+    );
+
+    return await buildProposalMessage(
+      {
+        ...commonData,
+        votingTimeSeconds,
+        snapshot,
+      },
+      SNAPSHOT_HUB_API_URL
+    );
+  }
+
+  /**
    * prepareAndSignProposalData
    *
    * Builds the proposal data for submission to Moloch v3 and Snapshot and signs it (ERC712).
@@ -128,20 +168,11 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
         adapterName,
         contracts
       );
-      const {body, name, metadata} = partialProposalData;
+      const {body, name, metadata, timestamp} = partialProposalData;
 
       const {data: snapshotSpace} = await getSpace(SNAPSHOT_HUB_API_URL, SPACE);
 
-      const snapshot: number = await web3Instance.eth.getBlockNumber();
-
-      const votingTimeSeconds: number = parseInt(
-        await getDAOConfigEntry(
-          ContractDAOConfigKeys.offchainVotingVotingPeriod,
-          daoRegistryInstance
-        )
-      );
-
-      const commonData = {
+      const commonData: SnapshotMessageBase = {
         name,
         body,
         metadata,
@@ -156,14 +187,10 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
       const message =
         type === 'draft'
           ? await buildDraftMessage(commonData, SNAPSHOT_HUB_API_URL)
-          : await buildProposalMessage(
-              {
-                ...commonData,
-                votingTimeSeconds,
-                snapshot,
-              },
-              SNAPSHOT_HUB_API_URL
-            );
+          : await buildProposalMessageHelper({
+              ...commonData,
+              timestamp,
+            });
 
       const {domain, types} = getDomainDefinition(
         message,
