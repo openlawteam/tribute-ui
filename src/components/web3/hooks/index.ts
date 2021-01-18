@@ -1,4 +1,5 @@
 export * from './usePrepareAndSignProposalData';
+export * from './usePrepareAndSignVoteData';
 export * from './useContractSend';
 export * from './useETHGasPrice';
 export * from './useInitContracts';
