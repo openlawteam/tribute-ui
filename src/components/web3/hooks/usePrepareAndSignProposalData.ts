@@ -53,8 +53,6 @@ type UsePrepareAndSignProposalDataReturn = {
 /**
  * usePrepareAndSignProposalData
  *
- * @todo THIS FILE IS NOT PRODUCTION-READY (it is untested)!
- *
  * React hook which prepares proposal data for submission
  * to Snapshot and Moloch v3 and signs it (ERC712)
  *
