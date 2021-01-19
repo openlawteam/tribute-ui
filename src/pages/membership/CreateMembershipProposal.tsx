@@ -3,6 +3,11 @@ import {useSelector} from 'react-redux';
 import {useForm} from 'react-hook-form';
 // import {useHistory} from 'react-router-dom';
 import Web3 from 'web3';
+import {
+  SnapshotSubmitBaseReturn,
+  SnapshotSubmitProposalReturn,
+  SnapshotType,
+} from '@openlaw/snapshot-js-erc712';
 
 import {
   getValidationError,
@@ -21,10 +26,6 @@ import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {SHARES_ADDRESS} from '../../config';
-import {
-  SnapshotSubmitBaseReturn,
-  SnapshotType,
-} from '@openlaw/snapshot-js-erc712';
 import {StoreState, MetaMaskRPCError} from '../../util/types';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import CycleMessage from '../../components/feedback/CycleMessage';
@@ -80,12 +81,15 @@ export default function CreateMembershipProposal() {
     txError,
     txEtherscanURL,
     txIsPromptOpen,
-    // txReceipt,
     txSend,
     txStatus,
   } = useContractSend();
 
-  const {signAndSendProposal} = useSignAndSubmitProposal();
+  const {
+    proposalData,
+    proposalSignAndSendStatus,
+    signAndSendProposal,
+  } = useSignAndSubmitProposal();
 
   /**
    * Their hooks
@@ -130,11 +134,17 @@ export default function CreateMembershipProposal() {
    */
   const {isValid} = formState;
 
-  const isInProcessOrDone =
+  const isInProcess =
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
     txStatus === Web3TxStatus.PENDING ||
-    txStatus === Web3TxStatus.FULFILLED ||
-    txIsPromptOpen;
+    proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM ||
+    proposalSignAndSendStatus === Web3TxStatus.PENDING;
+
+  const isDone =
+    txStatus === Web3TxStatus.FULFILLED &&
+    proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
+
+  const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
 
   /**
    * Cached callbacks
@@ -196,18 +206,24 @@ export default function CreateMembershipProposal() {
         throw new Error('No account found.');
       }
 
-      // Sign and submit draft for snapshot-hub
-      const {
-        uniqueId: proposalId,
-      } = await signAndSendProposal<SnapshotSubmitBaseReturn>(
-        {
-          name: account,
-          body: `Membership for ${account}.`,
-          metadata: {},
-        },
-        ContractAdapterNames.onboarding,
-        SnapshotType.draft
-      );
+      // Maybe set proposal ID from previous attempt
+      let proposalId: string = proposalData?.uniqueId || '';
+
+      // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
+      if (!proposalId) {
+        // Sign and submit draft for snapshot-hub
+        const {uniqueId} = await signAndSendProposal(
+          {
+            name: account,
+            body: `Membership for ${account}.`,
+            metadata: {},
+          },
+          ContractAdapterNames.onboarding,
+          SnapshotType.draft
+        );
+
+        proposalId = uniqueId;
+      }
 
       const {ethAddress, ethAmount} = values;
       const ethAmountInWei = Web3.utils.toWei(
@@ -219,7 +235,6 @@ export default function CreateMembershipProposal() {
         DaoRegistryContract.contractAddress,
         proposalId,
         ethAddress,
-        // @note Eventually remove and get from shared tribute/laoland lib's
         SHARES_ADDRESS,
         ethAmountInWei,
       ];
@@ -232,14 +247,14 @@ export default function CreateMembershipProposal() {
       };
 
       // Execute contract call for `onboard`
-      /* const receipt =  */ await txSend(
+      const receipt = await txSend(
         'onboard',
         OnboardingContract.instance.methods,
         onboardArguments,
-        txArguments,
-        // We don't need to do anything in this scope.
-        () => {}
+        txArguments
       );
+
+      console.log('receipt', receipt);
 
       // @todo Figure out what's needed after transaction is successful
       // to go to newly created member proposal details page.
@@ -434,14 +449,7 @@ export default function CreateMembershipProposal() {
             handleSubmit(getValues());
           }}
           type="submit">
-          {txStatus === Web3TxStatus.PENDING ||
-          txStatus === Web3TxStatus.AWAITING_CONFIRM ? (
-            <Loader />
-          ) : txStatus === Web3TxStatus.FULFILLED ? (
-            'Done'
-          ) : (
-            'Submit'
-          )}
+          {isInProcess ? <Loader /> : isDone ? 'Done' : 'Submit'}
         </button>
 
         {/* SUBMIT STATUS */}
