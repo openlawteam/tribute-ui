@@ -14,14 +14,17 @@ import {
   useContractSend,
   useETHGasPrice,
   useIsDefaultChain,
-  usePrepareAndSignProposalData,
+  useSignAndSubmitProposal,
 } from '../../components/web3/hooks';
 import {CHAINS} from '../../config';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {SHARES_ADDRESS} from '../../config';
-import {SnapshotType} from '@openlaw/snapshot-js-erc712';
+import {
+  SnapshotSubmitBaseReturn,
+  SnapshotType,
+} from '@openlaw/snapshot-js-erc712';
 import {StoreState, MetaMaskRPCError} from '../../util/types';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import CycleMessage from '../../components/feedback/CycleMessage';
@@ -43,6 +46,7 @@ type FormInputs = {
 
 type OnboardArguments = [
   string, // `dao`
+  string, // `proposalId`
   string, // `applicant`
   string, // `tokenToMint`
   string // `tokenAmount`
@@ -81,7 +85,7 @@ export default function CreateMembershipProposal() {
     txStatus,
   } = useContractSend();
 
-  const {prepareAndSignProposalData} = usePrepareAndSignProposalData();
+  const {signAndSendProposal} = useSignAndSubmitProposal();
 
   /**
    * Their hooks
@@ -192,7 +196,10 @@ export default function CreateMembershipProposal() {
         throw new Error('No account found.');
       }
 
-      await prepareAndSignProposalData(
+      // Sign and submit draft for snapshot-hub
+      const {
+        uniqueId: proposalId,
+      } = await signAndSendProposal<SnapshotSubmitBaseReturn>(
         {
           name: account,
           body: `Membership for ${account}.`,
@@ -210,6 +217,7 @@ export default function CreateMembershipProposal() {
 
       const onboardArguments: OnboardArguments = [
         DaoRegistryContract.contractAddress,
+        proposalId,
         ethAddress,
         // @note Eventually remove and get from shared tribute/laoland lib's
         SHARES_ADDRESS,
