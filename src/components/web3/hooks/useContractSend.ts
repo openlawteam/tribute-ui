@@ -42,7 +42,7 @@ export function useContractSend(): UseContractSendReturn {
    * Functions
    */
 
-  function handleOnTxProcess(callback: (txh: string) => void) {
+  function handleOnTxProcess(callback?: (txh: string) => void) {
     return (txHash: string) => {
       setTxStatus(Web3TxStatus.PENDING);
       setTxIsPromptOpen(false);
@@ -52,7 +52,7 @@ export function useContractSend(): UseContractSendReturn {
         setTxEtherscanURL(`${ETHERSCAN_URLS[networkId]}/tx/${txHash}`);
       }
 
-      callback(txHash);
+      callback && callback(txHash);
     };
   }
 
