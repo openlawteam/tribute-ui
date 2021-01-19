@@ -24,7 +24,7 @@ import {
 import {DEFAULT_CHAIN, SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
 import {getAdapterAddressFromContracts, getDAOConfigEntry} from '../helpers';
 import {PRIMARY_TYPE_ERC712} from '../config';
-import {AsyncStatus, StoreState} from '../../../util/types';
+import {StoreState} from '../../../util/types';
 import {useWeb3Modal} from './useWeb3Modal';
 
 type PrepareAndSignProposalDataParam = {
@@ -39,27 +39,22 @@ type PrepareAndSignProposalDataParam = {
 };
 
 type UseSignAndSubmitProposalReturn = {
-  prepareAndSignProposalData: (
+  signAndSendProposal: <
+    T extends SnapshotSubmitProposalReturn | SnapshotSubmitBaseReturn
+  >(
     partialProposalData: PrepareAndSignProposalDataParam,
     adapterName: ContractAdapterNames,
     type: SnapshotProposalData['type']
-  ) => Promise<{
-    data: SnapshotDraftData;
-    signature: string;
-  }>;
-  proposalData: SnapshotDraftData | undefined;
-  proposalHashData:
-    | SnapshotSubmitProposalReturn
-    | SnapshotSubmitBaseReturn
-    | undefined;
-  proposalSubmitStatus: AsyncStatus;
-  proposalSignError: Error | undefined;
-  proposalSignStatus: Web3TxStatus;
-  proposalSubmitError: Error | undefined;
-  submitProposal: <
-    T extends SnapshotSubmitProposalReturn | SnapshotSubmitBaseReturn
-  >() => Promise<T>;
+  ) => Promise<SignAndSendProposalReturn & T>;
+  proposalData: SignAndSendProposalReturn | undefined;
+  proposalSignAndSendError: Error | undefined;
+  proposalSignAndSendStatus: Web3TxStatus;
 };
+
+type SignAndSendProposalReturn = {
+  data: SnapshotDraftData;
+  signature: string;
+} & (SnapshotSubmitBaseReturn | SnapshotSubmitProposalReturn);
 
 /**
  * useSignAndSubmitProposal
@@ -92,19 +87,15 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
    * State
    */
 
-  const [proposalData, setProposalData] = useState<SnapshotDraftData>();
-  const [proposalHashData, setProposalHashData] = useState<
-    SnapshotSubmitProposalReturn | SnapshotSubmitBaseReturn
-  >();
-  const [proposalSignError, setProposalSignError] = useState<Error>();
-  const [proposalSubmitError, setProposalSubmitError] = useState<Error>();
-  const [proposalSignature, setProposalSignature] = useState<string>('');
-  const [proposalSignStatus, setProposalSignStatus] = useState<Web3TxStatus>(
-    Web3TxStatus.STANDBY
-  );
-  const [proposalSubmitStatus, setProposalSubmitStatus] = useState<AsyncStatus>(
-    AsyncStatus.STANDBY
-  );
+  const [proposalData, setProposalData] = useState<SignAndSendProposalReturn>();
+  const [
+    proposalSignAndSendError,
+    setProposalSignAndSendError,
+  ] = useState<Error>();
+  const [
+    proposalSignAndSendStatus,
+    setProposalSignAndSendStatus,
+  ] = useState<Web3TxStatus>(Web3TxStatus.STANDBY);
 
   /**
    * Functions
@@ -144,24 +135,27 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
   }
 
   /**
-   * prepareAndSignProposalData
+   * signAndSendProposal
    *
    * Builds the proposal data for submission to Moloch v3 and Snapshot and signs it (ERC712).
    *
    * @param {PrepareAndSignProposalDataParam}
    * @param {adapterName} ContractAdapterNames - An adapter's contract address this data is related to.
    *   @note Does not accept voting adapter names.
-   * @returns {Promise<BuildAndSignProposalDataReturn>} An object with the proposal data and the ERC712 signature string.
+   * @returns {Promise<SignAndSendProposalReturn>} An object with the proposal data, signature string, and propsal hash(es) from snapshot-hub.
    */
-  async function prepareAndSignProposalData(
+  async function signAndSendProposal<
+    T extends SnapshotSubmitProposalReturn | SnapshotSubmitBaseReturn
+  >(
     partialProposalData: PrepareAndSignProposalDataParam,
     adapterName: ContractAdapterNames,
     type: SnapshotType
-  ): Promise<{
-    data: SnapshotDraftData;
-    signature: string;
-  }> {
+  ): Promise<SignAndSendProposalReturn & T> {
     try {
+      if (!account) {
+        throw new Error('No account was found to send.');
+      }
+
       if (!web3Instance) {
         throw new Error('No Web3 instance was found.');
       }
@@ -178,7 +172,7 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
         throw new Error('Handling for type "vote" is not implemented.');
       }
 
-      setProposalSignStatus(Web3TxStatus.AWAITING_CONFIRM);
+      setProposalSignAndSendStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       const adapterAddress = getAdapterAddressFromContracts(
         adapterName,
@@ -222,75 +216,45 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
         message: message,
       });
 
-      setProposalSignStatus(Web3TxStatus.AWAITING_CONFIRM);
+      setProposalSignAndSendStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       // 2. Sign data
       const signature = await signMessage(provider, account, dataToSign);
 
-      setProposalSignStatus(Web3TxStatus.FULFILLED);
-      setProposalData(message);
-      setProposalSignature(signature);
+      setProposalSignAndSendStatus(Web3TxStatus.PENDING);
+
+      // 3. Send data to snapshot-hub
+      const {data} = await submitMessage<T>(
+        SNAPSHOT_HUB_API_URL,
+        account,
+        message,
+        signature
+      );
+
+      setProposalSignAndSendStatus(Web3TxStatus.FULFILLED);
+      setProposalData({
+        ...data,
+        data: message,
+        signature,
+      });
 
       return {
+        ...data,
         data: message,
         signature,
       };
     } catch (error) {
-      setProposalSignError(error);
-
-      throw error;
-    }
-  }
-
-  async function submitProposal<
-    T extends SnapshotSubmitProposalReturn | SnapshotSubmitBaseReturn
-  >() {
-    try {
-      if (!account) {
-        throw new Error('No account was found to send.');
-      }
-
-      if (!proposalData) {
-        throw new Error('No proposal data was found to send.');
-      }
-
-      if (!SNAPSHOT_HUB_API_URL) {
-        throw new Error('No "SNAPSHOT_HUB_API_URL" was found to send.');
-      }
-
-      if (!proposalSignature) {
-        throw new Error('No signature was found to send.');
-      }
-
-      setProposalSubmitStatus(AsyncStatus.PENDING);
-
-      const {data} = await submitMessage<T>(
-        SNAPSHOT_HUB_API_URL,
-        account,
-        proposalData,
-        proposalSignature
-      );
-
-      setProposalSubmitStatus(AsyncStatus.FULFILLED);
-      setProposalHashData(data);
-
-      return data;
-    } catch (error) {
-      setProposalSubmitStatus(AsyncStatus.REJECTED);
-      setProposalSubmitError(error);
+      setProposalSignAndSendStatus(Web3TxStatus.REJECTED);
+      setProposalSignAndSendError(error);
 
       throw error;
     }
   }
 
   return {
-    prepareAndSignProposalData,
     proposalData,
-    proposalHashData,
-    proposalSubmitStatus,
-    proposalSignError,
-    proposalSignStatus,
-    proposalSubmitError,
-    submitProposal,
+    proposalSignAndSendError,
+    proposalSignAndSendStatus,
+    signAndSendProposal,
   };
 }
