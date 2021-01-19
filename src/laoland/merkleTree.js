@@ -13,7 +13,7 @@ const {keccak256, keccakFromString, bufferToHex} = require('ethereumjs-util');
 const utils = Web3.utils;
 
 // Merkle tree called with 32 byte hex values
-class MerkleTree {
+export class MerkleTree {
   constructor(elements) {
     this.elements = elements
       .filter((el) => el)
@@ -149,7 +149,3 @@ class MerkleTree {
     return Buffer.concat([...args].sort(Buffer.compare));
   }
 }
-
-module.exports = {
-  MerkleTree,
-};

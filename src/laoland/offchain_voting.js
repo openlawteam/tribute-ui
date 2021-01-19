@@ -37,6 +37,8 @@ const {MerkleTree} = require('./merkleTree.js');
 
 const sha3 = Web3.utils.sha3;
 
+const TypedDataUtils = sigUtil.TypedDataUtils;
+
 function getMessageERC712Hash(m, verifyingContract, actionId, chainId) {
   const message = prepareMessage(m);
   const {domain, types} = getDomainDefinition(
@@ -455,7 +457,7 @@ function prepareVoteProposalPayload(payload) {
   };
 }
 
-Object.assign(exports, {
+export {
   createVote,
   prepareVoteResult,
   toStepNode,
@@ -474,5 +476,5 @@ Object.assign(exports, {
   getVoteDomainDefinition,
   getVoteStepDomainDefinition,
   getVoteResultRootDomainDefinition,
-  TypedDataUtils: sigUtil.TypedDataUtils,
-});
+  TypedDataUtils,
+};

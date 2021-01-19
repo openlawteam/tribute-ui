@@ -26,6 +26,13 @@ export type StoreState = {
   contracts: ContractsState;
 };
 
+export enum AsyncStatus {
+  STANDBY = 'STANDBY',
+  PENDING = 'PENDING',
+  FULFILLED = 'FULFILLED',
+  REJECTED = 'REJECTED',
+}
+
 // HELPERS
 
 /**

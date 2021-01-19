@@ -19,7 +19,7 @@ export async function contractSend(
   contractInstanceMethods: typeof Contract.prototype.methods,
   methodArguments: any[],
   txArguments: SendOptions,
-  onProcess: (txHash: string) => void
+  onProcess?: (txHash: string) => void
 ): Promise<TransactionReceipt> {
   // Promisify so we can both `reject()` inside .on('error') and from transactions.
   return new Promise<TransactionReceipt>(async (resolve, reject) => {
@@ -39,7 +39,7 @@ export async function contractSend(
         })
         .on('transactionHash', function (txHash: string) {
           // Call onProcess with transaction hash
-          onProcess(txHash);
+          onProcess && onProcess(txHash);
         })
         .on('receipt', function (receipt: TransactionReceipt) {
           // resolve on transaction receipt; contains event returnValues
