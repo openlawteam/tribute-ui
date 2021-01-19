@@ -1,14 +1,10 @@
 import {renderHook, act} from '@testing-library/react-hooks';
 
-import {
-  SnapshotSubmitBaseReturn,
-  SnapshotSubmitProposalReturn,
-  SnapshotType,
-} from '@openlaw/snapshot-js-erc712';
 import {ContractAdapterNames, Web3TxStatus} from '../types';
 import {rest, server} from '../../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../../config';
 import {snapshotAPISubmitMessage} from '../../../test/restResponses';
+import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useSignAndSubmitProposal} from '.';
 import Wrapper from '../../../test/Wrapper';
 

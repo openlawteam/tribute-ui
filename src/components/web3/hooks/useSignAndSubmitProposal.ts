@@ -144,9 +144,7 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
    *   @note Does not accept voting adapter names.
    * @returns {Promise<SignAndSendProposalReturn>} An object with the proposal data, signature string, and propsal hash(es) from snapshot-hub.
    */
-  async function signAndSendProposal<
-    T extends SnapshotSubmitProposalReturn | SnapshotSubmitBaseReturn
-  >(
+  async function signAndSendProposal(
     partialProposalData: PrepareAndSignProposalDataParam,
     adapterName: ContractAdapterNames,
     type: SnapshotType
@@ -224,10 +222,12 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
       setProposalSignAndSendStatus(Web3TxStatus.PENDING);
 
       // 3. Send data to snapshot-hub
-      const {data} = await submitMessage<{
-        uniqueId: string;
-        uniqueIdDraft?: string;
-      }>(SNAPSHOT_HUB_API_URL, account, message, signature);
+      const {data} = await submitMessage<SnapshotSubmitProposalReturn>(
+        SNAPSHOT_HUB_API_URL,
+        account,
+        message,
+        signature
+      );
 
       setProposalSignAndSendStatus(Web3TxStatus.FULFILLED);
       setProposalData({

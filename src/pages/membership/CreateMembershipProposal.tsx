@@ -3,11 +3,7 @@ import {useSelector} from 'react-redux';
 import {useForm} from 'react-hook-form';
 // import {useHistory} from 'react-router-dom';
 import Web3 from 'web3';
-import {
-  SnapshotSubmitBaseReturn,
-  SnapshotSubmitProposalReturn,
-  SnapshotType,
-} from '@openlaw/snapshot-js-erc712';
+import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 
 import {
   getValidationError,
