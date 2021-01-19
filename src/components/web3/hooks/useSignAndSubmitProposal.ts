@@ -39,13 +39,11 @@ type PrepareAndSignProposalDataParam = {
 };
 
 type UseSignAndSubmitProposalReturn = {
-  signAndSendProposal: <
-    T extends SnapshotSubmitProposalReturn | SnapshotSubmitBaseReturn
-  >(
+  signAndSendProposal: (
     partialProposalData: PrepareAndSignProposalDataParam,
     adapterName: ContractAdapterNames,
     type: SnapshotProposalData['type']
-  ) => Promise<SignAndSendProposalReturn & T>;
+  ) => Promise<SignAndSendProposalReturn>;
   proposalData: SignAndSendProposalReturn | undefined;
   proposalSignAndSendError: Error | undefined;
   proposalSignAndSendStatus: Web3TxStatus;
@@ -54,7 +52,9 @@ type UseSignAndSubmitProposalReturn = {
 type SignAndSendProposalReturn = {
   data: SnapshotDraftData;
   signature: string;
-} & (SnapshotSubmitBaseReturn | SnapshotSubmitProposalReturn);
+  uniqueId: SnapshotSubmitBaseReturn['uniqueId'];
+  uniqueIdDraft: SnapshotSubmitProposalReturn['uniqueIdDraft'];
+};
 
 /**
  * useSignAndSubmitProposal
@@ -150,7 +150,7 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
     partialProposalData: PrepareAndSignProposalDataParam,
     adapterName: ContractAdapterNames,
     type: SnapshotType
-  ): Promise<SignAndSendProposalReturn & T> {
+  ): Promise<SignAndSendProposalReturn> {
     try {
       if (!account) {
         throw new Error('No account was found to send.');
@@ -224,24 +224,24 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
       setProposalSignAndSendStatus(Web3TxStatus.PENDING);
 
       // 3. Send data to snapshot-hub
-      const {data} = await submitMessage<T>(
-        SNAPSHOT_HUB_API_URL,
-        account,
-        message,
-        signature
-      );
+      const {data} = await submitMessage<{
+        uniqueId: string;
+        uniqueIdDraft?: string;
+      }>(SNAPSHOT_HUB_API_URL, account, message, signature);
 
       setProposalSignAndSendStatus(Web3TxStatus.FULFILLED);
       setProposalData({
-        ...data,
         data: message,
         signature,
+        uniqueId: data.uniqueId,
+        uniqueIdDraft: data.uniqueIdDraft || '',
       });
 
       return {
-        ...data,
         data: message,
         signature,
+        uniqueId: data.uniqueId,
+        uniqueIdDraft: data.uniqueIdDraft || '',
       };
     } catch (error) {
       setProposalSignAndSendStatus(Web3TxStatus.REJECTED);

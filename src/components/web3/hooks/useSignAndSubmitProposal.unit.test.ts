@@ -98,6 +98,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
           '0x000000000000000000000000000000000000000000000000000000000000007b',
 
         uniqueId: 'abc123def456',
+        uniqueIdDraft: '',
       });
       expect(result.current.proposalSignAndSendError).toBe(undefined);
       expect(result.current.proposalSignAndSendStatus).toBe(
@@ -232,7 +233,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
         data,
         signature,
         uniqueId,
-      } = await result.current.signAndSendProposal<SnapshotSubmitBaseReturn>(
+      } = await result.current.signAndSendProposal(
         {name: 'Test Name', body: 'Test Body', metadata: {}},
         ContractAdapterNames.onboarding,
         SnapshotType.draft
@@ -301,7 +302,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
         uniqueId,
         uniqueIdDraft,
         signature,
-      } = await result.current.signAndSendProposal<SnapshotSubmitProposalReturn>(
+      } = await result.current.signAndSendProposal(
         {
           name: 'Test Name',
           body: 'Test Body',
