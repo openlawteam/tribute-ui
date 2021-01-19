@@ -10,7 +10,10 @@ import {
   SnapshotMessageBase,
   SnapshotMessageProposal,
   SnapshotProposalData,
+  SnapshotSubmitBaseReturn,
+  SnapshotSubmitProposalReturn,
   SnapshotType,
+  submitMessage,
 } from '@openlaw/snapshot-js-erc712';
 
 import {
@@ -21,7 +24,7 @@ import {
 import {DEFAULT_CHAIN, SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
 import {getAdapterAddressFromContracts, getDAOConfigEntry} from '../helpers';
 import {PRIMARY_TYPE_ERC712} from '../config';
-import {StoreState} from '../../../util/types';
+import {AsyncStatus, StoreState} from '../../../util/types';
 import {useWeb3Modal} from './useWeb3Modal';
 
 type PrepareAndSignProposalDataParam = {
@@ -35,7 +38,7 @@ type PrepareAndSignProposalDataParam = {
   timestamp?: SnapshotProposalData['timestamp'];
 };
 
-type UsePrepareAndSignProposalDataReturn = {
+type UseSignAndSubmitProposalReturn = {
   prepareAndSignProposalData: (
     partialProposalData: PrepareAndSignProposalDataParam,
     adapterName: ContractAdapterNames,
@@ -45,20 +48,28 @@ type UsePrepareAndSignProposalDataReturn = {
     signature: string;
   }>;
   proposalData: SnapshotDraftData | undefined;
-  proposalDataError: Error | undefined;
-  proposalDataStatus: Web3TxStatus;
-  proposalSignature: string;
+  proposalHashData:
+    | SnapshotSubmitProposalReturn
+    | SnapshotSubmitBaseReturn
+    | undefined;
+  proposalSubmitStatus: AsyncStatus;
+  proposalSignError: Error | undefined;
+  proposalSignStatus: Web3TxStatus;
+  proposalSubmitError: Error | undefined;
+  submitProposal: <
+    T extends SnapshotSubmitProposalReturn | SnapshotSubmitBaseReturn
+  >() => Promise<T>;
 };
 
 /**
- * usePrepareAndSignProposalData
+ * useSignAndSubmitProposal
  *
  * React hook which prepares proposal data for submission
  * to Snapshot and Moloch v3 and signs it (ERC712)
  *
- * @returns {Promise<BuildAndSignProposalDataReturn>} An object with the proposal data and the ERC712 signature string.
+ * @returns {Promise<UseSignAndSubmitProposalReturn>} An object with the proposal data and the ERC712 signature string.
  */
-export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataReturn {
+export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
   /**
    * Selectors
    */
@@ -82,10 +93,17 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
    */
 
   const [proposalData, setProposalData] = useState<SnapshotDraftData>();
-  const [proposalDataError, setProposalDataError] = useState<Error>();
+  const [proposalHashData, setProposalHashData] = useState<
+    SnapshotSubmitProposalReturn | SnapshotSubmitBaseReturn
+  >();
+  const [proposalSignError, setProposalSignError] = useState<Error>();
+  const [proposalSubmitError, setProposalSubmitError] = useState<Error>();
   const [proposalSignature, setProposalSignature] = useState<string>('');
-  const [proposalDataStatus, setProposalDataStatus] = useState<Web3TxStatus>(
+  const [proposalSignStatus, setProposalSignStatus] = useState<Web3TxStatus>(
     Web3TxStatus.STANDBY
+  );
+  const [proposalSubmitStatus, setProposalSubmitStatus] = useState<AsyncStatus>(
+    AsyncStatus.STANDBY
   );
 
   /**
@@ -160,7 +178,7 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
         throw new Error('Handling for type "vote" is not implemented.');
       }
 
-      setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
+      setProposalSignStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       const adapterAddress = getAdapterAddressFromContracts(
         adapterName,
@@ -181,7 +199,7 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
         verifyingContract: daoRegistryAddress,
       };
 
-      // Check proposal type and get appropriate message
+      // 1. Check proposal type and prepare appropriate message
       const message =
         type === 'draft'
           ? await buildDraftMessage(commonData, SNAPSHOT_HUB_API_URL)
@@ -204,11 +222,12 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
         message: message,
       });
 
-      setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
+      setProposalSignStatus(Web3TxStatus.AWAITING_CONFIRM);
 
+      // 2. Sign data
       const signature = await signMessage(provider, account, dataToSign);
 
-      setProposalDataStatus(Web3TxStatus.FULFILLED);
+      setProposalSignStatus(Web3TxStatus.FULFILLED);
       setProposalData(message);
       setProposalSignature(signature);
 
@@ -217,7 +236,48 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
         signature,
       };
     } catch (error) {
-      setProposalDataError(error);
+      setProposalSignError(error);
+
+      throw error;
+    }
+  }
+
+  async function submitProposal<
+    T extends SnapshotSubmitProposalReturn | SnapshotSubmitBaseReturn
+  >() {
+    try {
+      if (!account) {
+        throw new Error('No account was found to send.');
+      }
+
+      if (!proposalData) {
+        throw new Error('No proposal data was found to send.');
+      }
+
+      if (!SNAPSHOT_HUB_API_URL) {
+        throw new Error('No "SNAPSHOT_HUB_API_URL" was found to send.');
+      }
+
+      if (!proposalSignature) {
+        throw new Error('No signature was found to send.');
+      }
+
+      setProposalSubmitStatus(AsyncStatus.PENDING);
+
+      const {data} = await submitMessage<T>(
+        SNAPSHOT_HUB_API_URL,
+        account,
+        proposalData,
+        proposalSignature
+      );
+
+      setProposalSubmitStatus(AsyncStatus.FULFILLED);
+      setProposalHashData(data);
+
+      return data;
+    } catch (error) {
+      setProposalSubmitStatus(AsyncStatus.REJECTED);
+      setProposalSubmitError(error);
 
       throw error;
     }
@@ -226,8 +286,11 @@ export function usePrepareAndSignProposalData(): UsePrepareAndSignProposalDataRe
   return {
     prepareAndSignProposalData,
     proposalData,
-    proposalDataError,
-    proposalDataStatus,
-    proposalSignature,
+    proposalHashData,
+    proposalSubmitStatus,
+    proposalSignError,
+    proposalSignStatus,
+    proposalSubmitError,
+    submitProposal,
   };
 }
