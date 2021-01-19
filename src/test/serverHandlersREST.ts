@@ -3,6 +3,7 @@ import {SNAPSHOT_HUB_API_URL} from '../config';
 import {
   snapshotAPIRootResponse,
   snapshotAPISpaceResponse,
+  snapshotAPISubmitMessage,
 } from './restResponses';
 
 /**
@@ -19,10 +20,15 @@ const snapshotAPISpace = rest.get(
   async (_, res, ctx) => res(ctx.json(snapshotAPISpaceResponse))
 );
 
+const snapshotAPIMessage = rest.post(
+  `${SNAPSHOT_HUB_API_URL}/api/message`,
+  async (_, res, ctx) => res(ctx.json(snapshotAPISubmitMessage))
+);
+
 /**
  * HANDLERS TO EXPORT
  */
 
-const handlers = [snapshotAPIRoot, snapshotAPISpace];
+const handlers = [snapshotAPIRoot, snapshotAPISpace, snapshotAPIMessage];
 
 export {handlers};

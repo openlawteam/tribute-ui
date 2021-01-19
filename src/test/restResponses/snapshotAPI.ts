@@ -1,3 +1,5 @@
+import {SnapshotSubmitBaseReturn} from '@openlaw/snapshot-js-erc712';
+
 export const snapshotAPIRootResponse = {
   name: 'snapshot-hub',
   network: 'testnet',
@@ -23,4 +25,8 @@ export const snapshotAPISpaceResponse = {
     },
   ],
   filters: {defaultTab: 'all', minScore: 1},
+};
+
+export const snapshotAPISubmitMessage: SnapshotSubmitBaseReturn = {
+  uniqueId: 'abc123def456',
 };
