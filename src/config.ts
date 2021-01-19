@@ -74,7 +74,7 @@ export const DEFAULT_CHAIN =
 /**
  * These addresses are important as the contracts use them in their configs.
  *
- * @todo Remove and use future npm package to get these values for moloch v3
+ * @todo Remove and get from the chain/subgraph?
  *
  * @see https://github.com/openlawteam/laoland/blob/9e0e03616a00e41e666351e146ee109b9fe37fb2/utils/DaoFactory.js
  */
