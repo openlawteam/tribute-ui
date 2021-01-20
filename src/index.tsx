@@ -65,8 +65,12 @@ if (root !== null) {
           providerOptions={getProviderOptions()}
           defaultTheme={DefaultTheme.LIGHT}>
           <Init
-            render={({error}) =>
-              error ? <InitError error={error} /> : <App />
+            render={({error, isInitComplete}) =>
+              error ? (
+                <InitError error={error} />
+              ) : isInitComplete ? (
+                <App />
+              ) : null
             }
           />
         </Web3ModalManager>
