@@ -10,12 +10,12 @@ import {
   SnapshotVoteProposal,
 } from '@openlaw/snapshot-js-erc712';
 
-import {ContractAdapterNames, Web3TxStatus} from '../types';
+import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {DEFAULT_CHAIN, SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
-import {getAdapterAddressFromContracts} from '../helpers';
-import {PRIMARY_TYPE_ERC712} from '../config';
+import {getAdapterAddressFromContracts} from '../../web3/helpers';
+import {PRIMARY_TYPE_ERC712} from '../../web3/config';
 import {StoreState} from '../../../util/types';
-import {useWeb3Modal} from './useWeb3Modal';
+import {useWeb3Modal} from '../../web3/hooks/useWeb3Modal';
 
 type PrepareAndSignVoteDataParam = {
   choice: SnapshotMessageVote['choice'];

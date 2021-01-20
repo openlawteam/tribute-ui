@@ -1,5 +1,3 @@
-export * from './useSignAndSubmitProposal';
-export * from './usePrepareAndSignVoteData';
 export * from './useContractSend';
 export * from './useETHGasPrice';
 export * from './useInitContracts';

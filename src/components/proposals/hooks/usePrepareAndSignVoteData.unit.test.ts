@@ -1,6 +1,6 @@
 import {renderHook, act} from '@testing-library/react-hooks';
 
-import {ContractAdapterNames, Web3TxStatus} from '../types';
+import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {usePrepareAndSignVoteData} from '.';
 import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 import Wrapper from '../../../test/Wrapper';
