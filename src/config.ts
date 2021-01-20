@@ -15,9 +15,19 @@ const {
 
 export const ENVIRONMENT = REACT_APP_ENVIRONMENT as EnvironmentName | undefined;
 
-export const SNAPSHOT_HUB_API_URL:
-  | string
-  | undefined = REACT_APP_SNAPSHOT_HUB_API_URL;
+/**
+ * SNAPSHOT_HUB_API_URL
+ *
+ * @note For `ENVIRONMENT=localhost` we need to use CRA's local proxy
+ *   so that we can communicate with our develop Snapshot Hub API
+ *   without any CORS issues.
+ *
+ * @see src/setupProxy.js
+ */
+export const SNAPSHOT_HUB_API_URL: string | undefined =
+  ENVIRONMENT === 'localhost'
+    ? '/snapshot-hub'
+    : REACT_APP_SNAPSHOT_HUB_API_URL;
 
 // Infura Project Id
 export const INFURA_PROJECT_ID =
