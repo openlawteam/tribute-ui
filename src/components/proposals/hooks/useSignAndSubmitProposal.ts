@@ -20,12 +20,15 @@ import {
   ContractAdapterNames,
   ContractDAOConfigKeys,
   Web3TxStatus,
-} from '../types';
+} from '../../web3/types';
 import {DEFAULT_CHAIN, SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
-import {getAdapterAddressFromContracts, getDAOConfigEntry} from '../helpers';
-import {PRIMARY_TYPE_ERC712} from '../config';
+import {
+  getAdapterAddressFromContracts,
+  getDAOConfigEntry,
+} from '../../web3/helpers';
+import {PRIMARY_TYPE_ERC712} from '../../web3/config';
 import {StoreState} from '../../../util/types';
-import {useWeb3Modal} from './useWeb3Modal';
+import {useWeb3Modal} from '../../web3/hooks/useWeb3Modal';
 
 type PrepareAndSignProposalDataParam = {
   body: SnapshotProposalData['payload']['body'];

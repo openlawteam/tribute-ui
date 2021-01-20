@@ -15,8 +15,8 @@ import {
   useContractSend,
   useETHGasPrice,
   useIsDefaultChain,
-  useSignAndSubmitProposal,
 } from '../../components/web3/hooks';
+import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {CHAINS} from '../../config';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';

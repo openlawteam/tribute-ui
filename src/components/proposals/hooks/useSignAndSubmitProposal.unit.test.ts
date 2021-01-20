@@ -1,6 +1,6 @@
 import {renderHook, act} from '@testing-library/react-hooks';
 
-import {ContractAdapterNames, Web3TxStatus} from '../types';
+import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {rest, server} from '../../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../../config';
 import {snapshotAPISubmitMessage} from '../../../test/restResponses';
