@@ -1,6 +1,10 @@
 import React, {useCallback, useEffect, useState} from 'react';
+import {getApiStatus as getSnapshotAPIStatus} from '@openlaw/snapshot-js-erc712';
 
+import {AsyncStatus} from './util/types';
+import {SNAPSHOT_HUB_API_URL} from './config';
 import {useInitContracts, useIsDefaultChain} from './components/web3/hooks';
+import {useIsMounted} from './hooks';
 import {useWeb3Modal} from './components/web3/hooks';
 import ErrorMessageWithDetails from './components/common/ErrorMessageWithDetails';
 import FadeIn from './components/common/FadeIn';
@@ -9,6 +13,7 @@ import Wrap from './components/common/Wrap';
 
 type InitPropsRenderProps = {
   error: Error | undefined;
+  isInitComplete: boolean;
 };
 
 type InitProps = {
@@ -18,6 +23,14 @@ type InitProps = {
 type InitErrorProps = {
   error: Error;
 };
+
+/**
+ * Register any new async process names here.
+ * It is mainly to check their progress before rendering.
+ */
+enum ProcessName {
+  initSnapshotAPI = 'initSnapshotAPI',
+}
 
 /**
  * Init Component
@@ -38,14 +51,21 @@ export default function Init(props: InitProps) {
    */
 
   const [error, setError] = useState<Error>();
+  const [isInitComplete, setIsInitComplete] = useState<boolean>(false);
+  const [processReadyMap, setProcessReadyMap] = useState<
+    Record<ProcessName, AsyncStatus>
+  >({
+    [ProcessName.initSnapshotAPI]: AsyncStatus.STANDBY,
+  });
 
   /**
    * Our hooks
    */
 
   const {initContracts} = useInitContracts();
-  const {/* account, */ connected, provider, web3Instance} = useWeb3Modal();
+  const {connected, provider, web3Instance} = useWeb3Modal();
   const {defaultChainError} = useIsDefaultChain();
+  const {isMountedRef} = useIsMounted();
 
   /**
    * Cached callbacks
@@ -54,12 +74,21 @@ export default function Init(props: InitProps) {
   const handleInitContractsCached = useCallback(handleInitContracts, [
     initContracts,
   ]);
+  const handleGetSnapshotAPIStatusCached = useCallback(
+    handleGetSnapshotAPIStatus,
+    [isMountedRef]
+  );
 
   /**
    * Effects
    */
 
-  // Init the contracts used in the dApp
+  useEffect(() => {
+    setIsInitComplete(
+      Object.values(processReadyMap).every((fs) => fs === AsyncStatus.FULFILLED)
+    );
+  }, [processReadyMap]);
+
   useEffect(() => {
     connected && provider && web3Instance && handleInitContractsCached();
   }, [connected, handleInitContractsCached, provider, web3Instance]);
@@ -68,9 +97,39 @@ export default function Init(props: InitProps) {
     setError(defaultChainError);
   }, [defaultChainError]);
 
+  useEffect(() => {
+    handleGetSnapshotAPIStatusCached();
+  }, [handleGetSnapshotAPIStatusCached]);
+
   /**
    * Functions
    */
+
+  async function handleGetSnapshotAPIStatus() {
+    try {
+      if (!SNAPSHOT_HUB_API_URL) {
+        throw new Error('No Snapshot Hub API URL was found.');
+      }
+
+      const {data} = await getSnapshotAPIStatus(SNAPSHOT_HUB_API_URL);
+
+      // Choosing a slice of the data to make sure we have a response, not just 200 OK.
+      if (!data.version) {
+        throw new Error('Snapshot API is not ready.');
+      }
+
+      if (!isMountedRef.current) return;
+
+      setProcessReadyMap((p) => ({
+        ...p,
+        [ProcessName.initSnapshotAPI]: AsyncStatus.FULFILLED,
+      }));
+    } catch (error) {
+      if (!isMountedRef.current) return;
+
+      setError(new Error('Snapshot API is not responding.'));
+    }
+  }
 
   async function handleInitContracts() {
     try {
@@ -81,7 +140,7 @@ export default function Init(props: InitProps) {
   }
 
   // Render children
-  return render({error});
+  return render({error, isInitComplete});
 }
 
 /**
