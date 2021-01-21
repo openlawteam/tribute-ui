@@ -1,4 +1,13 @@
-import {SnapshotSubmitBaseReturn} from '@openlaw/snapshot-js-erc712';
+import {
+  SnapshotDraftData,
+  SnapshotProposalData,
+  SnapshotSubmitBaseReturn,
+  SnapshotType,
+} from '@openlaw/snapshot-js-erc712';
+
+import {VOTE_CHOICES} from '../../components/web3/config';
+import {DEFAULT_CHAIN} from '../../config';
+import {DEFAULT_ETH_ADDRESS, DEFAULT_SPACE} from '../helpers';
 
 export const snapshotAPIRootResponse = {
   name: 'snapshot-hub',
@@ -29,4 +38,41 @@ export const snapshotAPISpaceResponse = {
 
 export const snapshotAPISubmitMessage: SnapshotSubmitBaseReturn = {
   uniqueId: 'abc123def456',
+};
+
+export const snapshotAPIDraftResponse: SnapshotDraftData = {
+  payload: {
+    body: 'Test Snapshot Draft body content.',
+    choices: VOTE_CHOICES,
+    metadata: {},
+    name: 'Test Snapshot Draft',
+  },
+  timestamp: '1611234551',
+  type: SnapshotType.draft,
+  version: '0.1.2',
+  token: DEFAULT_ETH_ADDRESS,
+  space: DEFAULT_SPACE,
+  actionId: DEFAULT_ETH_ADDRESS,
+  chainId: DEFAULT_CHAIN,
+  verifyingContract: DEFAULT_ETH_ADDRESS,
+};
+
+export const snapshotAPIProposalResponse: SnapshotProposalData = {
+  payload: {
+    body: 'Test Snapshot Proposal body content.',
+    choices: VOTE_CHOICES,
+    end: 1611234731,
+    metadata: {},
+    name: 'Test Snapshot Proposal',
+    snapshot: 100,
+    start: 1611234551,
+  },
+  timestamp: '1611234551',
+  type: SnapshotType.proposal,
+  version: '0.1.2',
+  token: DEFAULT_ETH_ADDRESS,
+  space: DEFAULT_SPACE,
+  actionId: DEFAULT_ETH_ADDRESS,
+  chainId: DEFAULT_CHAIN,
+  verifyingContract: DEFAULT_ETH_ADDRESS,
 };

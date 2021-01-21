@@ -19,7 +19,7 @@ describe('useContractSend unit tests', () => {
      *   But we still need access to a contract ABI to test `contractSend` properly.
      *   Hence, the access of the Redux `contract` state.
      */
-    const {store, mockWeb3Provider, web3Instance} = setupHook({
+    const {store, mockWeb3Provider, web3Instance} = await setupHook({
       wrapperProps: {
         useInit: true,
         useWallet: true,
