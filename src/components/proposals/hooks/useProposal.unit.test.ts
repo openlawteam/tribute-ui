@@ -40,11 +40,11 @@ describe('useProposal unit tests', () => {
     server.use(
       ...[
         rest.get(
-          `${SNAPSHOT_HUB_API_URL}/:spaceName/proposal/:id`,
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposal/:id`,
           async (_req, res, ctx) => res(ctx.json({}))
         ),
         rest.get(
-          `${SNAPSHOT_HUB_API_URL}/:spaceName/draft/:id`,
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/draft/:id`,
           async (_req, res, ctx) => res(ctx.json(snapshotAPIDraftResponse))
         ),
       ]
@@ -75,11 +75,11 @@ describe('useProposal unit tests', () => {
     server.use(
       ...[
         rest.get(
-          `${SNAPSHOT_HUB_API_URL}/:spaceName/proposal/:id`,
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposal/:id`,
           async (_req, res, ctx) => res(ctx.json({}))
         ),
         rest.get(
-          `${SNAPSHOT_HUB_API_URL}/:spaceName/draft/:id`,
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/draft/:id`,
           async (_req, res, ctx) => res(ctx.json({}))
         ),
       ]
@@ -110,11 +110,11 @@ describe('useProposal unit tests', () => {
     server.use(
       ...[
         rest.get(
-          `${SNAPSHOT_HUB_API_URL}/:spaceName/proposal/:id`,
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposal/:id`,
           async (_req, res, ctx) => res(ctx.status(500))
         ),
         rest.get(
-          `${SNAPSHOT_HUB_API_URL}/:spaceName/draft/:id`,
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/draft/:id`,
           async (_req, res, ctx) => res(ctx.json(snapshotAPIDraftResponse))
         ),
       ]
@@ -145,11 +145,11 @@ describe('useProposal unit tests', () => {
     server.use(
       ...[
         rest.get(
-          `${SNAPSHOT_HUB_API_URL}/:spaceName/proposal/:id`,
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposal/:id`,
           async (_req, res, ctx) => res(ctx.status(500))
         ),
         rest.get(
-          `${SNAPSHOT_HUB_API_URL}/:spaceName/draft/:id`,
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/draft/:id`,
           async (_req, res, ctx) => res(ctx.status(500))
         ),
       ]
@@ -208,7 +208,7 @@ describe('useProposal unit tests', () => {
     server.use(
       ...[
         rest.get(
-          `${SNAPSHOT_HUB_API_URL}/:spaceName/draft/:id`,
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/draft/:id`,
           async (_req, res, ctx) => res(ctx.json({}))
         ),
       ]
@@ -241,7 +241,7 @@ describe('useProposal unit tests', () => {
     server.use(
       ...[
         rest.get(
-          `${SNAPSHOT_HUB_API_URL}/:spaceName/draft/:id`,
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/draft/:id`,
           async (_req, res, ctx) => res(ctx.status(500))
         ),
       ]
@@ -304,7 +304,7 @@ describe('useProposal unit tests', () => {
     server.use(
       ...[
         rest.get(
-          `${SNAPSHOT_HUB_API_URL}/:spaceName/proposal/:id`,
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposal/:id`,
           async (_req, res, ctx) => res(ctx.json({}))
         ),
       ]
@@ -337,7 +337,7 @@ describe('useProposal unit tests', () => {
     server.use(
       ...[
         rest.get(
-          `${SNAPSHOT_HUB_API_URL}/:spaceName/proposal/:id`,
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposal/:id`,
           async (_req, res, ctx) => res(ctx.status(500))
         ),
       ]

@@ -24,12 +24,12 @@ const getSnapshotAPISpace = rest.get(
 );
 
 const getSnapshotAPIDraft = rest.get(
-  `${SNAPSHOT_HUB_API_URL}/:spaceName/draft/:id`,
+  `${SNAPSHOT_HUB_API_URL}/api/:spaceName/draft/:id`,
   async (_req, res, ctx) => res(ctx.json(snapshotAPIDraftResponse))
 );
 
 const getSnapshotAPIProposal = rest.get(
-  `${SNAPSHOT_HUB_API_URL}/:spaceName/proposal/:id`,
+  `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposal/:id`,
   async (_req, res, ctx) => res(ctx.json(snapshotAPIProposalResponse))
 );
 

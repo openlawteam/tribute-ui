@@ -100,6 +100,8 @@ export function useProposal(
    */
 
   useEffect(() => {
+    if (!abortController?.signal) return;
+
     switch (type) {
       case SnapshotType.draft:
         handleGetDraftCached();
@@ -112,6 +114,7 @@ export function useProposal(
         break;
     }
   }, [
+    abortController?.signal,
     handleGetDraftCached,
     handleGetProposalCached,
     handleGetProposalOrDraftCached,
@@ -127,7 +130,7 @@ export function useProposal(
       setProposalStatus(AsyncStatus.PENDING);
 
       const response = await fetch(
-        `${SNAPSHOT_HUB_API_URL}/${SPACE}/draft/${id}`,
+        `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/draft/${id}`,
         {signal: abortController?.signal}
       );
 
@@ -161,7 +164,7 @@ export function useProposal(
       setProposalStatus(AsyncStatus.PENDING);
 
       const response = await fetch(
-        `${SNAPSHOT_HUB_API_URL}/${SPACE}/proposal/${id}?searchUniqueDraftId=true`,
+        `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/proposal/${id}?searchUniqueDraftId=true`,
         {signal: abortController?.signal}
       );
 
