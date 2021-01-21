@@ -1,5 +1,5 @@
 import React from 'react';
-import {Redirect, Route, Switch} from 'react-router-dom';
+import {Route, Switch} from 'react-router-dom';
 
 import GetStarted from './pages/start/GetStarted';
 import CreateMembershipProposal from './pages/membership/CreateMembershipProposal';
@@ -107,11 +107,7 @@ export default function Routes() {
           path="/members/:ethereumAddress"
           render={() => <MemberProfile />}
         />,
-        <Route key="notfound" exact path="/404" render={() => <NotFound />} />,
-        <Route
-          key="redirecttonotfound"
-          render={() => <Redirect to="/404" />}
-        />,
+        <Route key="no-match" component={NotFound} />,
       ]}
     </Switch>
   );
