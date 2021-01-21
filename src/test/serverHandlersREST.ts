@@ -1,6 +1,9 @@
 import {rest} from 'msw';
+
 import {SNAPSHOT_HUB_API_URL} from '../config';
 import {
+  snapshotAPIDraftResponse,
+  snapshotAPIProposalResponse,
   snapshotAPIRootResponse,
   snapshotAPISpaceResponse,
   snapshotAPISubmitMessage,
@@ -10,25 +13,41 @@ import {
  * Snapshot
  */
 
-const snapshotAPIRoot = rest.get(
+const getSnapshotAPIRoot = rest.get(
   `${SNAPSHOT_HUB_API_URL}/api`,
-  async (_, res, ctx) => res(ctx.json(snapshotAPIRootResponse))
+  async (_req, res, ctx) => res(ctx.json(snapshotAPIRootResponse))
 );
 
-const snapshotAPISpace = rest.get(
+const getSnapshotAPISpace = rest.get(
   `${SNAPSHOT_HUB_API_URL}/api/spaces/:spaceName`,
-  async (_, res, ctx) => res(ctx.json(snapshotAPISpaceResponse))
+  async (_req, res, ctx) => res(ctx.json(snapshotAPISpaceResponse))
 );
 
-const snapshotAPIMessage = rest.post(
+const getSnapshotAPIDraft = rest.get(
+  `${SNAPSHOT_HUB_API_URL}/:spaceName/draft/:id`,
+  async (_req, res, ctx) => res(ctx.json(snapshotAPIDraftResponse))
+);
+
+const getSnapshotAPIProposal = rest.get(
+  `${SNAPSHOT_HUB_API_URL}/:spaceName/proposal/:id`,
+  async (_req, res, ctx) => res(ctx.json(snapshotAPIProposalResponse))
+);
+
+const postSnapshotAPIMessage = rest.post(
   `${SNAPSHOT_HUB_API_URL}/api/message`,
-  async (_, res, ctx) => res(ctx.json(snapshotAPISubmitMessage))
+  async (_req, res, ctx) => res(ctx.json(snapshotAPISubmitMessage))
 );
 
 /**
  * HANDLERS TO EXPORT
  */
 
-const handlers = [snapshotAPIRoot, snapshotAPISpace, snapshotAPIMessage];
+const handlers = [
+  getSnapshotAPIDraft,
+  getSnapshotAPIProposal,
+  getSnapshotAPIRoot,
+  getSnapshotAPISpace,
+  postSnapshotAPIMessage,
+];
 
 export {handlers};
