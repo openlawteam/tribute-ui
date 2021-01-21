@@ -1,4 +1,4 @@
-import {waitFor} from '@testing-library/react';
+import {waitFor, act as actReact} from '@testing-library/react';
 import {renderHook, act} from '@testing-library/react-hooks';
 import Web3 from 'web3';
 
@@ -19,7 +19,7 @@ describe('useContractSend unit tests', () => {
      *   But we still need access to a contract ABI to test `contractSend` properly.
      *   Hence, the access of the Redux `contract` state.
      */
-    const {store, mockWeb3Provider, web3Instance} = setupHook({
+    const {store, mockWeb3Provider, web3Instance} = await setupHook({
       wrapperProps: {
         useInit: true,
         useWallet: true,
