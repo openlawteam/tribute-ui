@@ -1,4 +1,4 @@
-import {waitFor, act as actReact} from '@testing-library/react';
+import {waitFor} from '@testing-library/react';
 import {renderHook, act} from '@testing-library/react-hooks';
 import Web3 from 'web3';
 
