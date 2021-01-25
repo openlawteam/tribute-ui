@@ -1,53 +1,22 @@
-import {useState, useEffect} from 'react';
-
-import {FakeProposal} from './_mockData';
+import {ProposalOrDraftSnapshotData, ProposalCombined} from './types';
+import {useVotingStartEnd} from './hooks/useVotingStartEnd';
 import SponsorAction from './SponsorAction';
 import VotingAction from './VotingAction';
 
-type ProposalActionsProps = {
-  proposal: FakeProposal;
+type ProposalActionsProps<T extends ProposalOrDraftSnapshotData> = {
+  proposal: ProposalCombined<T>;
 };
 
-export default function ProposalActions(props: ProposalActionsProps) {
+export default function ProposalActions<T extends ProposalOrDraftSnapshotData>(
+  props: ProposalActionsProps<T>
+) {
   const {proposal} = props;
 
   /**
-   * Variables
+   * Our hooks
    */
 
-  // placeholder values to be able to render mockups with styles
-  const votingStartSeconds = proposal.snapshotProposal.start;
-
-  /**
-   * State
-   */
-
-  const [hasVotingStarted, setHasVotingStarted] = useState<boolean>(
-    Math.ceil(Date.now() / 1000) > votingStartSeconds
-  );
-
-  /**
-   * Effects
-   */
-
-  // Actively check if voting has started
-  useEffect(() => {
-    // If the value is already `true`, then exit.
-    if (hasVotingStarted) return;
-
-    // Check if voting has started every 1 second
-    const intervalID = setInterval(() => {
-      const hasStartedCheck = Math.ceil(Date.now() / 1000) > votingStartSeconds;
-
-      if (!hasStartedCheck) return;
-
-      setHasVotingStarted(hasStartedCheck);
-    }, 1000);
-
-    return () => {
-      clearInterval(intervalID);
-    };
-  }, [hasVotingStarted, votingStartSeconds]);
+  const {hasVotingStarted} = useVotingStartEnd(proposal);
 
   /**
    * Render

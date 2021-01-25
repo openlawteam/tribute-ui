@@ -1,13 +1,14 @@
 import {useState, useEffect} from 'react';
 
-import {FakeProposal} from './_mockData';
 import ProposalPeriod from './ProposalPeriod';
 import SquareRootVotingBar from './SquareRootVotingBar';
 
 import StopwatchSVG from '../../assets/svg/StopwatchSVG';
+import {ProposalCombined} from './types';
+import {SnapshotProposalResponseData} from '@openlaw/snapshot-js-erc712';
 
 type VotingStatusProps = {
-  proposal: FakeProposal; // placeholder prop
+  proposal: ProposalCombined<SnapshotProposalResponseData>;
   showPercentages?: boolean;
 };
 
@@ -20,10 +21,11 @@ export default function VotingStatus({
    */
 
   // placeholder values to be able to render mockups with styles
-  const votingStartSeconds = proposal.snapshotProposal.start;
-  const votingEndSeconds = proposal.snapshotProposal.end;
-  const yesShares = proposal.snapshotProposal.yesShares;
-  const noShares = proposal.snapshotProposal.noShares;
+  const votingStartSeconds = proposal.snapshotProposal.msg.payload.start;
+  const votingEndSeconds = proposal.snapshotProposal.msg.payload.end;
+  // @todo Add function to calculate member voting power by shares
+  const yesShares = 0;
+  const noShares = 0;
   const totalShares = 10000000;
 
   /**
