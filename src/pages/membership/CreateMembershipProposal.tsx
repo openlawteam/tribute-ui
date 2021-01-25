@@ -354,7 +354,7 @@ export default function CreateMembershipProposal() {
           <label className="form__input-row-label">ETH address</label>
           <div className="form__input-row-fieldwrap">
             <input
-              aria-describedby="error-ethAddress"
+              aria-describedby={`error-${Fields.ethAddress}`}
               aria-invalid={errors.ethAddress ? 'true' : 'false'}
               name={Fields.ethAddress}
               defaultValue={account}
@@ -373,7 +373,7 @@ export default function CreateMembershipProposal() {
 
             <InputError
               error={getValidationError(Fields.ethAddress, errors)}
-              id="error-ethAddress"
+              id={`error-${Fields.ethAddress}`}
             />
           </div>
         </div>
@@ -385,7 +385,7 @@ export default function CreateMembershipProposal() {
             <div className="input__suffix-wrap">
               <input
                 className="input__suffix"
-                aria-describedby="error-ethAmount"
+                aria-describedby={`error-${Fields.ethAmount}`}
                 aria-invalid={errors.ethAmount ? 'true' : 'false'}
                 name={Fields.ethAmount}
                 onChange={() =>
@@ -414,12 +414,13 @@ export default function CreateMembershipProposal() {
               />
               <div className="input__suffix-item">ETH</div>
             </div>
+
             <InputError
               error={getValidationError(Fields.ethAmount, errors)}
-              id="error-ethAmount"
+              id={`error-${Fields.ethAmount}`}
             />
           </div>
-          <div className="form__input-description">
+          <div className="form__input-addon">
             available:{' '}
             <span className="text-underline">
               {userAccountBalance
