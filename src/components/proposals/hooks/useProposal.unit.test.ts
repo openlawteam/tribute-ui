@@ -27,7 +27,9 @@ describe('useProposal unit tests', () => {
       await waitFor(() => {
         // Assert initial state
         expect(result.current.proposal).toStrictEqual(
-          snapshotAPIProposalResponse
+          snapshotAPIProposalResponse[
+            Object.keys(snapshotAPIProposalResponse)[0]
+          ]
         );
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
@@ -63,7 +65,9 @@ describe('useProposal unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toStrictEqual(snapshotAPIDraftResponse);
+        expect(result.current.proposal).toStrictEqual(
+          snapshotAPIDraftResponse[Object.keys(snapshotAPIDraftResponse)[0]]
+        );
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
@@ -133,7 +137,9 @@ describe('useProposal unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toStrictEqual(snapshotAPIDraftResponse);
+        expect(result.current.proposal).toStrictEqual(
+          snapshotAPIDraftResponse[Object.keys(snapshotAPIDraftResponse)[0]]
+        );
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
@@ -196,7 +202,9 @@ describe('useProposal unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toStrictEqual(snapshotAPIDraftResponse);
+        expect(result.current.proposal).toStrictEqual(
+          snapshotAPIDraftResponse[Object.keys(snapshotAPIDraftResponse)[0]]
+        );
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
@@ -291,7 +299,9 @@ describe('useProposal unit tests', () => {
       await waitFor(() => {
         // Assert initial state
         expect(result.current.proposal).toStrictEqual(
-          snapshotAPIProposalResponse
+          snapshotAPIProposalResponse[
+            Object.keys(snapshotAPIProposalResponse)[0]
+          ]
         );
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
