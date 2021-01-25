@@ -1,24 +1,17 @@
 import {useCallback, useEffect, useState} from 'react';
 import {
   SnapshotDraftResponse,
-  SnapshotDraftResponseData,
   SnapshotProposalResponse,
-  SnapshotProposalResponseData,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
 
+import {ProposalOrDraftFromType, ProposalOrDraftSnapshotType} from '../types';
 import {AsyncStatus} from '../../../util/types';
 import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
 import {useAbortController} from '../../../hooks';
 
-type ProposalOrDraft<
-  T extends SnapshotType.proposal | SnapshotType.draft
-> = T extends SnapshotType.proposal
-  ? SnapshotProposalResponseData
-  : SnapshotDraftResponseData;
-
-type UseProposalReturn<T extends SnapshotType.proposal | SnapshotType.draft> = {
-  proposal: ProposalOrDraft<T> | undefined;
+type UseProposalReturn<T extends ProposalOrDraftSnapshotType> = {
+  proposal: ProposalOrDraftFromType<T> | undefined;
   proposalError: Error | undefined;
   proposalNotFound: boolean;
   proposalStatus: AsyncStatus;
@@ -40,9 +33,7 @@ const ERROR_PROPOSAL_NOT_FOUND: string = 'Proposal was not found.';
  * @param {SnapshotType?} type An optional snapshot-hub `type` to search by.
  * @returns {UseProposalReturn}
  */
-export function useProposal<
-  T extends SnapshotType.proposal | SnapshotType.draft
->(
+export function useProposal<T extends ProposalOrDraftSnapshotType>(
   id: string,
   /**
    * @todo Remove optional once subgraph is implemented and we can determine
@@ -54,7 +45,7 @@ export function useProposal<
    * State
    */
 
-  const [proposal, setProposal] = useState<ProposalOrDraft<T>>();
+  const [proposal, setProposal] = useState<ProposalOrDraftFromType<T>>();
   const [proposalNotFound, setProposalNotFound] = useState<boolean>(false);
   const [proposalError, setProposalError] = useState<Error>();
   const [proposalStatus, setProposalStatus] = useState<AsyncStatus>(
@@ -144,9 +135,9 @@ export function useProposal<
       }
 
       setProposalStatus(AsyncStatus.FULFILLED);
-      setProposal(draft as ProposalOrDraft<T>);
+      setProposal(draft as ProposalOrDraftFromType<T>);
 
-      return draft as ProposalOrDraft<T>;
+      return draft as ProposalOrDraftFromType<T>;
     } catch (error) {
       setProposalStatus(AsyncStatus.REJECTED);
       setProposalError(error);
@@ -203,9 +194,9 @@ export function useProposal<
       }
 
       setProposalStatus(AsyncStatus.FULFILLED);
-      setProposal(proposal as ProposalOrDraft<T>);
+      setProposal(proposal as ProposalOrDraftFromType<T>);
 
-      return proposal as ProposalOrDraft<T>;
+      return proposal as ProposalOrDraftFromType<T>;
     } catch (error) {
       setProposalStatus(AsyncStatus.REJECTED);
       setProposalError(error);
