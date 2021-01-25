@@ -45,6 +45,10 @@ textarea::placeholder {
   opacity: 0.7;
 }
 
+textarea {
+  height: 15rem;
+}
+
 /* change autocomplete styles */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -83,6 +87,10 @@ select:-webkit-autofill:focus {
   select {
     font-size: 1rem;
     padding: 0.8rem;
+  }
+
+  textarea {
+    height: 12rem;
   }
 
   .input__suffix-item {
