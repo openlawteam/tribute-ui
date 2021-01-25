@@ -1,62 +1,105 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
-import {truncateEthAddress} from '../../util/helpers';
-import {
-  fakeMembershipProposals,
-  FakeProposal,
-} from '../../components/proposals/_mockData';
-import ProposalDetails from '../../components/proposals/ProposalDetails';
-import ProposalActions from '../../components/proposals/ProposalActions';
-import Wrap from '../../components/common/Wrap';
+import {AsyncStatus} from '../../util/types';
+import {combineProposals} from '../../components/proposals/helpers';
+import {SnapshotType} from '@openlaw/snapshot-js-erc712';
+import {useProposal} from '../../components/proposals/hooks';
+import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
+import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
+import NotFound from '../subpages/NotFound';
+import ProposalActions from '../../components/proposals/ProposalActions';
+import ProposalDetails from '../../components/proposals/ProposalDetails';
+import Wrap from '../../components/common/Wrap';
 
 export default function MembershipDetails() {
+  /**
+   * @todo
+   *
+   * 1. Fetch proposal by ID from the subgraph.
+   * 2. Determine if sponsored
+   * 3. Get Snapshot data
+   *   3.1 If sponsored, get data about proposal from Snapshot (use flag to also search by draft hash).
+   *   3.2 If not sponsored, get data about draft from Snapshot.
+   */
+
   /**
    * Their hooks
    */
 
   // Get hash for fetching the proposal.
-  // @todo Use this to check that proposal exists.
   const {proposalHash} = useParams<{proposalHash: string}>();
-  const history = useHistory();
+
+  /**
+   * @todo Get subgraph proposal and determine if it has been sponsored
+   *   so we know how to search snapshot-hub.
+   */
+
+  // ...
+
+  /**
+   * Our hooks
+   */
+
+  const {
+    proposal,
+    proposalError,
+    proposalNotFound,
+    proposalStatus,
+  } = useProposal(proposalHash, SnapshotType.proposal);
 
   /**
    * Variables
    */
 
-  // @todo replace with actual proposal fetch and proposal exists check
-  const memberProposal: FakeProposal | undefined = fakeMembershipProposals.find(
-    (proposal) => proposal.snapshotProposal.hash === proposalHash.toLowerCase()
-  );
-
-  /**
-   * Effects
-   */
-
-  // Navigate to 404
-  useEffect(() => {
-    if (!memberProposal) {
-      history.push('/404');
-    }
-  }, [history, memberProposal]);
+  const combinedProposal = combineProposals(proposal, {});
 
   /**
    * Render
    */
 
-  if (memberProposal) {
+  // Render loading
+  if (proposalStatus === AsyncStatus.PENDING) {
+    return (
+      <RenderWrapper>
+        <div style={{width: '3rem', margin: '0 auto'}}>
+          <LoaderWithEmoji />
+        </div>
+      </RenderWrapper>
+    );
+  }
+
+  // Render 404 no proposal found
+  if (proposalNotFound) {
+    return (
+      <RenderWrapper>
+        <NotFound />
+      </RenderWrapper>
+    );
+  }
+
+  // Render error
+  if (proposalStatus === AsyncStatus.REJECTED || proposalError) {
+    return (
+      <RenderWrapper>
+        <div className="text-center">
+          <ErrorMessageWithDetails
+            error={proposalError}
+            renderText="Something went wrong."
+          />
+        </div>
+      </RenderWrapper>
+    );
+  }
+
+  // Render proposal
+  if (combinedProposal) {
     return (
       <RenderWrapper>
         <ProposalDetails
-          proposal={memberProposal as FakeProposal}
-          name={truncateEthAddress(
-            (memberProposal as FakeProposal).snapshotProposal.name,
-            7
-          )}
-          renderActions={() => (
-            <ProposalActions proposal={memberProposal as FakeProposal} />
-          )}
+          proposal={combinedProposal}
+          renderActions={() => <ProposalActions proposal={combinedProposal} />}
         />
       </RenderWrapper>
     );
@@ -77,8 +120,9 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
    * Functions
    */
 
-  function viewAll(event: React.MouseEvent<HTMLButtonElement>) {
+  function goToAll(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
+
     history.push('/membership');
   }
 
@@ -91,7 +135,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
       <FadeIn>
         <div className="titlebar">
           <h2 className="titlebar__title">Membership</h2>
-          <button className="titlebar__action" onClick={viewAll}>
+          <button className="titlebar__action" onClick={goToAll}>
             View all
           </button>
         </div>
