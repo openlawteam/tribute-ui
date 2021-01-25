@@ -414,12 +414,13 @@ export default function CreateMembershipProposal() {
               />
               <div className="input__suffix-item">ETH</div>
             </div>
+
             <InputError
               error={getValidationError(Fields.ethAmount, errors)}
               id={`error-${Fields.ethAmount}`}
             />
           </div>
-          <div className="form__input-description">
+          <div className="form__input-addon">
             available:{' '}
             <span className="text-underline">
               {userAccountBalance

@@ -104,9 +104,14 @@
   margin: 0 auto;
 }
 
-.form__input-description {
+.form__input-addon {
   font-size: 1.125rem;
   margin-left: 2rem;
+}
+
+.form__input-description {
+  font-size: 1rem;
+  margin-top: 1rem;
 }
 
 /* @MEDIA QUERIES */
@@ -131,7 +136,7 @@
     width: 100%;
   }
 
-  .form__input-description {
+  .form__input-addon {
     margin: 0.5rem 0 0;
   }
 }
@@ -148,7 +153,11 @@
   .form__description p,
   .form__input-row-label,
   .form .error-message,
-  .form__input-description {
+  .form__input-addon {
     font-size: 1rem;
+  }
+
+  .form__input-description {
+    font-size: 0.9rem;
   }
 }
