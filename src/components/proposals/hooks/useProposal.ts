@@ -1,8 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {
-  SnapshotCoreProposalData,
-  SnapshotCoreProposalPayloadData,
-  SnapshotProposalPayloadData,
+  SnapshotDraftResponseData,
+  SnapshotProposalResponseData,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
 
@@ -10,25 +9,14 @@ import {AsyncStatus} from '../../../util/types';
 import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
 import {useAbortController} from '../../../hooks';
 
-type UseProposalProposalData = SnapshotCoreProposalData & {
-  payload: SnapshotCoreProposalPayloadData & {
-    /**
-     * `end` will only be returned for `proposal` types
-     */
-    end?: SnapshotProposalPayloadData['end'];
-    /**
-     * `snapshot` will only be returned for `proposal` types
-     */
-    snapshot?: SnapshotProposalPayloadData['snapshot'];
-    /**
-     * `start` will only be returned for `proposal` types
-     */
-    start?: SnapshotProposalPayloadData['start'];
-  };
-};
+type ProposalOrDraft<
+  T extends SnapshotType.proposal | SnapshotType.draft
+> = T extends SnapshotType.proposal
+  ? SnapshotProposalResponseData
+  : SnapshotDraftResponseData;
 
-type UseProposalReturn = {
-  proposal: UseProposalProposalData | undefined;
+type UseProposalReturn<T extends SnapshotType.proposal | SnapshotType.draft> = {
+  proposal: ProposalOrDraft<T> | undefined;
   proposalError: Error | undefined;
   proposalNotFound: boolean;
   proposalStatus: AsyncStatus;
@@ -50,19 +38,21 @@ const ERROR_PROPOSAL_NOT_FOUND: string = 'Proposal was not found.';
  * @param {SnapshotType?} type An optional snapshot-hub `type` to search by.
  * @returns {UseProposalReturn}
  */
-export function useProposal(
+export function useProposal<
+  T extends SnapshotType.proposal | SnapshotType.draft
+>(
   id: string,
   /**
    * @todo Remove optional once subgraph is implemented and we can determine
    *   whether or not it's been sponsored.
    */
-  type?: SnapshotType
-): UseProposalReturn {
+  type?: T
+): UseProposalReturn<T> {
   /**
    * State
    */
 
-  const [proposal, setProposal] = useState<UseProposalProposalData>();
+  const [proposal, setProposal] = useState<ProposalOrDraft<T>>();
   const [proposalNotFound, setProposalNotFound] = useState<boolean>(false);
   const [proposalError, setProposalError] = useState<Error>();
   const [proposalStatus, setProposalStatus] = useState<AsyncStatus>(
@@ -163,6 +153,10 @@ export function useProposal(
     try {
       setProposalStatus(AsyncStatus.PENDING);
 
+      /**
+       * @note `searchUniqueDraftId` includes the draft id in the search for the proposal
+       *   as a Moloch proposal's ID hash could be the Snapshot Draft's ID.
+       */
       const response = await fetch(
         `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/proposal/${id}?searchUniqueDraftId=true`,
         {signal: abortController?.signal}
@@ -212,6 +206,12 @@ export function useProposal(
     }
   }
 
+  /**
+   * Searches all possible combinations to return a proposal or a draft:
+   *
+   * 1. Search for a proposal (including by using the `id` as the Draft's ID hash via `searchUniqueDraftId`)
+   * 2. Search for a draft, if nothing is returned for a proposal.
+   */
   async function handleGetProposalOrDraft() {
     // 1. Attempt to search for a proposal.
     const proposal = await handleGetProposalCached();
