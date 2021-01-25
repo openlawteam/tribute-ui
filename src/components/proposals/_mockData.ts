@@ -21,7 +21,7 @@ export const fakeMembershipProposalsVoting: FakeProposal[] = [
       body:
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
       start: 1610350810,
-      end: 1611085505,
+      end: 1612222285,
       yesShares: 0,
       noShares: 0,
     },
@@ -33,7 +33,7 @@ export const fakeMembershipProposalsVoting: FakeProposal[] = [
       body:
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
       start: 1610350810,
-      end: 1611085505,
+      end: 1612222285,
       yesShares: 4500000,
       noShares: 0,
     },
@@ -45,7 +45,7 @@ export const fakeMembershipProposalsVoting: FakeProposal[] = [
       body:
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
       start: 1610350810,
-      end: 1611085505,
+      end: 1612222285,
       yesShares: 0,
       noShares: 3500000,
     },
@@ -57,7 +57,7 @@ export const fakeMembershipProposalsVoting: FakeProposal[] = [
       body:
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
       start: 1610350810,
-      end: 1611085505,
+      end: 1612222285,
       yesShares: 7000000,
       noShares: 2500000,
     },
@@ -69,7 +69,7 @@ export const fakeMembershipProposalsVoting: FakeProposal[] = [
       body:
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
       start: 1610350810,
-      end: 1611085505,
+      end: 1612222285,
       yesShares: 3500000,
       noShares: 5500000,
     },
@@ -81,7 +81,7 @@ export const fakeMembershipProposalsVoting: FakeProposal[] = [
       body:
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et',
       start: 1610350810,
-      end: 1611085505,
+      end: 1612222285,
       yesShares: 5000000,
       noShares: 5000000,
     },
