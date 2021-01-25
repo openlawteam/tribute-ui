@@ -1,24 +1,37 @@
-import {FakeProposal} from './_mockData';
-import VotingStatus from './VotingStatus';
-import ProposalAmount from './ProposalAmount';
+import {
+  SnapshotProposalResponseData,
+  SnapshotType,
+} from '@openlaw/snapshot-js-erc712';
 
-type RenderActionsArgs = {
-  proposal: FakeProposal;
+import {ProposalCombined, ProposalOrDraftSnapshotData} from './types';
+import {truncateEthAddress} from '../../util/helpers';
+import ProposalAmount from './ProposalAmount';
+import VotingStatus from './VotingStatus';
+
+type RenderActionsArgs<T extends ProposalOrDraftSnapshotData> = {
+  proposal: ProposalCombined<T>;
 };
 
-type ProposalDetailsProps = {
-  proposal: FakeProposal;
-  name: string;
+type ProposalDetailsProps<T extends ProposalOrDraftSnapshotData> = {
+  proposal: ProposalCombined<T>;
   /**
    * A render prop to render any action button flows for a proposal.
-   *
    */
-  renderActions: (p: RenderActionsArgs) => React.ReactNode;
+  renderActions: (p: RenderActionsArgs<T>) => React.ReactNode;
   showAmountBadge?: boolean;
 };
 
-export default function ProposalDetails(props: ProposalDetailsProps) {
-  const {proposal, name, renderActions, showAmountBadge = false} = props;
+export default function ProposalDetails<T extends ProposalOrDraftSnapshotData>(
+  props: ProposalDetailsProps<T>
+) {
+  const {proposal, renderActions} = props;
+
+  /**
+   * Variables
+   */
+
+  const isProposalType: boolean =
+    proposal.snapshotProposal.msg.type === SnapshotType.proposal;
 
   /**
    * Render
@@ -28,25 +41,30 @@ export default function ProposalDetails(props: ProposalDetailsProps) {
     <>
       <div className="proposaldetails__header">Proposal Details</div>
       <div className="proposaldetails">
-        {/* LEFT COLUMN */}
-
         {/* PROPOSAL NAME AND BODY */}
         <div className="proposaldetails__content">
-          <h3>{name}</h3>
-          <p>{proposal.snapshotProposal.body}</p>
+          <h3>
+            {truncateEthAddress(proposal.snapshotProposal.msg.payload.name, 7)}
+          </h3>
+
+          <p>{proposal.snapshotProposal.msg.payload.body}</p>
         </div>
 
-        {/* RIGHT COLUMN */}
+        {/* SIDEBAR */}
         <div className="proposaldetails__status">
           {/* ETH AMOUNT FOR TRANSER AND TRIBUTE PROPOSALS */}
-          {showAmountBadge && (
-            <div className="proposaldetails__amount">
-              <ProposalAmount />
-            </div>
-          )}
+          <div className="proposaldetails__amount">
+            <ProposalAmount />
+          </div>
 
           {/* VOTING PROGRESS STATUS AND BAR */}
-          <VotingStatus proposal={proposal} />
+          {isProposalType && (
+            <VotingStatus
+              proposal={
+                proposal as ProposalCombined<SnapshotProposalResponseData>
+              }
+            />
+          )}
 
           {/* SPONSOR & VOTING ACTIONS */}
           {renderActions({proposal})}
