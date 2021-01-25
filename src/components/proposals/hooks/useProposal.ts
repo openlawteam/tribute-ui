@@ -1,6 +1,8 @@
 import {useCallback, useEffect, useState} from 'react';
 import {
+  SnapshotDraftResponse,
   SnapshotDraftResponseData,
+  SnapshotProposalResponse,
   SnapshotProposalResponseData,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
@@ -128,7 +130,9 @@ export function useProposal<
         throw new Error(ERROR_PROPOSAL);
       }
 
-      const draft = await response.json();
+      const responseJSON: SnapshotDraftResponse = await response.json();
+      // Get the `SnapshotDraftResponseData` by the address key of the single result.
+      const draft = responseJSON[Object.keys(responseJSON)[0]];
 
       if (!isMountedRef.current) return;
 
@@ -140,9 +144,9 @@ export function useProposal<
       }
 
       setProposalStatus(AsyncStatus.FULFILLED);
-      setProposal(draft);
+      setProposal(draft as ProposalOrDraft<T>);
 
-      return draft;
+      return draft as ProposalOrDraft<T>;
     } catch (error) {
       setProposalStatus(AsyncStatus.REJECTED);
       setProposalError(error);
@@ -176,7 +180,9 @@ export function useProposal<
         return;
       }
 
-      const proposal = await response.json();
+      const responseJSON: SnapshotProposalResponse = await response.json();
+      // Get the `SnapshotProposalResponseData` by the address key of the single result.
+      const proposal = responseJSON[Object.keys(responseJSON)[0]];
 
       if (!isMountedRef.current) return;
 
@@ -197,9 +203,9 @@ export function useProposal<
       }
 
       setProposalStatus(AsyncStatus.FULFILLED);
-      setProposal(proposal);
+      setProposal(proposal as ProposalOrDraft<T>);
 
-      return proposal;
+      return proposal as ProposalOrDraft<T>;
     } catch (error) {
       setProposalStatus(AsyncStatus.REJECTED);
       setProposalError(error);
