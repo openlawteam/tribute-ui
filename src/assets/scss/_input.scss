@@ -46,7 +46,7 @@ textarea::placeholder {
 }
 
 textarea {
-  height: 15rem;
+  min-height: 15rem;
 }
 
 /* change autocomplete styles */
@@ -90,7 +90,7 @@ select:-webkit-autofill:focus {
   }
 
   textarea {
-    height: 12rem;
+    min-height: 12rem;
   }
 
   .input__suffix-item {
