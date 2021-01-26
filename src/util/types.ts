@@ -16,11 +16,11 @@ import {SmartContractItem} from '../components/web3/types';
 
 export type EnvironmentName = 'localhost' | 'development' | 'production';
 
-export interface ContractsState {
+export type ContractsState = {
   DaoRegistryContract: SmartContractItem | null;
   OnboardingContract: SmartContractItem | null;
   OffchainVotingContract: SmartContractItem | null;
-}
+};
 
 export type StoreState = {
   contracts: ContractsState;
