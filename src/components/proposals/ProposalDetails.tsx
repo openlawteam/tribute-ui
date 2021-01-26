@@ -18,13 +18,16 @@ type ProposalDetailsProps<T extends ProposalOrDraftSnapshotData> = {
    * A render prop to render any action button flows for a proposal.
    */
   renderActions: (p: RenderActionsArgs<T>) => React.ReactNode;
+  /**
+   * Option to change the visibility of the ETH amount. Defaults to `true`.
+   */
   showAmountBadge?: boolean;
 };
 
 export default function ProposalDetails<T extends ProposalOrDraftSnapshotData>(
   props: ProposalDetailsProps<T>
 ) {
-  const {proposal, renderActions} = props;
+  const {proposal, renderActions, showAmountBadge = true} = props;
 
   /**
    * Variables
@@ -41,7 +44,7 @@ export default function ProposalDetails<T extends ProposalOrDraftSnapshotData>(
     <>
       <div className="proposaldetails__header">Proposal Details</div>
       <div className="proposaldetails">
-        {/* PROPOSAL NAME AND BODY */}
+        {/* PROPOSAL NAME (address) AND BODY */}
         <div className="proposaldetails__content">
           <h3>
             {truncateEthAddress(proposal.snapshotProposal.msg.payload.name, 7)}
@@ -54,7 +57,10 @@ export default function ProposalDetails<T extends ProposalOrDraftSnapshotData>(
         <div className="proposaldetails__status">
           {/* ETH AMOUNT FOR TRANSER AND TRIBUTE PROPOSALS */}
           <div className="proposaldetails__amount">
-            <ProposalAmount />
+            {/* @todo use value from proposal.subgraphproposal.amount, or do not show if no `.amount` key */}
+            {showAmountBadge && (
+              /* proposal.subgraphProposal.amount */ <ProposalAmount amount="100000000000000000000" />
+            )}
           </div>
 
           {/* VOTING PROGRESS STATUS AND BAR */}
