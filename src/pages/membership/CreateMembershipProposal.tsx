@@ -16,13 +16,14 @@ import {
   useETHGasPrice,
   useIsDefaultChain,
 } from '../../components/web3/hooks';
-import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {CHAINS} from '../../config';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
+import {MetaMaskRPCError} from '../../util/types';
 import {SHARES_ADDRESS} from '../../config';
-import {StoreState, MetaMaskRPCError} from '../../util/types';
+import {StoreState} from '../../store/types';
+import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import CycleMessage from '../../components/feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';

@@ -26,8 +26,8 @@ import {
   getAdapterAddressFromContracts,
   getDAOConfigEntry,
 } from '../../web3/helpers';
+import {StoreState} from '../../../store/types';
 import {PRIMARY_TYPE_ERC712} from '../../web3/config';
-import {StoreState} from '../../../util/types';
 import {useWeb3Modal} from '../../web3/hooks/useWeb3Modal';
 
 type PrepareAndSignProposalDataParam = {

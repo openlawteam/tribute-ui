@@ -7,9 +7,9 @@ import {
   initContractOffchainVoting,
   initContractOnboarding,
 } from '../../../store/actions';
-import {useWeb3Modal} from '.';
-import {ReduxDispatch} from '../../../util/types';
+import {ReduxDispatch} from '../../../store/types';
 import {useIsDefaultChain} from './useIsDefaultChain';
+import {useWeb3Modal} from '.';
 
 /**
  * useInitContracts()

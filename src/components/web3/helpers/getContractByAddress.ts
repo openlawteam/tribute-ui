@@ -1,6 +1,6 @@
 import {normalizeString} from '../../../util/helpers';
 import {SmartContractItem} from '../types';
-import {StoreState} from '../../../util/types';
+import {StoreState} from '../../../store/types';
 
 /**
  * getContractByAddress
