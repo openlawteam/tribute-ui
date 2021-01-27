@@ -159,7 +159,7 @@ export default function Nav() {
                 }}
                 className="nav-modal">
                 <button
-                  className="nav-modal__close-button"
+                  className="modal__close-button modal__close-button--icon"
                   onClick={(event) => {
                     event.preventDefault();
                     handleMenuModalClose(false);
