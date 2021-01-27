@@ -195,37 +195,41 @@ export function InitError(props: InitErrorProps) {
   const {error} = props;
 
   return (
-    <Wrap className="section-wrapper">
+    <>
       <Header />
 
-      <FadeIn>
-        <div
-          style={{
-            padding: '2em 1em 1em',
-            textAlign: 'center',
-          }}>
-          <h1 style={{fontSize: '2rem'}}>
-            <span
-              className="pulse"
-              role="img"
-              aria-label="Emoji with eyes crossed out."
-              style={{display: 'inline-block'}}>
-              😵
-            </span>{' '}
-            Oops, something went wrong.
-          </h1>
-        </div>
+      <Wrap className="section-wrapper">
+        <main>
+          <FadeIn>
+            <div
+              style={{
+                padding: '2em 1em 1em',
+                textAlign: 'center',
+              }}>
+              <h1 style={{fontSize: '2rem'}}>
+                <span
+                  className="pulse"
+                  role="img"
+                  aria-label="Emoji with eyes crossed out."
+                  style={{display: 'inline-block'}}>
+                  😵
+                </span>{' '}
+                Oops, something went wrong.
+              </h1>
+            </div>
 
-        <div
-          style={{
-            textAlign: 'center',
-            maxWidth: 600,
-            display: 'block',
-            margin: '0 auto',
-          }}>
-          <ErrorMessageWithDetails error={error} renderText="" />
-        </div>
-      </FadeIn>
-    </Wrap>
+            <div
+              style={{
+                textAlign: 'center',
+                maxWidth: 600,
+                display: 'block',
+                margin: '0 auto',
+              }}>
+              <ErrorMessageWithDetails error={error} renderText="" />
+            </div>
+          </FadeIn>
+        </main>
+      </Wrap>
+    </>
   );
 }
