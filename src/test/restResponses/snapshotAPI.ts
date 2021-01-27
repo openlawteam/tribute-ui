@@ -1,20 +1,16 @@
 import {
-  SnapshotDraftData,
   SnapshotDraftResponse,
-  SnapshotProposalData,
   SnapshotProposalResponse,
   SnapshotSubmitBaseReturn,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
 
 import {VOTE_CHOICES} from '../../components/web3/config';
-import {DEFAULT_CHAIN} from '../../config';
 import {
   DEFAULT_DRAFT_HASH,
   DEFAULT_ETH_ADDRESS,
   DEFAULT_PROPOSAL_HASH,
   DEFAULT_SIG,
-  DEFAULT_SPACE,
 } from '../helpers';
 
 export const snapshotAPIRootResponse = {
@@ -51,6 +47,10 @@ export const snapshotAPISubmitMessage: SnapshotSubmitBaseReturn = {
 export const snapshotAPIDraftResponse: SnapshotDraftResponse = {
   [DEFAULT_DRAFT_HASH]: {
     address: DEFAULT_ETH_ADDRESS,
+    data: {
+      authorIpfsHash: DEFAULT_PROPOSAL_HASH,
+      sponsored: false,
+    },
     msg: {
       payload: {
         body: 'Test Snapshot Draft body content.',
