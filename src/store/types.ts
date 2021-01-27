@@ -8,10 +8,14 @@ export type ContractsState = {
   OffchainVotingContract: SmartContractItem | null;
 };
 
-export type ConnectedMemberState = {} | null;
+export type ConnectedMemberState = {
+  delegateKey: string;
+  isActiveMember: boolean;
+  memberAddress: string;
+} | null;
 
 export type StoreState = {
-  connectedMemberState: ConnectedMemberState;
+  connectedMember: ConnectedMemberState;
   contracts: ContractsState;
 };
 
