@@ -30,6 +30,13 @@ import {StoreState} from '../../../store/types';
 import {PRIMARY_TYPE_ERC712} from '../../web3/config';
 import {useWeb3Modal} from '../../web3/hooks/useWeb3Modal';
 
+type SignAndSendData = {
+  partialProposalData: PrepareAndSignProposalDataParam;
+  adapterAddress?: string;
+  adapterName?: ContractAdapterNames;
+  type: SnapshotType;
+};
+
 type PrepareAndSignProposalDataParam = {
   body: SnapshotProposalData['payload']['body'];
   name: SnapshotProposalData['payload']['name'];
@@ -43,9 +50,7 @@ type PrepareAndSignProposalDataParam = {
 
 type UseSignAndSubmitProposalReturn = {
   signAndSendProposal: (
-    partialProposalData: PrepareAndSignProposalDataParam,
-    adapterName: ContractAdapterNames,
-    type: SnapshotProposalData['type']
+    d: SignAndSendData
   ) => Promise<SignAndSendProposalReturn>;
   proposalData: SignAndSendProposalReturn | undefined;
   proposalSignAndSendError: Error | undefined;
@@ -142,16 +147,14 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
    *
    * Builds the proposal data for submission to Moloch v3 and Snapshot and signs it (ERC712).
    *
-   * @param {PrepareAndSignProposalDataParam}
-   * @param {adapterName} ContractAdapterNames - An adapter's contract address this data is related to.
-   *   @note Does not accept voting adapter names.
    * @returns {Promise<SignAndSendProposalReturn>} An object with the proposal data, signature string, and propsal hash(es) from snapshot-hub.
    */
-  async function signAndSendProposal(
-    partialProposalData: PrepareAndSignProposalDataParam,
-    adapterName: ContractAdapterNames,
-    type: SnapshotType
-  ): Promise<SignAndSendProposalReturn> {
+  async function signAndSendProposal({
+    partialProposalData,
+    adapterAddress,
+    adapterName,
+    type,
+  }: SignAndSendData): Promise<SignAndSendProposalReturn> {
     try {
       if (!account) {
         throw new Error('No account was found to send.');
@@ -175,10 +178,12 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
 
       setProposalSignAndSendStatus(Web3TxStatus.AWAITING_CONFIRM);
 
-      const adapterAddress = getAdapterAddressFromContracts(
-        adapterName,
-        contracts
-      );
+      const actionId = adapterAddress
+        ? adapterAddress
+        : adapterName
+        ? getAdapterAddressFromContracts(adapterName, contracts)
+        : '';
+
       const {body, name, metadata, timestamp} = partialProposalData;
 
       const {data: snapshotSpace} = await getSpace(SNAPSHOT_HUB_API_URL, SPACE);
@@ -189,7 +194,7 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
         metadata,
         token: snapshotSpace.token,
         space: SPACE,
-        actionId: adapterAddress,
+        actionId,
         chainId: DEFAULT_CHAIN,
         verifyingContract: daoRegistryAddress,
       };
@@ -206,7 +211,7 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
       const {domain, types} = getDomainDefinition(
         message,
         daoRegistryAddress,
-        adapterAddress,
+        actionId,
         DEFAULT_CHAIN
       );
 

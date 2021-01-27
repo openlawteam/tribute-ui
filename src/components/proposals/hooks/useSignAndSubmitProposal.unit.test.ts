@@ -37,11 +37,15 @@ describe('useSignAndSubmitProposal unit tests', () => {
 
       // Call signAndSendProposal
       act(() => {
-        result.current.signAndSendProposal(
-          {name: 'Test Name', body: 'Test Body', metadata: {}},
-          ContractAdapterNames.onboarding,
-          SnapshotType.draft
-        );
+        result.current.signAndSendProposal({
+          partialProposalData: {
+            name: 'Test Name',
+            body: 'Test Body',
+            metadata: {},
+          },
+          adapterName: ContractAdapterNames.onboarding,
+          type: SnapshotType.draft,
+        });
       });
 
       // assert awaiting confirmation state
@@ -143,16 +147,16 @@ describe('useSignAndSubmitProposal unit tests', () => {
 
       // Call signAndSendProposal
       act(() => {
-        result.current.signAndSendProposal(
-          {
+        result.current.signAndSendProposal({
+          partialProposalData: {
             name: 'Test Name',
             body: 'Test Body',
             metadata: {},
             timestamp: '1610981167',
           },
-          ContractAdapterNames.onboarding,
-          SnapshotType.proposal
-        );
+          adapterName: ContractAdapterNames.onboarding,
+          type: SnapshotType.proposal,
+        });
       });
 
       // assert awaiting confirmation state
@@ -229,11 +233,15 @@ describe('useSignAndSubmitProposal unit tests', () => {
         data,
         signature,
         uniqueId,
-      } = await result.current.signAndSendProposal(
-        {name: 'Test Name', body: 'Test Body', metadata: {}},
-        ContractAdapterNames.onboarding,
-        SnapshotType.draft
-      );
+      } = await result.current.signAndSendProposal({
+        partialProposalData: {
+          name: 'Test Name',
+          body: 'Test Body',
+          metadata: {},
+        },
+        adapterName: ContractAdapterNames.onboarding,
+        type: SnapshotType.draft,
+      });
 
       // @note Set the timestamp by hand as dates will always be different
       const now = (Date.now() / 1000).toFixed();
@@ -298,16 +306,16 @@ describe('useSignAndSubmitProposal unit tests', () => {
         uniqueId,
         uniqueIdDraft,
         signature,
-      } = await result.current.signAndSendProposal(
-        {
+      } = await result.current.signAndSendProposal({
+        partialProposalData: {
           name: 'Test Name',
           body: 'Test Body',
           metadata: {},
           timestamp: '1610981167',
         },
-        ContractAdapterNames.onboarding,
-        SnapshotType.proposal
-      );
+        adapterName: ContractAdapterNames.onboarding,
+        type: SnapshotType.proposal,
+      });
 
       expect(data).toStrictEqual({
         payload: {
