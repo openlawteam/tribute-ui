@@ -86,7 +86,7 @@ export default function CreateMembershipProposal() {
     proposalData,
     proposalSignAndSendStatus,
     signAndSendProposal,
-  } = useSignAndSubmitProposal();
+  } = useSignAndSubmitProposal<SnapshotType.draft>();
 
   /**
    * Their hooks
@@ -209,15 +209,15 @@ export default function CreateMembershipProposal() {
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
         // Sign and submit draft for snapshot-hub
-        const {uniqueId} = await signAndSendProposal(
-          {
+        const {uniqueId} = await signAndSendProposal({
+          partialProposalData: {
             name: account,
             body: `Membership for ${account}.`,
             metadata: {},
           },
-          ContractAdapterNames.onboarding,
-          SnapshotType.draft
-        );
+          adapterName: ContractAdapterNames.onboarding,
+          type: SnapshotType.draft,
+        });
 
         proposalId = uniqueId;
       }
