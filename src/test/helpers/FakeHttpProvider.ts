@@ -202,7 +202,7 @@ export class FakeHttpProvider {
   ) {
     abiDecoder.addABI(abi);
 
-    const {name = ''} = abiDecoder.decodeMethod(encodedMethodSignature);
+    const {name = ''} = abiDecoder.decodeMethod(encodedMethodSignature) || {};
 
     abiDecoder.removeABI(abi);
 
