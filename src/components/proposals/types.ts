@@ -1,4 +1,6 @@
 import {
+  SnapshotDraftData,
+  SnapshotProposalData,
   SnapshotDraftResponseData,
   SnapshotProposalResponseData,
   SnapshotType,
@@ -41,3 +43,7 @@ export type ProposalOrDraftFromType<
 > = T extends SnapshotType.proposal
   ? SnapshotProposalResponseData
   : SnapshotDraftResponseData;
+
+export type ProposalOrDraftSignDataFromType<
+  T extends ProposalOrDraftSnapshotType
+> = T extends SnapshotType.proposal ? SnapshotProposalData : SnapshotDraftData;

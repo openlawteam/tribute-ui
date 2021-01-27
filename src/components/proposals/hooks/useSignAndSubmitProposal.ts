@@ -6,7 +6,6 @@ import {
   getDomainDefinition,
   getSpace,
   signMessage,
-  SnapshotDraftData,
   SnapshotMessageBase,
   SnapshotMessageProposal,
   SnapshotProposalData,
@@ -26,15 +25,19 @@ import {
   getAdapterAddressFromContracts,
   getDAOConfigEntry,
 } from '../../web3/helpers';
-import {StoreState} from '../../../store/types';
 import {PRIMARY_TYPE_ERC712} from '../../web3/config';
+import {
+  ProposalOrDraftSignDataFromType,
+  ProposalOrDraftSnapshotType,
+} from '../types';
+import {StoreState} from '../../../store/types';
 import {useWeb3Modal} from '../../web3/hooks/useWeb3Modal';
 
-type SignAndSendData = {
+type SignAndSendData<T extends ProposalOrDraftSnapshotType> = {
   partialProposalData: PrepareAndSignProposalDataParam;
   adapterAddress?: string;
   adapterName?: ContractAdapterNames;
-  type: SnapshotType;
+  type: T;
 };
 
 type PrepareAndSignProposalDataParam = {
@@ -48,17 +51,17 @@ type PrepareAndSignProposalDataParam = {
   timestamp?: SnapshotProposalData['timestamp'];
 };
 
-type UseSignAndSubmitProposalReturn = {
+type UseSignAndSubmitProposalReturn<T extends ProposalOrDraftSnapshotType> = {
   signAndSendProposal: (
-    d: SignAndSendData
-  ) => Promise<SignAndSendProposalReturn>;
-  proposalData: SignAndSendProposalReturn | undefined;
+    d: SignAndSendData<T>
+  ) => Promise<SignAndSendProposalReturn<T>>;
+  proposalData: SignAndSendProposalReturn<T> | undefined;
   proposalSignAndSendError: Error | undefined;
   proposalSignAndSendStatus: Web3TxStatus;
 };
 
-type SignAndSendProposalReturn = {
-  data: SnapshotDraftData;
+type SignAndSendProposalReturn<T extends ProposalOrDraftSnapshotType> = {
+  data: ProposalOrDraftSignDataFromType<T>;
   signature: string;
   uniqueId: SnapshotSubmitBaseReturn['uniqueId'];
   uniqueIdDraft: SnapshotSubmitProposalReturn['uniqueIdDraft'];
@@ -72,7 +75,9 @@ type SignAndSendProposalReturn = {
  *
  * @returns {Promise<UseSignAndSubmitProposalReturn>} An object with the proposal data and the ERC712 signature string.
  */
-export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
+export function useSignAndSubmitProposal<
+  T extends ProposalOrDraftSnapshotType
+>(): UseSignAndSubmitProposalReturn<T> {
   /**
    * Selectors
    */
@@ -95,7 +100,9 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
    * State
    */
 
-  const [proposalData, setProposalData] = useState<SignAndSendProposalReturn>();
+  const [proposalData, setProposalData] = useState<
+    SignAndSendProposalReturn<T>
+  >();
   const [
     proposalSignAndSendError,
     setProposalSignAndSendError,
@@ -154,7 +161,7 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
     adapterAddress,
     adapterName,
     type,
-  }: SignAndSendData): Promise<SignAndSendProposalReturn> {
+  }: SignAndSendData<T>): Promise<SignAndSendProposalReturn<T>> {
     try {
       if (!account) {
         throw new Error('No account was found to send.');
@@ -172,7 +179,7 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
         throw new Error('No "SNAPSHOT_HUB_API_URL" was found.');
       }
 
-      if (type === SnapshotType.vote) {
+      if (type !== SnapshotType.draft && type !== SnapshotType.proposal) {
         throw new Error('Handling for type "vote" is not implemented.');
       }
 
@@ -200,13 +207,12 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
       };
 
       // 1. Check proposal type and prepare appropriate message
-      const message =
-        type === 'draft'
-          ? await buildDraftMessage(commonData, SNAPSHOT_HUB_API_URL)
-          : await buildProposalMessageHelper({
-              ...commonData,
-              timestamp,
-            });
+      const message = (type === 'draft'
+        ? await buildDraftMessage(commonData, SNAPSHOT_HUB_API_URL)
+        : await buildProposalMessageHelper({
+            ...commonData,
+            timestamp,
+          })) as ProposalOrDraftSignDataFromType<T>;
 
       const {domain, types} = getDomainDefinition(
         message,
@@ -237,20 +243,17 @@ export function useSignAndSubmitProposal(): UseSignAndSubmitProposalReturn {
         signature
       );
 
-      setProposalSignAndSendStatus(Web3TxStatus.FULFILLED);
-      setProposalData({
-        data: message,
-        signature,
-        uniqueId: data.uniqueId,
-        uniqueIdDraft: data.uniqueIdDraft || '',
-      });
-
-      return {
+      const dataToReturn = {
         data: message,
         signature,
         uniqueId: data.uniqueId,
         uniqueIdDraft: data.uniqueIdDraft || '',
       };
+
+      setProposalSignAndSendStatus(Web3TxStatus.FULFILLED);
+      setProposalData(dataToReturn);
+
+      return dataToReturn;
     } catch (error) {
       setProposalSignAndSendStatus(Web3TxStatus.REJECTED);
       setProposalSignAndSendError(error);
