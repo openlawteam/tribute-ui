@@ -2,7 +2,7 @@ import {Store} from 'redux';
 import {MemoryRouter} from 'react-router-dom';
 import {provider as Web3Provider} from 'web3-core/types';
 import {Provider} from 'react-redux';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import Web3 from 'web3';
 
 import {
@@ -27,6 +27,10 @@ export type WrapperReturnProps = {
 };
 
 type WrapperProps = {
+  /**
+   * Getter for the internal props. Useful when you do not want to use the render prop arguments.
+   */
+  getProps?: (p: WrapperReturnProps) => void;
   /**
    * Use the `<Init />` component to wrap the child component.
    */
@@ -60,10 +64,11 @@ export default function Wrapper(
   props: WrapperProps & React.PropsWithChildren<React.ReactNode>
 ) {
   const {
+    getProps,
+    mockMetaMaskRequest = false,
     useInit = false,
     useWallet = false,
     web3ModalContext,
-    mockMetaMaskRequest = false,
   } = props;
 
   /**
@@ -164,6 +169,9 @@ export default function Wrapper(
   }
 
   function renderChildren(children: React.ReactNode) {
+    // Call user callback, if provided.
+    getProps && getProps(getRenderReturnProps());
+
     const childrenToRender = props.render
       ? props.render(getRenderReturnProps())
       : children;
