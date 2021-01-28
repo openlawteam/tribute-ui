@@ -64,6 +64,9 @@ export default function ProposalDetails<T extends ProposalOrDraftSnapshotData>(
           </div>
 
           {/* VOTING PROGRESS STATUS AND BAR */}
+          {/* @todo Todo move to actions? */}
+          {/* @todo Find a better way to limit this from appearing if not yet sponsored in the DAO? */}
+          {/*   Or do we show it since it has a voting clock - reminding people they need to sponsor to DAO? */}
           {isProposalType && (
             <VotingStatus
               proposal={

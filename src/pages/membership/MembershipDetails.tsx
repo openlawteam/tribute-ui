@@ -42,12 +42,13 @@ export default function MembershipDetails() {
    * Our hooks
    */
 
+  // @todo Use dynamic `SnapshotType` depending on subgraph data for `type` arg.
   const {
     proposal,
     proposalError,
     proposalNotFound,
     proposalStatus,
-  } = useProposal(proposalHash, SnapshotType.proposal);
+  } = useProposal(proposalHash, SnapshotType.draft);
 
   /**
    * Variables

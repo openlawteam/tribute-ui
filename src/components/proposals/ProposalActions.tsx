@@ -26,7 +26,7 @@ export default function ProposalActions<T extends ProposalOrDraftSnapshotData>(
     <div className="proposaldetails__button-container">
       {/* SPONSOR BUTTON */}
       {/* @todo Show this action button if proposal still needs to be sponsored. Assumes voting starts upon sponsorship. There will probably be another data point to condition this on. */}
-      {!hasVotingStarted && <SponsorAction />}
+      {!hasVotingStarted && <SponsorAction proposal={proposal} />}
 
       {/* VOTING BUTTONS */}
       {/* @todo Show these action buttons if proposal has been sponsored. Assumes voting starts upon sponsorship. There will probably be another data point to condition this on. */}
