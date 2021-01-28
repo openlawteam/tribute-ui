@@ -91,7 +91,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
           timestamp: now,
           token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
           type: 'draft',
-          verifyingContract: '0xBC58f21e92f39d958CAF792706bb1ECadfABE4AB',
+          verifyingContract: '0xB07b42d3E1Ad056AbE2606cc0fFb7d8c6a9CFE9f',
           version: '0.1.2',
         },
         signature:
@@ -179,26 +179,41 @@ describe('useSignAndSubmitProposal unit tests', () => {
 
       await waitForNextUpdate();
 
+      // @note Set the timestamp by hand as dates will always be different
+      const now = Math.floor(Date.now() / 1000);
+      const proposalDataUpdated = {
+        ...result.current.proposalData,
+        data: {
+          ...result.current.proposalData?.data,
+          timestamp: now.toString(),
+          payload: {
+            ...result.current.proposalData?.data.payload,
+            start: now + 60,
+            end: now + 180,
+          },
+        },
+      };
+
       // assert pending state
       expect(result.current.signAndSendProposal).toBeInstanceOf(Function);
-      expect(result.current.proposalData).toStrictEqual({
+      expect(proposalDataUpdated).toStrictEqual({
         data: {
           payload: {
             body: 'Test Body',
             choices: ['Yes', 'No'],
             metadata: {},
             name: 'Test Name',
-            end: 1610981290,
-            start: 1610981167,
+            end: now + 180,
+            start: now + 60,
             snapshot: 123,
           },
           actionId: '0x0000000000000000000000000000000000000000',
           chainId: 1337,
           space: 'thelao',
-          timestamp: '1610981167',
+          timestamp: now.toString(),
           token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
           type: 'proposal',
-          verifyingContract: '0xBC58f21e92f39d958CAF792706bb1ECadfABE4AB',
+          verifyingContract: '0xB07b42d3E1Ad056AbE2606cc0fFb7d8c6a9CFE9f',
           version: '0.1.2',
         },
         uniqueId: '1234567jkl',
@@ -263,7 +278,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
         timestamp: now,
         token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
         type: 'draft',
-        verifyingContract: '0xBC58f21e92f39d958CAF792706bb1ECadfABE4AB',
+        verifyingContract: '0xB07b42d3E1Ad056AbE2606cc0fFb7d8c6a9CFE9f',
         version: '0.1.2',
       });
       expect(signature).toBe(
@@ -317,23 +332,35 @@ describe('useSignAndSubmitProposal unit tests', () => {
         type: SnapshotType.proposal,
       });
 
-      expect(data).toStrictEqual({
+      // @note Set the timestamp by hand as dates will always be different
+      const now = Math.floor(Date.now() / 1000);
+      const dataUpdated = {
+        ...data,
+        timestamp: now.toString(),
+        payload: {
+          ...data.payload,
+          start: now + 60,
+          end: now + 180,
+        },
+      };
+
+      expect(dataUpdated).toStrictEqual({
         payload: {
           body: 'Test Body',
           choices: ['Yes', 'No'],
           metadata: {},
           name: 'Test Name',
-          end: 1610981290,
-          start: 1610981167,
+          end: now + 180,
+          start: now + 60,
           snapshot: 123,
         },
         actionId: '0x0000000000000000000000000000000000000000',
         chainId: 1337,
         space: 'thelao',
-        timestamp: '1610981167',
+        timestamp: now.toString(),
         token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
         type: 'proposal',
-        verifyingContract: '0xBC58f21e92f39d958CAF792706bb1ECadfABE4AB',
+        verifyingContract: '0xB07b42d3E1Ad056AbE2606cc0fFb7d8c6a9CFE9f',
         version: '0.1.2',
       });
       expect(signature).toBe(
