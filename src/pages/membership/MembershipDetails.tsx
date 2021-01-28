@@ -4,7 +4,7 @@ import {useHistory, useParams} from 'react-router-dom';
 import {AsyncStatus} from '../../util/types';
 import {combineProposals} from '../../components/proposals/helpers';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
-import {useProposal} from '../../components/proposals/hooks';
+import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
@@ -48,7 +48,7 @@ export default function MembershipDetails() {
     proposalError,
     proposalNotFound,
     proposalStatus,
-  } = useProposal(proposalHash, SnapshotType.draft);
+  } = useProposalOrDraft(proposalHash, SnapshotType.draft);
 
   /**
    * Variables

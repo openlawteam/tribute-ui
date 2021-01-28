@@ -9,12 +9,14 @@ import {
 import {AsyncStatus} from '../../../util/types';
 import {rest, server} from '../../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../../config';
-import {useProposal} from '.';
+import {useProposalOrDraft} from '.';
 
-describe('useProposal unit tests', () => {
+describe('useProposalOrDraft unit tests', () => {
   test('no type: should return correct data when searching', async () => {
     await act(async () => {
-      const {result} = await renderHook(() => useProposal('abc123def456'));
+      const {result} = await renderHook(() =>
+        useProposalOrDraft('abc123def456')
+      );
 
       await waitFor(() => {
         // Assert initial state
@@ -53,7 +55,9 @@ describe('useProposal unit tests', () => {
     );
 
     await act(async () => {
-      const {result} = await renderHook(() => useProposal('abc123def456'));
+      const {result} = await renderHook(() =>
+        useProposalOrDraft('abc123def456')
+      );
 
       await waitFor(() => {
         // Assert initial state
@@ -90,7 +94,9 @@ describe('useProposal unit tests', () => {
     );
 
     await act(async () => {
-      const {result} = await renderHook(() => useProposal('abc123def456'));
+      const {result} = await renderHook(() =>
+        useProposalOrDraft('abc123def456')
+      );
 
       await waitFor(() => {
         // Assert initial state
@@ -125,7 +131,9 @@ describe('useProposal unit tests', () => {
     );
 
     await act(async () => {
-      const {result} = await renderHook(() => useProposal('abc123def456'));
+      const {result} = await renderHook(() =>
+        useProposalOrDraft('abc123def456')
+      );
 
       await waitFor(() => {
         // Assert initial state
@@ -162,7 +170,9 @@ describe('useProposal unit tests', () => {
     );
 
     await act(async () => {
-      const {result} = await renderHook(() => useProposal('abc123def456'));
+      const {result} = await renderHook(() =>
+        useProposalOrDraft('abc123def456')
+      );
 
       await waitFor(() => {
         // Assert initial state
@@ -189,7 +199,7 @@ describe('useProposal unit tests', () => {
   test('draft: should return correct data when searching', async () => {
     await act(async () => {
       const {result} = await renderHook(() =>
-        useProposal('abc123def456', SnapshotType.draft)
+        useProposalOrDraft('abc123def456', SnapshotType.draft)
       );
 
       await waitFor(() => {
@@ -224,7 +234,7 @@ describe('useProposal unit tests', () => {
 
     await act(async () => {
       const {result} = await renderHook(() =>
-        useProposal('abc123def456', SnapshotType.draft)
+        useProposalOrDraft('abc123def456', SnapshotType.draft)
       );
 
       await waitFor(() => {
@@ -257,7 +267,7 @@ describe('useProposal unit tests', () => {
 
     await act(async () => {
       const {result} = await renderHook(() =>
-        useProposal('abc123def456', SnapshotType.draft)
+        useProposalOrDraft('abc123def456', SnapshotType.draft)
       );
 
       await waitFor(() => {
@@ -285,7 +295,7 @@ describe('useProposal unit tests', () => {
   test('proposal: should return correct data when searching', async () => {
     await act(async () => {
       const {result} = await renderHook(() =>
-        useProposal('abc123def456', SnapshotType.proposal)
+        useProposalOrDraft('abc123def456', SnapshotType.proposal)
       );
 
       await waitFor(() => {
@@ -322,7 +332,7 @@ describe('useProposal unit tests', () => {
 
     await act(async () => {
       const {result} = await renderHook(() =>
-        useProposal('abc123def456', SnapshotType.proposal)
+        useProposalOrDraft('abc123def456', SnapshotType.proposal)
       );
 
       await waitFor(() => {
@@ -355,7 +365,7 @@ describe('useProposal unit tests', () => {
 
     await act(async () => {
       const {result} = await renderHook(() =>
-        useProposal('abc123def456', SnapshotType.proposal)
+        useProposalOrDraft('abc123def456', SnapshotType.proposal)
       );
 
       await waitFor(() => {

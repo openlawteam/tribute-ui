@@ -22,7 +22,7 @@ const ERROR_PROPOSAL: string =
 const ERROR_PROPOSAL_NOT_FOUND: string = 'Proposal was not found.';
 
 /**
- * useProposal
+ * useProposalOrDraft
  *
  * Ahook which fetches a snapshot-hub `proposal` or `draft` type by an ID string.
  *
@@ -33,7 +33,7 @@ const ERROR_PROPOSAL_NOT_FOUND: string = 'Proposal was not found.';
  * @param {SnapshotType?} type An optional snapshot-hub `type` to search by.
  * @returns {UseProposalReturn}
  */
-export function useProposal<T extends ProposalOrDraftSnapshotType>(
+export function useProposalOrDraft<T extends ProposalOrDraftSnapshotType>(
   id: string,
   /**
    * @todo Remove optional once subgraph is implemented and we can determine
