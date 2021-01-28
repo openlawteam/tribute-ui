@@ -23,6 +23,7 @@ import {isEthAddressValid} from '../../util/validation';
 import {MetaMaskRPCError} from '../../util/types';
 import {SHARES_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
+import {useHistory} from 'react-router-dom';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import CycleMessage from '../../components/feedback/CycleMessage';
@@ -96,7 +97,7 @@ export default function CreateMembershipProposal() {
     mode: 'onBlur',
     reValidateMode: 'onChange',
   });
-  // const history = useHistory();
+  const history = useHistory();
 
   /**
    * State
@@ -244,20 +245,15 @@ export default function CreateMembershipProposal() {
       };
 
       // Execute contract call for `onboard`
-      const receipt = await txSend(
+      await txSend(
         'onboard',
         OnboardingContract.instance.methods,
         onboardArguments,
         txArguments
       );
 
-      console.log('receipt', receipt);
-
-      // @todo Figure out what's needed after transaction is successful
-      // to go to newly created member proposal details page.
-
       // go to MemberDetails page for newly created member proposal
-      // history.push(`/membership/${proposalHash}`);
+      history.push(`/membership/${proposalId}`);
     } catch (error) {
       // Set any errors from Web3 utils or explicitly set above.
       setSubmitError(error);
