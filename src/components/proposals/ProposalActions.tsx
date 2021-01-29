@@ -1,22 +1,23 @@
-import {ProposalOrDraftSnapshotData, ProposalCombined} from './types';
+import React from 'react';
+
+import {ProposalData} from './types';
 import {useVotingStartEnd} from './hooks/useVotingStartEnd';
 import SponsorAction from './SponsorAction';
 import VotingAction from './VotingAction';
+import VotingStatus from './VotingStatus';
 
-type ProposalActionsProps<T extends ProposalOrDraftSnapshotData> = {
-  proposal: ProposalCombined<T>;
+type ProposalActionsProps = {
+  proposal: ProposalData;
 };
 
-export default function ProposalActions<T extends ProposalOrDraftSnapshotData>(
-  props: ProposalActionsProps<T>
-) {
+export default function ProposalActions(props: ProposalActionsProps) {
   const {proposal} = props;
 
   /**
    * Our hooks
    */
 
-  const {hasVotingStarted} = useVotingStartEnd(proposal);
+  const {hasVotingStarted, hasVotingEnded} = useVotingStartEnd(proposal);
 
   /**
    * Render
@@ -25,12 +26,16 @@ export default function ProposalActions<T extends ProposalOrDraftSnapshotData>(
   return (
     <div className="proposaldetails__button-container">
       {/* SPONSOR BUTTON */}
-      {/* @todo Show this action button if proposal still needs to be sponsored. Assumes voting starts upon sponsorship. There will probably be another data point to condition this on. */}
       {!hasVotingStarted && <SponsorAction proposal={proposal} />}
 
-      {/* VOTING BUTTONS */}
-      {/* @todo Show these action buttons if proposal has been sponsored. Assumes voting starts upon sponsorship. There will probably be another data point to condition this on. */}
-      {hasVotingStarted && <VotingAction />}
+      {hasVotingStarted && (
+        <>
+          {/* VOTING PROGRESS STATUS AND BAR */}
+          <VotingStatus proposal={proposal} />
+          {/* VOTING ACTIONS */}
+          {!hasVotingEnded && <VotingAction />}
+        </>
+      )}
     </div>
   );
 }
