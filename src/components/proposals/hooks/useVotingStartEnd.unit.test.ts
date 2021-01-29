@@ -5,7 +5,7 @@ import {
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
 
-import {ProposalCombined} from '../types';
+import {ProposalData} from '../types';
 import {useVotingStartEnd} from '.';
 
 describe('useVotingStartEnd unit tests', () => {
@@ -20,7 +20,7 @@ describe('useVotingStartEnd unit tests', () => {
             type: SnapshotType.proposal,
           },
         },
-      } as ProposalCombined<SnapshotProposalResponseData>)
+      } as ProposalData)
     );
 
     // Assert initial state
@@ -51,7 +51,7 @@ describe('useVotingStartEnd unit tests', () => {
             type: SnapshotType.proposal,
           },
         },
-      } as ProposalCombined<SnapshotProposalResponseData>)
+      } as ProposalData)
     );
 
     // Assert initial state
@@ -71,11 +71,11 @@ describe('useVotingStartEnd unit tests', () => {
       useVotingStartEnd({
         snapshotProposal: {
           msg: {
-            payload: {start: nowSeconds, end: nowSeconds - 1},
+            payload: {start: nowSeconds - 180, end: nowSeconds - 1},
             type: SnapshotType.proposal,
           },
         },
-      } as ProposalCombined<SnapshotProposalResponseData>)
+      } as ProposalData)
     );
 
     // Assert initial state
@@ -85,24 +85,19 @@ describe('useVotingStartEnd unit tests', () => {
     await waitForNextUpdate();
 
     expect(result.current.hasVotingStarted).toBe(true);
-    expect(result.current.hasVotingEnded).toBe(false);
-
-    await waitForNextUpdate();
-
-    expect(result.current.hasVotingStarted).toBe(true);
     expect(result.current.hasVotingEnded).toBe(true);
   });
 
-  test('should provide "false" if proposal is a draft', async () => {
+  test('should provide "false" if proposal is a draft / snapshotProposal does not exist', async () => {
     const {result} = await renderHook(() =>
       useVotingStartEnd({
-        snapshotProposal: {
+        snapshotDraft: {
           msg: {
             payload: {},
             type: SnapshotType.draft,
           },
         },
-      } as ProposalCombined<SnapshotDraftResponseData>)
+      } as ProposalData)
     );
 
     // Assert initial state
