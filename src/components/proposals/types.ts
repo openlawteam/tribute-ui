@@ -9,9 +9,41 @@ import {
 // @todo Change the type to be precise
 export type SubgraphProposal = Record<string, any>;
 
-export type ProposalCombined<T extends ProposalOrDraftSnapshotData> = {
-  snapshotProposal: T;
-  subgraphProposal: SubgraphProposal;
+/**
+ * We augment the response data to add a few helpful data pieces.
+ */
+export type SnapshotDraft = {
+  /**
+   * The ID used to reference the DAO.
+   */
+  idInDAO: string;
+} & SnapshotDraftResponseData;
+
+/**
+ * We augment the response data to add a few helpful data pieces.
+ */
+export type SnapshotProposal = {
+  /**
+   * The ID used to reference the DAO.
+   */
+  idInDAO: string;
+} & SnapshotProposalResponseData;
+
+/**
+ * Common data shared between a Snapshot Drafts and Proposals.
+ * Helpful when we need to display information which is accessible on both.
+ */
+export type SnapshotProposalCommon = SnapshotDraft | SnapshotProposal;
+
+export type ProposalData = {
+  daoProposal: SubgraphProposal | undefined;
+  /**
+   * Data for either a Draft or Proposal which is shared between the two types.
+   */
+  getCommonSnapshotProposalData: () => SnapshotProposalCommon | undefined;
+  snapshotDraft: SnapshotDraft | undefined;
+  snapshotProposal: SnapshotProposal | undefined;
+  snapshotType: ProposalOrDraftSnapshotType | undefined;
 };
 
 /**
@@ -23,27 +55,15 @@ export type ProposalOrDraftSnapshotData =
   | SnapshotDraftResponseData
   | SnapshotProposalResponseData;
 
-export type ProposalOrDraft<
-  T extends ProposalOrDraftSnapshotData
-> = T extends SnapshotProposalResponseData
-  ? SnapshotProposalResponseData
-  : SnapshotDraftResponseData;
+export type ProposalOrDraftSnapshotType =
+  | SnapshotType.proposal
+  | SnapshotType.draft;
 
 /**
  * A conditional helper type for determining which data shape to use based on the `ProposalOrDraftSnapshotType`.
  *
  * @link https://www.typescriptlang.org/docs/handbook/2/conditional-types.html
  */
-export type ProposalOrDraftSnapshotType =
-  | SnapshotType.proposal
-  | SnapshotType.draft;
-
-export type ProposalOrDraftFromType<
-  T extends ProposalOrDraftSnapshotType
-> = T extends SnapshotType.proposal
-  ? SnapshotProposalResponseData
-  : SnapshotDraftResponseData;
-
 export type ProposalOrDraftSignDataFromType<
   T extends ProposalOrDraftSnapshotType
 > = T extends SnapshotType.proposal ? SnapshotProposalData : SnapshotDraftData;
