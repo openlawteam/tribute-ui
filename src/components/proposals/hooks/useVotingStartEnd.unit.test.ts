@@ -1,9 +1,5 @@
 import {renderHook} from '@testing-library/react-hooks';
-import {
-  SnapshotDraftResponseData,
-  SnapshotProposalResponseData,
-  SnapshotType,
-} from '@openlaw/snapshot-js-erc712';
+import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 
 import {ProposalData} from '../types';
 import {useVotingStartEnd} from '.';
