@@ -461,4 +461,61 @@ describe('useProposalOrDraft unit tests', () => {
       });
     });
   });
+
+  test('can refetch', async () => {
+    await act(async () => {
+      server.use(
+        ...[
+          rest.get(
+            `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposal/:id`,
+            async (_req, res, ctx) => res(ctx.status(500))
+          ),
+          rest.get(
+            `${SNAPSHOT_HUB_API_URL}/api/:spaceName/draft/:id`,
+            async (_req, res, ctx) => res(ctx.json(snapshotAPIDraftResponse))
+          ),
+        ]
+      );
+
+      const {result, waitForNextUpdate} = await renderHook(() =>
+        useProposalOrDraft('abc123def456')
+      );
+
+      const draftIdKey = Object.keys(snapshotAPIDraftResponse)[0];
+      const draft = snapshotAPIDraftResponse[draftIdKey];
+
+      const proposal =
+        snapshotAPIProposalResponse[
+          Object.keys(snapshotAPIProposalResponse)[0]
+        ];
+
+      await waitFor(() => {
+        expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
+      });
+
+      expect(result.current.proposalData?.snapshotDraft).toStrictEqual({
+        ...draft,
+        idInDAO: draftIdKey,
+      });
+
+      server.use(
+        ...[
+          rest.get(
+            `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposal/:id`,
+            async (_req, res, ctx) => res(ctx.json(snapshotAPIProposalResponse))
+          ),
+        ]
+      );
+
+      // Request refetch
+      result.current.proposalData?.refetchProposalOrDraft();
+
+      await waitForNextUpdate();
+
+      expect(result.current.proposalData?.snapshotProposal).toStrictEqual({
+        ...proposal,
+        idInDAO: proposal.data.erc712DraftHash,
+      });
+    });
+  });
 });
