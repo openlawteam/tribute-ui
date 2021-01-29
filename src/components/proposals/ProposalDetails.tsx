@@ -1,44 +1,36 @@
-import {
-  SnapshotProposalResponseData,
-  SnapshotType,
-} from '@openlaw/snapshot-js-erc712';
-
-import {ProposalCombined, ProposalOrDraftSnapshotData} from './types';
+import {ProposalData} from './types';
 import {truncateEthAddress} from '../../util/helpers';
 import ProposalAmount from './ProposalAmount';
-import VotingStatus from './VotingStatus';
 
-type RenderActionsArgs<T extends ProposalOrDraftSnapshotData> = {
-  proposal: ProposalCombined<T>;
+type RenderActionsArgs = {
+  proposal: ProposalData;
 };
 
-type ProposalDetailsProps<T extends ProposalOrDraftSnapshotData> = {
-  proposal: ProposalCombined<T>;
+type ProposalDetailsProps = {
+  proposal: ProposalData;
   /**
    * A render prop to render any action button flows for a proposal.
    */
-  renderActions: (p: RenderActionsArgs<T>) => React.ReactNode;
+  renderActions: (p: RenderActionsArgs) => React.ReactNode;
   /**
    * Option to change the visibility of the ETH amount. Defaults to `true`.
    */
   showAmountBadge?: boolean;
 };
 
-export default function ProposalDetails<T extends ProposalOrDraftSnapshotData>(
-  props: ProposalDetailsProps<T>
-) {
+export default function ProposalDetails(props: ProposalDetailsProps) {
   const {proposal, renderActions, showAmountBadge = true} = props;
 
-  /**
-   * Variables
-   */
-
-  const isProposalType: boolean =
-    proposal.snapshotProposal.msg.type === SnapshotType.proposal;
+  const {daoProposal} = proposal;
+  const commonData = proposal.getCommonSnapshotProposalData();
 
   /**
    * Render
    */
+
+  if (!commonData) {
+    return null;
+  }
 
   return (
     <>
@@ -46,11 +38,9 @@ export default function ProposalDetails<T extends ProposalOrDraftSnapshotData>(
       <div className="proposaldetails">
         {/* PROPOSAL NAME (address) AND BODY */}
         <div className="proposaldetails__content">
-          <h3>
-            {truncateEthAddress(proposal.snapshotProposal.msg.payload.name, 7)}
-          </h3>
+          <h3>{truncateEthAddress(commonData.msg.payload.name || '', 7)}</h3>
 
-          <p>{proposal.snapshotProposal.msg.payload.body}</p>
+          <p>{commonData.msg.payload.body}</p>
         </div>
 
         {/* SIDEBAR */}
@@ -58,22 +48,8 @@ export default function ProposalDetails<T extends ProposalOrDraftSnapshotData>(
           {/* ETH AMOUNT FOR TRANSER AND TRIBUTE PROPOSALS */}
           <div className="proposaldetails__amount">
             {/* @todo use value from proposal.subgraphproposal.amount, or do not show if no `.amount` key */}
-            {showAmountBadge && (
-              /* proposal.subgraphProposal.amount */ <ProposalAmount amount="100000000000000000000" />
-            )}
+            {showAmountBadge && <ProposalAmount amount={daoProposal?.amount} />}
           </div>
-
-          {/* VOTING PROGRESS STATUS AND BAR */}
-          {/* @todo Todo move to actions? */}
-          {/* @todo Find a better way to limit this from appearing if not yet sponsored in the DAO? */}
-          {/*   Or do we show it since it has a voting clock - reminding people they need to sponsor to DAO? */}
-          {isProposalType && (
-            <VotingStatus
-              proposal={
-                proposal as ProposalCombined<SnapshotProposalResponseData>
-              }
-            />
-          )}
 
           {/* SPONSOR & VOTING ACTIONS */}
           {renderActions({proposal})}
