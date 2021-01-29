@@ -1,9 +1,8 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {useSelector} from 'react-redux';
-import {useForm} from 'react-hook-form';
-// import {useHistory} from 'react-router-dom';
-import Web3 from 'web3';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
+import {useForm} from 'react-hook-form';
+import {useSelector} from 'react-redux';
+import Web3 from 'web3';
 
 import {
   getValidationError,
@@ -16,13 +15,13 @@ import {
   useETHGasPrice,
   useIsDefaultChain,
 } from '../../components/web3/hooks';
-import {CHAINS} from '../../config';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {MetaMaskRPCError} from '../../util/types';
 import {SHARES_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
+import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 import {useHistory} from 'react-router-dom';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
@@ -32,6 +31,7 @@ import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
 import Wrap from '../../components/common/Wrap';
+import EtherscanURL from '../../components/web3/EtherscanURL';
 
 enum Fields {
   ethAddress = 'ethAddress',
@@ -73,7 +73,7 @@ export default function CreateMembershipProposal() {
    */
 
   const {defaultChainError} = useIsDefaultChain();
-  const {connected, account, networkId, web3Instance} = useWeb3Modal();
+  const {connected, account, web3Instance} = useWeb3Modal();
   const gasPrices = useETHGasPrice();
   const {
     txError,
@@ -124,7 +124,6 @@ export default function CreateMembershipProposal() {
 
   const createMemberError = submitError || txError;
   const isConnected = connected && account;
-  const isChainGanache = networkId === CHAINS.GANACHE;
 
   /**
    * @note From the docs: "Read the formState before render to subscribe the form state through Proxy"
@@ -183,7 +182,6 @@ export default function CreateMembershipProposal() {
     }
   }
 
-  // @todo Need to hook this to smart contract and snapshot.
   async function handleSubmit(values: FormInputs) {
     try {
       if (!isConnected) {
@@ -260,57 +258,42 @@ export default function CreateMembershipProposal() {
     }
   }
 
-  function renderSubmitStatus() {
+  function renderSubmitStatus(): React.ReactNode {
+    // Either Snapshot or chain tx
+    if (
+      txStatus === Web3TxStatus.AWAITING_CONFIRM ||
+      proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM
+    ) {
+      return 'Awaiting your confirmation\u2026';
+    }
+
+    // Only for chain tx
     switch (txStatus) {
-      case Web3TxStatus.AWAITING_CONFIRM:
-        return 'Awaiting your confirmation\u2026';
       case Web3TxStatus.PENDING:
         return (
           <>
             <CycleMessage
               intervalMs={2000}
-              messages={[
-                'Submitting\u2026',
-                'Working\u2026',
-                'DAOing\u2026',
-                'Getting closer\u2026',
-                'Dreaming of ETH\u2026',
-              ]}
+              messages={TX_CYCLE_MESSAGES}
               useFirstItemStart
               render={(message) => {
                 return <FadeIn key={message}>{message}</FadeIn>;
               }}
             />
-            {!isChainGanache && (
-              <small>
-                <a
-                  href={txEtherscanURL}
-                  rel="noopener noreferrer"
-                  target="_blank">
-                  view progress
-                </a>
-              </small>
-            )}
+
+            <EtherscanURL url={txEtherscanURL} isPending />
           </>
         );
       case Web3TxStatus.FULFILLED:
         return (
           <>
             <div>Proposal submitted!</div>
-            {!isChainGanache && (
-              <small>
-                <a
-                  href={txEtherscanURL}
-                  rel="noopener noreferrer"
-                  target="_blank">
-                  view transaction
-                </a>
-              </small>
-            )}
+
+            <EtherscanURL url={txEtherscanURL} />
           </>
         );
       default:
-        return;
+        return null;
     }
   }
 
