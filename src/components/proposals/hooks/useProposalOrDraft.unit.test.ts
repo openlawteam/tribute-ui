@@ -18,9 +18,14 @@ describe('useProposalOrDraft unit tests', () => {
         useProposalOrDraft('abc123def456')
       );
 
+      const proposal =
+        snapshotAPIProposalResponse[
+          Object.keys(snapshotAPIProposalResponse)[0]
+        ];
+
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
@@ -28,11 +33,10 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toStrictEqual(
-          snapshotAPIProposalResponse[
-            Object.keys(snapshotAPIProposalResponse)[0]
-          ]
-        );
+        expect(result.current.proposalData?.snapshotProposal).toStrictEqual({
+          ...proposal,
+          idInDAO: proposal.data.erc712DraftHash,
+        });
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
@@ -59,9 +63,12 @@ describe('useProposalOrDraft unit tests', () => {
         useProposalOrDraft('abc123def456')
       );
 
+      const draftIdkey = Object.keys(snapshotAPIDraftResponse)[0];
+      const draft = snapshotAPIDraftResponse[draftIdkey];
+
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData?.snapshotDraft).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
@@ -69,9 +76,10 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toStrictEqual(
-          snapshotAPIDraftResponse[Object.keys(snapshotAPIDraftResponse)[0]]
-        );
+        expect(result.current.proposalData?.snapshotDraft).toStrictEqual({
+          ...draft,
+          idInDAO: draftIdkey,
+        });
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
@@ -100,7 +108,8 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData?.snapshotDraft).toBe(undefined);
+        expect(result.current.proposalData?.snapshotProposal).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
@@ -108,11 +117,16 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData?.snapshotDraft).toBe(undefined);
+        expect(result.current.proposalData?.snapshotProposal).toBe(undefined);
         expect(result.current.proposalError).toBeInstanceOf(Error);
         expect(result.current.proposalStatus).toBe(AsyncStatus.REJECTED);
         expect(result.current.proposalNotFound).toBe(true);
       });
+
+      const data = result.current.proposalData?.getCommonSnapshotProposalData();
+
+      expect(data).toBe(undefined);
     });
   });
 
@@ -135,9 +149,12 @@ describe('useProposalOrDraft unit tests', () => {
         useProposalOrDraft('abc123def456')
       );
 
+      const draftIdkey = Object.keys(snapshotAPIDraftResponse)[0];
+      const draft = snapshotAPIDraftResponse[draftIdkey];
+
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData?.snapshotDraft).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
@@ -145,9 +162,10 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toStrictEqual(
-          snapshotAPIDraftResponse[Object.keys(snapshotAPIDraftResponse)[0]]
-        );
+        expect(result.current.proposalData?.snapshotDraft).toStrictEqual({
+          ...draft,
+          idInDAO: draftIdkey,
+        });
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
@@ -176,7 +194,7 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
@@ -184,11 +202,15 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBeInstanceOf(Error);
         expect(result.current.proposalStatus).toBe(AsyncStatus.REJECTED);
         expect(result.current.proposalNotFound).toBe(false);
       });
+
+      const data = result.current.proposalData?.getCommonSnapshotProposalData();
+
+      expect(data).toBe(undefined);
     });
   });
 
@@ -202,9 +224,12 @@ describe('useProposalOrDraft unit tests', () => {
         useProposalOrDraft('abc123def456', SnapshotType.draft)
       );
 
+      const draftIdkey = Object.keys(snapshotAPIDraftResponse)[0];
+      const draft = snapshotAPIDraftResponse[draftIdkey];
+
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData?.snapshotDraft).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
@@ -212,9 +237,10 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toStrictEqual(
-          snapshotAPIDraftResponse[Object.keys(snapshotAPIDraftResponse)[0]]
-        );
+        expect(result.current.proposalData?.snapshotDraft).toStrictEqual({
+          ...draft,
+          idInDAO: draftIdkey,
+        });
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
@@ -239,7 +265,7 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
@@ -247,7 +273,7 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBeInstanceOf(Error);
         expect(result.current.proposalStatus).toBe(AsyncStatus.REJECTED);
         expect(result.current.proposalNotFound).toBe(true);
@@ -272,7 +298,7 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
@@ -280,10 +306,32 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBeInstanceOf(Error);
         expect(result.current.proposalStatus).toBe(AsyncStatus.REJECTED);
         expect(result.current.proposalNotFound).toBe(false);
+      });
+    });
+  });
+
+  test('draft: getCommonSnapshotProposalData should return correct data when called', async () => {
+    await act(async () => {
+      const {result} = await renderHook(() =>
+        useProposalOrDraft('abc123def456', SnapshotType.draft)
+      );
+
+      const draftIdkey = Object.keys(snapshotAPIDraftResponse)[0];
+      const draft = snapshotAPIDraftResponse[draftIdkey];
+
+      await waitFor(() => {
+        expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
+      });
+
+      const data = result.current.proposalData?.getCommonSnapshotProposalData();
+
+      expect(data).toStrictEqual({
+        ...draft,
+        idInDAO: draftIdkey,
       });
     });
   });
@@ -298,9 +346,14 @@ describe('useProposalOrDraft unit tests', () => {
         useProposalOrDraft('abc123def456', SnapshotType.proposal)
       );
 
+      const proposal =
+        snapshotAPIProposalResponse[
+          Object.keys(snapshotAPIProposalResponse)[0]
+        ];
+
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData?.snapshotProposal).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
@@ -308,11 +361,10 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toStrictEqual(
-          snapshotAPIProposalResponse[
-            Object.keys(snapshotAPIProposalResponse)[0]
-          ]
-        );
+        expect(result.current.proposalData?.snapshotProposal).toStrictEqual({
+          ...proposal,
+          idInDAO: proposal.data.erc712DraftHash,
+        });
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
@@ -337,7 +389,7 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
@@ -345,7 +397,7 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBeInstanceOf(Error);
         expect(result.current.proposalStatus).toBe(AsyncStatus.REJECTED);
         expect(result.current.proposalNotFound).toBe(true);
@@ -370,7 +422,7 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
@@ -378,10 +430,34 @@ describe('useProposalOrDraft unit tests', () => {
 
       await waitFor(() => {
         // Assert initial state
-        expect(result.current.proposal).toBe(undefined);
+        expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBeInstanceOf(Error);
         expect(result.current.proposalStatus).toBe(AsyncStatus.REJECTED);
         expect(result.current.proposalNotFound).toBe(false);
+      });
+    });
+  });
+
+  test('proposal: getCommonSnapshotProposalData should return correct data when called', async () => {
+    await act(async () => {
+      const {result} = await renderHook(() =>
+        useProposalOrDraft('abc123def456', SnapshotType.proposal)
+      );
+
+      const proposal =
+        snapshotAPIProposalResponse[
+          Object.keys(snapshotAPIProposalResponse)[0]
+        ];
+
+      await waitFor(() => {
+        expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
+      });
+
+      const data = result.current.proposalData?.getCommonSnapshotProposalData();
+
+      expect(data).toStrictEqual({
+        ...proposal,
+        idInDAO: proposal.data.erc712DraftHash,
       });
     });
   });
