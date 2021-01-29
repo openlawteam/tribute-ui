@@ -15,22 +15,24 @@ export default function ErrorMessageWithDetails(
 
   return error ? (
     <FadeIn>
-      <p className="error-message">
-        {typeof renderText === 'string' ? renderText : renderText()}
-      </p>
+      <div className="text-center">
+        <p className="error-message">
+          {typeof renderText === 'string' ? renderText : renderText()}
+        </p>
 
-      {error && (
-        <details {...props.detailsProps}>
-          <summary
-            className="error-message"
-            style={{cursor: 'pointer', outline: 'none'}}>
-            <small>Details</small>
-          </summary>
-          <p className="error-message">
-            <small>{error.message}</small>
-          </p>
-        </details>
-      )}
+        {error && (
+          <details {...props.detailsProps}>
+            <summary
+              className="error-message"
+              style={{cursor: 'pointer', outline: 'none'}}>
+              <small>Details</small>
+            </summary>
+            <p className="error-message">
+              <small>{error.message}</small>
+            </p>
+          </details>
+        )}
+      </div>
     </FadeIn>
   ) : null;
 }
