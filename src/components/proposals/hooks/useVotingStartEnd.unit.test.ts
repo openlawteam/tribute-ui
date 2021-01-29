@@ -1,9 +1,9 @@
 import {renderHook} from '@testing-library/react-hooks';
+import {waitFor} from '@testing-library/react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 
 import {ProposalData} from '../types';
 import {useVotingStartEnd} from '.';
-import {waitFor} from '@testing-library/react';
 
 describe('useVotingStartEnd unit tests', () => {
   test('hook returns correct data throughout the voting period', async () => {
@@ -13,7 +13,7 @@ describe('useVotingStartEnd unit tests', () => {
       useVotingStartEnd({
         snapshotProposal: {
           msg: {
-            payload: {start: nowSeconds + 1, end: nowSeconds + 3},
+            payload: {start: nowSeconds, end: nowSeconds + 2},
             type: SnapshotType.proposal,
           },
         },
@@ -21,18 +21,21 @@ describe('useVotingStartEnd unit tests', () => {
     );
 
     // Assert initial state
+    expect(result.current.votingStartEndInitReady).toBe(false);
     expect(result.current.hasVotingStarted).toBe(false);
     expect(result.current.hasVotingEnded).toBe(false);
 
     await waitForNextUpdate();
 
     // Assert initial state
+    expect(result.current.votingStartEndInitReady).toBe(true);
     expect(result.current.hasVotingStarted).toBe(true);
     expect(result.current.hasVotingEnded).toBe(false);
 
     await waitForNextUpdate();
 
     // Assert initial state
+    expect(result.current.votingStartEndInitReady).toBe(true);
     expect(result.current.hasVotingStarted).toBe(true);
     expect(result.current.hasVotingEnded).toBe(true);
   });
@@ -52,11 +55,13 @@ describe('useVotingStartEnd unit tests', () => {
     );
 
     // Assert initial state
+    expect(result.current.votingStartEndInitReady).toBe(false);
     expect(result.current.hasVotingStarted).toBe(false);
     expect(result.current.hasVotingEnded).toBe(false);
 
     await waitForNextUpdate();
 
+    expect(result.current.votingStartEndInitReady).toBe(true);
     expect(result.current.hasVotingStarted).toBe(true);
     expect(result.current.hasVotingEnded).toBe(false);
   });
@@ -76,12 +81,14 @@ describe('useVotingStartEnd unit tests', () => {
     );
 
     // Assert initial state
+    expect(result.current.votingStartEndInitReady).toBe(false);
     expect(result.current.hasVotingStarted).toBe(false);
     expect(result.current.hasVotingEnded).toBe(false);
 
     await waitForNextUpdate();
 
     await waitFor(() => {
+      expect(result.current.votingStartEndInitReady).toBe(true);
       expect(result.current.hasVotingStarted).toBe(true);
       expect(result.current.hasVotingEnded).toBe(true);
     });
@@ -100,6 +107,7 @@ describe('useVotingStartEnd unit tests', () => {
     );
 
     // Assert initial state
+    expect(result.current.votingStartEndInitReady).toBe(true);
     expect(result.current.hasVotingStarted).toBe(false);
     expect(result.current.hasVotingEnded).toBe(false);
   });

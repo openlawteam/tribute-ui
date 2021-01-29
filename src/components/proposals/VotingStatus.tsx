@@ -39,7 +39,11 @@ export default function VotingStatus({
    * Our hooks
    */
 
-  const {hasVotingStarted, hasVotingEnded} = useVotingStartEnd(proposal);
+  const {
+    hasVotingStarted,
+    hasVotingEnded,
+    votingStartEndInitReady,
+  } = useVotingStartEnd(proposal);
 
   /**
    * Functions
@@ -61,13 +65,18 @@ export default function VotingStatus({
     <>
       <div className="votingstatus-container">
         <StopwatchSVG />
+
+        {!votingStartEndInitReady && (
+          <span className="votingstatus">&hellip;</span>
+        )}
+
         {/* STATUS WHEN NOT SPONSORED */}
-        {!hasVotingStarted && (
+        {votingStartEndInitReady && !hasVotingStarted && (
           <span className="votingstatus">Pending Sponsor</span>
         )}
 
         {/* CLOCK WHILE IN VOTING */}
-        {hasVotingStarted && !hasVotingEnded && (
+        {votingStartEndInitReady && hasVotingStarted && !hasVotingEnded && (
           <ProposalPeriod
             startPeriod={new Date(votingStartSeconds * 1000)}
             endPeriod={new Date(votingEndSeconds * 1000)}

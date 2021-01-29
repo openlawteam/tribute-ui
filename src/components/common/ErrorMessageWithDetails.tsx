@@ -13,7 +13,8 @@ export default function ErrorMessageWithDetails(
 ) {
   const {error, renderText} = props;
 
-  return error ? (
+  // @note Some wallets will provide proper error codes. The `4001` is a "user rejected transaction".
+  return error && (error as any)?.code !== 4001 ? (
     <FadeIn>
       <div className="text-center">
         <p className="error-message">

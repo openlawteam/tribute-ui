@@ -31,7 +31,7 @@ type SponsorActionProps = {
 
 export default function SponsorAction(props: SponsorActionProps) {
   const {
-    proposal: {snapshotDraft},
+    proposal: {snapshotDraft, refetchProposalOrDraft},
   } = props;
 
   /**
@@ -154,6 +154,9 @@ export default function SponsorAction(props: SponsorActionProps) {
         sponsorArguments,
         txArguments
       );
+
+      // Update the proposal
+      refetchProposalOrDraft();
     } catch (error) {
       setSubmitError(error);
     }

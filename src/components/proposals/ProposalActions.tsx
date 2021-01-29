@@ -17,7 +17,11 @@ export default function ProposalActions(props: ProposalActionsProps) {
    * Our hooks
    */
 
-  const {hasVotingStarted, hasVotingEnded} = useVotingStartEnd(proposal);
+  const {
+    hasVotingStarted,
+    hasVotingEnded,
+    votingStartEndInitReady,
+  } = useVotingStartEnd(proposal);
 
   /**
    * Render
@@ -26,9 +30,11 @@ export default function ProposalActions(props: ProposalActionsProps) {
   return (
     <div className="proposaldetails__button-container">
       {/* SPONSOR BUTTON */}
-      {!hasVotingStarted && <SponsorAction proposal={proposal} />}
+      {votingStartEndInitReady && !hasVotingStarted && (
+        <SponsorAction proposal={proposal} />
+      )}
 
-      {hasVotingStarted && (
+      {votingStartEndInitReady && hasVotingStarted && (
         <>
           {/* VOTING PROGRESS STATUS AND BAR */}
           <VotingStatus proposal={proposal} />

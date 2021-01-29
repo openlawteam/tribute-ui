@@ -41,6 +41,7 @@ export type ProposalData = {
    * Data for either a Draft or Proposal which is shared between the two types.
    */
   getCommonSnapshotProposalData: () => SnapshotProposalCommon | undefined;
+  refetchProposalOrDraft: () => void;
   snapshotDraft: SnapshotDraft | undefined;
   snapshotProposal: SnapshotProposal | undefined;
   snapshotType: ProposalOrDraftSnapshotType | undefined;

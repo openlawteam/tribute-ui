@@ -2,10 +2,17 @@ import {useEffect, useState} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 
 import {ProposalData} from '../types';
+import {AsyncStatus} from '../../../util/types';
 
 type UseVotingStartEndReturn = {
   hasVotingEnded: boolean;
   hasVotingStarted: boolean;
+  /**
+   * Informs if the initial async checks have run.
+   * This helps to tame UI false-positives that can arise when
+   * using only booleans to check status.
+   */
+  votingStartEndInitReady: boolean;
 };
 
 export function useVotingStartEnd(
@@ -19,6 +26,10 @@ export function useVotingStartEnd(
 
   const [hasVotingStarted, setHasVotingStarted] = useState<boolean>(false);
   const [hasVotingEnded, setHasVotingEnded] = useState<boolean>(false);
+  const [votingStartEndStatus, setVotingStartEndStatus] = useState<{
+    start: AsyncStatus;
+    end: AsyncStatus;
+  }>({start: AsyncStatus.STANDBY, end: AsyncStatus.STANDBY});
 
   /**
    * Effects
@@ -26,13 +37,22 @@ export function useVotingStartEnd(
 
   // Actively check if voting has started
   useEffect(() => {
-    if (snapshotProposal?.msg.type !== SnapshotType.proposal) return;
+    if (
+      snapshotProposal?.msg.type !== SnapshotType.proposal ||
+      hasVotingStarted
+    ) {
+      setVotingStartEndStatus((s) => ({...s, start: AsyncStatus.FULFILLED}));
 
-    // If the value is already `true`, then exit.
-    if (hasVotingStarted) return;
+      return;
+    }
+
+    setVotingStartEndStatus((s) => ({...s, start: AsyncStatus.PENDING}));
 
     // Check if voting has started every 1 second
     const intervalID = setInterval(() => {
+      // Async process ran
+      setVotingStartEndStatus((s) => ({...s, start: AsyncStatus.FULFILLED}));
+
       const hasStartedCheck =
         Math.floor(Date.now() / 1000) > snapshotProposal.msg.payload.start;
 
@@ -52,13 +72,22 @@ export function useVotingStartEnd(
 
   // Actively check if voting has ended
   useEffect(() => {
-    if (snapshotProposal?.msg.type !== SnapshotType.proposal) return;
+    if (
+      snapshotProposal?.msg.type !== SnapshotType.proposal ||
+      hasVotingEnded
+    ) {
+      setVotingStartEndStatus((s) => ({...s, end: AsyncStatus.FULFILLED}));
 
-    // If the value is already `true`, then exit.
-    if (hasVotingEnded) return;
+      return;
+    }
+
+    setVotingStartEndStatus((s) => ({...s, end: AsyncStatus.PENDING}));
 
     // Check if voting has ended every 1 second
     const intervalID = setInterval(() => {
+      // Async process ran
+      setVotingStartEndStatus((s) => ({...s, end: AsyncStatus.FULFILLED}));
+
       const hasEndedCheck =
         Math.ceil(Date.now() / 1000) > snapshotProposal.msg.payload.end;
 
@@ -76,5 +105,11 @@ export function useVotingStartEnd(
     snapshotProposal?.msg.type,
   ]);
 
-  return {hasVotingStarted, hasVotingEnded};
+  return {
+    hasVotingStarted,
+    hasVotingEnded,
+    votingStartEndInitReady: Object.values(votingStartEndStatus).every(
+      (s) => s === AsyncStatus.FULFILLED
+    ),
+  };
 }

@@ -15,7 +15,7 @@ import {
   SnapshotProposalCommon,
   SubgraphProposal,
 } from '../types';
-import {useAbortController} from '../../../hooks';
+import {useAbortController, useCounter} from '../../../hooks';
 
 type UseProposalReturn = {
   proposalData: ProposalData | undefined;
@@ -68,6 +68,7 @@ export function useProposalOrDraft(
    */
 
   const {abortController, isMountedRef} = useAbortController();
+  const [refetchCount, updateRefetchCount] = useCounter();
 
   /**
    * Cached callbacks
@@ -77,11 +78,13 @@ export function useProposalOrDraft(
     abortController?.signal,
     id,
     isMountedRef,
+    refetchCount,
   ]);
   const handleGetProposalCached = useCallback(handleGetProposal, [
     abortController?.signal,
     id,
     isMountedRef,
+    refetchCount,
     type,
   ]);
   const handleGetProposalOrDraftCached = useCallback(handleGetProposalOrDraft, [
@@ -108,6 +111,7 @@ export function useProposalOrDraft(
       ? {
           daoProposal,
           getCommonSnapshotProposalData,
+          refetchProposalOrDraft,
           snapshotDraft,
           snapshotProposal,
           snapshotType,
@@ -146,7 +150,8 @@ export function useProposalOrDraft(
 
   async function handleGetDraft(): Promise<SnapshotDraft | undefined> {
     try {
-      setProposalStatus(AsyncStatus.PENDING);
+      // Do not trigger pending requests (UI will show loader) for refetches (meant to be silent).
+      if (refetchCount === 0) setProposalStatus(AsyncStatus.PENDING);
 
       const response = await fetch(
         `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/draft/${id}`,
@@ -187,7 +192,8 @@ export function useProposalOrDraft(
 
   async function handleGetProposal(): Promise<SnapshotProposal | undefined> {
     try {
-      setProposalStatus(AsyncStatus.PENDING);
+      // Do not trigger pending requests (UI will show loader) for refetches (meant to be silent).
+      if (refetchCount === 0) setProposalStatus(AsyncStatus.PENDING);
 
       /**
        * @note `searchUniqueDraftId` includes the draft id in the search for the proposal
@@ -284,6 +290,10 @@ export function useProposalOrDraft(
       default:
         return undefined;
     }
+  }
+
+  function refetchProposalOrDraft(): void {
+    updateRefetchCount({type: 'increment'});
   }
 
   return {
