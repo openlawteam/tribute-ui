@@ -1,17 +1,23 @@
 import {useSelector} from 'react-redux';
 
-import {getContractByAddress} from '../web3/helpers';
 import {
   prepareVoteProposalData,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
-import {useSignAndSubmitProposal} from './hooks';
-import {ProposalOrDraftSnapshotData, ProposalCombined} from './types';
-import {SPACE} from '../../config';
+import {getContractByAddress} from '../web3/helpers';
+import {ProposalData} from './types';
 import {StoreState} from '../../store/types';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
-import {lchmod} from 'fs';
+import {useSignAndSubmitProposal} from './hooks';
+import React, {useState} from 'react';
+import {Web3TxStatus} from '../web3/types';
+import FadeIn from '../common/FadeIn';
+import CycleMessage from '../feedback/CycleMessage';
+import {TX_CYCLE_MESSAGES} from '../web3/config';
+import EtherscanURL from '../web3/EtherscanURL';
+import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
+import Loader from '../feedback/Loader';
 
 type SponsorArguments = [
   string, // `dao`
@@ -19,14 +25,20 @@ type SponsorArguments = [
   string // `proposal data`
 ];
 
-type SponsorActionProps<T extends ProposalOrDraftSnapshotData> = {
-  proposal: ProposalCombined<T>;
+type SponsorActionProps = {
+  proposal: ProposalData;
 };
 
-export default function SponsorAction<T extends ProposalOrDraftSnapshotData>(
-  props: SponsorActionProps<T>
-) {
-  const {proposal} = props;
+export default function SponsorAction(props: SponsorActionProps) {
+  const {
+    proposal: {snapshotDraft},
+  } = props;
+
+  /**
+   * State
+   */
+
+  const [submitError, setSubmitError] = useState<Error>();
 
   /**
    * Selectors
@@ -43,13 +55,7 @@ export default function SponsorAction<T extends ProposalOrDraftSnapshotData>(
 
   const {account, web3Instance} = useWeb3Modal();
 
-  const {
-    txError,
-    txEtherscanURL,
-    txIsPromptOpen,
-    txSend,
-    txStatus,
-  } = useContractSend();
+  const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
 
   const {
     isDisabled,
@@ -58,12 +64,27 @@ export default function SponsorAction<T extends ProposalOrDraftSnapshotData>(
   } = useMemberActionDisabled();
 
   const {
-    proposalData,
     proposalSignAndSendStatus,
     signAndSendProposal,
-  } = useSignAndSubmitProposal<SnapshotType.draft>();
+  } = useSignAndSubmitProposal<SnapshotType.proposal>();
 
   const gasPrices = useETHGasPrice();
+
+  /**
+   * Variables
+   */
+
+  const isInProcess =
+    txStatus === Web3TxStatus.AWAITING_CONFIRM ||
+    txStatus === Web3TxStatus.PENDING ||
+    proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM ||
+    proposalSignAndSendStatus === Web3TxStatus.PENDING;
+
+  const isDone =
+    txStatus === Web3TxStatus.FULFILLED &&
+    proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
+
+  const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
 
   /**
    * Functions
@@ -75,19 +96,18 @@ export default function SponsorAction<T extends ProposalOrDraftSnapshotData>(
         throw new Error('No DAO Registry address was found.');
       }
 
-      const contract = getContractByAddress(
-        proposal.snapshotProposal.actionId,
-        contracts
-      );
+      if (!snapshotDraft) {
+        throw new Error('No Snapshot draft was found.');
+      }
+
+      const contract = getContractByAddress(snapshotDraft.actionId, contracts);
 
       const {
-        snapshotProposal: {
-          msg: {
-            payload: {name, body, metadata},
-            timestamp,
-          },
+        msg: {
+          payload: {name, body, metadata},
+          timestamp,
         },
-      } = proposal;
+      } = snapshotDraft;
 
       // Sign and submit draft for snapshot-hub
       const {data, signature} = await signAndSendProposal({
@@ -98,7 +118,7 @@ export default function SponsorAction<T extends ProposalOrDraftSnapshotData>(
           timestamp,
         },
         adapterAddress: contract.contractAddress,
-        type: SnapshotType.proposal as any,
+        type: SnapshotType.proposal,
       });
 
       // Prepare data for submission to DAO
@@ -107,28 +127,20 @@ export default function SponsorAction<T extends ProposalOrDraftSnapshotData>(
           name: data.payload.name,
           body: data.payload.body,
           choices: data.payload.choices,
-          snapshot: (data.payload as any).snapshot.toString(),
-          start: (data.payload as any).start,
-          end: (data.payload as any).end,
+          snapshot: data.payload.snapshot.toString(),
+          start: data.payload.start,
+          end: data.payload.end,
         },
         sig: signature,
         space: data.space,
         timestamp: parseInt(data.timestamp),
       };
 
-      console.log('dataToPrepare', dataToPrepare);
-
       const sponsorArguments: SponsorArguments = [
         daoRegistryAddress,
-        // @todo Change how we access the proposal ID
-        proposal.snapshotProposal.authorIpfsHash,
+        snapshotDraft.idInDAO,
         prepareVoteProposalData(dataToPrepare, web3Instance),
       ];
-
-      console.log(
-        'sponsorArguments',
-        JSON.stringify(sponsorArguments, null, 2)
-      );
 
       const txArguments = {
         from: account || '',
@@ -136,16 +148,14 @@ export default function SponsorAction<T extends ProposalOrDraftSnapshotData>(
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      const receipt = await txSend(
+      await txSend(
         'sponsorProposal',
         contract.instance.methods,
         sponsorArguments,
         txArguments
       );
-
-      console.log('receipt', receipt);
     } catch (error) {
-      throw error;
+      setSubmitError(error);
     }
   }
 
@@ -153,15 +163,64 @@ export default function SponsorAction<T extends ProposalOrDraftSnapshotData>(
    * Render
    */
 
+  function renderSubmitStatus(): React.ReactNode {
+    // Either Snapshot or chain tx
+    if (
+      txStatus === Web3TxStatus.AWAITING_CONFIRM ||
+      proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM
+    ) {
+      return 'Awaiting your confirmation\u2026';
+    }
+
+    // Only for chain tx
+    switch (txStatus) {
+      case Web3TxStatus.PENDING:
+        return (
+          <>
+            <CycleMessage
+              intervalMs={2000}
+              messages={TX_CYCLE_MESSAGES}
+              useFirstItemStart
+              render={(message) => {
+                return <FadeIn key={message}>{message}</FadeIn>;
+              }}
+            />
+
+            <EtherscanURL url={txEtherscanURL} isPending />
+          </>
+        );
+      case Web3TxStatus.FULFILLED:
+        return (
+          <>
+            <div>Proposal submitted!</div>
+
+            <EtherscanURL url={txEtherscanURL} />
+          </>
+        );
+      default:
+        return null;
+    }
+  }
+
   return (
     <>
       <div>
         <button
           className="proposaldetails__button"
-          disabled={isDisabled}
-          onClick={isDisabled ? () => {} : handleSubmit}>
-          Sponsor
+          disabled={isDisabled || isInProcessOrDone}
+          onClick={isDisabled || isInProcessOrDone ? () => {} : handleSubmit}>
+          {isInProcess ? <Loader /> : isDone ? 'Done' : 'Sponsor'}
         </button>
+
+        <ErrorMessageWithDetails
+          error={submitError}
+          renderText="Something went wrong"
+        />
+
+        {/* SUBMIT STATUS */}
+        <div className="form__submit-status-container">
+          {isInProcessOrDone && renderSubmitStatus()}
+        </div>
 
         {isDisabled && (
           <button className="button--help" onClick={openWhyDisabledModal}>
