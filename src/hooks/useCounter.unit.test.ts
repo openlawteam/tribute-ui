@@ -1,11 +1,11 @@
 // import {waitFor} from '@testing-library/react';
 import {act, renderHook} from '@testing-library/react-hooks';
 
-import useCounter from './useCounter';
+import {useCounter} from './useCounter';
 
 describe('useCounter unit tests', () => {
   test('should increment', async () => {
-    const {result} = await renderHook(useCounter);
+    const {result} = await renderHook(() => useCounter());
 
     const [count, dispatch] = result.current;
 
