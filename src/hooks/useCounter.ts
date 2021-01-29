@@ -30,7 +30,7 @@ function reducer(state: CounterState, action: CounterAction) {
  *  changed dependency for consumer's useEffect when a consumer higher up wants to trigger a "re-run"
  *  (i.e. re-fetch, refresh some data), similarly to dispatching a Redux action again to update the state.
  */
-export default function useCounter(): CounterReturn {
+export function useCounter(): CounterReturn {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   return [state.count, dispatch];
