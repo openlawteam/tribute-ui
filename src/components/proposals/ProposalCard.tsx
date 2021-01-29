@@ -37,7 +37,8 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
       <h3 className="proposalcard__title">{name}</h3>
 
       {/* VOTING PROGRESS STATUS AND BAR */}
-      <VotingStatus proposal={proposal} />
+      {/* @todo fix */}
+      <VotingStatus proposal={proposal as any} />
 
       {/* BUTTON (no click handler) */}
       <button className="proposalcard__button">{buttonText}</button>

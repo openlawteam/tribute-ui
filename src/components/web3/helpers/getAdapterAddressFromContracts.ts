@@ -1,5 +1,5 @@
-import {StoreState} from '../../../util/types';
 import {SmartContractItem, ContractAdapterNames} from '../types';
+import {StoreState} from '../../../store/types';
 
 function getContractAddressOrThrow(contract: SmartContractItem | null): string {
   try {

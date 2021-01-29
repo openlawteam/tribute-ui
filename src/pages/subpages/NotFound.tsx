@@ -7,7 +7,7 @@ export default function NotFound() {
   return (
     <Wrap className="section-wrapper">
       <FadeIn>
-        <div style={{padding: '2rem', textAlign: 'center', fontSize: '5rem'}}>
+        <div style={{textAlign: 'center', fontSize: '5rem'}}>
           <h3>
             4
             <span

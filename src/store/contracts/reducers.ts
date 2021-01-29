@@ -3,8 +3,7 @@ import {
   CONTRACT_ONBOARDING,
   CONTRACT_VOTING,
 } from '../actions';
-
-import {ContractsState} from '../../util/types';
+import {ContractsState} from '../types';
 
 const initialState = {
   DaoRegistryContract: null,

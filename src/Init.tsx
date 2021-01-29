@@ -2,7 +2,11 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {getApiStatus as getSnapshotAPIStatus} from '@openlaw/snapshot-js-erc712';
 
 import {AsyncStatus} from './util/types';
+import {getConnectedMember} from './store/actions';
+import {ReduxDispatch, StoreState} from './store/types';
+import {SmartContractItem} from './components/web3/types';
 import {SNAPSHOT_HUB_API_URL} from './config';
+import {useDispatch, useSelector} from 'react-redux';
 import {useInitContracts, useIsDefaultChain} from './components/web3/hooks';
 import {useIsMounted} from './hooks';
 import {useWeb3Modal} from './components/web3/hooks';
@@ -27,6 +31,9 @@ type InitErrorProps = {
 /**
  * Register any new async process names here.
  * It is mainly to check their progress before rendering.
+ *
+ * If the app is not dependent on a process before starting
+ * do not add it here.
  */
 enum ProcessName {
   initSnapshotAPI = 'initSnapshotAPI',
@@ -47,6 +54,14 @@ export default function Init(props: InitProps) {
   const {render} = props;
 
   /**
+   * Selectors
+   */
+
+  const daoRegistryContract = useSelector(
+    (s: StoreState) => s.contracts.DaoRegistryContract
+  );
+
+  /**
    * State
    */
 
@@ -63,9 +78,15 @@ export default function Init(props: InitProps) {
    */
 
   const {initContracts} = useInitContracts();
-  const {connected, provider, web3Instance} = useWeb3Modal();
+  const {account, connected, provider, web3Instance} = useWeb3Modal();
   const {defaultChainError} = useIsDefaultChain();
   const {isMountedRef} = useIsMounted();
+
+  /**
+   * Their hooks
+   */
+
+  const dispatch = useDispatch<ReduxDispatch>();
 
   /**
    * Cached callbacks
@@ -74,6 +95,7 @@ export default function Init(props: InitProps) {
   const handleInitContractsCached = useCallback(handleInitContracts, [
     initContracts,
   ]);
+  const handleGetMemberCached = useCallback(handleGetMember, [dispatch]);
   const handleGetSnapshotAPIStatusCached = useCallback(
     handleGetSnapshotAPIStatus,
     [isMountedRef]
@@ -92,6 +114,13 @@ export default function Init(props: InitProps) {
   useEffect(() => {
     connected && provider && web3Instance && handleInitContractsCached();
   }, [connected, handleInitContractsCached, provider, web3Instance]);
+
+  useEffect(() => {
+    connected &&
+      account &&
+      daoRegistryContract &&
+      handleGetMemberCached(account, daoRegistryContract);
+  }, [account, connected, daoRegistryContract, handleGetMemberCached]);
 
   useEffect(() => {
     setError(defaultChainError);
@@ -139,6 +168,17 @@ export default function Init(props: InitProps) {
     }
   }
 
+  async function handleGetMember(
+    account: string,
+    daoRegistryContract: SmartContractItem
+  ) {
+    try {
+      await dispatch(getConnectedMember(account, daoRegistryContract));
+    } catch (error) {
+      setError(error);
+    }
+  }
+
   // Render children
   return render({error, isInitComplete});
 }
@@ -155,37 +195,41 @@ export function InitError(props: InitErrorProps) {
   const {error} = props;
 
   return (
-    <Wrap className="section-wrapper">
+    <>
       <Header />
 
-      <FadeIn>
-        <div
-          style={{
-            padding: '2em 1em 1em',
-            textAlign: 'center',
-          }}>
-          <h1 style={{fontSize: '2rem'}}>
-            <span
-              className="pulse"
-              role="img"
-              aria-label="Emoji with eyes crossed out."
-              style={{display: 'inline-block'}}>
-              😵
-            </span>{' '}
-            Oops, something went wrong.
-          </h1>
-        </div>
+      <Wrap className="section-wrapper">
+        <main>
+          <FadeIn>
+            <div
+              style={{
+                padding: '2em 1em 1em',
+                textAlign: 'center',
+              }}>
+              <h1 style={{fontSize: '2rem'}}>
+                <span
+                  className="pulse"
+                  role="img"
+                  aria-label="Emoji with eyes crossed out."
+                  style={{display: 'inline-block'}}>
+                  😵
+                </span>{' '}
+                Oops, something went wrong.
+              </h1>
+            </div>
 
-        <div
-          style={{
-            textAlign: 'center',
-            maxWidth: 600,
-            display: 'block',
-            margin: '0 auto',
-          }}>
-          <ErrorMessageWithDetails error={error} renderText="" />
-        </div>
-      </FadeIn>
-    </Wrap>
+            <div
+              style={{
+                textAlign: 'center',
+                maxWidth: 600,
+                display: 'block',
+                margin: '0 auto',
+              }}>
+              <ErrorMessageWithDetails error={error} renderText="" />
+            </div>
+          </FadeIn>
+        </main>
+      </Wrap>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 @use "./variables" as *; /* load without namespace for convenience */
 @use "./mixins" as *; /* load without namespace for convenience */
 @use "./functions" as *; /* load without namespace for convenience */
+@use "./button" as *; /* load without namespace for convenience */
 
 .modal-container {
   height: calc(100% - (1.5rem * 2)); /* minus the top, bottom margins */
@@ -62,10 +63,14 @@
 }
 
 .modal__close-button {
-  width: 1rem;
+  @extend %button-base;
+
   position: absolute;
   right: 1rem;
   top: 0.5rem;
   color: $color-primary;
-  cursor: pointer;
+}
+
+.modal__close-button--icon {
+  width: 1.75rem;
 }

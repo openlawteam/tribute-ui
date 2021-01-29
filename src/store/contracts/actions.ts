@@ -4,7 +4,7 @@ import {Dispatch} from 'redux';
 import {ContractAdapterNames} from '../../components/web3/types';
 import {DEFAULT_CHAIN, DAO_REGISTRY_CONTRACT_ADDRESS} from '../../config';
 import {getAdapterAddress} from '../../components/web3/helpers';
-import {StoreState} from '../../util/types';
+import {StoreState} from '../types';
 import DaoRegistry from '../../truffle-contracts/DaoRegistry.json';
 import OffchainVotingContract from '../../truffle-contracts/OffchainVotingContract.json';
 import OnboardingContract from '../../truffle-contracts/OnboardingContract.json';

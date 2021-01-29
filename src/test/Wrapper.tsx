@@ -2,13 +2,18 @@ import {Store} from 'redux';
 import {MemoryRouter} from 'react-router-dom';
 import {provider as Web3Provider} from 'web3-core/types';
 import {Provider} from 'react-redux';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import Web3 from 'web3';
 
 import {
   Web3ModalContext,
   Web3ModalContextValue,
 } from '../components/web3/Web3ModalManager';
+import {
+  getCurrentDelegateKey,
+  isActiveMember,
+  memberAddressesByDelegatedKey,
+} from './web3Responses';
 import * as useWeb3ModalToMock from '../components/web3/hooks/useWeb3Modal';
 import * as getAdapterAddressToMock from '../components/web3/helpers/getAdapterAddress';
 import {CHAINS as mockChains} from '../config';
@@ -22,6 +27,10 @@ export type WrapperReturnProps = {
 };
 
 type WrapperProps = {
+  /**
+   * Getter for the internal props. Useful when you do not want to use the render prop arguments.
+   */
+  getProps?: (p: WrapperReturnProps) => void;
   /**
    * Use the `<Init />` component to wrap the child component.
    */
@@ -55,10 +64,11 @@ export default function Wrapper(
   props: WrapperProps & React.PropsWithChildren<React.ReactNode>
 ) {
   const {
+    getProps,
+    mockMetaMaskRequest = false,
     useInit = false,
     useWallet = false,
     web3ModalContext,
-    mockMetaMaskRequest = false,
   } = props;
 
   /**
@@ -135,6 +145,17 @@ export default function Wrapper(
     };
   }, [mockMetaMaskRequest, mockWeb3Provider, web3Instance.eth.abi]);
 
+  // Inject initial results for calls made via getConnectedMember
+  useEffect(() => {
+    if (!useWallet) return;
+
+    mockWeb3Provider.injectResult(
+      ...memberAddressesByDelegatedKey({web3Instance})
+    );
+    mockWeb3Provider.injectResult(...isActiveMember({web3Instance}));
+    mockWeb3Provider.injectResult(...getCurrentDelegateKey({web3Instance}));
+  }, [mockWeb3Provider, useWallet, web3Instance]);
+
   /**
    * Functions
    */
@@ -148,6 +169,9 @@ export default function Wrapper(
   }
 
   function renderChildren(children: React.ReactNode) {
+    // Call user callback, if provided.
+    getProps && getProps(getRenderReturnProps());
+
     const childrenToRender = props.render
       ? props.render(getRenderReturnProps())
       : children;

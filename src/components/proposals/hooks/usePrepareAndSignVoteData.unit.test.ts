@@ -74,7 +74,7 @@ describe('usePrepareAndSignVoteData unit tests', () => {
         timestamp: now,
         token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
         type: 'vote',
-        verifyingContract: '0xBC58f21e92f39d958CAF792706bb1ECadfABE4AB',
+        verifyingContract: '0xB07b42d3E1Ad056AbE2606cc0fFb7d8c6a9CFE9f',
         version: '0.1.2',
       });
       expect(result.current.proposalDataError).toBe(undefined);
@@ -160,7 +160,7 @@ describe('usePrepareAndSignVoteData unit tests', () => {
         timestamp: now,
         token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
         type: 'vote',
-        verifyingContract: '0xBC58f21e92f39d958CAF792706bb1ECadfABE4AB',
+        verifyingContract: '0xB07b42d3E1Ad056AbE2606cc0fFb7d8c6a9CFE9f',
         version: '0.1.2',
       });
       expect(result.current.proposalDataError).toBe(undefined);

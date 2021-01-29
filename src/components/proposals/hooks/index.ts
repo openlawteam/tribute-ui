@@ -1,3 +1,4 @@
 export * from './usePrepareAndSignVoteData';
-export * from './useProposal';
+export * from './useProposalOrDraft';
 export * from './useSignAndSubmitProposal';
+export * from './useVotingStartEnd';

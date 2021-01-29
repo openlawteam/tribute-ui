@@ -87,6 +87,8 @@ export function useContractSend(): UseContractSendReturn {
       setTxIsPromptOpen(false);
 
       unsubscribeDontCloseWindow();
+
+      throw error;
     }
   }
 
