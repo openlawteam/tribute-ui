@@ -2,8 +2,6 @@ import React from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
 import {AsyncStatus} from '../../util/types';
-import {combineProposals} from '../../components/proposals/helpers';
-import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
@@ -44,17 +42,11 @@ export default function MembershipDetails() {
 
   // @todo Use dynamic `SnapshotType` depending on subgraph data for `type` arg.
   const {
-    proposal,
+    proposalData,
     proposalError,
     proposalNotFound,
     proposalStatus,
-  } = useProposalOrDraft(proposalHash, SnapshotType.draft);
-
-  /**
-   * Variables
-   */
-
-  const combinedProposal = combineProposals(proposal, {});
+  } = useProposalOrDraft(proposalHash);
 
   /**
    * Render
@@ -95,12 +87,12 @@ export default function MembershipDetails() {
   }
 
   // Render proposal
-  if (combinedProposal) {
+  if (proposalData) {
     return (
       <RenderWrapper>
         <ProposalDetails
-          proposal={combinedProposal}
-          renderActions={() => <ProposalActions proposal={combinedProposal} />}
+          proposal={proposalData}
+          renderActions={() => <ProposalActions proposal={proposalData} />}
         />
       </RenderWrapper>
     );
