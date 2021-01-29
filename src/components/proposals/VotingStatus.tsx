@@ -78,8 +78,8 @@ export default function VotingStatus({
         {/* CLOCK WHILE IN VOTING */}
         {votingStartEndInitReady && hasVotingStarted && !hasVotingEnded && (
           <ProposalPeriod
-            startPeriod={new Date(votingStartSeconds * 1000)}
-            endPeriod={new Date(votingEndSeconds * 1000)}
+            startPeriodMs={votingStartSeconds * 1000}
+            endPeriodMs={votingEndSeconds * 1000}
           />
         )}
 

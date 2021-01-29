@@ -1,12 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react';
 
 type ProposalPeriodProps = {
-  startPeriod: Date;
-  endPeriod: Date;
+  startPeriodMs: number;
+  endPeriodMs: number;
 };
 
 export default function ProposalPeriod(props: ProposalPeriodProps) {
-  const {startPeriod, endPeriod} = props;
+  const {startPeriodMs, endPeriodMs} = props;
 
   /**
    * Variables
@@ -48,23 +48,26 @@ export default function ProposalPeriod(props: ProposalPeriodProps) {
   useEffect(() => {
     const interval = setInterval(() => {
       const currentDate = new Date();
-      if (currentDate < startPeriod) {
+      const startDate = new Date(startPeriodMs);
+      const endDate = new Date(endPeriodMs);
+
+      if (currentDate < startDate) {
         const start = (
           <span>
             <span className="votingstatus">Starts:</span>{' '}
             <span className="votingstatus__timer">
-              {displayCountdownCached(startPeriod, true)}
+              {displayCountdownCached(startDate, true)}
             </span>
           </span>
         );
 
         setProposalPeriod(start);
-      } else if (currentDate < endPeriod) {
+      } else if (currentDate < endDate) {
         const end = (
           <span>
             <span className="votingstatus">Ends:</span>{' '}
             <span className="votingstatus__timer">
-              {displayCountdownCached(endPeriod)}
+              {displayCountdownCached(endDate)}
             </span>
           </span>
         );
@@ -77,14 +80,20 @@ export default function ProposalPeriod(props: ProposalPeriodProps) {
         clearInterval(interval);
       }
     }, 1000);
-    return () => clearInterval(interval);
-  }, [startPeriod, endPeriod, displayCountdownCached]);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [startPeriodMs, endPeriodMs, displayCountdownCached]);
 
   /**
    * Functions
    */
 
-  function displayCountdown(countdown: Date, showDaysOnly?: boolean) {
+  function displayCountdown(
+    countdown: Date,
+    showDaysOnly?: boolean
+  ): string | React.ReactNode {
     const {days, hours, minutes, seconds} = getTimeRemaining(countdown);
 
     if (days > 2 && showDaysOnly) {
@@ -105,10 +114,10 @@ export default function ProposalPeriod(props: ProposalPeriodProps) {
         'sec'
       )}`;
     } else {
-      return React.createElement(
-        'span',
-        {className: 'color-brightsalmon'},
-        `${formatTimePeriod(seconds, 'sec')}`
+      return (
+        <span className="color-brightsalmon">
+          {formatTimePeriod(seconds, 'sec')}
+        </span>
       );
     }
   }
