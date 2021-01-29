@@ -1,19 +1,18 @@
 import {useEffect, useState} from 'react';
-import {
-  SnapshotProposalResponseData,
-  SnapshotType,
-} from '@openlaw/snapshot-js-erc712';
+import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 
-import {ProposalCombined, ProposalOrDraftSnapshotData} from '../types';
+import {ProposalData} from '../types';
 
 type UseVotingStartEndReturn = {
   hasVotingEnded: boolean;
   hasVotingStarted: boolean;
 };
 
-export function useVotingStartEnd<T extends ProposalOrDraftSnapshotData>(
-  proposal: ProposalCombined<T>
+export function useVotingStartEnd(
+  proposal: ProposalData
 ): UseVotingStartEndReturn {
+  const {snapshotProposal} = proposal;
+
   /**
    * State
    */
@@ -27,14 +26,10 @@ export function useVotingStartEnd<T extends ProposalOrDraftSnapshotData>(
 
   // Actively check if voting has started
   useEffect(() => {
-    if (proposal.snapshotProposal.msg.type !== SnapshotType.proposal) return;
+    if (snapshotProposal?.msg.type !== SnapshotType.proposal) return;
 
     // If the value is already `true`, then exit.
     if (hasVotingStarted) return;
-
-    const {
-      snapshotProposal,
-    } = proposal as ProposalCombined<SnapshotProposalResponseData>;
 
     // Check if voting has started every 1 second
     const intervalID = setInterval(() => {
@@ -49,18 +44,18 @@ export function useVotingStartEnd<T extends ProposalOrDraftSnapshotData>(
     return () => {
       clearInterval(intervalID);
     };
-  }, [hasVotingStarted, proposal]);
+  }, [
+    hasVotingStarted,
+    snapshotProposal?.msg.payload.start,
+    snapshotProposal?.msg.type,
+  ]);
 
   // Actively check if voting has ended
   useEffect(() => {
-    if (proposal.snapshotProposal.msg.type !== SnapshotType.proposal) return;
+    if (snapshotProposal?.msg.type !== SnapshotType.proposal) return;
 
     // If the value is already `true`, then exit.
     if (hasVotingEnded) return;
-
-    const {
-      snapshotProposal,
-    } = proposal as ProposalCombined<SnapshotProposalResponseData>;
 
     // Check if voting has ended every 1 second
     const intervalID = setInterval(() => {
@@ -75,7 +70,11 @@ export function useVotingStartEnd<T extends ProposalOrDraftSnapshotData>(
     return () => {
       clearInterval(intervalID);
     };
-  }, [hasVotingEnded, proposal]);
+  }, [
+    hasVotingEnded,
+    snapshotProposal?.msg.payload.end,
+    snapshotProposal?.msg.type,
+  ]);
 
   return {hasVotingStarted, hasVotingEnded};
 }
