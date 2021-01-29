@@ -71,7 +71,7 @@ describe('useVotingStartEnd unit tests', () => {
       useVotingStartEnd({
         snapshotProposal: {
           msg: {
-            payload: {start: nowSeconds - 180, end: nowSeconds - 1},
+            payload: {start: nowSeconds - 180, end: nowSeconds - 5},
             type: SnapshotType.proposal,
           },
         },
