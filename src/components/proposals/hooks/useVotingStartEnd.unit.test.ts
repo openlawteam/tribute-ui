@@ -7,6 +7,7 @@ import {
 
 import {ProposalData} from '../types';
 import {useVotingStartEnd} from '.';
+import {waitFor} from '@testing-library/react';
 
 describe('useVotingStartEnd unit tests', () => {
   test('hook returns correct data throughout the voting period', async () => {
@@ -84,8 +85,10 @@ describe('useVotingStartEnd unit tests', () => {
 
     await waitForNextUpdate();
 
-    expect(result.current.hasVotingStarted).toBe(true);
-    expect(result.current.hasVotingEnded).toBe(true);
+    await waitFor(() => {
+      expect(result.current.hasVotingStarted).toBe(true);
+      expect(result.current.hasVotingEnded).toBe(true);
+    });
   });
 
   test('should provide "false" if proposal is a draft / snapshotProposal does not exist', async () => {
