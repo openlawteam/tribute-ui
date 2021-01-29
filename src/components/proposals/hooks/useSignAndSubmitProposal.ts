@@ -183,6 +183,8 @@ export function useSignAndSubmitProposal<
         throw new Error('Handling for type "vote" is not implemented.');
       }
 
+      setProposalSignAndSendStatus(Web3TxStatus.AWAITING_CONFIRM);
+
       const actionId = adapterAddress
         ? adapterAddress
         : adapterName
@@ -225,8 +227,6 @@ export function useSignAndSubmitProposal<
         primaryType: PRIMARY_TYPE_ERC712,
         message: message,
       });
-
-      setProposalSignAndSendStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       // 2. Sign data
       const signature = await signMessage(provider, account, dataToSign);
