@@ -4,6 +4,7 @@ import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {usePrepareAndSignVoteData} from '.';
 import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 import Wrapper from '../../../test/Wrapper';
+import {DEFAULT_DAO_REGISTRY_ADDRESS} from '../../../test/helpers';
 
 describe('usePrepareAndSignVoteData unit tests', () => {
   test('should return correct data when calling prepareAndSignVoteData', async () => {
@@ -74,7 +75,7 @@ describe('usePrepareAndSignVoteData unit tests', () => {
         timestamp: now,
         token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
         type: 'vote',
-        verifyingContract: '0xB07b42d3E1Ad056AbE2606cc0fFb7d8c6a9CFE9f',
+        verifyingContract: DEFAULT_DAO_REGISTRY_ADDRESS,
         version: '0.1.2',
       });
       expect(result.current.proposalDataError).toBe(undefined);
@@ -160,7 +161,7 @@ describe('usePrepareAndSignVoteData unit tests', () => {
         timestamp: now,
         token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
         type: 'vote',
-        verifyingContract: '0xB07b42d3E1Ad056AbE2606cc0fFb7d8c6a9CFE9f',
+        verifyingContract: DEFAULT_DAO_REGISTRY_ADDRESS,
         version: '0.1.2',
       });
       expect(result.current.proposalDataError).toBe(undefined);

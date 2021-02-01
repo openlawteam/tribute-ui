@@ -7,6 +7,7 @@ import {snapshotAPISubmitMessage} from '../../../test/restResponses';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useSignAndSubmitProposal} from '.';
 import Wrapper from '../../../test/Wrapper';
+import {DEFAULT_DAO_REGISTRY_ADDRESS} from '../../../test/helpers';
 
 describe('useSignAndSubmitProposal unit tests', () => {
   test('hook states should be correct when signing & sending (Draft)', async () => {
@@ -91,7 +92,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
           timestamp: now,
           token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
           type: 'draft',
-          verifyingContract: '0xB07b42d3E1Ad056AbE2606cc0fFb7d8c6a9CFE9f',
+          verifyingContract: DEFAULT_DAO_REGISTRY_ADDRESS,
           version: '0.1.2',
         },
         signature:
@@ -213,7 +214,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
           timestamp: now.toString(),
           token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
           type: 'proposal',
-          verifyingContract: '0xB07b42d3E1Ad056AbE2606cc0fFb7d8c6a9CFE9f',
+          verifyingContract: DEFAULT_DAO_REGISTRY_ADDRESS,
           version: '0.1.2',
         },
         uniqueId: '1234567jkl',
@@ -278,7 +279,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
         timestamp: now,
         token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
         type: 'draft',
-        verifyingContract: '0xB07b42d3E1Ad056AbE2606cc0fFb7d8c6a9CFE9f',
+        verifyingContract: DEFAULT_DAO_REGISTRY_ADDRESS,
         version: '0.1.2',
       });
       expect(signature).toBe(
@@ -360,7 +361,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
         timestamp: now.toString(),
         token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
         type: 'proposal',
-        verifyingContract: '0xB07b42d3E1Ad056AbE2606cc0fFb7d8c6a9CFE9f',
+        verifyingContract: DEFAULT_DAO_REGISTRY_ADDRESS,
         version: '0.1.2',
       });
       expect(signature).toBe(
