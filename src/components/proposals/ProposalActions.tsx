@@ -3,7 +3,7 @@ import React from 'react';
 import {ProposalData} from './types';
 import {useVotingStartEnd} from './hooks/useVotingStartEnd';
 import SponsorAction from './SponsorAction';
-import VotingAction from './VotingAction';
+import VotingActionButtons from './VotingActionButtons';
 import VotingStatus from './VotingStatus';
 
 type ProposalActionsProps = {
@@ -39,7 +39,19 @@ export default function ProposalActions(props: ProposalActionsProps) {
           {/* VOTING PROGRESS STATUS AND BAR */}
           <VotingStatus proposal={proposal} />
           {/* VOTING ACTIONS */}
-          {!hasVotingEnded && <VotingAction />}
+          {!hasVotingEnded && (
+            <VotingActionButtons
+              onClick={console.log}
+              buttonProps={
+                {
+                  // disabled: true,
+                  // 'aria-disabled': true,
+                }
+              }
+              // voteChosen={}
+              // voteProgress={}
+            />
+          )}
         </>
       )}
     </div>

@@ -7,17 +7,17 @@ import {
 import {getContractByAddress} from '../web3/helpers';
 import {ProposalData} from './types';
 import {StoreState} from '../../store/types';
+import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
 import {useSignAndSubmitProposal} from './hooks';
-import React, {useState} from 'react';
 import {Web3TxStatus} from '../web3/types';
-import FadeIn from '../common/FadeIn';
 import CycleMessage from '../feedback/CycleMessage';
-import {TX_CYCLE_MESSAGES} from '../web3/config';
-import EtherscanURL from '../web3/EtherscanURL';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
+import EtherscanURL from '../web3/EtherscanURL';
+import FadeIn from '../common/FadeIn';
 import Loader from '../feedback/Loader';
+import React, {useState} from 'react';
 
 type SponsorArguments = [
   string, // `dao`
