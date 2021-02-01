@@ -6,7 +6,7 @@ export default function VotingAction() {
   return (
     <>
       <button className="proposaldetails__button">Vote Yes</button>
-      <button className="proposaldetails__button">Vote no</button>
+      <button className="proposaldetails__button">Vote No</button>
     </>
   );
 }
