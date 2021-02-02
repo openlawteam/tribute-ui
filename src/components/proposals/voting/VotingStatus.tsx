@@ -1,8 +1,8 @@
-import {ProposalData} from './types';
-import {useVotingStartEnd} from './hooks';
-import ProposalPeriod from './ProposalPeriod';
-import SquareRootVotingBar from './SquareRootVotingBar';
-import StopwatchSVG from '../../assets/svg/StopwatchSVG';
+import {ProposalData} from '../types';
+import {SquareRootVotingBar} from './';
+import {useVotingStartEnd} from '../hooks';
+import ProposalPeriod from '../ProposalPeriod';
+import StopwatchSVG from '../../../assets/svg/StopwatchSVG';
 
 type VotingStatusProps = {
   proposal: ProposalData;
@@ -17,7 +17,7 @@ type VotingStatusProps = {
  * @param {VotingStatusProps} props
  * @returns {JSX.Element}
  */
-export default function VotingStatus({
+export function VotingStatus({
   proposal,
   showPercentages = true,
 }: VotingStatusProps): JSX.Element {

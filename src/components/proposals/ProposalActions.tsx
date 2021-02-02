@@ -2,9 +2,9 @@ import React from 'react';
 
 import {ProposalData} from './types';
 import {useVotingStartEnd} from './hooks/useVotingStartEnd';
+import {VotingActionButtons} from './voting';
+import {VotingStatus} from './voting';
 import SponsorAction from './SponsorAction';
-import VotingActionButtons from './VotingActionButtons';
-import VotingStatus from './VotingStatus';
 
 type ProposalActionsProps = {
   proposal: ProposalData;

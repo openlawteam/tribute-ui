@@ -1,5 +1,5 @@
 import {FakeProposal} from './_mockData';
-import VotingStatus from './VotingStatus';
+import {VotingStatus} from './voting';
 
 type ProposalCardProps = {
   buttonText?: string;

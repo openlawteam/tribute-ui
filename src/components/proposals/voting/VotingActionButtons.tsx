@@ -1,6 +1,7 @@
-import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 import React, {ButtonHTMLAttributes} from 'react';
-import Loader from '../feedback/Loader';
+import {VoteChoices} from '@openlaw/snapshot-js-erc712';
+
+import Loader from '../../feedback/Loader';
 
 type VotingActionButtonsProps = {
   /**
@@ -21,7 +22,7 @@ type VotingActionButtonsProps = {
 /**
  * @todo Implement vote chosen
  */
-export default function VotingActionButtons(
+export function VotingActionButtons(
   props: VotingActionButtonsProps
 ): JSX.Element {
   const {buttonProps, onClick, voteChosen, voteProgress} = props;

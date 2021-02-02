@@ -1,4 +1,4 @@
-import CheckSVG from '../../assets/svg/CheckSVG';
+import CheckSVG from '../../../assets/svg/CheckSVG';
 
 type SquareRootVotingBarProps = {
   yesShares: number;
@@ -8,7 +8,7 @@ type SquareRootVotingBarProps = {
   showPercentages: boolean;
 };
 
-export default function SquareRootVotingBar({
+export function SquareRootVotingBar({
   yesShares = 0,
   noShares = 0,
   totalShares,

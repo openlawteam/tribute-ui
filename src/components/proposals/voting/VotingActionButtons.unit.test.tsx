@@ -2,7 +2,7 @@ import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import VotingActionButtons from './VotingActionButtons';
+import {VotingActionButtons} from './VotingActionButtons';
 
 describe('VotingActionButtons unit tests', () => {
   test('can render', () => {
