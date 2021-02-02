@@ -1,26 +1,26 @@
 import {ProposalData} from '../types';
-import {SquareRootVotingBar} from './';
+import {SquareRootVotingBar} from '.';
 import {useVotingStartEnd} from '../hooks';
 import ProposalPeriod from '../ProposalPeriod';
 import StopwatchSVG from '../../../assets/svg/StopwatchSVG';
 
-type VotingStatusProps = {
+type OffchainVotingStatusProps = {
   proposal: ProposalData;
   showPercentages?: boolean;
 };
 
 /**
- * VotingStatus
+ * OffchainVotingStatus
  *
  * A read-only component to show voting status information.
  *
- * @param {VotingStatusProps} props
+ * @param {OffchainVotingStatusProps} props
  * @returns {JSX.Element}
  */
-export function VotingStatus({
+export function OffchainVotingStatus({
   proposal,
   showPercentages = true,
-}: VotingStatusProps): JSX.Element {
+}: OffchainVotingStatusProps): JSX.Element {
   const {snapshotProposal} = proposal;
 
   /**
