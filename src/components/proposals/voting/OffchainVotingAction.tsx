@@ -17,7 +17,7 @@ type OffchainVotingActionProps = {
  */
 export function OffchainVotingAction(
   props: OffchainVotingActionProps
-): React.ReactNode {
+): JSX.Element | null {
   const {proposal} = props;
 
   /**
