@@ -5,9 +5,6 @@ import {ContractAdapterNames} from '../../components/web3/types';
 import {DEFAULT_CHAIN, DAO_REGISTRY_CONTRACT_ADDRESS} from '../../config';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {StoreState} from '../types';
-import DaoRegistry from '../../truffle-contracts/DaoRegistry.json';
-import OffchainVotingContract from '../../truffle-contracts/OffchainVotingContract.json';
-import OnboardingContract from '../../truffle-contracts/OnboardingContract.json';
 
 export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
 export const CONTRACT_VOTING = 'CONTRACT_VOTING';
@@ -21,7 +18,10 @@ export function initContractDaoRegistry(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
     try {
       if (web3Instance) {
-        const daoRegistryContract: Record<string, any> = DaoRegistry;
+        const lazyDaoRegistryABI = await import(
+          '../../truffle-contracts/DaoRegistry.json'
+        );
+        const daoRegistryContract: Record<string, any> = lazyDaoRegistryABI;
         const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
         const instance = new web3Instance.eth.Contract(
           daoRegistryContract.abi,
@@ -45,10 +45,13 @@ export function initContractOffchainVoting(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
+        const lazyOffchainVotingABI = await import(
+          '../../truffle-contracts/OffchainVotingContract.json'
+        );
         const offchainVotingContract: Record<
           string,
           any
-        > = OffchainVotingContract;
+        > = lazyOffchainVotingABI;
         /**
          * Get address via DAO Registry.
          *
@@ -80,7 +83,10 @@ export function initContractOnboarding(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
-        const onboardingContract: Record<string, any> = OnboardingContract;
+        const lazyOnboardingABI = await import(
+          '../../truffle-contracts/OffchainVotingContract.json'
+        );
+        const onboardingContract: Record<string, any> = lazyOnboardingABI;
         /**
          * Get address via DAO Registry.
          *
