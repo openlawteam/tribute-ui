@@ -1,3 +1,4 @@
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {
@@ -17,7 +18,6 @@ import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import EtherscanURL from '../web3/EtherscanURL';
 import FadeIn from '../common/FadeIn';
 import Loader from '../feedback/Loader';
-import React, {useState} from 'react';
 
 type SponsorArguments = [
   string, // `dao`
@@ -121,25 +121,33 @@ export default function SponsorAction(props: SponsorActionProps) {
         type: SnapshotType.proposal,
       });
 
-      // Prepare data for submission to DAO
-      const dataToPrepare = {
-        payload: {
-          name: data.payload.name,
-          body: data.payload.body,
-          choices: data.payload.choices,
-          snapshot: data.payload.snapshot.toString(),
-          start: data.payload.start,
-          end: data.payload.end,
+      /**
+       * Prepare `data` argument for submission to DAO
+       *
+       * For information about which data the smart contract needs for signature verification (e.g. `hashMessage`):
+       * @link https://github.com/openlawteam/laoland/blob/master/contracts/adapters/voting/OffchainVoting.sol
+       */
+      const preparedVoteVerificationBytes = prepareVoteProposalData(
+        {
+          payload: {
+            name: data.payload.name,
+            body: data.payload.body,
+            choices: data.payload.choices,
+            snapshot: data.payload.snapshot.toString(),
+            start: data.payload.start,
+            end: data.payload.end,
+          },
+          sig: signature,
+          space: data.space,
+          timestamp: parseInt(data.timestamp),
         },
-        sig: signature,
-        space: data.space,
-        timestamp: parseInt(data.timestamp),
-      };
+        web3Instance
+      );
 
       const sponsorArguments: SponsorArguments = [
         daoRegistryAddress,
         snapshotDraft.idInDAO,
-        prepareVoteProposalData(dataToPrepare, web3Instance),
+        preparedVoteVerificationBytes,
       ];
 
       const txArguments = {
