@@ -136,11 +136,9 @@ export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
       };
 
       const voteProposalData: SnapshotVoteProposal = {
-        actionId: adapterAddress,
         proposalHash,
         space: SPACE,
         token: snapshotSpace.token,
-        verifyingContract: daoRegistryAddress,
       };
 
       // Check proposal type and get appropriate message
