@@ -4,10 +4,12 @@ import {
   buildVoteMessage,
   getDomainDefinition,
   getSpace,
+  prepareVoteMessage,
   signMessage,
   SnapshotMessageVote,
   SnapshotVoteData,
   SnapshotVoteProposal,
+  VoteChoicesIndex,
 } from '@openlaw/snapshot-js-erc712';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
@@ -17,7 +19,7 @@ import {PRIMARY_TYPE_ERC712} from '../../web3/config';
 import {StoreState} from '../../../store/types';
 import {useWeb3Modal} from '../../web3/hooks/useWeb3Modal';
 
-type PrepareAndSignVoteDataParam = {
+type SignAndSendVoteDataParam = {
   choice: SnapshotMessageVote['choice'];
   /**
    * The address of a delegate voter for a member.
@@ -26,30 +28,30 @@ type PrepareAndSignVoteDataParam = {
   metadata?: Record<string, any>;
 };
 
-type UsePrepareAndSignVoteDataReturn = {
-  prepareAndSignVoteData: (
-    partialVoteData: PrepareAndSignVoteDataParam,
+type UseSignAndSendVoteReturn = {
+  signAndSendVote: (
+    partialVoteData: SignAndSendVoteDataParam,
     adapterName: ContractAdapterNames,
     proposalHash: SnapshotVoteData['payload']['proposalHash']
   ) => Promise<{
     data: SnapshotVoteData;
     signature: string;
   }>;
-  proposalData: SnapshotVoteData | undefined;
-  proposalDataError: Error | undefined;
-  proposalDataStatus: Web3TxStatus;
-  proposalSignature: string;
+  voteData: SnapshotVoteData | undefined;
+  voteDataError: Error | undefined;
+  voteDataStatus: Web3TxStatus;
+  voteSignature: string;
 };
 
 /**
- * usePrepareAndSignVoteData
+ * useSignAndSendVote
  *
  * React hook which prepares proposal data for submission
  * to Snapshot and Moloch v3 and signs it (ERC712)
  *
  * @returns {Promise<BuildAndSignProposalDataReturn>} An object with the proposal data and the ERC712 signature string.
  */
-export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
+export function useSignAndSendVote(): UseSignAndSendVoteReturn {
   /**
    * Selectors
    */
@@ -69,10 +71,10 @@ export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
    * State
    */
 
-  const [proposalData, setVoteData] = useState<SnapshotVoteData>();
-  const [proposalDataError, setProposalDataError] = useState<Error>();
-  const [proposalSignature, setProposalSignature] = useState<string>('');
-  const [proposalDataStatus, setProposalDataStatus] = useState<Web3TxStatus>(
+  const [voteData, setVoteData] = useState<SnapshotVoteData>();
+  const [voteDataError, setVoteDataError] = useState<Error>();
+  const [voteSignature, setVoteSignature] = useState<string>('');
+  const [voteDataStatus, setVoteDataStatus] = useState<Web3TxStatus>(
     Web3TxStatus.STANDBY
   );
 
@@ -81,18 +83,18 @@ export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
    */
 
   /**
-   * prepareAndSignVoteData
+   * signAndSendVote
    *
-   * Builds the vote data for submission to Moloch v3 and Snapshot and signs it (ERC712).
+   * Builds the vote data for submission to Snapshot and signs it (ERC712).
    *
-   * @param {PrepareAndSignVoteDataParam}
+   * @param {SignAndSendVoteDataParam}
    * @param {adapterName} ContractAdapterNames - An adapter's contract address this data is related to.
    *   @note Does not accept voting adapter names.
    * @param {SnapshotVoteData['payload']['proposalHash']} proposalHash - The unique hash of the proposal from snapshot-hub.
    * @returns {Promise<BuildAndSignProposalDataReturn>} An object with the vote data and the ERC712 signature string.
    */
-  async function prepareAndSignVoteData(
-    partialVoteData: PrepareAndSignVoteDataParam,
+  async function signAndSendVote(
+    partialVoteData: SignAndSendVoteDataParam,
     adapterName: ContractAdapterNames,
     proposalHash: SnapshotVoteData['payload']['proposalHash']
   ): Promise<{
@@ -116,7 +118,7 @@ export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
         throw new Error('No "SNAPSHOT_HUB_API_URL" was found.');
       }
 
-      setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
+      setVoteDataStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       const adapterAddress = getAdapterAddressFromContracts(
         adapterName,
@@ -141,12 +143,20 @@ export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
         token: snapshotSpace.token,
       };
 
-      // Check proposal type and get appropriate message
+      // 1. Check proposal type and get appropriate message
       const message = await buildVoteMessage(
         voteData,
         voteProposalData,
         SNAPSHOT_HUB_API_URL
       );
+
+      prepareVoteMessage({
+        timestamp: message.timestamp,
+        payload: {
+          proposalHash: message.payload.proposalHash,
+          choice: VoteChoicesIndex[choice],
+        },
+      });
 
       const {domain, types} = getDomainDefinition(
         message,
@@ -162,30 +172,30 @@ export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
         message: message,
       });
 
-      setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
+      setVoteDataStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       const signature = await signMessage(provider, account, dataToSign);
 
-      setProposalDataStatus(Web3TxStatus.FULFILLED);
+      setVoteDataStatus(Web3TxStatus.FULFILLED);
       setVoteData(message);
-      setProposalSignature(signature);
+      setVoteSignature(signature);
 
       return {
         data: message,
         signature,
       };
     } catch (error) {
-      setProposalDataError(error);
+      setVoteDataError(error);
 
       throw error;
     }
   }
 
   return {
-    prepareAndSignVoteData,
-    proposalData,
-    proposalDataError,
-    proposalDataStatus,
-    proposalSignature,
+    signAndSendVote,
+    voteData,
+    voteDataError,
+    voteDataStatus,
+    voteSignature,
   };
 }

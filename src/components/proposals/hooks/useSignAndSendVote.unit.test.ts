@@ -1,16 +1,15 @@
 import {renderHook, act} from '@testing-library/react-hooks';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
-import {usePrepareAndSignVoteData} from '.';
+import {useSignAndSendVote} from '.';
 import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 import Wrapper from '../../../test/Wrapper';
-import {DEFAULT_DAO_REGISTRY_ADDRESS} from '../../../test/helpers';
 
-describe('usePrepareAndSignVoteData unit tests', () => {
-  test('should return correct data when calling prepareAndSignVoteData', async () => {
+describe('useSignAndSendVote unit tests', () => {
+  test('should return correct data when calling signAndSendVote', async () => {
     await act(async () => {
       const {result, waitForNextUpdate} = renderHook(
-        () => usePrepareAndSignVoteData(),
+        () => useSignAndSendVote(),
         {
           initialProps: {
             useInit: true,
@@ -26,15 +25,15 @@ describe('usePrepareAndSignVoteData unit tests', () => {
       });
 
       // assert initial state
-      expect(result.current.prepareAndSignVoteData).toBeInstanceOf(Function);
-      expect(result.current.proposalData).toBe(undefined);
-      expect(result.current.proposalDataError).toBe(undefined);
-      expect(result.current.proposalDataStatus).toBe(Web3TxStatus.STANDBY);
-      expect(result.current.proposalSignature).toBe('');
+      expect(result.current.signAndSendVote).toBeInstanceOf(Function);
+      expect(result.current.voteData).toBe(undefined);
+      expect(result.current.voteDataError).toBe(undefined);
+      expect(result.current.voteDataStatus).toBe(Web3TxStatus.STANDBY);
+      expect(result.current.voteSignature).toBe('');
 
-      // Call prepareAndSignVoteData
+      // Call signAndSendVote
       act(() => {
-        result.current.prepareAndSignVoteData(
+        result.current.signAndSendVote(
           {choice: VoteChoices.Yes},
           ContractAdapterNames.onboarding,
           'abc123'
@@ -42,26 +41,24 @@ describe('usePrepareAndSignVoteData unit tests', () => {
       });
 
       // assert awaiting confirmation state
-      expect(result.current.prepareAndSignVoteData).toBeInstanceOf(Function);
-      expect(result.current.proposalData).toBe(undefined);
-      expect(result.current.proposalDataError).toBe(undefined);
-      expect(result.current.proposalDataStatus).toBe(
-        Web3TxStatus.AWAITING_CONFIRM
-      );
-      expect(result.current.proposalSignature).toBe('');
+      expect(result.current.signAndSendVote).toBeInstanceOf(Function);
+      expect(result.current.voteData).toBe(undefined);
+      expect(result.current.voteDataError).toBe(undefined);
+      expect(result.current.voteDataStatus).toBe(Web3TxStatus.AWAITING_CONFIRM);
+      expect(result.current.voteSignature).toBe('');
 
       await waitForNextUpdate();
 
       // @note Set the timestamp by hand as dates will always be different
       const now = (Date.now() / 1000).toFixed();
-      const proposalDataUpdated = {
-        ...result.current.proposalData,
+      const voteDataUpdated = {
+        ...result.current.voteData,
         timestamp: now,
       };
 
       // assert pending state
-      expect(result.current.prepareAndSignVoteData).toBeInstanceOf(Function);
-      expect(proposalDataUpdated).toStrictEqual({
+      expect(result.current.signAndSendVote).toBeInstanceOf(Function);
+      expect(voteDataUpdated).toStrictEqual({
         payload: {
           choice: 1,
           metadata: {
@@ -75,18 +72,18 @@ describe('usePrepareAndSignVoteData unit tests', () => {
         type: 'vote',
         version: '0.1.2',
       });
-      expect(result.current.proposalDataError).toBe(undefined);
-      expect(result.current.proposalDataStatus).toBe(Web3TxStatus.FULFILLED);
-      expect(result.current.proposalSignature).toBe(
+      expect(result.current.voteDataError).toBe(undefined);
+      expect(result.current.voteDataStatus).toBe(Web3TxStatus.FULFILLED);
+      expect(result.current.voteSignature).toBe(
         '0x000000000000000000000000000000000000000000000000000000000000007b'
       );
     });
   });
 
-  test('should return correct data when calling prepareAndSignVoteData with delegate address', async () => {
+  test('should return correct data when calling signAndSendVote with delegate address', async () => {
     await act(async () => {
       const {result, waitForNextUpdate} = renderHook(
-        () => usePrepareAndSignVoteData(),
+        () => useSignAndSendVote(),
         {
           initialProps: {
             useInit: true,
@@ -102,15 +99,15 @@ describe('usePrepareAndSignVoteData unit tests', () => {
       });
 
       // assert initial state
-      expect(result.current.prepareAndSignVoteData).toBeInstanceOf(Function);
-      expect(result.current.proposalData).toBe(undefined);
-      expect(result.current.proposalDataError).toBe(undefined);
-      expect(result.current.proposalDataStatus).toBe(Web3TxStatus.STANDBY);
-      expect(result.current.proposalSignature).toBe('');
+      expect(result.current.signAndSendVote).toBeInstanceOf(Function);
+      expect(result.current.voteData).toBe(undefined);
+      expect(result.current.voteDataError).toBe(undefined);
+      expect(result.current.voteDataStatus).toBe(Web3TxStatus.STANDBY);
+      expect(result.current.voteSignature).toBe('');
 
-      // Call prepareAndSignVoteData
+      // Call signAndSendVote
       act(() => {
-        result.current.prepareAndSignVoteData(
+        result.current.signAndSendVote(
           {
             choice: VoteChoices.Yes,
             delegateAddress: '0xF297430B340fEEdfe18da3747e1392B5A04b5c99',
@@ -124,26 +121,24 @@ describe('usePrepareAndSignVoteData unit tests', () => {
       });
 
       // assert awaiting confirmation state
-      expect(result.current.prepareAndSignVoteData).toBeInstanceOf(Function);
-      expect(result.current.proposalData).toBe(undefined);
-      expect(result.current.proposalDataError).toBe(undefined);
-      expect(result.current.proposalDataStatus).toBe(
-        Web3TxStatus.AWAITING_CONFIRM
-      );
-      expect(result.current.proposalSignature).toBe('');
+      expect(result.current.signAndSendVote).toBeInstanceOf(Function);
+      expect(result.current.voteData).toBe(undefined);
+      expect(result.current.voteDataError).toBe(undefined);
+      expect(result.current.voteDataStatus).toBe(Web3TxStatus.AWAITING_CONFIRM);
+      expect(result.current.voteSignature).toBe('');
 
       await waitForNextUpdate();
 
       // @note Set the timestamp by hand as dates will always be different
       const now = (Date.now() / 1000).toFixed();
-      const proposalDataUpdated = {
-        ...result.current.proposalData,
+      const voteDataUpdated = {
+        ...result.current.voteData,
         timestamp: now,
       };
 
       // assert pending state
-      expect(result.current.prepareAndSignVoteData).toBeInstanceOf(Function);
-      expect(proposalDataUpdated).toStrictEqual({
+      expect(result.current.signAndSendVote).toBeInstanceOf(Function);
+      expect(voteDataUpdated).toStrictEqual({
         payload: {
           choice: 1,
           metadata: {
@@ -158,9 +153,9 @@ describe('usePrepareAndSignVoteData unit tests', () => {
         type: 'vote',
         version: '0.1.2',
       });
-      expect(result.current.proposalDataError).toBe(undefined);
-      expect(result.current.proposalDataStatus).toBe(Web3TxStatus.FULFILLED);
-      expect(result.current.proposalSignature).toBe(
+      expect(result.current.voteDataError).toBe(undefined);
+      expect(result.current.voteDataStatus).toBe(Web3TxStatus.FULFILLED);
+      expect(result.current.voteSignature).toBe(
         '0x000000000000000000000000000000000000000000000000000000000000007b'
       );
     });
