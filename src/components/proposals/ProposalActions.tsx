@@ -1,10 +1,9 @@
 import React from 'react';
 
+import {OffchainVotingStatus, OffchainVotingAction} from './voting';
 import {ProposalData} from './types';
 import {useVotingStartEnd} from './hooks/useVotingStartEnd';
 import SponsorAction from './SponsorAction';
-import VotingAction from './VotingAction';
-import VotingStatus from './VotingStatus';
 
 type ProposalActionsProps = {
   proposal: ProposalData;
@@ -17,11 +16,9 @@ export default function ProposalActions(props: ProposalActionsProps) {
    * Our hooks
    */
 
-  const {
-    hasVotingStarted,
-    hasVotingEnded,
-    votingStartEndInitReady,
-  } = useVotingStartEnd(proposal);
+  const {hasVotingStarted, votingStartEndInitReady} = useVotingStartEnd(
+    proposal
+  );
 
   /**
    * Render
@@ -36,10 +33,8 @@ export default function ProposalActions(props: ProposalActionsProps) {
 
       {votingStartEndInitReady && hasVotingStarted && (
         <>
-          {/* VOTING PROGRESS STATUS AND BAR */}
-          <VotingStatus proposal={proposal} />
-          {/* VOTING ACTIONS */}
-          {!hasVotingEnded && <VotingAction />}
+          <OffchainVotingStatus proposal={proposal} />
+          <OffchainVotingAction proposal={proposal} />
         </>
       )}
     </div>

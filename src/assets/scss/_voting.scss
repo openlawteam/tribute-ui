@@ -116,3 +116,12 @@ $bar-height: 14px;
     }
   }
 }
+
+.votingbutton--voted {
+  &::before {
+    content: "\2713"; /* check mark */
+    margin-left: -1.125em;
+    color: $color-primary;
+    position: absolute;
+  }
+}

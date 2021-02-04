@@ -1,5 +1,5 @@
 import {FakeProposal} from './_mockData';
-import VotingStatus from './VotingStatus';
+import {OffchainVotingStatus} from './voting';
 
 type ProposalCardProps = {
   buttonText?: string;
@@ -38,7 +38,7 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
 
       {/* VOTING PROGRESS STATUS AND BAR */}
       {/* @todo fix */}
-      <VotingStatus proposal={proposal as any} />
+      <OffchainVotingStatus proposal={proposal as any} />
 
       {/* BUTTON (no click handler) */}
       <button className="proposalcard__button">{buttonText}</button>
