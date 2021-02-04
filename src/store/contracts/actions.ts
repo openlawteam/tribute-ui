@@ -84,7 +84,7 @@ export function initContractOnboarding(web3Instance: Web3) {
     try {
       if (web3Instance) {
         const lazyOnboardingABI = await import(
-          '../../truffle-contracts/OffchainVotingContract.json'
+          '../../truffle-contracts/OnboardingContract.json'
         );
         const onboardingContract: Record<string, any> = lazyOnboardingABI;
         /**
