@@ -5,6 +5,8 @@ import {
   buildProposalMessage,
   getDomainDefinition,
   getSpace,
+  prepareDraftMessage,
+  prepareProposalMessage,
   signMessage,
   SnapshotMessageBase,
   SnapshotMessageProposal,
@@ -201,34 +203,37 @@ export function useSignAndSubmitProposal<
         metadata,
         token: snapshotSpace.token,
         space: SPACE,
-        actionId,
-        chainId: DEFAULT_CHAIN,
-        verifyingContract: daoRegistryAddress,
       };
 
       // 1. Check proposal type and prepare appropriate message
-      const message = (type === 'draft'
+      const message = (type === SnapshotType.draft
         ? await buildDraftMessage(commonData, SNAPSHOT_HUB_API_URL)
         : await buildProposalMessageHelper({
             ...commonData,
             timestamp,
           })) as ProposalOrDraftSignDataFromType<T>;
 
+      // 2. Prepare signing data. Snapshot and the contracts will verify this same data against the signature.
+      const erc712Message =
+        type === SnapshotType.draft
+          ? prepareDraftMessage(message)
+          : prepareProposalMessage(message as SnapshotProposalData);
+
       const {domain, types} = getDomainDefinition(
-        message,
+        {...erc712Message, type},
         daoRegistryAddress,
         actionId,
         DEFAULT_CHAIN
       );
 
       const dataToSign = JSON.stringify({
-        types: types,
-        domain: domain,
+        types,
+        domain,
         primaryType: PRIMARY_TYPE_ERC712,
-        message: message,
+        message: erc712Message,
       });
 
-      // 2. Sign data
+      // 3. Sign data
       const signature = await signMessage(provider, account, dataToSign);
 
       setProposalSignAndSendStatus(Web3TxStatus.PENDING);
@@ -238,7 +243,13 @@ export function useSignAndSubmitProposal<
         SNAPSHOT_HUB_API_URL,
         account,
         message,
-        signature
+        signature,
+        {
+          actionId: domain.actionId,
+          chainId: domain.chainId,
+          verifyingContract: domain.verifyingContract,
+          message: erc712Message,
+        }
       );
 
       const dataToReturn = {
