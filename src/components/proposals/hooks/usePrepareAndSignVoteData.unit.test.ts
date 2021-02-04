@@ -69,13 +69,10 @@ describe('usePrepareAndSignVoteData unit tests', () => {
           },
           proposalHash: 'abc123',
         },
-        actionId: '0x0000000000000000000000000000000000000000',
-        chainId: 1337,
         space: 'thelao',
         timestamp: now,
         token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
         type: 'vote',
-        verifyingContract: DEFAULT_DAO_REGISTRY_ADDRESS,
         version: '0.1.2',
       });
       expect(result.current.proposalDataError).toBe(undefined);
@@ -155,13 +152,10 @@ describe('usePrepareAndSignVoteData unit tests', () => {
           },
           proposalHash: 'abc123',
         },
-        actionId: '0x0000000000000000000000000000000000000000',
-        chainId: 1337,
         space: 'thelao',
         timestamp: now,
         token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
         type: 'vote',
-        verifyingContract: DEFAULT_DAO_REGISTRY_ADDRESS,
         version: '0.1.2',
       });
       expect(result.current.proposalDataError).toBe(undefined);
