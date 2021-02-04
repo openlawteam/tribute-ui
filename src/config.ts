@@ -11,6 +11,7 @@ const {
   REACT_APP_INFURA_PROJECT_ID_LOCAL,
   REACT_APP_INFURA_PROJECT_ID_PROD,
   REACT_APP_SNAPSHOT_HUB_API_URL,
+  REACT_APP_GRAPH_API_URL,
 } = process.env;
 
 export const ENVIRONMENT = REACT_APP_ENVIRONMENT as EnvironmentName | undefined;
@@ -36,6 +37,9 @@ export const INFURA_PROJECT_ID =
     : REACT_APP_ENVIRONMENT === 'development'
     ? REACT_APP_INFURA_PROJECT_ID_DEV
     : REACT_APP_INFURA_PROJECT_ID_LOCAL;
+
+// The Graph API URL
+export const GRAPH_API_URL = REACT_APP_GRAPH_API_URL;
 
 // Network IDs, when users change wallet networks
 export const CHAINS = {
@@ -68,7 +72,7 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
 export const DAO_REGISTRY_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x69c0c049b1F2E7Abe8DaC47B2baCAC927839D49a',
+  [CHAINS.RINKEBY]: '0x297cdac59d773ddbe3b63dbcfeecb8dff0fec670',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.

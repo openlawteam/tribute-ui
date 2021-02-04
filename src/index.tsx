@@ -2,10 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {BrowserRouter} from 'react-router-dom';
+import {ApolloProvider} from '@apollo/react-hooks';
+import {
+  ApolloClient,
+  InMemoryCache,
+  NormalizedCacheObject,
+} from '@apollo/client';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 
 import {disableReactDevTools} from './util/helpers';
-import {ENVIRONMENT, INFURA_PROJECT_ID} from './config';
+import {ENVIRONMENT, INFURA_PROJECT_ID, GRAPH_API_URL} from './config';
 import {DefaultTheme} from './components/web3/hooks/useWeb3ModalManager';
 import {store} from './store';
 import App from './App';
@@ -57,6 +63,14 @@ function getProviderOptions() {
   return providerOptions;
 }
 
+// Create apolloClient
+export const apolloClient:
+  | ApolloClient<NormalizedCacheObject>
+  | undefined = new ApolloClient({
+  uri: GRAPH_API_URL,
+  cache: new InMemoryCache(),
+});
+
 if (root !== null) {
   ReactDOM.render(
     <Provider store={store}>
@@ -64,15 +78,17 @@ if (root !== null) {
         <Web3ModalManager
           providerOptions={getProviderOptions()}
           defaultTheme={DefaultTheme.LIGHT}>
-          <Init
-            render={({error, isInitComplete}) =>
-              error ? (
-                <InitError error={error} />
-              ) : isInitComplete ? (
-                <App />
-              ) : null
-            }
-          />
+          <ApolloProvider client={apolloClient}>
+            <Init
+              render={({error, isInitComplete}) =>
+                error ? (
+                  <InitError error={error} />
+                ) : isInitComplete ? (
+                  <App />
+                ) : null
+              }
+            />
+          </ApolloProvider>
         </Web3ModalManager>
       </BrowserRouter>
     </Provider>,

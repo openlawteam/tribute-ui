@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import {isMobile} from 'react-device-detect';
+import {useHistory} from 'react-router-dom';
 
-import {ETHERSCAN_URLS, CHAINS} from '../../config';
+import {CHAINS} from '../../config';
 import {svgWalletIcon} from './WalletIcons';
 import {truncateEthAddress} from '../../util/helpers';
 import {useIsDefaultChain} from './hooks';
@@ -43,6 +44,12 @@ function ConnectWallet({
   const {defaultChain, defaultChainError, isDefaultChain} = useIsDefaultChain();
 
   /**
+   * Their hooks
+   */
+
+  const history = useHistory();
+
+  /**
    * State
    */
 
@@ -77,7 +84,8 @@ function ConnectWallet({
   }
 
   function handleNavigate(): void {
-    window.open(`${ETHERSCAN_URLS[defaultChain]}/address/${account}`, '_blank');
+    setOpenModal(false);
+    history.push(`/members/${account}`);
   }
 
   function displayProviders(): JSX.Element {

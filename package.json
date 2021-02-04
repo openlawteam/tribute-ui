@@ -10,6 +10,8 @@
   "license": "Apache-2.0",
   "description": "A modular DAO framework developed and coordinated by its members",
   "dependencies": {
+    "@apollo/client": "^3.3.7",
+    "@apollo/react-hooks": "^4.0.0",
     "@openlaw/snapshot-js-erc712": "^1.0.13",
     "@walletconnect/web3-provider": "^1.3.2",
     "aos": "^2.3.4",

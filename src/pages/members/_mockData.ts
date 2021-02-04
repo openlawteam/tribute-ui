@@ -24,4 +24,7 @@ export const fakeMembers: FakeMember[] = [
   {
     address: '0x69732A015EE3A371714C99CcF6291fF774638E77',
   },
+  {
+    address: '0x2b22914fd1A891a4b11A39B11bD53f0e0434a63A',
+  },
 ];
