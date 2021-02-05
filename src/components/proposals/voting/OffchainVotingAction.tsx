@@ -96,7 +96,7 @@ export function OffchainVotingAction(
 
   const isSubmitDisabled = isDisabled || isInProcessOrDone;
 
-  const voteChoiceProgress: VoteChoices | undefined = isInProcessOrDone
+  const voteChoiceProgress: VoteChoices | undefined = isInProcess
     ? voteChoiceClicked
     : undefined;
 
