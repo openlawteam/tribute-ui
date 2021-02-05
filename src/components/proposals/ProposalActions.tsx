@@ -1,10 +1,10 @@
 import React from 'react';
 
+import {ContractAdapterNames} from '../web3/types';
 import {OffchainVotingStatus, OffchainVotingAction} from './voting';
 import {ProposalData} from './types';
 import {useVotingStartEnd} from './hooks/useVotingStartEnd';
 import SponsorAction from './SponsorAction';
-import {ContractAdapterNames} from '../web3/types';
 
 type ProposalActionsProps = {
   adpaterName: ContractAdapterNames;

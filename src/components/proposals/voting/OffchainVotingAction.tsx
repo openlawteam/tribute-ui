@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
+import {getVoteChosen} from '../helpers';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
 import {useIsAddressDelegated, useWeb3Modal} from '../../web3/hooks';
@@ -10,7 +11,6 @@ import {useSignAndSendVote, useVotingStartEnd} from '../hooks';
 import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 import {VotingActionButtons} from '.';
 import ErrorMessageWithDetails from '../../common/ErrorMessageWithDetails';
-import {getVoteChosen} from '../helpers';
 
 type OffchainVotingActionProps = {
   adapterName: ContractAdapterNames;
