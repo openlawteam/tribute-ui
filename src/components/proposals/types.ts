@@ -17,6 +17,10 @@ export type SnapshotDraft = {
    * The ID used to reference the DAO.
    */
   idInDAO: string;
+  /**
+   * An ID helper to reference the Draft hash
+   */
+  idInSnapshot: string;
 } & SnapshotDraftResponseData;
 
 /**
@@ -27,6 +31,10 @@ export type SnapshotProposal = {
    * The ID used to reference the DAO.
    */
   idInDAO: string;
+  /**
+   * An ID helper to reference the Proposal hash
+   */
+  idInSnapshot: string;
 } & SnapshotProposalResponseData;
 
 /**
