@@ -35,7 +35,6 @@ export function OffchainVotingStatus({
    * Variables
    */
 
-  // placeholder values to be able to render mockups with styles
   const votingStartSeconds = snapshotProposal?.msg.payload.start || 0;
   const votingEndSeconds = snapshotProposal?.msg.payload.end || 0;
   // @todo Add function to calculate member voting power by shares
