@@ -157,6 +157,9 @@ export function OffchainVotingAction(
       setVoteChoiceClicked(VoteChoices[choice]);
 
       await signAndSendVote({choice}, adapterName, proposalHash);
+
+      // Refetch to show the vote the user submitted
+      await proposal.refetchProposalOrDraft();
     } catch (error) {
       setSubmitError(error);
     }
