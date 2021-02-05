@@ -201,7 +201,7 @@ export function useProposalOrDraft(
        *   as a Moloch proposal's ID hash could be the Snapshot Draft's ID.
        */
       const response = await fetch(
-        `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/proposal/${id}?searchUniqueDraftId=true`,
+        `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/proposal/${id}?searchUniqueDraftId=true&includeVotes=true`,
         {signal: abortController?.signal}
       );
 
