@@ -10,6 +10,7 @@ import NotFound from '../subpages/NotFound';
 import ProposalActions from '../../components/proposals/ProposalActions';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
 import Wrap from '../../components/common/Wrap';
+import {ContractAdapterNames} from '../../components/web3/types';
 
 export default function MembershipDetails() {
   /**
@@ -92,7 +93,12 @@ export default function MembershipDetails() {
       <RenderWrapper>
         <ProposalDetails
           proposal={proposalData}
-          renderActions={() => <ProposalActions proposal={proposalData} />}
+          renderActions={() => (
+            <ProposalActions
+              adpaterName={ContractAdapterNames.onboarding}
+              proposal={proposalData}
+            />
+          )}
         />
       </RenderWrapper>
     );
