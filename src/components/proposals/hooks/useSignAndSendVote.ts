@@ -7,8 +7,11 @@ import {
   prepareVoteMessage,
   signMessage,
   SnapshotMessageVote,
+  SnapshotSubmitBaseReturn,
+  SnapshotType,
   SnapshotVoteData,
   SnapshotVoteProposal,
+  submitMessage,
   VoteChoicesIndex,
 } from '@openlaw/snapshot-js-erc712';
 
@@ -33,14 +36,16 @@ type UseSignAndSendVoteReturn = {
     partialVoteData: SignAndSendVoteDataParam,
     adapterName: ContractAdapterNames,
     proposalHash: SnapshotVoteData['payload']['proposalHash']
-  ) => Promise<{
-    data: SnapshotVoteData;
-    signature: string;
-  }>;
-  voteData: SnapshotVoteData | undefined;
+  ) => Promise<SignAndSendVoteReturn>;
+  voteData: SignAndSendVoteReturn | undefined;
   voteDataError: Error | undefined;
   voteDataStatus: Web3TxStatus;
-  voteSignature: string;
+};
+
+type SignAndSendVoteReturn = {
+  data: SnapshotVoteData;
+  signature: string;
+  uniqueId: SnapshotSubmitBaseReturn['uniqueId'];
 };
 
 /**
@@ -71,9 +76,8 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
    * State
    */
 
-  const [voteData, setVoteData] = useState<SnapshotVoteData>();
+  const [voteData, setVoteData] = useState<SignAndSendVoteReturn>();
   const [voteDataError, setVoteDataError] = useState<Error>();
-  const [voteSignature, setVoteSignature] = useState<string>('');
   const [voteDataStatus, setVoteDataStatus] = useState<Web3TxStatus>(
     Web3TxStatus.STANDBY
   );
@@ -97,10 +101,7 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
     partialVoteData: SignAndSendVoteDataParam,
     adapterName: ContractAdapterNames,
     proposalHash: SnapshotVoteData['payload']['proposalHash']
-  ): Promise<{
-    data: SnapshotVoteData;
-    signature: string;
-  }> {
+  ): Promise<SignAndSendVoteReturn> {
     try {
       if (!web3Instance) {
         throw new Error('No Web3 instance was found.');
@@ -150,7 +151,7 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
         SNAPSHOT_HUB_API_URL
       );
 
-      prepareVoteMessage({
+      const erc712Message = prepareVoteMessage({
         timestamp: message.timestamp,
         payload: {
           proposalHash: message.payload.proposalHash,
@@ -159,7 +160,7 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
       });
 
       const {domain, types} = getDomainDefinition(
-        message,
+        {...erc712Message, type: SnapshotType.vote},
         daoRegistryAddress,
         adapterAddress,
         DEFAULT_CHAIN
@@ -169,21 +170,41 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
         types: types,
         domain: domain,
         primaryType: PRIMARY_TYPE_ERC712,
-        message: message,
+        message: erc712Message,
       });
 
-      setVoteDataStatus(Web3TxStatus.AWAITING_CONFIRM);
+      const signature: string = await signMessage(
+        provider,
+        account,
+        dataToSign
+      );
 
-      const signature = await signMessage(provider, account, dataToSign);
+      setVoteDataStatus(Web3TxStatus.PENDING);
 
-      setVoteDataStatus(Web3TxStatus.FULFILLED);
-      setVoteData(message);
-      setVoteSignature(signature);
+      // 3. Send data to snapshot-hub
+      const {data} = await submitMessage<SnapshotSubmitBaseReturn>(
+        SNAPSHOT_HUB_API_URL,
+        account,
+        message,
+        signature,
+        {
+          actionId: domain.actionId,
+          chainId: domain.chainId,
+          verifyingContract: domain.verifyingContract,
+          message: erc712Message,
+        }
+      );
 
-      return {
+      const dataToReturn = {
         data: message,
         signature,
+        uniqueId: data.uniqueId,
       };
+
+      setVoteDataStatus(Web3TxStatus.FULFILLED);
+      setVoteData(dataToReturn);
+
+      return dataToReturn;
     } catch (error) {
       setVoteDataError(error);
 
@@ -196,6 +217,5 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
     voteData,
     voteDataError,
     voteDataStatus,
-    voteSignature,
   };
 }
