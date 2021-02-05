@@ -1,10 +1,13 @@
 import React from 'react';
 
+import {ContractAdapterNames} from '../../web3/types';
 import {ProposalData} from '../types';
-import {useVotingStartEnd} from '../hooks';
+import {useSignAndSendVote, useVotingStartEnd} from '../hooks';
+import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 import {VotingActionButtons} from '.';
 
 type OffchainVotingActionProps = {
+  adapterName: ContractAdapterNames;
   proposal: ProposalData;
 };
 
@@ -18,13 +21,20 @@ type OffchainVotingActionProps = {
 export function OffchainVotingAction(
   props: OffchainVotingActionProps
 ): JSX.Element | null {
-  const {proposal} = props;
+  const {adapterName, proposal} = props;
 
   /**
    * Our hooks
    */
 
   const {hasVotingEnded, votingStartEndInitReady} = useVotingStartEnd(proposal);
+  const {signAndSendVote} = useSignAndSendVote();
+
+  /**
+   * Variables
+   */
+
+  const proposalHash: string = proposal.snapshotProposal?.idInSnapshot || '';
 
   /**
    * Render
@@ -34,9 +44,29 @@ export function OffchainVotingAction(
     return null;
   }
 
+  /**
+   * Functions
+   */
+
+  async function handleSubmitVote(choice: VoteChoices) {
+    if (!proposalHash) {
+      // @todo set error
+      return;
+    }
+
+    // 1. Sign and submit to Snapshot Hub
+    const {signature} = await signAndSendVote(
+      {choice},
+      adapterName,
+      proposalHash
+    );
+
+    console.log('signature', signature);
+  }
+
   return (
     <VotingActionButtons
-      onClick={console.log}
+      onClick={handleSubmitVote}
       buttonProps={
         {
           // disabled: true,

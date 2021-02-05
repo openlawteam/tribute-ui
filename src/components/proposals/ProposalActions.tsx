@@ -4,13 +4,15 @@ import {OffchainVotingStatus, OffchainVotingAction} from './voting';
 import {ProposalData} from './types';
 import {useVotingStartEnd} from './hooks/useVotingStartEnd';
 import SponsorAction from './SponsorAction';
+import {ContractAdapterNames} from '../web3/types';
 
 type ProposalActionsProps = {
+  adpaterName: ContractAdapterNames;
   proposal: ProposalData;
 };
 
 export default function ProposalActions(props: ProposalActionsProps) {
-  const {proposal} = props;
+  const {adpaterName, proposal} = props;
 
   /**
    * Our hooks
@@ -34,7 +36,7 @@ export default function ProposalActions(props: ProposalActionsProps) {
       {votingStartEndInitReady && hasVotingStarted && (
         <>
           <OffchainVotingStatus proposal={proposal} />
-          <OffchainVotingAction proposal={proposal} />
+          <OffchainVotingAction adapterName={adpaterName} proposal={proposal} />
         </>
       )}
     </div>
