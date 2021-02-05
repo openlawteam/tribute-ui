@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 
 import {ProposalData} from '../types';
@@ -15,10 +15,21 @@ type UseVotingStartEndReturn = {
   votingStartEndInitReady: boolean;
 };
 
+type StartEndStatus = {start: AsyncStatus; end: AsyncStatus};
+
 export function useVotingStartEnd(
   proposal: ProposalData
 ): UseVotingStartEndReturn {
   const {snapshotProposal} = proposal;
+
+  /**
+   * Refs
+   */
+
+  const votingStartEndStatusRef = useRef<StartEndStatus>({
+    start: AsyncStatus.STANDBY,
+    end: AsyncStatus.STANDBY,
+  });
 
   /**
    * State
@@ -26,10 +37,10 @@ export function useVotingStartEnd(
 
   const [hasVotingStarted, setHasVotingStarted] = useState<boolean>(false);
   const [hasVotingEnded, setHasVotingEnded] = useState<boolean>(false);
-  const [votingStartEndStatus, setVotingStartEndStatus] = useState<{
-    start: AsyncStatus;
-    end: AsyncStatus;
-  }>({start: AsyncStatus.STANDBY, end: AsyncStatus.STANDBY});
+  const [
+    votingStartEndInitReady,
+    setVotingStartEndInitReady,
+  ] = useState<boolean>(isInitReady(votingStartEndStatusRef.current));
 
   /**
    * Effects
@@ -41,17 +52,26 @@ export function useVotingStartEnd(
       snapshotProposal?.msg.type !== SnapshotType.proposal ||
       hasVotingStarted
     ) {
-      setVotingStartEndStatus((s) => ({...s, start: AsyncStatus.FULFILLED}));
+      setVotingStartEndInitReady(() => {
+        votingStartEndStatusRef.current.start = AsyncStatus.FULFILLED;
+        return isInitReady(votingStartEndStatusRef.current);
+      });
 
       return;
     }
 
-    setVotingStartEndStatus((s) => ({...s, start: AsyncStatus.PENDING}));
+    setVotingStartEndInitReady(() => {
+      votingStartEndStatusRef.current.start = AsyncStatus.PENDING;
+      return isInitReady(votingStartEndStatusRef.current);
+    });
 
     // Check if voting has started every 1 second
     const intervalID = setInterval(() => {
       // Async process ran
-      setVotingStartEndStatus((s) => ({...s, start: AsyncStatus.FULFILLED}));
+      setVotingStartEndInitReady(() => {
+        votingStartEndStatusRef.current.start = AsyncStatus.FULFILLED;
+        return isInitReady(votingStartEndStatusRef.current);
+      });
 
       const hasStartedCheck =
         Math.floor(Date.now() / 1000) > snapshotProposal.msg.payload.start;
@@ -76,17 +96,26 @@ export function useVotingStartEnd(
       snapshotProposal?.msg.type !== SnapshotType.proposal ||
       hasVotingEnded
     ) {
-      setVotingStartEndStatus((s) => ({...s, end: AsyncStatus.FULFILLED}));
+      setVotingStartEndInitReady(() => {
+        votingStartEndStatusRef.current.end = AsyncStatus.FULFILLED;
+        return isInitReady(votingStartEndStatusRef.current);
+      });
 
       return;
     }
 
-    setVotingStartEndStatus((s) => ({...s, end: AsyncStatus.PENDING}));
+    setVotingStartEndInitReady(() => {
+      votingStartEndStatusRef.current.end = AsyncStatus.PENDING;
+      return isInitReady(votingStartEndStatusRef.current);
+    });
 
     // Check if voting has ended every 1 second
     const intervalID = setInterval(() => {
       // Async process ran
-      setVotingStartEndStatus((s) => ({...s, end: AsyncStatus.FULFILLED}));
+      setVotingStartEndInitReady(() => {
+        votingStartEndStatusRef.current.end = AsyncStatus.FULFILLED;
+        return isInitReady(votingStartEndStatusRef.current);
+      });
 
       const hasEndedCheck =
         Math.ceil(Date.now() / 1000) > snapshotProposal.msg.payload.end;
@@ -105,11 +134,19 @@ export function useVotingStartEnd(
     snapshotProposal?.msg.type,
   ]);
 
+  /**
+   * Functions
+   */
+
+  function isInitReady(votingStartEndInitReady: StartEndStatus) {
+    return Object.values(votingStartEndInitReady).every(
+      (s) => s === AsyncStatus.FULFILLED
+    );
+  }
+
   return {
     hasVotingStarted,
     hasVotingEnded,
-    votingStartEndInitReady: Object.values(votingStartEndStatus).every(
-      (s) => s === AsyncStatus.FULFILLED
-    ),
+    votingStartEndInitReady,
   };
 }
