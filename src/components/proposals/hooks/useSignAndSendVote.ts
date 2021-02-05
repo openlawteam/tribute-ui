@@ -206,6 +206,7 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
 
       return dataToReturn;
     } catch (error) {
+      setVoteDataStatus(Web3TxStatus.REJECTED);
       setVoteDataError(error);
 
       throw error;
