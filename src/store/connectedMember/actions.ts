@@ -1,6 +1,7 @@
 import {Dispatch} from 'redux';
 
 import {SmartContractItem} from '../../components/web3/types';
+import {ConnectedMemberState} from '../types';
 
 export const SET_CONNECTED_MEMBER = 'SET_CONNECTED_MEMBER';
 export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
@@ -55,7 +56,7 @@ export function getConnectedMember(
   };
 }
 
-export function setConnectedMember(payload: Record<string, any>) {
+export function setConnectedMember(payload: ConnectedMemberState) {
   return {type: SET_CONNECTED_MEMBER, ...payload};
 }
 
