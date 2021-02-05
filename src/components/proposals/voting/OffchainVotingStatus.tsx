@@ -1,3 +1,5 @@
+import {useEffect, useState} from 'react';
+
 import {ProposalData} from '../types';
 import {SquareRootVotingBar} from '.';
 import {useVotingStartEnd} from '../hooks';
@@ -24,6 +26,12 @@ export function OffchainVotingStatus({
   const {snapshotProposal} = proposal;
 
   /**
+   * State
+   */
+
+  const [didVotePass, setDidVotePass] = useState<boolean>();
+
+  /**
    * Variables
    */
 
@@ -46,16 +54,14 @@ export function OffchainVotingStatus({
   } = useVotingStartEnd(proposal);
 
   /**
-   * Functions
+   * Effects
    */
 
-  function getDidVotePass(): boolean | undefined {
+  useEffect(() => {
     if (!hasVotingEnded) return;
 
-    const yesGreaterThanNo = yesShares > noShares;
-
-    return yesGreaterThanNo;
-  }
+    setDidVotePass(yesShares > noShares);
+  }, [hasVotingEnded]);
 
   /**
    * Render
@@ -84,9 +90,10 @@ export function OffchainVotingStatus({
         )}
 
         {/* STATUSES ON VOTING ENDED */}
-        {getDidVotePass() && <span className="votingstatus">Approved</span>}
-        {getDidVotePass() === false && (
-          <span className="votingstatus">Failed</span>
+        {typeof didVotePass === 'boolean' && (
+          <span className="votingstatus">
+            {didVotePass ? 'Approved' : 'Failed'}
+          </span>
         )}
       </div>
 
