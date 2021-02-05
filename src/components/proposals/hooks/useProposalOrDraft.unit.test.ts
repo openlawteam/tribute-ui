@@ -18,10 +18,8 @@ describe('useProposalOrDraft unit tests', () => {
         useProposalOrDraft('abc123def456')
       );
 
-      const proposal =
-        snapshotAPIProposalResponse[
-          Object.keys(snapshotAPIProposalResponse)[0]
-        ];
+      const idKey = Object.keys(snapshotAPIProposalResponse)[0];
+      const proposal = snapshotAPIProposalResponse[idKey];
 
       await waitFor(() => {
         // Assert initial state
@@ -36,6 +34,7 @@ describe('useProposalOrDraft unit tests', () => {
         expect(result.current.proposalData?.snapshotProposal).toStrictEqual({
           ...proposal,
           idInDAO: proposal.data.erc712DraftHash,
+          idInSnapshot: idKey,
         });
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
@@ -79,6 +78,7 @@ describe('useProposalOrDraft unit tests', () => {
         expect(result.current.proposalData?.snapshotDraft).toStrictEqual({
           ...draft,
           idInDAO: draftIdkey,
+          idInSnapshot: draftIdkey,
         });
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
@@ -165,6 +165,7 @@ describe('useProposalOrDraft unit tests', () => {
         expect(result.current.proposalData?.snapshotDraft).toStrictEqual({
           ...draft,
           idInDAO: draftIdkey,
+          idInSnapshot: draftIdkey,
         });
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
@@ -240,6 +241,7 @@ describe('useProposalOrDraft unit tests', () => {
         expect(result.current.proposalData?.snapshotDraft).toStrictEqual({
           ...draft,
           idInDAO: draftIdkey,
+          idInSnapshot: draftIdkey,
         });
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
@@ -332,6 +334,7 @@ describe('useProposalOrDraft unit tests', () => {
       expect(data).toStrictEqual({
         ...draft,
         idInDAO: draftIdkey,
+        idInSnapshot: draftIdkey,
       });
     });
   });
@@ -346,10 +349,8 @@ describe('useProposalOrDraft unit tests', () => {
         useProposalOrDraft('abc123def456', SnapshotType.proposal)
       );
 
-      const proposal =
-        snapshotAPIProposalResponse[
-          Object.keys(snapshotAPIProposalResponse)[0]
-        ];
+      const idKey = Object.keys(snapshotAPIProposalResponse)[0];
+      const proposal = snapshotAPIProposalResponse[idKey];
 
       await waitFor(() => {
         // Assert initial state
@@ -364,6 +365,7 @@ describe('useProposalOrDraft unit tests', () => {
         expect(result.current.proposalData?.snapshotProposal).toStrictEqual({
           ...proposal,
           idInDAO: proposal.data.erc712DraftHash,
+          idInSnapshot: idKey,
         });
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
@@ -444,10 +446,8 @@ describe('useProposalOrDraft unit tests', () => {
         useProposalOrDraft('abc123def456', SnapshotType.proposal)
       );
 
-      const proposal =
-        snapshotAPIProposalResponse[
-          Object.keys(snapshotAPIProposalResponse)[0]
-        ];
+      const idKey = Object.keys(snapshotAPIProposalResponse)[0];
+      const proposal = snapshotAPIProposalResponse[idKey];
 
       await waitFor(() => {
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
@@ -458,6 +458,7 @@ describe('useProposalOrDraft unit tests', () => {
       expect(data).toStrictEqual({
         ...proposal,
         idInDAO: proposal.data.erc712DraftHash,
+        idInSnapshot: idKey,
       });
     });
   });
@@ -484,10 +485,8 @@ describe('useProposalOrDraft unit tests', () => {
       const draftIdKey = Object.keys(snapshotAPIDraftResponse)[0];
       const draft = snapshotAPIDraftResponse[draftIdKey];
 
-      const proposal =
-        snapshotAPIProposalResponse[
-          Object.keys(snapshotAPIProposalResponse)[0]
-        ];
+      const idKey = Object.keys(snapshotAPIProposalResponse)[0];
+      const proposal = snapshotAPIProposalResponse[idKey];
 
       await waitFor(() => {
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
@@ -496,6 +495,7 @@ describe('useProposalOrDraft unit tests', () => {
       expect(result.current.proposalData?.snapshotDraft).toStrictEqual({
         ...draft,
         idInDAO: draftIdKey,
+        idInSnapshot: draftIdKey,
       });
 
       server.use(
@@ -515,6 +515,7 @@ describe('useProposalOrDraft unit tests', () => {
       expect(result.current.proposalData?.snapshotProposal).toStrictEqual({
         ...proposal,
         idInDAO: proposal.data.erc712DraftHash,
+        idInSnapshot: idKey,
       });
     });
   });

@@ -177,6 +177,7 @@ export function useProposalOrDraft(
       // Get the `SnapshotDraftResponseData` by the address key of the single result.
       const draft: SnapshotDraft = {
         idInDAO: idKey,
+        idInSnapshot: idKey,
         ...responseJSON[idKey],
       };
 
@@ -241,6 +242,7 @@ export function useProposalOrDraft(
       // Get the `SnapshotProposalResponseData` by the address key of the single result.
       const proposal: SnapshotProposal = {
         idInDAO: proposalId,
+        idInSnapshot: idKey,
         ...responseJSON[idKey],
       };
 
