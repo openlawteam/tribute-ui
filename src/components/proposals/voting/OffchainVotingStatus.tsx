@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 
 import {ProposalData} from '../types';
 import {SquareRootVotingBar} from '.';
-import {useVotingStartEnd} from '../hooks';
+import {useOffchainVotingStartEnd} from '../hooks';
 import ProposalPeriod from '../ProposalPeriod';
 import StopwatchSVG from '../../../assets/svg/StopwatchSVG';
 
@@ -47,20 +47,20 @@ export function OffchainVotingStatus({
    */
 
   const {
-    hasVotingStarted,
-    hasVotingEnded,
-    votingStartEndInitReady,
-  } = useVotingStartEnd(proposal);
+    hasOffchainVotingStarted,
+    hasOffchainVotingEnded,
+    offchainVotingStartEndInitReady,
+  } = useOffchainVotingStartEnd(proposal);
 
   /**
    * Effects
    */
 
   useEffect(() => {
-    if (!hasVotingEnded) return;
+    if (!hasOffchainVotingEnded) return;
 
     setDidVotePass(yesShares > noShares);
-  }, [hasVotingEnded]);
+  }, [hasOffchainVotingEnded]);
 
   /**
    * Render
@@ -71,22 +71,24 @@ export function OffchainVotingStatus({
       <div className="votingstatus-container">
         <StopwatchSVG />
 
-        {!votingStartEndInitReady && (
+        {!offchainVotingStartEndInitReady && (
           <span className="votingstatus">&hellip;</span>
         )}
 
         {/* STATUS WHEN NOT SPONSORED */}
-        {votingStartEndInitReady && !hasVotingStarted && (
+        {offchainVotingStartEndInitReady && !hasOffchainVotingStarted && (
           <span className="votingstatus">Pending Sponsor</span>
         )}
 
         {/* CLOCK WHILE IN VOTING */}
-        {votingStartEndInitReady && hasVotingStarted && !hasVotingEnded && (
-          <ProposalPeriod
-            startPeriodMs={votingStartSeconds * 1000}
-            endPeriodMs={votingEndSeconds * 1000}
-          />
-        )}
+        {offchainVotingStartEndInitReady &&
+          hasOffchainVotingStarted &&
+          !hasOffchainVotingEnded && (
+            <ProposalPeriod
+              startPeriodMs={votingStartSeconds * 1000}
+              endPeriodMs={votingEndSeconds * 1000}
+            />
+          )}
 
         {/* STATUSES ON VOTING ENDED */}
         {typeof didVotePass === 'boolean' && (
@@ -101,7 +103,7 @@ export function OffchainVotingStatus({
         yesShares={yesShares}
         noShares={noShares}
         totalShares={totalShares}
-        votingExpired={hasVotingEnded}
+        votingExpired={hasOffchainVotingEnded}
         showPercentages={showPercentages}
       />
     </>
