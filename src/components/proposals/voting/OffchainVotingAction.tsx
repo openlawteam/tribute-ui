@@ -7,7 +7,7 @@ import {StoreState} from '../../../store/types';
 import {useIsAddressDelegated, useWeb3Modal} from '../../web3/hooks';
 import {useMemberActionDisabled} from '../../../hooks';
 import {useSelector} from 'react-redux';
-import {useSignAndSendVote, useVotingStartEnd} from '../hooks';
+import {useSignAndSendVote} from '../hooks';
 import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 import {VotingActionButtons} from '.';
 import ErrorMessageWithDetails from '../../common/ErrorMessageWithDetails';
@@ -66,7 +66,6 @@ export function OffchainVotingAction(
    */
 
   const {account} = useWeb3Modal();
-  const {hasVotingEnded, votingStartEndInitReady} = useVotingStartEnd(proposal);
   const {signAndSendVote, voteDataStatus} = useSignAndSendVote();
   const isAddressDelegated = useIsAddressDelegated();
   const voteChosen = getVoteChosen(
@@ -130,19 +129,10 @@ export function OffchainVotingAction(
     setOtherDisabledReasons(Object.values(votingDisabledReasonsRef.current));
   }, [
     delegateAddress,
-    hasVotingEnded,
     isAddressDelegated,
     setOtherDisabledReasons,
     voteChosen,
   ]);
-
-  /**
-   * Render
-   */
-
-  if (!votingStartEndInitReady || hasVotingEnded) {
-    return null;
-  }
 
   /**
    * Functions
