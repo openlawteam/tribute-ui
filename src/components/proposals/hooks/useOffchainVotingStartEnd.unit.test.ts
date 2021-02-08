@@ -3,14 +3,14 @@ import {waitFor} from '@testing-library/react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 
 import {ProposalData} from '../types';
-import {useVotingStartEnd} from '.';
+import {useOffchainVotingStartEnd} from '.';
 
-describe('useVotingStartEnd unit tests', () => {
+describe('useOffchainVotingStartEnd unit tests', () => {
   test('hook returns correct data throughout the voting period', async () => {
     const nowSeconds = Math.floor(Date.now() / 1000);
 
     const {result, waitForNextUpdate} = await renderHook(() =>
-      useVotingStartEnd({
+      useOffchainVotingStartEnd({
         snapshotProposal: {
           msg: {
             payload: {start: nowSeconds, end: nowSeconds + 2},
@@ -21,30 +21,30 @@ describe('useVotingStartEnd unit tests', () => {
     );
 
     // Assert initial state
-    expect(result.current.votingStartEndInitReady).toBe(false);
-    expect(result.current.hasVotingStarted).toBe(false);
-    expect(result.current.hasVotingEnded).toBe(false);
+    expect(result.current.offchainVotingStartEndInitReady).toBe(false);
+    expect(result.current.hasOffchainVotingStarted).toBe(false);
+    expect(result.current.hasOffchainVotingEnded).toBe(false);
 
     await waitForNextUpdate();
 
     // Assert initial state
-    expect(result.current.votingStartEndInitReady).toBe(true);
-    expect(result.current.hasVotingStarted).toBe(true);
-    expect(result.current.hasVotingEnded).toBe(false);
+    expect(result.current.offchainVotingStartEndInitReady).toBe(true);
+    expect(result.current.hasOffchainVotingStarted).toBe(true);
+    expect(result.current.hasOffchainVotingEnded).toBe(false);
 
     await waitForNextUpdate();
 
     // Assert initial state
-    expect(result.current.votingStartEndInitReady).toBe(true);
-    expect(result.current.hasVotingStarted).toBe(true);
-    expect(result.current.hasVotingEnded).toBe(true);
+    expect(result.current.offchainVotingStartEndInitReady).toBe(true);
+    expect(result.current.hasOffchainVotingStarted).toBe(true);
+    expect(result.current.hasOffchainVotingEnded).toBe(true);
   });
 
   test('should provide "true" if voting already started', async () => {
     const nowSeconds = Math.floor(Date.now() / 1000);
 
     const {result, waitForNextUpdate} = await renderHook(() =>
-      useVotingStartEnd({
+      useOffchainVotingStartEnd({
         snapshotProposal: {
           msg: {
             payload: {start: nowSeconds - 1, end: nowSeconds + 3},
@@ -55,22 +55,22 @@ describe('useVotingStartEnd unit tests', () => {
     );
 
     // Assert initial state
-    expect(result.current.votingStartEndInitReady).toBe(false);
-    expect(result.current.hasVotingStarted).toBe(false);
-    expect(result.current.hasVotingEnded).toBe(false);
+    expect(result.current.offchainVotingStartEndInitReady).toBe(false);
+    expect(result.current.hasOffchainVotingStarted).toBe(false);
+    expect(result.current.hasOffchainVotingEnded).toBe(false);
 
     await waitForNextUpdate();
 
-    expect(result.current.votingStartEndInitReady).toBe(true);
-    expect(result.current.hasVotingStarted).toBe(true);
-    expect(result.current.hasVotingEnded).toBe(false);
+    expect(result.current.offchainVotingStartEndInitReady).toBe(true);
+    expect(result.current.hasOffchainVotingStarted).toBe(true);
+    expect(result.current.hasOffchainVotingEnded).toBe(false);
   });
 
   test('should provide "true" if voting already ended', async () => {
     const nowSeconds = Math.floor(Date.now() / 1000);
 
     const {result, waitForNextUpdate} = await renderHook(() =>
-      useVotingStartEnd({
+      useOffchainVotingStartEnd({
         snapshotProposal: {
           msg: {
             payload: {start: nowSeconds - 180, end: nowSeconds - 5},
@@ -81,22 +81,22 @@ describe('useVotingStartEnd unit tests', () => {
     );
 
     // Assert initial state
-    expect(result.current.votingStartEndInitReady).toBe(false);
-    expect(result.current.hasVotingStarted).toBe(false);
-    expect(result.current.hasVotingEnded).toBe(false);
+    expect(result.current.offchainVotingStartEndInitReady).toBe(false);
+    expect(result.current.hasOffchainVotingStarted).toBe(false);
+    expect(result.current.hasOffchainVotingEnded).toBe(false);
 
     await waitForNextUpdate();
 
     await waitFor(() => {
-      expect(result.current.votingStartEndInitReady).toBe(true);
-      expect(result.current.hasVotingStarted).toBe(true);
-      expect(result.current.hasVotingEnded).toBe(true);
+      expect(result.current.offchainVotingStartEndInitReady).toBe(true);
+      expect(result.current.hasOffchainVotingStarted).toBe(true);
+      expect(result.current.hasOffchainVotingEnded).toBe(true);
     });
   });
 
   test('should provide "false" if proposal is a draft / snapshotProposal does not exist', async () => {
     const {result} = await renderHook(() =>
-      useVotingStartEnd({
+      useOffchainVotingStartEnd({
         snapshotDraft: {
           msg: {
             payload: {},
@@ -107,8 +107,8 @@ describe('useVotingStartEnd unit tests', () => {
     );
 
     // Assert initial state
-    expect(result.current.votingStartEndInitReady).toBe(true);
-    expect(result.current.hasVotingStarted).toBe(false);
-    expect(result.current.hasVotingEnded).toBe(false);
+    expect(result.current.offchainVotingStartEndInitReady).toBe(true);
+    expect(result.current.hasOffchainVotingStarted).toBe(false);
+    expect(result.current.hasOffchainVotingEnded).toBe(false);
   });
 });
