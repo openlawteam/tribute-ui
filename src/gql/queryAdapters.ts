@@ -5,6 +5,7 @@ export const GET_ADAPTERS = gql`
     adapters {
       id
       acl
+      adapterId
       adapterAddress
     }
   }

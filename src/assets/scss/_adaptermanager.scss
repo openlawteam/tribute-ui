@@ -1,0 +1,43 @@
+@use "./variables" as *; /* load without namespace for convenience */
+@use "./mixins" as *; /* load without namespace for convenience */
+@use "./button";
+
+.adaptermanager {
+  // font-family: $font-mono;
+}
+
+.adaptermanager__grid {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 2rem;
+}
+
+.adaptermanager__info {
+  flex: 50%;
+
+  .adaptermanager__name,
+  .adaptermanager__desc {
+    display: flex;
+    flex: 100%;
+  }
+
+  .adaptermanager__desc {
+    line-height: 2;
+  }
+}
+
+.adaptermanager__add,
+.adaptermanager__configure,
+.adaptermanager__remove {
+  align-self: center;
+  flex: 25%;
+  text-align: center;
+}
+
+.adaptermanager__add {
+  flex: 50%;
+}
+
+.adaptermanager__name {
+  text-transform: uppercase;
+}
