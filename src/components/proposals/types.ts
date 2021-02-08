@@ -6,6 +6,25 @@ import {
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
 
+/**
+ * ENUMS
+ */
+
+// @todo Need more information about the vote challenge flow.
+export enum ProposalFlowStatus {
+  Sponsor = 'Sponsor',
+  OffchainVoting = 'OffchainVoting',
+  OffchainVotingSubmitResult = 'OffchainVotingSubmitResult',
+  OffchainVotingGracePeriod = 'OffchainVotingGracePeriod',
+  OnchainVoting = 'OnchainVoting',
+  Process = 'Process',
+  Completed = 'Completed',
+}
+
+/**
+ * TYPES
+ */
+
 // @todo Change the type to be precise
 export type SubgraphProposal = Record<string, any>;
 
