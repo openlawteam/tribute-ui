@@ -3,6 +3,7 @@ import {useSelector} from 'react-redux';
 import {
   createVote,
   getDomainDefinition,
+  getVoteResultRootDomainDefinition,
   prepareVoteResult,
   signMessage,
   SnapshotVoteResponseData,
@@ -18,7 +19,7 @@ import {
 } from '../../web3/helpers';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
-import {TX_CYCLE_MESSAGES} from '../../web3/config';
+import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
 import {useMemberActionDisabled} from '../../../hooks';
 import {useWeb3Modal, useContractSend, useETHGasPrice} from '../../web3/hooks';
 import {
@@ -35,6 +36,25 @@ type OffchainVotingSubmitResultActionProps = {
   adapterName: ContractAdapterNames;
   proposal: ProposalData;
 };
+
+type SubmitVoteResultArguments = [
+  string, // `dao`
+  string, // `proposalId`
+  string, // `proposal data`,
+  {
+    account: string;
+    choice: VoteChoicesIndex;
+    index: number;
+    nbNo: string;
+    nbYes: string;
+    proof: string[];
+    proposalHash: string;
+    rootSig: string;
+    sig: string;
+    timestamp: number;
+  }
+];
+
 export function OffchainVotingSubmitResultAction(
   props: OffchainVotingSubmitResultActionProps
 ) {
@@ -85,7 +105,6 @@ export function OffchainVotingSubmitResultAction(
    */
 
   const adapterAddress = getAdapterAddressFromContracts(adapterName, contracts);
-  const adapterContract = getContractByAddress(adapterAddress, contracts);
 
   const isInProcess =
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
@@ -152,6 +171,8 @@ export function OffchainVotingSubmitResultAction(
         votes: await Promise.all(voteEntriesPromises),
       });
 
+      const voteResultTreeHexRoot = voteResultTree.getHexRoot();
+
       const result = toStepNode({
         actionId: adapterAddress,
         chainId: DEFAULT_CHAIN,
@@ -161,13 +182,10 @@ export function OffchainVotingSubmitResultAction(
         verifyingContract: daoRegistryAddress,
       });
 
-      const messageToSign: MessageWithType = {
-        root: voteResultTree.getHexRoot(),
-        type: 'result',
-      };
+      // (result as any).nbNo = Number(result.nbNo);
+      // (result as any).nbYes = Number(result.nbYes);
 
-      const {domain, types} = getDomainDefinition(
-        messageToSign,
+      const {domain, types} = getVoteResultRootDomainDefinition(
         daoRegistryAddress,
         adapterAddress,
         DEFAULT_CHAIN
@@ -175,22 +193,25 @@ export function OffchainVotingSubmitResultAction(
 
       const messageParams = JSON.stringify({
         domain,
-        message: messageToSign,
-        primaryType: 'Message',
+        message: {root: voteResultTreeHexRoot},
+        primaryType: PRIMARY_TYPE_ERC712,
         types,
       });
 
       const signature = await signMessage(provider, account, messageParams);
 
-      // @todo Add type
-      (result as any).rootSig = signature;
+      const vote = await contracts.OffchainVotingContract?.instance.methods
+        .votes(daoRegistryAddress, proposalHash)
+        .call();
+
+      console.log('vote', vote);
 
       // @todo Add type
-      const submitVoteResultArguments = [
+      const submitVoteResultArguments: SubmitVoteResultArguments = [
         daoRegistryAddress,
         proposalHash,
-        voteResultTree.getHexRoot(),
-        result,
+        voteResultTreeHexRoot,
+        {...result, rootSig: signature},
       ];
 
       console.log('submitVoteResultArguments', submitVoteResultArguments);
