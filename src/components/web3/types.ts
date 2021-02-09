@@ -1,5 +1,6 @@
 import {AbiItem} from 'web3-utils/types';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
+import {CoreProposalVoteChoices} from '@openlaw/snapshot-js-erc712';
 
 /**
  * WEB3 TYPES
@@ -126,14 +127,11 @@ export type CoreProposalData = {
   verifyingContract: string;
 };
 
-// Ordered vote choices. Do not change the indexes!
-export type CoreProposalVoteChoices = [VoteChoices.Yes, VoteChoices.No];
-
 /**
  * WEB3 ENUMS
  */
 
-// @todo Add 'transfer' and 'tribute' when ready
+// @todo Add other extensions as needs arise
 export enum ContractAdapterNames {
   configuration = 'configuration',
   financing = 'financing',
@@ -143,6 +141,11 @@ export enum ContractAdapterNames {
   onboarding = 'onboarding',
   ragequit = 'ragequit',
   voting = 'voting',
+}
+
+// @todo Add other extensions as needs arise
+export enum ContractExtensionNames {
+  bank = 'bank',
 }
 
 // @todo Add more as the need arises.

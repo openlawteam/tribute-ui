@@ -3,6 +3,7 @@ import {ThunkDispatch} from 'redux-thunk';
 import {SmartContractItem} from '../components/web3/types';
 
 export type ContractsState = {
+  BankExtensionContract: SmartContractItem | null;
   DaoRegistryContract: SmartContractItem | null;
   OnboardingContract: SmartContractItem | null;
   OffchainVotingContract: SmartContractItem | null;

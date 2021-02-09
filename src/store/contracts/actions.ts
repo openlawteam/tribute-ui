@@ -1,14 +1,19 @@
 import Web3 from 'web3';
 import {Dispatch} from 'redux';
 
-import {ContractAdapterNames} from '../../components/web3/types';
+import {
+  ContractAdapterNames,
+  ContractExtensionNames,
+} from '../../components/web3/types';
 import {DEFAULT_CHAIN, DAO_REGISTRY_CONTRACT_ADDRESS} from '../../config';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {StoreState} from '../types';
+import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
 
 export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
 export const CONTRACT_VOTING = 'CONTRACT_VOTING';
 export const CONTRACT_ONBOARDING = 'CONTRACT_ONBOARDING';
+export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
 
 /**
  * @todo Add inits for Transfer and Tribute when ready
@@ -104,6 +109,47 @@ export function initContractOnboarding(web3Instance: Web3) {
         dispatch({
           type: CONTRACT_ONBOARDING,
           abi: onboardingContract.abi,
+          contractAddress,
+          instance,
+        });
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+}
+
+/**
+ * @note
+ *   Once subgraph is implemented we may not need this.
+ *   Currently it is used for getting voting weight before
+ *   submitting the off-chain result on-chain.
+ */
+export function initContractBankExtension(web3Instance: Web3) {
+  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
+    try {
+      if (web3Instance) {
+        const lazyBankExtensionABI = await import(
+          '../../truffle-contracts/BankExtension.json'
+        );
+        const bankExtensionContract: Record<string, any> = lazyBankExtensionABI;
+        /**
+         * Get address via DAO Registry.
+         *
+         * @note The `DaoRegistryContract` must be set in Redux first.
+         */
+        const contractAddress = await getExtensionAddress(
+          ContractExtensionNames.bank,
+          getState().contracts.DaoRegistryContract?.instance
+        );
+        const instance = new web3Instance.eth.Contract(
+          bankExtensionContract.abi,
+          contractAddress
+        );
+
+        dispatch({
+          type: CONTRACT_BANK_EXTENSION,
+          abi: bankExtensionContract.abi,
           contractAddress,
           instance,
         });

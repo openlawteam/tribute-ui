@@ -3,6 +3,7 @@ import {useDispatch} from 'react-redux';
 
 // @todo Add inits for Transfer and Tribute when ready
 import {
+  initContractBankExtension,
   initContractDaoRegistry,
   initContractOffchainVoting,
   initContractOnboarding,
@@ -52,6 +53,7 @@ export function useInitContracts() {
       await dispatch(initContractDaoRegistry(web3Instance));
       await dispatch(initContractOffchainVoting(web3Instance));
       await dispatch(initContractOnboarding(web3Instance));
+      await dispatch(initContractBankExtension(web3Instance));
 
       // @todo Add inits for Transfer and Tribute when ready
     } catch (error) {
