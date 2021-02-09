@@ -2,9 +2,9 @@
 @use "./mixins" as *; /* load without namespace for convenience */
 @use "./button";
 
-.adaptermanager {
-  // font-family: $font-mono;
-}
+// .adaptermanager {
+//   // font-family: $font-mono;
+// }
 
 .adaptermanager__grid {
   display: flex;

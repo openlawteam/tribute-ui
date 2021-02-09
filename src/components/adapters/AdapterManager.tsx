@@ -68,6 +68,9 @@ export default function AdapterManager() {
     if (!DaoRegistryContract) return;
 
     console.log('add ', adapter);
+
+    // @todo construct paramters to get adapterAddress & acl
+
     // addAdapter(3)
     // [0]bytes32 adapterId
     // [1]address adapterAddress
@@ -93,6 +96,10 @@ export default function AdapterManager() {
         txArguments
       );
     } catch (error) {}
+  }
+
+  async function configureAdapter(adapter: Record<string, any>) {
+    console.log('configure', adapter);
   }
 
   async function removeAdapter(adapter: Record<string, any>) {
@@ -151,8 +158,8 @@ export default function AdapterManager() {
             <div className="adaptermanager__configure">
               <button
                 className="button--secondary"
-                onClick={() => addAdapter(adapter)}>
-                Update
+                onClick={() => configureAdapter(adapter)}>
+                Configure
               </button>
               {/** @todo maybe modal popup to configure and add */}
             </div>

@@ -6,6 +6,12 @@ import {
   initContractDaoRegistry,
   initContractOffchainVoting,
   initContractOnboarding,
+  initContractConfiguration,
+  initContractFinancing,
+  initContractGuildKick,
+  initContractManaging,
+  initContractRagequit,
+  initContractVoting,
 } from '../../../store/actions';
 import {ReduxDispatch} from '../../../store/types';
 import {useIsDefaultChain} from './useIsDefaultChain';
@@ -52,6 +58,12 @@ export function useInitContracts() {
       await dispatch(initContractDaoRegistry(web3Instance));
       await dispatch(initContractOffchainVoting(web3Instance));
       await dispatch(initContractOnboarding(web3Instance));
+      await dispatch(initContractConfiguration(web3Instance));
+      await dispatch(initContractFinancing(web3Instance));
+      await dispatch(initContractGuildKick(web3Instance));
+      await dispatch(initContractManaging(web3Instance));
+      await dispatch(initContractRagequit(web3Instance));
+      await dispatch(initContractVoting(web3Instance));
 
       // @todo Add inits for Transfer and Tribute when ready
     } catch (error) {
