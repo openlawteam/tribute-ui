@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ContractAdapterNames} from '../web3/types';
 import {OffchainVotingStatus, OffchainVotingAction} from './voting';
+import {OffchainVotingSubmitResultAction} from './voting/OffchainVotingSubmitResultAction';
 import {ProposalData, ProposalFlowStatus} from './types';
 import {useProposalFlowStatus} from './hooks/useProposalFlowStatus';
 import SponsorAction from './SponsorAction';
@@ -45,6 +46,14 @@ export default function ProposalActions(props: ProposalActionsProps) {
       {/* OFF-CHAIN VOTING BUTTONS */}
       {proposalStatus === ProposalFlowStatus.OffchainVoting && (
         <OffchainVotingAction adapterName={adpaterName} proposal={proposal} />
+      )}
+
+      {/* SUBMIT VOTE RESULT */}
+      {proposalStatus === ProposalFlowStatus.OffchainVotingSubmitResult && (
+        <OffchainVotingSubmitResultAction
+          adapterName={adpaterName}
+          proposal={proposal}
+        />
       )}
     </div>
   );
