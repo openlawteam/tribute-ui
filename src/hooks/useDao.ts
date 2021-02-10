@@ -39,7 +39,7 @@ export function useDao(): UseDaoReturn {
   function getDaoRegistry() {
     try {
       if (!getDao.loading && getDao.data) {
-        setDao(getDao.data);
+        setDao(getDao.data.laolands[0]);
       } else {
         if (getDao.error) {
           throw new Error(getDao.error.message);
@@ -49,6 +49,6 @@ export function useDao(): UseDaoReturn {
       // setError(error);
     }
   }
-  console.log('dao', dao);
+
   return {dao};
 }

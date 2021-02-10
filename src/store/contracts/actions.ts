@@ -17,6 +17,7 @@ import {
   VOTING_CONTRACT_ADDRESS,
   // WITHDRAW_CONTRACT_ADDRESS // @todo
 } from '../../config';
+import {DaoConstants} from '../../components/adapters/config';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {StoreState} from '../types';
 
@@ -92,6 +93,7 @@ export function initContractOffchainVoting(web3Instance: Web3) {
         dispatch({
           type: CONTRACT_OFFCHAIN_VOTING,
           abi: offchainVotingContract.abi,
+          adapterName: DaoConstants.OFFCHAIN_VOTING,
           contractAddress,
           instance,
         });
@@ -127,6 +129,7 @@ export function initContractOnboarding(web3Instance: Web3) {
         dispatch({
           type: CONTRACT_ONBOARDING,
           abi: onboardingContract.abi,
+          adapterName: DaoConstants.ONBOARDING,
           contractAddress,
           instance,
         });
@@ -155,6 +158,7 @@ export function initContractConfiguration(web3Instance: Web3) {
         dispatch({
           type: CONTRACT_CONFIGURATION,
           abi: configurationContract.abi,
+          adapterName: DaoConstants.CONFIGURATION,
           contractAddress,
           instance,
         });
@@ -183,6 +187,7 @@ export function initContractFinancing(web3Instance: Web3) {
         dispatch({
           type: CONTRACT_FINANCING,
           abi: financingContract.abi,
+          adapterName: DaoConstants.FINANCING,
           contractAddress,
           instance,
         });
@@ -211,6 +216,7 @@ export function initContractGuildKick(web3Instance: Web3) {
         dispatch({
           type: CONTRACT_GUILDKICK,
           abi: guildKickContract.abi,
+          adapterName: DaoConstants.GUILDKICK,
           contractAddress,
           instance,
         });
@@ -239,6 +245,7 @@ export function initContractManaging(web3Instance: Web3) {
         dispatch({
           type: CONTRACT_MANAGING,
           abi: managingContract.abi,
+          adapterName: DaoConstants.MANAGING,
           contractAddress,
           instance,
         });
@@ -267,6 +274,7 @@ export function initContractRagequit(web3Instance: Web3) {
         dispatch({
           type: CONTRACT_RAGEQUIT,
           abi: ragequitContract.abi,
+          adapterName: DaoConstants.RAGEQUIT,
           contractAddress,
           instance,
         });
@@ -293,8 +301,9 @@ export function initContractVoting(web3Instance: Web3) {
         );
 
         dispatch({
-          type: CONTRACT_RAGEQUIT,
+          type: CONTRACT_VOTING,
           abi: votingContract.abi,
+          adapterName: DaoConstants.VOTING,
           contractAddress,
           instance,
         });

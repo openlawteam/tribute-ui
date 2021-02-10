@@ -1,15 +1,23 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {StoreState} from '../../store/types';
 import {AsyncStatus} from '../../util/types';
+import {
+  DaoConstants,
+  adapterAccessControlLayer,
+  configurationABIFunction,
+} from './config';
 import {useAdapters} from './hooks/useAdapters';
+import {useDao} from '../../hooks';
 import {
   useContractSend,
   useETHGasPrice,
   useIsDefaultChain,
   useWeb3Modal,
 } from '../web3/hooks';
+
+import AdapterConfiguratorModal from './AdapterConfiguratorModal';
 
 type AddAdapterArguments = [
   string, // `adapterId`
@@ -25,9 +33,15 @@ export default function AdapterManager() {
   /**
    * Selectors
    */
-  const DaoRegistryContract = useSelector(
-    (state: StoreState) => state.contracts?.DaoRegistryContract
+  const {DaoRegistryContract, ...adapterContracts} = useSelector(
+    (state: StoreState) => state.contracts
   );
+
+  /**
+   * States
+   */
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [inputParameters, setInputParameters] = useState<Record<string, any>>();
 
   /**
    * Hooks
@@ -40,7 +54,11 @@ export default function AdapterManager() {
     getDaoAdapters,
   } = useAdapters();
   const {isDefaultChain} = useIsDefaultChain();
+  const {dao} = useDao();
 
+  /**
+   * Effects
+   */
   useEffect(() => {
     if (
       isDefaultChain &&
@@ -51,13 +69,19 @@ export default function AdapterManager() {
   }, [adapterStatus, isDefaultChain, getDaoAdapters]);
 
   const {
-    // txError,
-    // txEtherscanURL,
-    // txIsPromptOpen,
+    txError,
+    txEtherscanURL,
+    txIsPromptOpen,
     txSend,
-    // txStatus,
+    txStatus,
   } = useContractSend();
   const gasPrices = useETHGasPrice();
+
+  function getAdapter(adapterName: DaoConstants): Record<string, any> {
+    return Object.keys(adapterContracts)
+      .map((a) => adapterContracts[a])
+      .filter((a) => a.adapterName === adapterName)[0];
+  }
 
   // console.log('txStatus', txStatus);
   // console.log('txIsPromptOpen', txIsPromptOpen);
@@ -65,22 +89,34 @@ export default function AdapterManager() {
   // console.log('txError', txError);
 
   async function addAdapter(adapter: Record<string, any>) {
-    if (!DaoRegistryContract) return;
-
-    console.log('add ', adapter);
-
-    // @todo construct paramters to get adapterAddress & acl
-
     // addAdapter(3)
     // [0]bytes32 adapterId
     // [1]address adapterAddress
     // [2]uint256 acl
+    if (!DaoRegistryContract) return;
 
     try {
+      console.log('add ', adapter);
+
+      // Get adapters contract address
+      const {contractAddress} = getAdapter(adapter.adapterName);
+      // Get adapters access control layer (acl)
+      // @note these are the functions the adapter will have access to
+      const {acl} = adapterAccessControlLayer(adapter.adapterName);
+
+      console.log(
+        ` adapter.adapterId,
+      contractAddress,
+      acl`,
+        adapter.adapterId,
+        contractAddress,
+        acl
+      );
+
       const addAdapterArguments: AddAdapterArguments = [
         adapter.adapterId,
-        adapter.adapterAddress,
-        adapter.acl,
+        contractAddress,
+        acl,
       ];
       const txArguments = {
         from: account || '',
@@ -95,18 +131,51 @@ export default function AdapterManager() {
         addAdapterArguments,
         txArguments
       );
-    } catch (error) {}
+    } catch (error) {
+      console.log('error', adapter.adapterName, error);
+    }
   }
 
   async function configureAdapter(adapter: Record<string, any>) {
     console.log('configure', adapter);
+    try {
+      const adapterABIFunctionName: string = configurationABIFunction()[
+        adapter.adapterName
+      ];
+      // console.log('adapterABIFunctionName', adapterABIFunctionName);
+
+      // Get adapters ABI
+      const {abi} = getAdapter(adapter.adapterName);
+      // console.log('abi', abi);
+
+      // Get adapters configure function input parameters
+      const {inputs} = abi.filter(
+        (p: Record<string, any>) => p.name === adapterABIFunctionName
+      )[0];
+
+      // console.log('---abiFunction inputs', inputs);
+
+      // pass inputs to modal for display
+      setOpenModal(true);
+      setInputParameters(inputs);
+    } catch (error) {
+      console.log('error', error);
+    }
+    /**
+     * 1. get the configuration function for the adapter - done
+     * 2. get the params from the abi - done
+     * 3. open modal - done
+     * 4. render the fields per abi params
+     * 5. button to submit contract call
+     */
   }
 
   async function removeAdapter(adapter: Record<string, any>) {
-    console.log('remove', adapter);
-    if (!DaoRegistryContract) return;
     // removeAdapter(1)
     // [0]bytes32 adapterId
+    console.log('remove', adapter);
+    if (!DaoRegistryContract) return;
+
     try {
       const removeAdapterArguments: RemoveAdapterArguments = [
         adapter.adapterId,
@@ -135,6 +204,7 @@ export default function AdapterManager() {
   return (
     <div className="adaptermanager">
       <h1>Adapter Manager</h1>
+      {dao && <h2>{dao?.name}</h2>}
       <p>
         Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
         consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut lacus
@@ -200,6 +270,16 @@ export default function AdapterManager() {
         ))}
 
       <button onClick={finalizeDao}>Finalize Dao</button>
+
+      {openModal && (
+        <AdapterConfiguratorModal
+          isOpen={openModal}
+          configurationInputs={inputParameters}
+          closeHandler={() => {
+            setOpenModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }
