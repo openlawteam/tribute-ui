@@ -1,8 +1,7 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {
   createVote,
-  getDomainDefinition,
   getVoteResultRootDomainDefinition,
   prepareVoteResult,
   signMessage,
@@ -10,22 +9,17 @@ import {
   toStepNode,
   VoteChoicesIndex,
 } from '@openlaw/snapshot-js-erc712';
+import {VoteEntry} from '@openlaw/snapshot-js-erc712/dist/types';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
+import {getAdapterAddressFromContracts} from '../../web3/helpers';
 import {DEFAULT_CHAIN, SHARES_ADDRESS} from '../../../config';
-import {
-  getAdapterAddressFromContracts,
-  getContractByAddress,
-} from '../../web3/helpers';
+import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
-import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
 import {useMemberActionDisabled} from '../../../hooks';
 import {useWeb3Modal, useContractSend, useETHGasPrice} from '../../web3/hooks';
-import {
-  MessageWithType,
-  VoteEntry,
-} from '../../../../../snapshot-js-erc712/dist/types';
+import {VotingState} from './types';
 import CycleMessage from '../../feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../common/ErrorMessageWithDetails';
 import EtherscanURL from '../../web3/EtherscanURL';
@@ -55,7 +49,7 @@ type SubmitVoteResultArguments = [
   }
 ];
 
-export function OffchainVotingSubmitResultAction(
+export function OffchainOpRollupVotingSubmitResultAction(
   props: OffchainVotingSubmitResultActionProps
 ) {
   const {
@@ -67,6 +61,9 @@ export function OffchainVotingSubmitResultAction(
    * State
    */
 
+  const [signatureStatus, setSignatureStatus] = useState<Web3TxStatus>(
+    Web3TxStatus.STANDBY
+  );
   const [submitError, setSubmitError] = useState<Error>();
 
   /**
@@ -77,7 +74,10 @@ export function OffchainVotingSubmitResultAction(
     (s: StoreState) => s.contracts.BankExtensionContract?.instance.methods
   );
   const offchainVotingMethods = useSelector(
-    (s: StoreState) => s.contracts.OffchainVotingContract?.instance.methods
+    (s: StoreState) => s.contracts.VotingContract?.instance.methods
+  );
+  const daoInstance = useSelector(
+    (s: StoreState) => s.contracts.DaoRegistryContract?.instance
   );
   const daoRegistryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
@@ -88,7 +88,7 @@ export function OffchainVotingSubmitResultAction(
    * Our hooks
    */
 
-  const {account, provider} = useWeb3Modal();
+  const {account, provider, connected} = useWeb3Modal();
 
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
 
@@ -104,15 +104,44 @@ export function OffchainVotingSubmitResultAction(
    * Variables
    */
 
-  const adapterAddress = getAdapterAddressFromContracts(adapterName, contracts);
-
   const isInProcess =
+    signatureStatus === Web3TxStatus.AWAITING_CONFIRM ||
+    signatureStatus === Web3TxStatus.PENDING ||
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
     txStatus === Web3TxStatus.PENDING;
 
-  const isDone = txStatus === Web3TxStatus.FULFILLED;
+  const isDone =
+    txStatus === Web3TxStatus.FULFILLED &&
+    signatureStatus === Web3TxStatus.FULFILLED;
 
   const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
+
+  /**
+   * Effects
+   */
+
+  useEffect(() => {
+    if (
+      !connected ||
+      !daoInstance ||
+      !daoRegistryAddress ||
+      !snapshotProposal?.idInDAO
+    )
+      return;
+
+    offchainVotingMethods
+      ?.voteResult(daoRegistryAddress, snapshotProposal?.idInDAO)
+      .call()
+      .then((r: any) =>
+        console.log(VotingState[r] === VotingState[VotingState.NOT_PASS])
+      );
+  }, [
+    connected,
+    daoInstance,
+    daoRegistryAddress,
+    offchainVotingMethods,
+    snapshotProposal?.idInDAO,
+  ]);
 
   /**
    * Functions
@@ -132,34 +161,34 @@ export function OffchainVotingSubmitResultAction(
         throw new Error('No Snapshot proposal votes were found.');
       }
 
+      setSignatureStatus(Web3TxStatus.AWAITING_CONFIRM);
+
       const {idInDAO: proposalHash} = snapshotProposal;
+      const adapterAddress = getAdapterAddressFromContracts(
+        adapterName,
+        contracts
+      );
 
       // 1. Create vote entries
       const voteEntriesPromises: Promise<VoteEntry>[] = snapshotProposal.votes.map(
         async (v) => {
           const voteData: SnapshotVoteResponseData = Object.values(v)[0];
 
-          const vote = createVote({
+          return createVote({
             proposalHash,
             account: voteData.address,
             voteYes: voteData.msg.payload.choice === VoteChoicesIndex.Yes,
             timestamp: Number(voteData.msg.timestamp),
-          });
-
-          const voteEntry = {
-            ...vote,
             sig: voteData.sig,
             // @todo use subgraph weight data
             weight: await bankExtensionMethods
               .getPriorAmount(
-                vote.payload.account,
+                voteData.address,
                 SHARES_ADDRESS,
                 snapshotProposal.msg.payload.snapshot
               )
               .call(),
-          } as VoteEntry;
-
-          return voteEntry;
+          });
         }
       );
 
@@ -182,9 +211,6 @@ export function OffchainVotingSubmitResultAction(
         verifyingContract: daoRegistryAddress,
       });
 
-      // (result as any).nbNo = Number(result.nbNo);
-      // (result as any).nbYes = Number(result.nbYes);
-
       const {domain, types} = getVoteResultRootDomainDefinition(
         daoRegistryAddress,
         adapterAddress,
@@ -198,15 +224,11 @@ export function OffchainVotingSubmitResultAction(
         types,
       });
 
+      // 3. Sign message
       const signature = await signMessage(provider, account, messageParams);
 
-      const vote = await contracts.OffchainVotingContract?.instance.methods
-        .votes(daoRegistryAddress, proposalHash)
-        .call();
+      setSignatureStatus(Web3TxStatus.FULFILLED);
 
-      console.log('vote', vote);
-
-      // @todo Add type
       const submitVoteResultArguments: SubmitVoteResultArguments = [
         daoRegistryAddress,
         proposalHash,
@@ -214,95 +236,30 @@ export function OffchainVotingSubmitResultAction(
         {...result, rootSig: signature},
       ];
 
-      console.log('submitVoteResultArguments', submitVoteResultArguments);
-
       const txArguments = {
         from: account || '',
         // Set a fast gas price
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
+      // 4. Send the tx
       await txSend(
         'submitVoteResult',
         offchainVotingMethods,
         submitVoteResultArguments,
         txArguments
       );
-
-      // const contract = getContractByAddress(snapshotDraft.actionId, contracts);
-
-      // const {
-      //   msg: {
-      //     payload: {name, body, metadata},
-      //     timestamp,
-      //   },
-      // } = snapshotDraft;
-
-      // // Sign and submit draft for snapshot-hub
-      // const {data, signature} = await signAndSendProposal({
-      //   partialProposalData: {
-      //     name,
-      //     body,
-      //     metadata,
-      //     timestamp,
-      //   },
-      //   adapterAddress: contract.contractAddress,
-      //   type: SnapshotType.proposal,
-      // });
-
-      // /**
-      //  * Prepare `data` argument for submission to DAO
-      //  *
-      //  * For information about which data the smart contract needs for signature verification (e.g. `hashMessage`):
-      //  * @link https://github.com/openlawteam/laoland/blob/master/contracts/adapters/voting/OffchainVoting.sol
-      //  */
-      // const preparedVoteVerificationBytes = prepareVoteProposalData(
-      //   {
-      //     payload: {
-      //       name: data.payload.name,
-      //       body: data.payload.body,
-      //       choices: data.payload.choices,
-      //       snapshot: data.payload.snapshot.toString(),
-      //       start: data.payload.start,
-      //       end: data.payload.end,
-      //     },
-      //     sig: signature,
-      //     space: data.space,
-      //     timestamp: parseInt(data.timestamp),
-      //   },
-      //   web3Instance
-      // );
-
-      // const sponsorArguments: SponsorArguments = [
-      //   daoRegistryAddress,
-      //   snapshotDraft.idInDAO,
-      //   preparedVoteVerificationBytes,
-      // ];
-
-      // const txArguments = {
-      //   from: account || '',
-      //   // Set a fast gas price
-      //   ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
-      // };
-
-      // await txSend(
-      //   'sponsorProposal',
-      //   contract.instance.methods,
-      //   sponsorArguments,
-      //   txArguments
-      // );
     } catch (error) {
-      console.log('error', error);
-
       setSubmitError(error);
+      setSignatureStatus(Web3TxStatus.REJECTED);
     }
   }
 
-  /* function renderSubmitStatus(): React.ReactNode {
+  function renderSubmitStatus(): React.ReactNode {
     // Either Snapshot or chain tx
     if (
       txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-      proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM
+      signatureStatus === Web3TxStatus.AWAITING_CONFIRM
     ) {
       return 'Awaiting your confirmation\u2026';
     }
@@ -327,7 +284,7 @@ export function OffchainVotingSubmitResultAction(
       case Web3TxStatus.FULFILLED:
         return (
           <>
-            <div>Proposal submitted!</div>
+            <div>Result submitted!</div>
 
             <EtherscanURL url={txEtherscanURL} />
           </>
@@ -335,7 +292,7 @@ export function OffchainVotingSubmitResultAction(
       default:
         return null;
     }
-  } */
+  }
 
   /**
    * Render
@@ -359,13 +316,13 @@ export function OffchainVotingSubmitResultAction(
         {/* SUBMIT STATUS */}
         {isInProcessOrDone && (
           <div className="form__submit-status-container">
-            {/* {renderSubmitStatus()} */}
+            {renderSubmitStatus()}
           </div>
         )}
 
         {isDisabled && (
           <button className="button--help" onClick={openWhyDisabledModal}>
-            Why is submitting the vote result disabled?
+            Why is submitting disabled?
           </button>
         )}
       </div>
