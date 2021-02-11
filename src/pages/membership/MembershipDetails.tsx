@@ -28,7 +28,7 @@ export default function MembershipDetails() {
    */
 
   // Get hash for fetching the proposal.
-  const {proposalHash} = useParams<{proposalHash: string}>();
+  const {proposalId} = useParams<{proposalId: string}>();
 
   /**
    * @todo Get subgraph proposal and determine if it has been sponsored
@@ -47,7 +47,7 @@ export default function MembershipDetails() {
     proposalError,
     proposalNotFound,
     proposalStatus,
-  } = useProposalOrDraft(proposalHash);
+  } = useProposalOrDraft(proposalId);
 
   /**
    * Render
