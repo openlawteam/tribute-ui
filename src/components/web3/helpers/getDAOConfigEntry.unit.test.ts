@@ -18,12 +18,12 @@ describe('getDAOConfigEntry unit tests', () => {
     // Inject Web3 result for `getConfiguration.call()`
     mockWeb3Provider.injectResult(...result);
 
-    const address = await getDAOConfigEntry(
+    const configEntry = await getDAOConfigEntry(
       ContractDAOConfigKeys.offchainVotingVotingPeriod,
       instance
     );
 
-    expect(address).toBe('1000');
+    expect(configEntry).toBe('1000');
   });
 
   test('should throw if no contract instance provided', async () => {

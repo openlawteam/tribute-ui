@@ -1,7 +1,6 @@
 import {Dispatch} from 'redux';
 
-import {SmartContractItem} from '../../components/web3/types';
-import {ConnectedMemberState} from '../types';
+import {ConnectedMemberState, ContractsStateEntry} from '../types';
 
 export const SET_CONNECTED_MEMBER = 'SET_CONNECTED_MEMBER';
 export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
@@ -19,7 +18,7 @@ export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
  */
 export function getConnectedMember(
   account: string,
-  daoRegistryContract: SmartContractItem
+  daoRegistryContract: ContractsStateEntry
 ) {
   return async function (dispatch: Dispatch<any>) {
     const daoRegistryInstance = daoRegistryContract.instance;
