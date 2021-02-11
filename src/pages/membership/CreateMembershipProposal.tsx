@@ -331,7 +331,7 @@ export default function CreateMembershipProposal() {
       <form className="form" onSubmit={(e) => e.preventDefault()}>
         {/* ETH ADDRESS */}
         <div className="form__input-row">
-          <label className="form__input-row-label">ETH address</label>
+          <label className="form__input-row-label">Applicant Address</label>
           <div className="form__input-row-fieldwrap">
             <input
               aria-describedby={`error-${Fields.ethAddress}`}
