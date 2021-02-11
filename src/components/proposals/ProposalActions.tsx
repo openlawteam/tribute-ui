@@ -42,7 +42,7 @@ export default function ProposalActions(props: ProposalActionsProps) {
 
       {/* SPONSOR BUTTON */}
       {proposalStatus === ProposalFlowStatus.Sponsor && (
-        <SponsorAction adapterName={adpaterName} proposal={proposal} />
+        <SponsorAction proposal={proposal} />
       )}
 
       {/* OFF-CHAIN VOTING BUTTONS */}
