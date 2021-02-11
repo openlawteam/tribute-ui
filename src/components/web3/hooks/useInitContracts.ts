@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
 
-// @todo Add inits for Transfer and Tribute when ready
+// @todo Add init for Transfer when ready
 import {
   initContractBankExtension,
   initContractDaoRegistry,
@@ -57,7 +57,7 @@ export function useInitContracts() {
       await dispatch(initContractBankExtension(web3Instance));
       await dispatch(initContractTribute(web3Instance));
 
-      // @todo Add inits for Transfer and Tribute when ready
+      // @todo Add init for Transfer when ready
     } catch (error) {
       throw error;
     }

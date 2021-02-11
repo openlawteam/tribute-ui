@@ -25,7 +25,7 @@ export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
 export const CONTRACT_TRIBUTE = 'CONTRACT_TRIBUTE';
 
 /**
- * @todo Add inits for Transfer and Tribute when ready
+ * @todo Add init for Transfer when ready
  */
 
 export function initContractDaoRegistry(web3Instance: Web3) {
