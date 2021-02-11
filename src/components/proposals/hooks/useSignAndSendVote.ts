@@ -32,11 +32,12 @@ type SignAndSendVoteDataParam = {
 };
 
 type UseSignAndSendVoteReturn = {
-  signAndSendVote: (
-    partialVoteData: SignAndSendVoteDataParam,
-    adapterName: ContractAdapterNames,
-    proposalHash: SnapshotVoteData['payload']['proposalHash']
-  ) => Promise<SignAndSendVoteReturn>;
+  signAndSendVote: (data: {
+    partialVoteData: SignAndSendVoteDataParam;
+    adapterName: ContractAdapterNames;
+    proposalIdInDAO: SnapshotVoteData['payload']['proposalHash'];
+    proposalIdInSnapshot: string;
+  }) => Promise<SignAndSendVoteReturn>;
   voteData: SignAndSendVoteReturn | undefined;
   voteDataError: Error | undefined;
   voteDataStatus: Web3TxStatus;
@@ -97,11 +98,28 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
    * @param {SnapshotVoteData['payload']['proposalHash']} proposalHash - The unique hash of the proposal from snapshot-hub.
    * @returns {Promise<BuildAndSignProposalDataReturn>} An object with the vote data and the ERC712 signature string.
    */
-  async function signAndSendVote(
-    partialVoteData: SignAndSendVoteDataParam,
-    adapterName: ContractAdapterNames,
-    proposalHash: SnapshotVoteData['payload']['proposalHash']
-  ): Promise<SignAndSendVoteReturn> {
+  async function signAndSendVote({
+    partialVoteData,
+    adapterName,
+    proposalIdInDAO,
+    proposalIdInSnapshot,
+  }: {
+    partialVoteData: SignAndSendVoteDataParam;
+    adapterName: ContractAdapterNames;
+    /**
+     * This is the hash of the content as submitted to the DAO.
+     * The hash should be the same as the Snapshot draft's, or
+     * proposal's (if not submitted as a draft), ID.
+     *
+     * We need to make sure this matches what has been submitted to
+     * the DAO for later signature verifications.
+     */
+    proposalIdInDAO: SnapshotVoteData['payload']['proposalHash'];
+    /**
+     * Must match a `proposal` type's ID in Snapshot so a `vote` may be attached.
+     */
+    proposalIdInSnapshot: string;
+  }): Promise<SignAndSendVoteReturn> {
     try {
       if (!web3Instance) {
         throw new Error('No Web3 instance was found.');
@@ -139,7 +157,7 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
       };
 
       const voteProposalData: SnapshotVoteProposal = {
-        proposalHash,
+        proposalHash: proposalIdInDAO,
         space: SPACE,
         token: snapshotSpace.token,
       };
@@ -185,7 +203,11 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
       const {data} = await submitMessage<SnapshotSubmitBaseReturn>(
         SNAPSHOT_HUB_API_URL,
         account,
-        message,
+        {
+          ...message,
+          // @note We pass the proposal's hash (ID) so we can vote on it.
+          payload: {...message.payload, proposalHash: proposalIdInSnapshot},
+        },
         signature,
         {
           actionId: domain.actionId,

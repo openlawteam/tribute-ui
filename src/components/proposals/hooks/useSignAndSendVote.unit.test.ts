@@ -33,11 +33,12 @@ describe('useSignAndSendVote unit tests', () => {
 
       // Call signAndSendVote
       act(() => {
-        result.current.signAndSendVote(
-          {choice: VoteChoices.Yes},
-          ContractAdapterNames.onboarding,
-          'abc123'
-        );
+        result.current.signAndSendVote({
+          partialVoteData: {choice: VoteChoices.Yes},
+          adapterName: ContractAdapterNames.onboarding,
+          proposalIdInDAO: 'abc123',
+          proposalIdInSnapshot: 'abc123',
+        });
       });
 
       // assert awaiting confirmation state
@@ -111,17 +112,18 @@ describe('useSignAndSendVote unit tests', () => {
 
       // Call signAndSendVote
       act(() => {
-        result.current.signAndSendVote(
-          {
+        result.current.signAndSendVote({
+          partialVoteData: {
             choice: VoteChoices.Yes,
             delegateAddress: '0xF297430B340fEEdfe18da3747e1392B5A04b5c99',
             metadata: {
               someData: 'Some data',
             },
           },
-          ContractAdapterNames.onboarding,
-          'abc123'
-        );
+          adapterName: ContractAdapterNames.onboarding,
+          proposalIdInDAO: 'abc123',
+          proposalIdInSnapshot: 'abc123',
+        });
       });
 
       // assert awaiting confirmation state

@@ -83,7 +83,9 @@ export function OffchainVotingAction(
    * Variables
    */
 
-  const proposalHash: string = proposal.snapshotProposal?.idInSnapshot || '';
+  const proposalHash: string = proposal.snapshotProposal?.idInDAO || '';
+  const snapshotProposalId: string =
+    proposal.snapshotProposal?.idInSnapshot || '';
 
   const isInProcess =
     voteDataStatus === Web3TxStatus.AWAITING_CONFIRM ||
@@ -143,10 +145,18 @@ export function OffchainVotingAction(
       if (!proposalHash) {
         throw new Error('No proposal hash was found.');
       }
+      if (!snapshotProposalId) {
+        throw new Error('No proposal ID was found.');
+      }
 
       setVoteChoiceClicked(VoteChoices[choice]);
 
-      await signAndSendVote({choice}, adapterName, proposalHash);
+      await signAndSendVote({
+        partialVoteData: {choice},
+        adapterName,
+        proposalIdInDAO: proposalHash,
+        proposalIdInSnapshot: snapshotProposalId,
+      });
 
       // Refetch to show the vote the user submitted
       await proposal.refetchProposalOrDraft();
