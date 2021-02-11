@@ -211,3 +211,11 @@ export const SPACES: Record<EnvironmentName, string> = {
 
 // Defaults to `localhost` space if `ENVIRONMENT` is `undefined`.
 export const SPACE: string = SPACES[ENVIRONMENT || 'localhost'];
+
+/**
+ * POLLING INTERVAL FOR GQL QUERIES
+ * localhost | development - ms, poll every 5sec = 5000
+ * production - ms, poll every 10sec = 10000
+ */
+export const GQL_QUERY_POLLING_INTERVAL: number =
+  REACT_APP_ENVIRONMENT === 'production' ? 10000 : 5000;

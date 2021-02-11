@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useQuery} from '@apollo/react-hooks';
 
 import {StoreState} from '../../../store/types';
@@ -8,6 +8,7 @@ import {useSelector} from 'react-redux';
 import {GET_ADAPTERS} from '../../../gql';
 
 import {getAdapters, Adapters} from '../config';
+import {GQL_QUERY_POLLING_INTERVAL} from '../../../config';
 
 export type AdapterType = {
   __typename: string;
@@ -20,9 +21,8 @@ export type AdapterType = {
 type UseAdaptersReturn = {
   adapterStatus: AsyncStatus;
   availableAdapters: Adapters[];
-  usedAdapters: AdapterType[] | undefined;
   unusedAdapters: Adapters[] | undefined;
-  getDaoAdapters: () => void;
+  usedAdapters: AdapterType[] | undefined;
 };
 
 export type AdaptersType = AdapterType & Adapters;
@@ -46,7 +46,9 @@ export function useAdapters(): UseAdaptersReturn {
   /**
    * Their hooks
    */
-  const getUsedAdapters = useQuery(GET_ADAPTERS);
+  const getUsedAdapters = useQuery(GET_ADAPTERS, {
+    pollInterval: GQL_QUERY_POLLING_INTERVAL,
+  });
 
   /**
    * State
@@ -62,19 +64,24 @@ export function useAdapters(): UseAdaptersReturn {
   /**
    * Variables
    */
-  const availableAdapters: Adapters[] = [...getAdapters()];
+  // memoize calling `getAdapters` because it's an expensive
+  // operation and because eslint-plugin-react-hooks was complaining :)
+  const availableAdapters: Adapters[] = useMemo(() => getAdapters(), []);
 
-  function getDaoAdapters() {
+  // Get GQL adapters
+  useEffect(() => {
     if (!daoRegistryContract?.contractAddress) return;
-
     try {
       setAdapterStatus(AsyncStatus.PENDING);
       if (!getUsedAdapters.loading && getUsedAdapters.data) {
+        // get adapters
+        const {adapters} = getUsedAdapters.data as Record<string, any>;
+
         // get dao address
         const daoAddress = daoRegistryContract.contractAddress;
 
         // get all availables adapters for the dao
-        const daoAdapters: [] = getUsedAdapters.data.adapters.filter(
+        const daoAdapters: [] = adapters.filter(
           (adapter: AdapterType) => adapter.id.startsWith(daoAddress) && adapter
         );
 
@@ -113,16 +120,16 @@ export function useAdapters(): UseAdaptersReturn {
         }
       }
     } catch (error) {
-      // setError(error);
+      setAdapters(undefined);
+      setUnusedAdapters(undefined);
       setAdapterStatus(AsyncStatus.REJECTED);
     }
-  }
+  }, [availableAdapters, daoRegistryContract, getUsedAdapters]);
 
   return {
-    availableAdapters,
-    usedAdapters: adapters,
-    unusedAdapters,
-    getDaoAdapters,
     adapterStatus,
+    availableAdapters,
+    unusedAdapters,
+    usedAdapters: adapters,
   };
 }

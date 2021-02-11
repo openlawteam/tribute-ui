@@ -27,15 +27,20 @@
 }
 
 .adaptermanager__add,
-.adaptermanager__configure,
-.adaptermanager__remove {
+.adaptermanager__configure {
   align-self: center;
-  flex: 25%;
+  flex: 50%;
   text-align: center;
 }
+.adaptermanager__remove {
+  border-top: 2px solid #eaeaea;
+  margin-bottom: 2rem;
 
-.adaptermanager__add {
-  flex: 50%;
+  button {
+    background-color: #ffcbcb;
+    color: red;
+    font-family: $font-mono;
+  }
 }
 
 .adaptermanager__name {
