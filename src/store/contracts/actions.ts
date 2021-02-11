@@ -7,8 +7,14 @@ import {
 } from '../../components/web3/types';
 import {DEFAULT_CHAIN, DAO_REGISTRY_CONTRACT_ADDRESS} from '../../config';
 import {getAdapterAddress} from '../../components/web3/helpers';
-import {StoreState} from '../types';
+import {ContractsStateEntry, StoreState} from '../types';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
+
+type ContractAction =
+  | typeof CONTRACT_DAO_REGISTRY
+  | typeof CONTRACT_VOTING
+  | typeof CONTRACT_ONBOARDING
+  | typeof CONTRACT_BANK_EXTENSION;
 
 export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
 export const CONTRACT_VOTING = 'CONTRACT_VOTING';
@@ -28,17 +34,24 @@ export function initContractDaoRegistry(web3Instance: Web3) {
         );
         const daoRegistryContract: Record<string, any> = lazyDaoRegistryABI;
         const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+
+        if (!contractAddress) {
+          throw new Error('No DAO Registry contract address was found.');
+        }
+
         const instance = new web3Instance.eth.Contract(
           daoRegistryContract.abi,
           contractAddress
         );
 
-        dispatch({
-          type: CONTRACT_DAO_REGISTRY,
-          abi: daoRegistryContract.abi,
-          contractAddress,
-          instance,
-        });
+        dispatch(
+          createContractAction({
+            type: CONTRACT_DAO_REGISTRY,
+            abi: daoRegistryContract.abi,
+            contractAddress,
+            instance,
+          })
+        );
       }
     } catch (error) {
       throw error;
@@ -46,7 +59,15 @@ export function initContractDaoRegistry(web3Instance: Web3) {
   };
 }
 
-export function initContractOffchainVoting(web3Instance: Web3) {
+/**
+ * @todo Since there can only be one style of voting registered,
+ *   we need to call the Registry to get the implemented voting style name.
+ *   Therefore, we will know which contract to load into Redux.
+ *
+ * @todo We can add an optional param as well in case we want to directly state which
+ *   voting adapter we want.
+ */
+export function initContractVoting(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
@@ -71,12 +92,14 @@ export function initContractOffchainVoting(web3Instance: Web3) {
           contractAddress
         );
 
-        dispatch({
-          type: CONTRACT_VOTING,
-          abi: offchainVotingContract.abi,
-          contractAddress,
-          instance,
-        });
+        dispatch(
+          createContractAction({
+            type: CONTRACT_VOTING,
+            abi: offchainVotingContract.abi,
+            contractAddress,
+            instance,
+          })
+        );
       }
     } catch (error) {
       throw error;
@@ -106,12 +129,14 @@ export function initContractOnboarding(web3Instance: Web3) {
           contractAddress
         );
 
-        dispatch({
-          type: CONTRACT_ONBOARDING,
-          abi: onboardingContract.abi,
-          contractAddress,
-          instance,
-        });
+        dispatch(
+          createContractAction({
+            type: CONTRACT_ONBOARDING,
+            abi: onboardingContract.abi,
+            contractAddress,
+            instance,
+          })
+        );
       }
     } catch (error) {
       throw error;
@@ -147,15 +172,29 @@ export function initContractBankExtension(web3Instance: Web3) {
           contractAddress
         );
 
-        dispatch({
-          type: CONTRACT_BANK_EXTENSION,
-          abi: bankExtensionContract.abi,
-          contractAddress,
-          instance,
-        });
+        dispatch(
+          createContractAction({
+            type: CONTRACT_BANK_EXTENSION,
+            abi: bankExtensionContract.abi,
+            contractAddress,
+            instance,
+          })
+        );
       }
     } catch (error) {
       throw error;
     }
+  };
+}
+
+function createContractAction({
+  type,
+  ...payload
+}: {
+  type: ContractAction;
+} & ContractsStateEntry) {
+  return {
+    type,
+    ...payload,
   };
 }

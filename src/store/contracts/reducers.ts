@@ -9,7 +9,7 @@ import {ContractsState} from '../types';
 const initialState = {
   BankExtensionContract: null,
   DaoRegistryContract: null,
-  OffchainVotingContract: null,
+  VotingContract: null,
   OnboardingContract: null,
 };
 
@@ -55,5 +55,5 @@ function contractOnboarding(
 }
 
 function contractVoting(state: ContractsState, payload: any): ContractsState {
-  return {...state, OffchainVotingContract: {...payload}};
+  return {...state, VotingContract: {...payload}};
 }
