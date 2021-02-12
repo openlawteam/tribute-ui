@@ -292,12 +292,7 @@ export default function CreateTributeProposal() {
       const tributeAmountWithDecimals = toBN(
         stripFormatNumber(tributeAmount)
       ).mul(multiplier);
-      // @todo What should the `requestAmount` input value be multiplied by for the smart contract argument? `nbShares`? How do you get that multiplier value?
       const requestAmountArg = stripFormatNumber(requestAmount);
-      // const requestAmountInWei = Web3.utils.toWei(
-      //   stripFormatNumber(requestAmount),
-      //   'ether'
-      // );
 
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
