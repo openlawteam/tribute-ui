@@ -3,7 +3,6 @@ import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
 import {Link} from 'react-router-dom';
-// import Web3 from 'web3';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
 import {toBN} from 'web3-utils';
 
@@ -62,10 +61,17 @@ type TributeArguments = [
   string // `tributeAmount`
 ];
 
+type TokenApproveArguments = [
+  string, // `spender`
+  string // `value`
+];
+
 type ERC20Details = {
   symbol: string;
   decimals: number;
 };
+
+type BN = ReturnType<typeof toBN>;
 
 export default function CreateTributeProposal() {
   /**
@@ -92,6 +98,13 @@ export default function CreateTributeProposal() {
     txIsPromptOpen,
     txSend,
     txStatus,
+  } = useContractSend();
+  const {
+    txError: txErrorTokenApprove,
+    txEtherscanURL: txEtherscanURLTokenApprove,
+    txIsPromptOpen: txIsPromptOpenTokenApprove,
+    txSend: txSendTokenApprove,
+    txStatus: txStatusTokenApprove,
   } = useContractSend();
 
   const {
@@ -133,7 +146,7 @@ export default function CreateTributeProposal() {
   } = form;
   const erc20AddressValue = getValues().erc20Address;
 
-  const createTributeError = submitError || txError;
+  const createTributeError = submitError || txError || txErrorTokenApprove;
   const isConnected = connected && account;
 
   /**
@@ -145,6 +158,8 @@ export default function CreateTributeProposal() {
   const isInProcess =
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
     txStatus === Web3TxStatus.PENDING ||
+    txStatusTokenApprove === Web3TxStatus.AWAITING_CONFIRM ||
+    txStatusTokenApprove === Web3TxStatus.PENDING ||
     proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM ||
     proposalSignAndSendStatus === Web3TxStatus.PENDING;
 
@@ -152,7 +167,8 @@ export default function CreateTributeProposal() {
     txStatus === Web3TxStatus.FULFILLED &&
     proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
 
-  const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
+  const isInProcessOrDone =
+    isInProcess || isDone || txIsPromptOpen || txIsPromptOpenTokenApprove;
 
   /**
    * Cached callbacks
@@ -242,15 +258,54 @@ export default function CreateTributeProposal() {
       const divisor = toBN(10).pow(toBN(decimals));
       const beforeDecimal = balanceBN.div(divisor);
       const afterDecimal = balanceBN.mod(divisor);
-      const balanceReadable =
-        afterDecimal.toString() === '0'
-          ? beforeDecimal.toString()
-          : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
+      const balanceReadable = afterDecimal.eq(toBN(0))
+        ? beforeDecimal.toString()
+        : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
 
       setUserERC20Balance(balanceReadable);
     } catch (error) {
       console.error(error);
       setUserERC20Balance(undefined);
+    }
+  }
+
+  async function handleSubmitTokenApprove(
+    tributeAmountWithDecimals: BN,
+    allowanceBN: BN
+  ) {
+    try {
+      if (!erc20Contract) {
+        throw new Error('No ERC20Contract found.');
+      }
+
+      if (!TributeContract) {
+        throw new Error('No TributeContract found.');
+      }
+
+      if (!account) {
+        throw new Error('No account found.');
+      }
+
+      const difference = tributeAmountWithDecimals.sub(allowanceBN);
+      const tokenApproveArguments: TokenApproveArguments = [
+        TributeContract.contractAddress,
+        difference.toString(),
+      ];
+      const txArguments = {
+        from: account || '',
+        // Set a fast gas price
+        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+      };
+
+      // Execute contract call for `approve`
+      await txSendTokenApprove(
+        'approve',
+        erc20Contract.methods,
+        tokenApproveArguments,
+        txArguments
+      );
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -274,12 +329,13 @@ export default function CreateTributeProposal() {
         throw new Error('No account found.');
       }
 
+      if (!erc20Contract) {
+        throw new Error('No ERC20Contract found.');
+      }
+
       if (!erc20Details) {
         throw new Error('No ERC20 details found.');
       }
-
-      // Maybe set proposal ID from previous attempt
-      let proposalId: string = proposalData?.uniqueId || '';
 
       const {
         applicantAddress,
@@ -293,6 +349,32 @@ export default function CreateTributeProposal() {
         stripFormatNumber(tributeAmount)
       ).mul(multiplier);
       const requestAmountArg = stripFormatNumber(requestAmount);
+
+      // Check if adapter is allowed to spend amount of tribute tokens on behalf
+      // of user. If allowance is not sufficient, approve the adapter to spend
+      // the amount of tokens needed for the user to provide the full tribute
+      // amount.
+      const allowance = await erc20Contract.methods
+        .allowance(account, TributeContract.contractAddress)
+        .call();
+      const allowanceBN = toBN(allowance);
+
+      if (tributeAmountWithDecimals.gt(allowanceBN)) {
+        try {
+          await handleSubmitTokenApprove(
+            tributeAmountWithDecimals,
+            allowanceBN
+          );
+        } catch (error) {
+          console.error(error);
+          throw new Error(
+            'Your ERC20 tokens could not be approved for transer.'
+          );
+        }
+      }
+
+      // Maybe set proposal ID from previous attempt
+      let proposalId: string = proposalData?.uniqueId || '';
 
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
@@ -346,9 +428,20 @@ export default function CreateTributeProposal() {
     // Either Snapshot or chain tx
     if (
       txStatus === Web3TxStatus.AWAITING_CONFIRM ||
+      txStatusTokenApprove === Web3TxStatus.AWAITING_CONFIRM ||
       proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM
     ) {
       return 'Awaiting your confirmation\u2026';
+    }
+
+    if (txStatusTokenApprove === Web3TxStatus.PENDING) {
+      return (
+        <>
+          <div>{'Approving your tokens for transfer\u2026'}</div>
+
+          <EtherscanURL url={txEtherscanURLTokenApprove} isPending />
+        </>
+      );
     }
 
     // Only for chain tx
@@ -504,7 +597,7 @@ export default function CreateTributeProposal() {
                       ? FormFieldErrors.INVALID_NUMBER
                       : amount <= 0
                       ? 'The value must be greater than 0.'
-                      : amount >= Number(userERC20Balance)
+                      : amount > Number(userERC20Balance)
                       ? 'Insufficient funds.'
                       : true;
                   },
@@ -527,7 +620,6 @@ export default function CreateTributeProposal() {
               This amount will be held in escrow pending a member vote. If the
               proposal is accepted, the funds will automatically be sent to the
               DAO. If the proposal fails, the funds will be refunded to you.
-              {/* @todo Emphasize that user needs to first approve the adapter as spender of the amount of tribute tokens. (We possibly could build the approval function into the form on this page.) */}
             </div>
           </div>
 
