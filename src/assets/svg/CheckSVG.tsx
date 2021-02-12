@@ -1,4 +1,6 @@
-export default function CheckSVG(props: any) {
+import {SVGAttributes} from 'react';
+
+export default function CheckSVG(props: SVGAttributes<HTMLOrSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
