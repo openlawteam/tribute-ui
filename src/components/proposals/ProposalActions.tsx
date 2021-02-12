@@ -6,7 +6,6 @@ import {OffchainVotingStatus, OffchainVotingAction} from './voting';
 import {ProposalData, ProposalFlowStatus} from './types';
 import {useProposalFlowStatus} from './hooks/useProposalFlowStatus';
 import SponsorAction from './SponsorAction';
-import {useWeb3Modal} from '../web3/hooks';
 
 type ProposalActionsProps = {
   adpaterName: ContractAdapterNames;
