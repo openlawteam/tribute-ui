@@ -7,6 +7,7 @@ import {StoreState} from '../../store/types';
 import {AsyncStatus, MetaMaskRPCError} from '../../util/types';
 import {getValidationError} from '../../util/helpers';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
+import {Web3TxStatus} from '../web3/types';
 
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import InputError from '../../components/common/InputError';
@@ -47,6 +48,13 @@ export default function AdapterConfiguratorModal({
    * State
    */
   const [submitError, setSubmitError] = useState<Error>();
+  const [
+    configureAdapterStatus,
+    setConfigureAdapterStatus,
+  ] = useState<Web3TxStatus>(Web3TxStatus.STANDBY);
+  const [removeAdapterStatus, setRemoveAdapterStatus] = useState<Web3TxStatus>(
+    Web3TxStatus.STANDBY
+  );
 
   /**
    * Hooks
@@ -56,7 +64,7 @@ export default function AdapterConfiguratorModal({
     // txEtherscanURL,
     txIsPromptOpen,
     txSend,
-    // txStatus,
+    txStatus,
   } = useContractSend();
   const gasPrices = useETHGasPrice();
   const {connected, account} = useWeb3Modal();
@@ -90,17 +98,28 @@ export default function AdapterConfiguratorModal({
    */
   const {isValid} = formState;
 
-  const isInProcess = false; // temp
+  const isConfigureInProcess = false; // temp
   // txStatus === Web3TxStatus.AWAITING_CONFIRM ||
   // txStatus === Web3TxStatus.PENDING ||
-  // proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM ||
-  // proposalSignAndSendStatus === Web3TxStatus.PENDING;
+  // configureAdapterStatus === Web3TxStatus.AWAITING_CONFIRM ||
+  // configureAdapterStatus === Web3TxStatus.PENDING;
+  const isRemoveInProcess =
+    txStatus === Web3TxStatus.AWAITING_CONFIRM ||
+    txStatus === Web3TxStatus.PENDING ||
+    removeAdapterStatus === Web3TxStatus.AWAITING_CONFIRM ||
+    removeAdapterStatus === Web3TxStatus.PENDING;
 
-  const isDone = false; // temp
+  const isConfigureDone = false; // temp
   // txStatus === Web3TxStatus.FULFILLED &&
-  // proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
+  // configureAdapterStatus === Web3TxStatus.FULFILLED;
+  const isRemoveDone =
+    txStatus === Web3TxStatus.FULFILLED &&
+    removeAdapterStatus === Web3TxStatus.FULFILLED;
 
-  const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
+  const isConfigureInProcessOrDone =
+    isConfigureInProcess || isConfigureDone || txIsPromptOpen;
+  // const isRemoveInProcessOrRemoveDone =
+  //   isRemoveInProcess || isRemoveDone || txIsPromptOpen;
 
   function getAdapter(adapterName: DaoConstants): Record<string, any> {
     return Object.keys(adapterContracts)
@@ -117,6 +136,8 @@ export default function AdapterConfiguratorModal({
     if (!DaoRegistryContract) return;
 
     try {
+      setRemoveAdapterStatus(Web3TxStatus.AWAITING_CONFIRM);
+
       const removeAdapterArguments: RemoveAdapterArguments = [
         adapterId, // [0]bytes32 adapterId
       ];
@@ -133,14 +154,25 @@ export default function AdapterConfiguratorModal({
         removeAdapterArguments,
         txArguments
       );
+
+      setRemoveAdapterStatus(Web3TxStatus.FULFILLED);
+
+      // Close modal
+      setTimeout(() => {
+        closeHandler();
+        // @todo Display closing modal message
+      }, 3000);
     } catch (error) {
       setSubmitError(error);
+      setRemoveAdapterStatus(Web3TxStatus.REJECTED);
     }
   }
 
   async function handleSubmit(values: Record<string, any>) {
     try {
       console.log('values', values);
+
+      setConfigureAdapterStatus(Web3TxStatus.PENDING);
 
       const {
         contractAddress,
@@ -171,13 +203,16 @@ export default function AdapterConfiguratorModal({
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
+      setConfigureAdapterStatus(Web3TxStatus.AWAITING_CONFIRM);
+
       // Execute contract call
       await txSend(abiMethodName, methods, adapterConfigArguments, txArguments);
 
-      // close modal
+      setConfigureAdapterStatus(Web3TxStatus.FULFILLED);
     } catch (error) {
       // Set any errors from Web3 utils or explicitly set above.
       setSubmitError(error);
+      setConfigureAdapterStatus(Web3TxStatus.REJECTED);
       console.log('error', error);
     }
   }
@@ -224,7 +259,7 @@ export default function AdapterConfiguratorModal({
                       )
                     }
                     ref={register}
-                    disabled={isInProcessOrDone}
+                    disabled={isConfigureInProcessOrDone}
                   />
 
                   <InputError
@@ -238,9 +273,9 @@ export default function AdapterConfiguratorModal({
           {/* SUBMIT */}
           <button
             className="button"
-            disabled={isInProcessOrDone}
+            disabled={isConfigureInProcessOrDone}
             onClick={() => {
-              if (isInProcessOrDone) return;
+              if (isConfigureInProcessOrDone) return;
               if (!isValid) {
                 triggerValidation();
                 return;
@@ -248,12 +283,18 @@ export default function AdapterConfiguratorModal({
               handleSubmit(getValues());
             }}
             type="submit">
-            {isInProcess ? <Loader /> : isDone ? 'Done' : 'Submit'}
+            {isConfigureInProcess ? (
+              <Loader />
+            ) : isConfigureDone ? (
+              'Done'
+            ) : (
+              'Submit'
+            )}
           </button>
 
           {/* SUBMIT STATUS */}
           {/* <div className="form__submit-status-container">
-          {isInProcessOrDone && renderSubmitStatus()}
+          {isConfigureInProcessOrDone && renderSubmitStatus()}
         </div> */}
 
           {/* SUBMIT ERROR */}
@@ -274,7 +315,13 @@ export default function AdapterConfiguratorModal({
               re-added if the DAO isn't finalized.
             </p>
             <button className="button--secondary" onClick={removeAdapter}>
-              Remove
+              {isRemoveInProcess ? (
+                <Loader />
+              ) : isRemoveDone ? (
+                'Done'
+              ) : (
+                'Remove'
+              )}
             </button>
             {/** @todo maybe modal popup to configure and remove */}
           </div>

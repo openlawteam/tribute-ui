@@ -157,6 +157,26 @@ export default function AdapterManager() {
     }
   }
 
+  function addSelectedAdapters() {
+    console.log('addSelectedAdapters');
+
+    try {
+      // Set the `Add` button states to true for all selected adapters
+      for (const adapterName in selections) {
+        if (selections[adapterName]) {
+          setIsInProcess((prevState) => ({
+            ...prevState,
+            [adapterName]: true,
+          }));
+        }
+      }
+
+      // Get selected adapters
+    } catch (error) {}
+
+    // @todo iterate throught selection and call DaoFactory `addAdapters`
+  }
+
   /**
    * configureAdapter
    *
@@ -194,12 +214,7 @@ export default function AdapterManager() {
     console.log('finalizeDao');
   }
 
-  function addSelectedAdapters() {
-    console.log('addSelectedAdapters');
-
-    // @todo iterate throught selection and call DaoFactory `addAdapters`
-  }
-
+  // Handles the select all checkbox event
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
     // Update the select all checkbox
     setSelectAll(event.target.checked);

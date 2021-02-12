@@ -1,11 +1,5 @@
 import Web3 from 'web3';
 
-export type Adapters = {
-  adapterId: string | null;
-  adapterName: string;
-  adapterDescription: string;
-};
-
 // DaoConstants defined solidity DaoConstants.sol contract
 export enum DaoConstants {
   BANK = 'bank',
@@ -35,6 +29,12 @@ const daoConstants: Array<DaoConstants> = [
   DaoConstants.RAGEQUIT,
   DaoConstants.VOTING,
 ];
+
+export type Adapters = {
+  adapterId: string | null;
+  adapterName: string;
+  adapterDescription: string;
+};
 
 /**
  * getAdapters()
