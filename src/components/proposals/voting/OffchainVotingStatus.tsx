@@ -1,10 +1,8 @@
 import {useEffect, useState} from 'react';
 
 import {ProposalData} from '../types';
-import {SquareRootVotingBar} from '.';
 import {useOffchainVotingStartEnd} from '../hooks';
-import ProposalPeriod from '../ProposalPeriod';
-import StopwatchSVG from '../../../assets/svg/StopwatchSVG';
+import {VotingStatus} from './VotingStatus';
 
 type OffchainVotingStatusProps = {
   proposal: ProposalData;
@@ -21,7 +19,6 @@ type OffchainVotingStatusProps = {
  */
 export function OffchainVotingStatus({
   proposal,
-  showPercentages = true,
 }: OffchainVotingStatusProps): JSX.Element {
   const {snapshotProposal} = proposal;
 
@@ -63,49 +60,54 @@ export function OffchainVotingStatus({
   }, [hasOffchainVotingEnded]);
 
   /**
+   * Functions
+   */
+
+  function renderStatus() {
+    // On loading
+    if (!offchainVotingStartEndInitReady) {
+      return '\u2026'; // ...
+    }
+
+    // @todo On grace period start
+
+    // On voting ended
+    if (typeof didVotePass === 'boolean') {
+      return didVotePass ? 'Approved' : 'Failed';
+    }
+  }
+
+  function renderTimer(
+    ProposalPeriodComponent: Parameters<
+      Parameters<typeof VotingStatus>[0]['renderTimer']
+    >[0]
+  ) {
+    if (
+      offchainVotingStartEndInitReady &&
+      hasOffchainVotingStarted &&
+      !hasOffchainVotingEnded
+    ) {
+      return (
+        <ProposalPeriodComponent
+          startPeriodMs={votingStartSeconds * 1000}
+          endPeriodMs={votingEndSeconds * 1000}
+        />
+      );
+    }
+  }
+
+  /**
    * Render
    */
 
   return (
-    <>
-      <div className="votingstatus-container">
-        <StopwatchSVG />
-
-        {!offchainVotingStartEndInitReady && (
-          <span className="votingstatus">&hellip;</span>
-        )}
-
-        {/* STATUS WHEN NOT SPONSORED */}
-        {offchainVotingStartEndInitReady && !hasOffchainVotingStarted && (
-          <span className="votingstatus">Pending Sponsor</span>
-        )}
-
-        {/* CLOCK WHILE IN VOTING */}
-        {offchainVotingStartEndInitReady &&
-          hasOffchainVotingStarted &&
-          !hasOffchainVotingEnded && (
-            <ProposalPeriod
-              startPeriodMs={votingStartSeconds * 1000}
-              endPeriodMs={votingEndSeconds * 1000}
-            />
-          )}
-
-        {/* STATUSES ON VOTING ENDED */}
-        {typeof didVotePass === 'boolean' && (
-          <span className="votingstatus">
-            {didVotePass ? 'Approved' : 'Failed'}
-          </span>
-        )}
-      </div>
-
-      {/* VOTES */}
-      <SquareRootVotingBar
-        yesShares={yesShares}
-        noShares={noShares}
-        totalShares={totalShares}
-        votingExpired={hasOffchainVotingEnded}
-        showPercentages={showPercentages}
-      />
-    </>
+    <VotingStatus
+      renderTimer={renderTimer}
+      renderStatus={renderStatus}
+      hasVotingEnded={hasOffchainVotingEnded}
+      noShares={noShares}
+      totalShares={totalShares}
+      yesShares={yesShares}
+    />
   );
 }
