@@ -54,7 +54,7 @@ export function SquareRootVotingBar({
             {/* YES */}
             {votingExpired && yesShares > noShares && (
               <span className="yes-check">
-                <CheckSVG />
+                <CheckSVG aria-label="Vote has passed" />
               </span>
             )}
             <span className="yes-percent">{percentYes}%</span>
@@ -63,7 +63,7 @@ export function SquareRootVotingBar({
             <span className="no-percent">{percentNo}%</span>
             {votingExpired && yesShares <= noShares && (
               <span className="no-check">
-                <CheckSVG />
+                <CheckSVG aria-label="Vote has failed" />
               </span>
             )}
           </>
