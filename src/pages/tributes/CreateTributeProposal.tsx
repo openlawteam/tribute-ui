@@ -368,7 +368,7 @@ export default function CreateTributeProposal() {
         } catch (error) {
           console.error(error);
           throw new Error(
-            'Your ERC20 tokens could not be approved for transer.'
+            'Your ERC20 tokens could not be approved for transfer.'
           );
         }
       }
