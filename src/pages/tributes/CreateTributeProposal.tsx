@@ -2,7 +2,10 @@ import React, {useState, useCallback, useEffect} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
-import Web3 from 'web3';
+import {Link} from 'react-router-dom';
+// import Web3 from 'web3';
+import {Contract as Web3Contract} from 'web3-eth-contract/types';
+import {toBN} from 'web3-utils';
 
 import {
   getValidationError,
@@ -34,26 +37,34 @@ import Wrap from '../../components/common/Wrap';
 import EtherscanURL from '../../components/web3/EtherscanURL';
 
 enum Fields {
-  ethAddress = 'ethAddress',
-  ethAmount = 'ethAmount',
+  applicantAddress = 'applicantAddress',
+  erc20Address = 'erc20Address',
+  tributeAmount = 'tributeAmount',
+  requestAmount = 'requestAmount',
+  description = 'description',
 }
 
 type FormInputs = {
-  ethAddress: string;
-  ethAmount: string;
+  applicantAddress: string;
+  erc20Address: string;
+  tributeAmount: string;
+  requestAmount: string;
+  description: string;
 };
 
-type OnboardArguments = [
+type TributeArguments = [
   string, // `dao`
   string, // `proposalId`
   string, // `applicant`
   string, // `tokenToMint`
-  string // `tokenAmount`
+  string, // `requestAmount`
+  string, // `tokenAddr`
+  string // `tributeAmount`
 ];
 
-type UserAccountBalance = {
-  wei: string;
-  eth: string;
+type ERC20Details = {
+  symbol: string;
+  decimals: number;
 };
 
 export default function CreateTributeProposal() {
@@ -61,8 +72,8 @@ export default function CreateTributeProposal() {
    * Selectors
    */
 
-  const OnboardingContract = useSelector(
-    (state: StoreState) => state.contracts?.OnboardingContract
+  const TributeContract = useSelector(
+    (state: StoreState) => state.contracts?.TributeContract
   );
   const DaoRegistryContract = useSelector(
     (state: StoreState) => state.contracts?.DaoRegistryContract
@@ -104,10 +115,9 @@ export default function CreateTributeProposal() {
    */
 
   const [submitError, setSubmitError] = useState<Error>();
-  const [
-    userAccountBalance,
-    setUserAccountBalance,
-  ] = useState<UserAccountBalance>();
+  const [userERC20Balance, setUserERC20Balance] = useState<string>();
+  const [erc20Details, setERC20Details] = useState<ERC20Details>();
+  const [erc20Contract, setERC20Contract] = useState<Web3Contract>();
 
   /**
    * Variables
@@ -121,6 +131,7 @@ export default function CreateTributeProposal() {
     register,
     triggerValidation,
   } = form;
+  const erc20AddressValue = getValues().erc20Address;
 
   const createTributeError = submitError || txError;
   const isConnected = connected && account;
@@ -147,9 +158,19 @@ export default function CreateTributeProposal() {
    * Cached callbacks
    */
 
-  const getUserAccountBalanceCached = useCallback(getUserAccountBalance, [
-    account,
+  const getERC20ContractCached = useCallback(getERC20Contract, [
+    erc20AddressValue,
     web3Instance,
+  ]);
+
+  const getERC20DetailsCached = useCallback(getERC20Details, [
+    account,
+    erc20Contract,
+  ]);
+
+  const getUserERC20BalanceCached = useCallback(getUserERC20Balance, [
+    account,
+    erc20Contract,
   ]);
 
   /**
@@ -157,28 +178,79 @@ export default function CreateTributeProposal() {
    */
 
   useEffect(() => {
-    getUserAccountBalanceCached();
-  }, [getUserAccountBalanceCached]);
+    getERC20ContractCached();
+  }, [getERC20ContractCached]);
+
+  useEffect(() => {
+    getERC20DetailsCached();
+  }, [getERC20DetailsCached]);
+
+  useEffect(() => {
+    getUserERC20BalanceCached();
+  }, [getUserERC20BalanceCached]);
 
   /**
    * Functions
    */
 
-  async function getUserAccountBalance() {
-    if (!web3Instance || !account) {
-      setUserAccountBalance(undefined);
+  async function getERC20Contract() {
+    if (!web3Instance || !erc20AddressValue) {
+      setERC20Contract(undefined);
       return;
     }
 
     try {
-      // Ether wallet balance
-      const accountBalanceInWei = await web3Instance.eth.getBalance(account);
-      setUserAccountBalance({
-        wei: accountBalanceInWei,
-        eth: web3Instance.utils.fromWei(accountBalanceInWei),
-      });
+      const lazyERC20ABI = await import('../../truffle-contracts/ERC20.json');
+      const erc20Contract: Record<string, any> = lazyERC20ABI;
+      const instance = new web3Instance.eth.Contract(
+        erc20Contract.abi,
+        erc20AddressValue
+      );
+      setERC20Contract(instance);
     } catch (error) {
-      setUserAccountBalance(undefined);
+      console.error(error);
+      setERC20Contract(undefined);
+    }
+  }
+
+  async function getERC20Details() {
+    if (!account || !erc20Contract) {
+      setERC20Details(undefined);
+      return;
+    }
+
+    try {
+      const symbol = await erc20Contract.methods.symbol().call();
+      const decimals = await erc20Contract.methods.decimals().call();
+      setERC20Details({symbol, decimals: Number(decimals)});
+    } catch (error) {
+      console.error(error);
+      setERC20Details(undefined);
+    }
+  }
+
+  async function getUserERC20Balance() {
+    if (!account || !erc20Contract) {
+      setUserERC20Balance(undefined);
+      return;
+    }
+
+    try {
+      const balance = await erc20Contract.methods.balanceOf(account).call();
+      const balanceBN = toBN(balance);
+      const decimals = await erc20Contract.methods.decimals().call();
+      const divisor = toBN(10).pow(toBN(decimals));
+      const beforeDecimal = balanceBN.div(divisor);
+      const afterDecimal = balanceBN.mod(divisor);
+      const balanceReadable =
+        afterDecimal.toString() === '0'
+          ? beforeDecimal.toString()
+          : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
+
+      setUserERC20Balance(balanceReadable);
+    } catch (error) {
+      console.error(error);
+      setUserERC20Balance(undefined);
     }
   }
 
@@ -190,8 +262,8 @@ export default function CreateTributeProposal() {
         );
       }
 
-      if (!OnboardingContract) {
-        throw new Error('No OnboardingContract found.');
+      if (!TributeContract) {
+        throw new Error('No TributeContract found.');
       }
 
       if (!DaoRegistryContract) {
@@ -202,51 +274,68 @@ export default function CreateTributeProposal() {
         throw new Error('No account found.');
       }
 
+      if (!erc20Details) {
+        throw new Error('No ERC20 details found.');
+      }
+
       // Maybe set proposal ID from previous attempt
       let proposalId: string = proposalData?.uniqueId || '';
+
+      const {
+        applicantAddress,
+        erc20Address,
+        tributeAmount,
+        requestAmount,
+        description,
+      } = values;
+      const multiplier = toBN(10).pow(toBN(erc20Details.decimals));
+      const tributeAmountWithDecimals = toBN(
+        stripFormatNumber(tributeAmount)
+      ).mul(multiplier);
+      // @todo What should the `requestAmount` input value be multiplied by for the smart contract argument? `nbShares`? How do you get that multiplier value?
+      const requestAmountArg = stripFormatNumber(requestAmount);
+      // const requestAmountInWei = Web3.utils.toWei(
+      //   stripFormatNumber(requestAmount),
+      //   'ether'
+      // );
 
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
         // Sign and submit draft for snapshot-hub
         const {uniqueId} = await signAndSendProposal({
           partialProposalData: {
-            name: account,
-            body: `Membership for ${account}.`,
+            name: applicantAddress,
+            body: description || `Tribute for ${applicantAddress}.`,
             metadata: {},
           },
-          adapterName: ContractAdapterNames.onboarding,
+          adapterName: ContractAdapterNames.tribute,
           type: SnapshotType.draft,
         });
 
         proposalId = uniqueId;
       }
 
-      const {ethAddress, ethAmount} = values;
-      const ethAmountInWei = Web3.utils.toWei(
-        stripFormatNumber(ethAmount),
-        'ether'
-      );
-
-      const onboardArguments: OnboardArguments = [
+      const tributeArguments: TributeArguments = [
         DaoRegistryContract.contractAddress,
         proposalId,
-        ethAddress,
+        applicantAddress,
         SHARES_ADDRESS,
-        ethAmountInWei,
+        requestAmountArg,
+        erc20Address,
+        tributeAmountWithDecimals.toString(),
       ];
 
       const txArguments = {
         from: account || '',
-        value: ethAmountInWei,
         // Set a fast gas price
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      // Execute contract call for `onboard`
+      // Execute contract call for `provideTribute`
       await txSend(
-        'onboard',
-        OnboardingContract.instance.methods,
-        onboardArguments,
+        'provideTribute',
+        TributeContract.instance.methods,
+        tributeArguments,
         txArguments
       );
 
@@ -297,6 +386,17 @@ export default function CreateTributeProposal() {
     }
   }
 
+  function renderUserERC20Balance() {
+    if (!userERC20Balance) {
+      return '---';
+    }
+
+    const isBalanceInt = !userERC20Balance.includes('.');
+    return isBalanceInt
+      ? userERC20Balance
+      : formatDecimal(Number(userERC20Balance));
+  }
+
   /**
    * Render
    */
@@ -326,20 +426,20 @@ export default function CreateTributeProposal() {
   return (
     <RenderWrapper>
       <form className="form" onSubmit={(e) => e.preventDefault()}>
-        {/* ETH ADDRESS */}
+        {/* APPLICANT ADDRESS */}
         <div className="form__input-row">
           <label className="form__input-row-label">Applicant Address</label>
           <div className="form__input-row-fieldwrap">
             <input
-              aria-describedby={`error-${Fields.ethAddress}`}
-              aria-invalid={errors.ethAddress ? 'true' : 'false'}
-              name={Fields.ethAddress}
+              aria-describedby={`error-${Fields.applicantAddress}`}
+              aria-invalid={errors.applicantAddress ? 'true' : 'false'}
+              name={Fields.applicantAddress}
               defaultValue={account}
               ref={register({
-                validate: (ethAddress: string): string | boolean => {
-                  return !ethAddress
+                validate: (applicantAddress: string): string | boolean => {
+                  return !applicantAddress
                     ? FormFieldErrors.REQUIRED
-                    : !isEthAddressValid(ethAddress)
+                    : !isEthAddressValid(applicantAddress)
                     ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
                     : true;
                 },
@@ -349,39 +449,67 @@ export default function CreateTributeProposal() {
             />
 
             <InputError
-              error={getValidationError(Fields.ethAddress, errors)}
-              id={`error-${Fields.ethAddress}`}
+              error={getValidationError(Fields.applicantAddress, errors)}
+              id={`error-${Fields.applicantAddress}`}
             />
           </div>
         </div>
 
-        {/* ETH AMOUNT */}
+        {/* ERC20 ADDRESS */}
+        <div className="form__input-row">
+          <label className="form__input-row-label">ERC20 Address</label>
+          <div className="form__input-row-fieldwrap">
+            <input
+              aria-describedby={`error-${Fields.erc20Address}`}
+              aria-invalid={errors.erc20Address ? 'true' : 'false'}
+              name={Fields.erc20Address}
+              ref={register({
+                validate: (erc20Address: string): string | boolean => {
+                  return !erc20Address
+                    ? FormFieldErrors.REQUIRED
+                    : !isEthAddressValid(erc20Address)
+                    ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
+                    : true;
+                },
+              })}
+              type="text"
+              disabled={isInProcessOrDone}
+            />
+
+            <InputError
+              error={getValidationError(Fields.erc20Address, errors)}
+              id={`error-${Fields.erc20Address}`}
+            />
+          </div>
+        </div>
+
+        {/* TRIBUTE AMOUNT */}
         <div className="form__input-row">
           <label className="form__input-row-label">Amount</label>
           <div className="form__input-row-fieldwrap--narrow">
             <div className="input__suffix-wrap">
               <input
                 className="input__suffix"
-                aria-describedby={`error-${Fields.ethAmount}`}
-                aria-invalid={errors.ethAmount ? 'true' : 'false'}
-                name={Fields.ethAmount}
+                aria-describedby={`error-${Fields.tributeAmount}`}
+                aria-invalid={errors.tributeAmount ? 'true' : 'false'}
+                name={Fields.tributeAmount}
                 onChange={() =>
                   setValue(
-                    Fields.ethAmount,
-                    formatNumber(getValues().ethAmount)
+                    Fields.tributeAmount,
+                    formatNumber(getValues().tributeAmount)
                   )
                 }
                 ref={register({
-                  validate: (value: string): string | boolean => {
-                    const amount = Number(stripFormatNumber(value));
+                  validate: (tributeAmount: string): string | boolean => {
+                    const amount = Number(stripFormatNumber(tributeAmount));
 
-                    return value === ''
+                    return tributeAmount === ''
                       ? FormFieldErrors.REQUIRED
                       : isNaN(amount)
                       ? FormFieldErrors.INVALID_NUMBER
                       : amount <= 0
-                      ? 'The value must be greater than 0 ETH.'
-                      : amount >= Number(userAccountBalance?.eth)
+                      ? 'The value must be greater than 0.'
+                      : amount >= Number(userERC20Balance)
                       ? 'Insufficient funds.'
                       : true;
                   },
@@ -389,22 +517,95 @@ export default function CreateTributeProposal() {
                 type="text"
                 disabled={isInProcessOrDone}
               />
-              <div className="input__suffix-item">ETH</div>
+
+              <div className="input__suffix-item">
+                {erc20Details?.symbol || '___'}
+              </div>
             </div>
 
             <InputError
-              error={getValidationError(Fields.ethAmount, errors)}
-              id={`error-${Fields.ethAmount}`}
+              error={getValidationError(Fields.tributeAmount, errors)}
+              id={`error-${Fields.tributeAmount}`}
             />
+
+            <div className="form__input-description">
+              This amount will be held in escrow pending a member vote. If the
+              proposal is accepted, the funds will automatically be sent to the
+              DAO. If the proposal fails, the funds will be refunded to you.
+              {/* @todo Emphasize that user needs to first approve the adapter as spender of the amount of tribute tokens. (We possibly could build the approval function into the form on this page.) */}
+            </div>
           </div>
+
           <div className="form__input-addon">
             available:{' '}
-            <span className="text-underline">
-              {userAccountBalance
-                ? formatDecimal(Number(userAccountBalance.eth))
-                : '---'}{' '}
-              ETH
-            </span>
+            <span className="text-underline">{renderUserERC20Balance()}</span>
+          </div>
+        </div>
+
+        {/* REQUEST AMOUNT */}
+        <div className="form__input-row">
+          <label className="form__input-row-label">Request Amount</label>
+          <div className="form__input-row-fieldwrap--narrow">
+            <input
+              aria-describedby={`error-${Fields.requestAmount}`}
+              aria-invalid={errors.requestAmount ? 'true' : 'false'}
+              name={Fields.requestAmount}
+              onChange={() =>
+                setValue(
+                  Fields.requestAmount,
+                  formatNumber(getValues().requestAmount)
+                )
+              }
+              ref={register({
+                validate: (requestAmount: string): string | boolean => {
+                  const amount = Number(stripFormatNumber(requestAmount));
+
+                  return requestAmount === ''
+                    ? FormFieldErrors.REQUIRED
+                    : isNaN(amount)
+                    ? FormFieldErrors.INVALID_NUMBER
+                    : amount < 0
+                    ? 'The value must be at least 0.'
+                    : true;
+                },
+              })}
+              type="text"
+              disabled={isInProcessOrDone}
+            />
+
+            <InputError
+              error={getValidationError(Fields.requestAmount, errors)}
+              id={`error-${Fields.requestAmount}`}
+            />
+
+            <div className="form__input-description">
+              This is the amount of DAO tokens you are requesting be sent to the
+              Applicant Address in exchange for your tribute. Current member
+              allocations can be viewed{' '}
+              <Link to="/members" target="_blank" rel="noopener noreferrer">
+                here
+              </Link>
+              .
+            </div>
+          </div>
+        </div>
+
+        {/* DESCRIPTION */}
+        <div className="form__textarea-row">
+          <label className="form__input-row-label">Description</label>
+          <div className="form__input-row-fieldwrap">
+            <textarea
+              aria-describedby={`error-${Fields.description}`}
+              aria-invalid={errors.description ? 'true' : 'false'}
+              name={Fields.description}
+              placeholder="Say something about your tribute..."
+              ref={register}
+            />
+
+            <InputError
+              error={getValidationError(Fields.description, errors)}
+              id={`error-${Fields.description}`}
+            />
           </div>
         </div>
 
