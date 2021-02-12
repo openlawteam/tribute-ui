@@ -61,7 +61,7 @@ describe('VotingStatus unit tests', () => {
       />
     );
 
-    // Assert grace period timer
+    // Assert changing timer and labels: grace period timer (example only, as it may not be how we use it)
     await waitFor(() => {
       expect(screen.getByLabelText(/vote has passed/i)).toBeInTheDocument();
       expect(screen.getByText(/grace period ends:/i)).toBeInTheDocument();
