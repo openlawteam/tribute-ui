@@ -10,12 +10,12 @@ export type Adapters = {
 export enum DaoConstants {
   BANK = 'bank',
   CONFIGURATION = 'configuration',
-  EXECUTION = 'execution',
+  // EXECUTION = 'execution',
   FINANCING = 'financing',
   GUILDKICK = 'guildkick',
   ONBOARDING = 'onboarding',
   OFFCHAIN_VOTING = 'offchain-voting',
-  NONVOTING_ONBOARDING = 'nonvoting-onboarding',
+  // NONVOTING_ONBOARDING = 'nonvoting-onboarding',
   MANAGING = 'managing',
   RAGEQUIT = 'ragequit',
   VOTING = 'voting',
@@ -25,11 +25,11 @@ export enum DaoConstants {
 const daoConstants: Array<DaoConstants> = [
   DaoConstants.BANK,
   DaoConstants.CONFIGURATION,
-  DaoConstants.EXECUTION,
+  // DaoConstants.EXECUTION,
   DaoConstants.FINANCING,
   DaoConstants.GUILDKICK,
   DaoConstants.MANAGING,
-  DaoConstants.NONVOTING_ONBOARDING,
+  // DaoConstants.NONVOTING_ONBOARDING,
   DaoConstants.OFFCHAIN_VOTING,
   DaoConstants.ONBOARDING,
   DaoConstants.RAGEQUIT,
@@ -65,18 +65,17 @@ function sha3(value: string): string | null {
 /**
  * configurationABIFunction()
  *
- * Returns the ABI function used to configure an adapter
+ * Returns the ABI functions used to configure adapters
  */
 export function configurationABIFunction(): Record<DaoConstants, string> {
-  // adapterName: string
   return {
     [DaoConstants.BANK]: '', //@todo
     [DaoConstants.CONFIGURATION]: 'submitConfigurationProposal', // ?!
-    [DaoConstants.EXECUTION]: '', //@todo
+    // [DaoConstants.EXECUTION]: '', //@todo
     [DaoConstants.FINANCING]: 'createFinancingRequest', // ?!
     [DaoConstants.GUILDKICK]: 'submitKickProposal', // ?!
     [DaoConstants.MANAGING]: 'createAdapterChangeRequest', // ?!
-    [DaoConstants.NONVOTING_ONBOARDING]: '', //@todo
+    // [DaoConstants.NONVOTING_ONBOARDING]: '', //@todo
     [DaoConstants.OFFCHAIN_VOTING]: 'configureDao',
     [DaoConstants.ONBOARDING]: 'configureDao',
     [DaoConstants.RAGEQUIT]: 'configureDao',
@@ -97,7 +96,7 @@ export function adapterAccessControlLayer(
       SPONSOR_PROPOSAL: true,
       SET_CONFIGURATION: true,
     },
-    [DaoConstants.EXECUTION]: {},
+    // [DaoConstants.EXECUTION]: {},
     [DaoConstants.FINANCING]: {
       SUBMIT_PROPOSAL: true,
       SPONSOR_PROPOSAL: true,
@@ -122,7 +121,7 @@ export function adapterAccessControlLayer(
       REMOVE_ADAPTER: true,
       ADD_ADAPTER: true,
     },
-    [DaoConstants.NONVOTING_ONBOARDING]: {},
+    // [DaoConstants.NONVOTING_ONBOARDING]: {},
     [DaoConstants.OFFCHAIN_VOTING]: {},
     [DaoConstants.ONBOARDING]: {
       SUBMIT_PROPOSAL: true,

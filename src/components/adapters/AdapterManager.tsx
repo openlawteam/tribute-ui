@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {StoreState} from '../../store/types';
-import {AsyncStatus} from '../../util/types';
+// import {AsyncStatus} from '../../util/types';
 import {
   DaoConstants,
   adapterAccessControlLayer,
@@ -10,14 +10,11 @@ import {
 } from './config';
 import {useAdapters} from './hooks/useAdapters';
 import {useDao} from '../../hooks';
-import {
-  useContractSend,
-  useETHGasPrice,
-  useIsDefaultChain,
-  useWeb3Modal,
-} from '../web3/hooks';
+import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 
 import AdapterConfiguratorModal from './AdapterConfiguratorModal';
+import Loader from '../../components/feedback/Loader';
+import Checkbox, {CheckboxSize} from '../../components/common/Checkbox';
 
 type AddAdapterArguments = [
   string, // `adapterId`
@@ -41,41 +38,56 @@ export default function AdapterManager() {
   const [adapterConfigName, setAdapterConfigName] = useState<string>('');
   const [inputParameters, setInputParameters] = useState<Record<string, any>>();
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const [isInProcess, setIsInProcess] = useState<
+    Record<string, boolean> | undefined
+  >();
+  const [isDone, setIsDone] = useState<Record<string, boolean> | undefined>();
+  const [selectAll, setSelectAll] = useState<boolean>(false);
+  const [selectionCount, setSelectionCount] = useState<number>(0);
+  const [selections, setSelections] = useState<
+    Record<string, boolean> | undefined
+  >();
 
   /**
    * Hooks
    */
   const {account} = useWeb3Modal();
-  const {
-    adapterStatus,
-    usedAdapters,
-    unusedAdapters,
-    // getDaoAdapters,
-  } = useAdapters();
-  // const {isDefaultChain} = useIsDefaultChain();
+  const {usedAdapters, unusedAdapters} = useAdapters();
   const {dao} = useDao();
 
-  /**
-   * Effects
-   */
-  // useEffect(() => {
-  //   if (
-  //     isDefaultChain &&
-  //     adapterStatus !== (AsyncStatus.FULFILLED || AsyncStatus.REJECTED)
-  //   ) {
-  //     getDaoAdapters();
-  //   }
-  // }, [adapterStatus, isDefaultChain, getDaoAdapters]);
-
   const {
-    txError,
-    txEtherscanURL,
-    txIsPromptOpen,
+    // txError,
+    // txEtherscanURL,
+    // txIsPromptOpen,
     txSend,
-    txStatus,
+    // txStatus,
   } = useContractSend();
   const gasPrices = useETHGasPrice();
 
+  // Sets the initial checkbox selections to `false`
+  useEffect(() => {
+    unusedAdapters?.forEach((adapter: Record<string, any>) => {
+      setSelections((prevState: Record<string, boolean> | undefined) => ({
+        ...prevState,
+        [adapter.adapterName]: false,
+      }));
+    });
+  }, [unusedAdapters]);
+
+  // Updates checkbox selection counter
+  useEffect(() => {
+    selections &&
+      setSelectionCount(
+        Object.values(selections).filter((adapter: boolean) => adapter === true)
+          .length
+      );
+  }, [selections]);
+
+  /**
+   * getAdapter
+   *
+   * @param adapterName
+   */
   function getAdapter(adapterName: DaoConstants): Record<string, any> {
     return Object.keys(adapterContracts)
       .map((a) => adapterContracts[a])
@@ -88,7 +100,8 @@ export default function AdapterManager() {
   // console.log('txError', txError);
 
   /**
-   * addAdapter()
+   * addAdapter
+   *
    * @param adapter
    */
   async function addAdapter(adapter: Record<string, any>) {
@@ -96,6 +109,11 @@ export default function AdapterManager() {
 
     try {
       console.log('add ', adapter);
+
+      setIsInProcess((prevState) => ({
+        ...prevState,
+        [adapter.adapterName]: true,
+      }));
 
       // Get adapters contract address
       const {contractAddress} = getAdapter(adapter.adapterName);
@@ -121,11 +139,29 @@ export default function AdapterManager() {
         addAdapterArguments,
         txArguments
       );
+
+      setIsInProcess((prevState) => ({
+        ...prevState,
+        [adapter.adapterName]: false,
+      }));
+      setIsDone((prevState) => ({
+        ...prevState,
+        [adapter.adapterName]: true,
+      }));
     } catch (error) {
       console.log('error', adapter.adapterName, error);
+      setIsInProcess((prevState) => ({
+        ...prevState,
+        [adapter.adapterName]: false,
+      }));
     }
   }
 
+  /**
+   * configureAdapter
+   *
+   * @param adapter
+   */
   async function configureAdapter(adapter: Record<string, any>) {
     console.log('configure', adapter);
     try {
@@ -150,9 +186,31 @@ export default function AdapterManager() {
     }
   }
 
+  /**
+   * finalizeDao
+   */
   function finalizeDao() {
     // window.confirm before proceeding
     console.log('finalizeDao');
+  }
+
+  function addSelectedAdapters() {
+    console.log('addSelectedAdapters');
+
+    // @todo iterate throught selection and call DaoFactory `addAdapters`
+  }
+
+  function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
+    // Update the select all checkbox
+    setSelectAll(event.target.checked);
+
+    // Update all unused adapter options
+    for (const key in selections) {
+      setSelections((s) => ({
+        ...s,
+        [key]: event.target.checked,
+      }));
+    }
   }
 
   return (
@@ -165,11 +223,88 @@ export default function AdapterManager() {
         dictum fermentum vel tincidunt neque. Sed sed lacinia...
       </p>
 
-      {/** USED ADAPTERS TO CONFIGURE OR REMOVE */}
+      <div className="adaptermanager__selection">
+        <div>
+          <Checkbox
+            id={'select-all'}
+            label={`${selectionCount} selected`}
+            checked={selectAll === true}
+            disabled={false /* @todo */}
+            name={'select-all'}
+            size={CheckboxSize.LARGE}
+            onChange={handleOnChange}
+          />
+        </div>
+        <div>
+          <button
+            className="button--secondary"
+            disabled={selectionCount === 0}
+            onClick={addSelectedAdapters}>
+            Add selected
+          </button>
+        </div>
+      </div>
+
+      {/** UNUSED ADAPTERS TO ADD */}
+      {unusedAdapters &&
+        unusedAdapters?.length &&
+        unusedAdapters.map((adapter: Record<string, any>) => (
+          <div
+            className="adaptermanager__grid unused-adapters"
+            key={adapter.adapterId}>
+            <div className="adaptermanager__checkbox">
+              <Checkbox
+                id={adapter.adapterName}
+                label={''}
+                checked={
+                  (selections && selections[adapter.adapterName] === true) ||
+                  false
+                }
+                disabled={false /*state.disableConfirmDelgation*/}
+                name={adapter.adapterName}
+                size={CheckboxSize.LARGE}
+                onChange={(event) => {
+                  setSelections((s) => ({
+                    ...s,
+                    [adapter.adapterName]: event.target.checked,
+                  }));
+                }}
+              />
+            </div>
+
+            <div className="adaptermanager__info">
+              <span className="adaptermanager__name">
+                {adapter.adapterName}
+              </span>
+              <span className="adaptermanager__desc">
+                {adapter.adapterDescription}
+              </span>
+            </div>
+
+            <div className="adaptermanager__add">
+              <button
+                className="button--secondary"
+                disabled={isInProcess && isInProcess[adapter.adapterName]}
+                onClick={() => addAdapter(adapter)}>
+                {isInProcess && isInProcess[adapter.adapterName] ? (
+                  <Loader />
+                ) : isDone && isDone[adapter.adapterName] ? (
+                  'Done'
+                ) : (
+                  'Add'
+                )}
+              </button>
+            </div>
+          </div>
+        ))}
+
+      {/** CURRENTLY USED ADAPTERS TO CONFIGURE OR REMOVE */}
       {usedAdapters &&
         usedAdapters?.length &&
         usedAdapters.map((adapter: Record<string, any>) => (
-          <div className="adaptermanager__grid" key={adapter.adapterId}>
+          <div
+            className="adaptermanager__grid used-adapters"
+            key={adapter.adapterId}>
             <div className="adaptermanager__info">
               <span className="adaptermanager__name">
                 {adapter.adapterName}
@@ -186,50 +321,28 @@ export default function AdapterManager() {
                 Configure
               </button>
             </div>
-
-            {/* <div className="adaptermanager__remove">
-              <button
-                className="button--secondary"
-                onClick={() => removeAdapter(adapter)}>
-                Remove
-              </button>
-            </div> */}
           </div>
         ))}
 
-      {/** UNUSED ADAPTERS TO ADD */}
-      {unusedAdapters &&
-        unusedAdapters?.length &&
-        unusedAdapters.map((adapter: Record<string, any>) => (
-          <div className="adaptermanager__grid" key={adapter.adapterId}>
-            <div className="adaptermanager__info">
-              <span className="adaptermanager__name">
-                {adapter.adapterName}
-              </span>
-              <span className="adaptermanager__desc">
-                {adapter.adapterDescription}
-              </span>
-            </div>
-
-            <div className="adaptermanager__add">
-              <button
-                className="button--secondary"
-                onClick={() => addAdapter(adapter)}>
-                Add
-              </button>
-            </div>
-          </div>
-        ))}
-
-      <button onClick={finalizeDao}>Finalize Dao</button>
+      <div className="adaptermanager_finalize">
+        <p>
+          If you're happy with your setup, you can finalize your DAO. After your
+          DAO is finalized you will need to submit a proposal to make changes.
+        </p>
+        <div>
+          <button className="button--secondary" onClick={finalizeDao}>
+            Finalize Dao
+          </button>
+        </div>
+      </div>
 
       {openModal && (
         <AdapterConfiguratorModal
           abiMethodName={abiMethodName}
           adapterId={adapterConfigId}
           adapterName={adapterConfigName}
-          isOpen={openModal}
           configurationInputs={inputParameters}
+          isOpen={openModal}
           closeHandler={() => {
             setOpenModal(false);
           }}

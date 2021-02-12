@@ -2,19 +2,72 @@
 @use "./mixins" as *; /* load without namespace for convenience */
 @use "./button";
 
-// .adaptermanager {
-//   // font-family: $font-mono;
-// }
+.adapter-configurator-modal {
+  max-width: 48.5rem;
+
+  h1 {
+    font-family: $font-mono;
+  }
+
+  .form__input-row {
+    margin: 1rem 0;
+  }
+}
 
 .adaptermanager__grid {
   display: flex;
   flex-direction: row;
   margin-bottom: 2rem;
+
+  .button--secondary {
+    font-family: $font-mono;
+  }
+}
+
+.adaptermanager__selection {
+  border-bottom: 2px solid #e4e4e4;
+  display: flex;
+  flex-direction: row;
+  margin: 2rem 0;
+  padding-bottom: 1.5rem;
+
+  div:first-child {
+    flex: 70% 1;
+  }
+
+  > div {
+    display: inline-flex;
+    align-self: center;
+    text-align: center;
+  }
+}
+
+.used-adapters {
+  .adaptermanager__info {
+    padding-left: 10%;
+  }
+  .adaptermanager__info {
+    flex: 60%;
+  }
+  .adaptermanager__configure {
+    flex: 30%;
+  }
+}
+
+// includes room for the checkbox
+.unused-adapters {
+  .adaptermanager__checkbox {
+    flex: 10%;
+  }
+  .adaptermanager__info {
+    flex: 60%;
+  }
+  .adaptermanager__add {
+    flex: 30%;
+  }
 }
 
 .adaptermanager__info {
-  flex: 50%;
-
   .adaptermanager__name,
   .adaptermanager__desc {
     display: flex;
@@ -29,7 +82,6 @@
 .adaptermanager__add,
 .adaptermanager__configure {
   align-self: center;
-  flex: 50%;
   text-align: center;
 }
 .adaptermanager__remove {
@@ -40,9 +92,28 @@
     background-color: #ffcbcb;
     color: red;
     font-family: $font-mono;
+    text-transform: lowercase;
+  }
+
+  p {
+    margin: 2rem;
   }
 }
 
 .adaptermanager__name {
   text-transform: uppercase;
+}
+
+.adaptermanager_finalize {
+  border-top: 2px solid #e4e4e4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 3rem 0;
+  padding-bottom: 1.5rem;
+
+  .button--secondary {
+    background-color: #dce7f2;
+    color: #547ac4;
+  }
 }

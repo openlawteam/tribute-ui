@@ -53,10 +53,10 @@ export default function AdapterConfiguratorModal({
    */
   const {
     txError,
-    txEtherscanURL,
+    // txEtherscanURL,
     txIsPromptOpen,
     txSend,
-    txStatus,
+    // txStatus,
   } = useContractSend();
   const gasPrices = useETHGasPrice();
   const {connected, account} = useWeb3Modal();
@@ -133,7 +133,9 @@ export default function AdapterConfiguratorModal({
         removeAdapterArguments,
         txArguments
       );
-    } catch (error) {}
+    } catch (error) {
+      setSubmitError(error);
+    }
   }
 
   async function handleSubmit(values: Record<string, any>) {
@@ -175,7 +177,7 @@ export default function AdapterConfiguratorModal({
       // close modal
     } catch (error) {
       // Set any errors from Web3 utils or explicitly set above.
-      // setSubmitError(error);
+      setSubmitError(error);
       console.log('error', error);
     }
   }
@@ -183,6 +185,7 @@ export default function AdapterConfiguratorModal({
   return (
     <Modal
       keyProp="adapter-configurator"
+      modalClassNames="adapter-configurator-modal"
       isOpen={isOpen}
       isOpenHandler={() => {
         closeHandler();
