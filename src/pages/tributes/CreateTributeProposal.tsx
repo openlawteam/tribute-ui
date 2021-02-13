@@ -287,9 +287,10 @@ export default function CreateTributeProposal() {
       }
 
       const difference = tributeAmountWithDecimals.sub(allowanceBN);
+      const approveValue = allowanceBN.add(difference);
       const tokenApproveArguments: TokenApproveArguments = [
         TributeContract.contractAddress,
-        difference.toString(),
+        approveValue.toString(),
       ];
       const txArguments = {
         from: account || '',
@@ -434,6 +435,7 @@ export default function CreateTributeProposal() {
       return 'Awaiting your confirmation\u2026';
     }
 
+    // If token approve transaction is confirmed
     if (txStatusTokenApprove === Web3TxStatus.PENDING) {
       return (
         <>
