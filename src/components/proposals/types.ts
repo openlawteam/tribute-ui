@@ -10,6 +10,24 @@ import {
  * ENUMS
  */
 
+/**
+ * Reverse mapping of DaoRegistry proposal flags.
+ * The formula used to create the `flags` entry is:
+ *   `prevFlags + 2**nextFlagIndex`
+ *    i.e. to get the flag after `flags: 1` the formula is: `1 + 2**1 = 3`
+ *
+ * @note Order matters
+ *
+ * @see `ProposalFlag` in laoland `DaoRegistry.sol`
+ * @see `getFlag` in laoland `DaoConstants.sol`
+ * @see `setFlag` in laoland `DaoConstants.sol`
+ */
+export enum ProposalFlag {
+  EXISTS = 1,
+  SPONSORED = 3,
+  PROCESSED = 7,
+}
+
 // @todo Need more information about the vote challenge flow.
 export enum ProposalFlowStatus {
   Sponsor = 'Sponsor',
