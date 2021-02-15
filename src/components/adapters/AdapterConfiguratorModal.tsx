@@ -134,8 +134,6 @@ export default function AdapterConfiguratorModal({
   async function handleRemoveAdapter(): Promise<void> {
     if (!DaoRegistryContract) return;
 
-    console.log('remove: adapterId', adapter?.adapterId);
-
     try {
       setRemoveAdapterStatus(Web3TxStatus.AWAITING_CONFIRM);
 
@@ -208,14 +206,6 @@ export default function AdapterConfiguratorModal({
 
       setConfigureAdapterStatus(Web3TxStatus.AWAITING_CONFIRM);
 
-      console.log(
-        'abiMethodName, methods, adapterConfigArguments, txArguments ====== ',
-        abiMethodName,
-        methods,
-        adapterConfigArguments,
-        txArguments
-      );
-
       // Execute contract call
       await txSend(abiMethodName, methods, adapterConfigArguments, txArguments);
 
@@ -226,8 +216,6 @@ export default function AdapterConfiguratorModal({
       setConfigureAdapterStatus(Web3TxStatus.REJECTED);
     }
   }
-
-  console.log('errors', errors);
 
   return (
     <Modal
@@ -289,7 +277,9 @@ export default function AdapterConfiguratorModal({
           {/* SUBMIT */}
           <button
             className="button"
-            disabled={isConfigureInProcessOrDone}
+            disabled={
+              isConfigureInProcessOrDone || isRemoveInProcess || isRemoveDone
+            }
             onClick={() => {
               if (isConfigureInProcessOrDone) return;
 
@@ -332,7 +322,12 @@ export default function AdapterConfiguratorModal({
               Delete this adapter. Once you delete this adapter, it can be
               re-added if the DAO isn't finalized.
             </p>
-            <button className="button--secondary" onClick={handleRemoveAdapter}>
+            <button
+              className="button--secondary"
+              disabled={
+                isRemoveInProcess || isRemoveDone || isConfigureInProcessOrDone
+              }
+              onClick={handleRemoveAdapter}>
               {isRemoveInProcess ? (
                 <Loader />
               ) : isRemoveDone ? (

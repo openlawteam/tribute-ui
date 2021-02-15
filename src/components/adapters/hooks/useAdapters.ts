@@ -64,15 +64,17 @@ export function useAdapters(): UseAdaptersReturn {
   /**
    * Variables
    */
-  // memoize calling `getAdapters` because it's an expensive
+  // Memoize calling `getAdapters` because it's an expensive
   // operation and because eslint-plugin-react-hooks was complaining :)
   const availableAdapters: Adapters[] = useMemo(() => getAdapters(), []);
 
   // Get GQL adapters
   useEffect(() => {
     if (!daoRegistryContract?.contractAddress) return;
+
     try {
       setAdapterStatus(AsyncStatus.PENDING);
+
       if (!getUsedAdapters.loading && getUsedAdapters.data) {
         // get adapters
         const {adapters} = getUsedAdapters.data as Record<string, any>;

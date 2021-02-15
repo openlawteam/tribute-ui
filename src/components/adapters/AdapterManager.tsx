@@ -16,6 +16,7 @@ import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import AdapterConfiguratorModal from './AdapterConfiguratorModal';
 import Loader from '../../components/feedback/Loader';
 import Checkbox, {CheckboxSize} from '../../components/common/Checkbox';
+import {AsyncStatus} from '../../util/types';
 
 type AddAdapterArguments = [
   string, // `adapterId`
@@ -55,7 +56,7 @@ export default function AdapterManager() {
    * Hooks
    */
   const {account} = useWeb3Modal();
-  const {usedAdapters, unusedAdapters} = useAdapters();
+  const {adapterStatus, usedAdapters, unusedAdapters} = useAdapters();
   const {dao} = useDao();
 
   const {
@@ -70,20 +71,22 @@ export default function AdapterManager() {
   /**
    * Variables
    */
-  const hasAdapters =
-    usedAdapters !== undefined && unusedAdapters !== undefined;
+  const noAvailableAdapters =
+    usedAdapters === undefined && unusedAdapters === undefined;
 
   // Sets the initial checkbox selections for unused adapters to `false`
   // and sets the `Select All` checkbox to disabled if no adapters are available
   useEffect(() => {
-    hasAdapters &&
+    if (!unusedAdapters) return;
+
+    unusedAdapters &&
       unusedAdapters?.forEach((adapter: Record<string, any>) => {
         setSelections((prevState: Record<string, boolean> | undefined) => ({
           ...prevState,
           [adapter.adapterName]: false,
         }));
       });
-  }, [hasAdapters, unusedAdapters]);
+  }, [unusedAdapters]);
 
   // Updates checkbox selection counter when user selects a checkbox
   useEffect(() => {
@@ -260,7 +263,7 @@ export default function AdapterManager() {
             label={`${selectionCount} selected`}
             checked={selectAll === true}
             disabled={
-              !hasAdapters /* 
+              noAvailableAdapters /* 
               @todo 
               - also disable when selection is processing 
               - when there are no more unused adapters to select
@@ -281,9 +284,14 @@ export default function AdapterManager() {
         </div>
       </div>
 
+      {adapterStatus === AsyncStatus.PENDING && <Loader />}
+
+      {adapterStatus === AsyncStatus.REJECTED && noAvailableAdapters && (
+        <p>No adapters available</p>
+      )}
+
       {/** UNUSED ADAPTERS TO ADD */}
-      {hasAdapters &&
-        unusedAdapters &&
+      {unusedAdapters &&
         unusedAdapters?.length &&
         unusedAdapters.map((adapter: Record<string, any>) => (
           <div
@@ -336,8 +344,7 @@ export default function AdapterManager() {
         ))}
 
       {/** CURRENTLY USED ADAPTERS TO CONFIGURE OR REMOVE */}
-      {hasAdapters &&
-        usedAdapters &&
+      {usedAdapters &&
         usedAdapters?.length &&
         usedAdapters.map((adapter: Record<string, any>) => (
           <div
@@ -362,8 +369,6 @@ export default function AdapterManager() {
           </div>
         ))}
 
-      {!hasAdapters && <p>No adapters available</p>}
-
       <div className="adaptermanager_finalize">
         <p>
           If you're happy with your setup, you can finalize your DAO. After your
@@ -373,7 +378,7 @@ export default function AdapterManager() {
           <button
             className="button--secondary"
             disabled={
-              !hasAdapters /* 
+              noAvailableAdapters /* 
               @todo 
               - also disable when selection is processing 
               - when there are no more unused adapters to select
