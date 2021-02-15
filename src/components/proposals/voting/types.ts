@@ -1,7 +1,6 @@
 /**
  * @see `IVoting.sol` in laoland
  */
-
 export enum VotingState {
   NOT_STARTED,
   TIE,
