@@ -1,7 +1,5 @@
 import {TestWeb3ResponseArgs, TestWeb3ResponseReturn} from './types';
-import DaoRegistryJSON from '../../truffle-contracts/DaoRegistry.json';
-
-const daoRegistryABI = DaoRegistryJSON.abi;
+import DAORegistryABI from '../../truffle-contracts/DaoRegistry.json';
 
 /**
  * isActiveMember
@@ -16,6 +14,6 @@ export const isActiveMember = ({
 }: TestWeb3ResponseArgs): TestWeb3ResponseReturn<string> => {
   return [
     result ?? web3Instance.eth.abi.encodeParameter('bool', true),
-    {abiMethodName: 'isActiveMember', abi: daoRegistryABI},
+    {abiMethodName: 'isActiveMember', abi: DAORegistryABI},
   ];
 };
