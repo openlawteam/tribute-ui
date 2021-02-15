@@ -11,6 +11,10 @@
 
   .form__input-row {
     margin: 1rem 0;
+
+    .error-message {
+      text-align: left;
+    }
   }
 }
 
@@ -87,6 +91,7 @@
 .adaptermanager__remove {
   border-top: 2px solid #eaeaea;
   margin-bottom: 2rem;
+  margin-top: 2rem;
 
   button {
     background-color: #ffcbcb;

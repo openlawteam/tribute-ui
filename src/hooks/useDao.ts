@@ -8,6 +8,7 @@ import {GET_DAO} from '../gql';
 
 type UseDaoReturn = {
   dao: Record<string, any> | undefined;
+  error: Error | undefined;
 };
 
 /**
@@ -27,6 +28,7 @@ export function useDao(): UseDaoReturn {
   });
 
   const [dao, setDao] = useState<Record<string, any> | undefined>();
+  const [error, setError] = useState<Error>();
 
   const getDaoRegistryCallback = useCallback(getDaoRegistry, [getDao]);
 
@@ -46,9 +48,9 @@ export function useDao(): UseDaoReturn {
         }
       }
     } catch (error) {
-      // setError(error);
+      setError(error);
     }
   }
 
-  return {dao};
+  return {dao, error};
 }

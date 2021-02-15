@@ -4,6 +4,7 @@ import {useSelector} from 'react-redux';
 import {StoreState} from '../../store/types';
 // import {AsyncStatus} from '../../util/types';
 import {
+  Adapters,
   DaoConstants,
   adapterAccessControlLayer,
   configurationABIFunction,
@@ -34,17 +35,19 @@ export default function AdapterManager() {
    * States
    */
   const [abiMethodName, setABIMethodName] = useState<string>('');
-  const [adapterConfigId, setAdapterConfigId] = useState<string>('');
-  const [adapterConfigName, setAdapterConfigName] = useState<string>('');
   const [inputParameters, setInputParameters] = useState<Record<string, any>>();
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [isInProcess, setIsInProcess] = useState<
-    Record<string, boolean> | undefined
-  >();
   const [isDone, setIsDone] = useState<Record<string, boolean> | undefined>();
+  const [submitError, setSubmitError] = useState<Error>();
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [selectionCount, setSelectionCount] = useState<number>(0);
   const [selections, setSelections] = useState<
+    Record<string, boolean> | undefined
+  >();
+  const [configureAdapter, setConfigureAdapter] = useState<
+    Adapters | undefined
+  >();
+  const [isInProcess, setIsInProcess] = useState<
     Record<string, boolean> | undefined
   >();
 
@@ -64,17 +67,25 @@ export default function AdapterManager() {
   } = useContractSend();
   const gasPrices = useETHGasPrice();
 
-  // Sets the initial checkbox selections to `false`
-  useEffect(() => {
-    unusedAdapters?.forEach((adapter: Record<string, any>) => {
-      setSelections((prevState: Record<string, boolean> | undefined) => ({
-        ...prevState,
-        [adapter.adapterName]: false,
-      }));
-    });
-  }, [unusedAdapters]);
+  /**
+   * Variables
+   */
+  const hasAdapters =
+    usedAdapters !== undefined && unusedAdapters !== undefined;
 
-  // Updates checkbox selection counter
+  // Sets the initial checkbox selections for unused adapters to `false`
+  // and sets the `Select All` checkbox to disabled if no adapters are available
+  useEffect(() => {
+    hasAdapters &&
+      unusedAdapters?.forEach((adapter: Record<string, any>) => {
+        setSelections((prevState: Record<string, boolean> | undefined) => ({
+          ...prevState,
+          [adapter.adapterName]: false,
+        }));
+      });
+  }, [hasAdapters, unusedAdapters]);
+
+  // Updates checkbox selection counter when user selects a checkbox
   useEffect(() => {
     selections &&
       setSelectionCount(
@@ -100,11 +111,11 @@ export default function AdapterManager() {
   // console.log('txError', txError);
 
   /**
-   * addAdapter
+   * handleAddAdapter
    *
    * @param adapter
    */
-  async function addAdapter(adapter: Record<string, any>) {
+  async function handleAddAdapter(adapter: Record<string, any>) {
     if (!DaoRegistryContract) return;
 
     try {
@@ -117,6 +128,11 @@ export default function AdapterManager() {
 
       // Get adapters contract address
       const {contractAddress} = getAdapter(adapter.adapterName);
+
+      if (!contractAddress) {
+        throw new Error('adapterAddress must not be empty');
+      }
+
       // Get adapters access control layer (acl)
       // these are the functions the adapter will have access to
       const {acl} = adapterAccessControlLayer(adapter.adapterName);
@@ -126,6 +142,7 @@ export default function AdapterManager() {
         contractAddress, // [1]address adapterAddress
         acl, // [2]uint256 acl
       ];
+
       const txArguments = {
         from: account || '',
         // Set a fast gas price
@@ -149,16 +166,17 @@ export default function AdapterManager() {
         [adapter.adapterName]: true,
       }));
     } catch (error) {
-      console.log('error', adapter.adapterName, error);
       setIsInProcess((prevState) => ({
         ...prevState,
         [adapter.adapterName]: false,
       }));
+
+      setSubmitError(error);
     }
   }
 
-  function addSelectedAdapters() {
-    console.log('addSelectedAdapters');
+  function handleAddSelectedAdapters() {
+    console.log('handleAddSelectedAdapters');
 
     try {
       // Set the `Add` button states to true for all selected adapters
@@ -170,11 +188,9 @@ export default function AdapterManager() {
           }));
         }
       }
-
-      // Get selected adapters
-    } catch (error) {}
-
-    // @todo iterate throught selection and call DaoFactory `addAdapters`
+    } catch (error) {
+      setSubmitError(error);
+    }
   }
 
   /**
@@ -182,7 +198,7 @@ export default function AdapterManager() {
    *
    * @param adapter
    */
-  async function configureAdapter(adapter: Record<string, any>) {
+  async function handleConfigureAdapter(adapter: Adapters) {
     console.log('configure', adapter);
     try {
       // Get ABI function name
@@ -197,21 +213,20 @@ export default function AdapterManager() {
       )[0];
 
       setABIMethodName(adapterABIFunctionName);
-      setAdapterConfigId(adapter.adapterId);
-      setAdapterConfigName(adapter.adapterName);
+      setConfigureAdapter(adapter);
       setInputParameters(inputs);
       setOpenModal(true);
     } catch (error) {
-      console.log('error', error);
+      setSubmitError(error);
     }
   }
 
   /**
    * finalizeDao
    */
-  function finalizeDao() {
+  function handleFinalizeDao() {
     // window.confirm before proceeding
-    console.log('finalizeDao');
+    console.log('handleFinalizeDao');
   }
 
   // Handles the select all checkbox event
@@ -244,7 +259,13 @@ export default function AdapterManager() {
             id={'select-all'}
             label={`${selectionCount} selected`}
             checked={selectAll === true}
-            disabled={false /* @todo */}
+            disabled={
+              !hasAdapters /* 
+              @todo 
+              - also disable when selection is processing 
+              - when there are no more unused adapters to select
+              */
+            }
             name={'select-all'}
             size={CheckboxSize.LARGE}
             onChange={handleOnChange}
@@ -254,14 +275,15 @@ export default function AdapterManager() {
           <button
             className="button--secondary"
             disabled={selectionCount === 0}
-            onClick={addSelectedAdapters}>
+            onClick={handleAddSelectedAdapters}>
             Add selected
           </button>
         </div>
       </div>
 
       {/** UNUSED ADAPTERS TO ADD */}
-      {unusedAdapters &&
+      {hasAdapters &&
+        unusedAdapters &&
         unusedAdapters?.length &&
         unusedAdapters.map((adapter: Record<string, any>) => (
           <div
@@ -300,7 +322,7 @@ export default function AdapterManager() {
               <button
                 className="button--secondary"
                 disabled={isInProcess && isInProcess[adapter.adapterName]}
-                onClick={() => addAdapter(adapter)}>
+                onClick={() => handleAddAdapter(adapter)}>
                 {isInProcess && isInProcess[adapter.adapterName] ? (
                   <Loader />
                 ) : isDone && isDone[adapter.adapterName] ? (
@@ -314,7 +336,8 @@ export default function AdapterManager() {
         ))}
 
       {/** CURRENTLY USED ADAPTERS TO CONFIGURE OR REMOVE */}
-      {usedAdapters &&
+      {hasAdapters &&
+        usedAdapters &&
         usedAdapters?.length &&
         usedAdapters.map((adapter: Record<string, any>) => (
           <div
@@ -332,12 +355,14 @@ export default function AdapterManager() {
             <div className="adaptermanager__configure">
               <button
                 className="button--secondary"
-                onClick={() => configureAdapter(adapter)}>
+                onClick={() => handleConfigureAdapter(adapter as Adapters)}>
                 Configure
               </button>
             </div>
           </div>
         ))}
+
+      {!hasAdapters && <p>No adapters available</p>}
 
       <div className="adaptermanager_finalize">
         <p>
@@ -345,7 +370,16 @@ export default function AdapterManager() {
           DAO is finalized you will need to submit a proposal to make changes.
         </p>
         <div>
-          <button className="button--secondary" onClick={finalizeDao}>
+          <button
+            className="button--secondary"
+            disabled={
+              !hasAdapters /* 
+              @todo 
+              - also disable when selection is processing 
+              - when there are no more unused adapters to select
+              */
+            }
+            onClick={handleFinalizeDao}>
             Finalize Dao
           </button>
         </div>
@@ -354,8 +388,7 @@ export default function AdapterManager() {
       {openModal && (
         <AdapterConfiguratorModal
           abiMethodName={abiMethodName}
-          adapterId={adapterConfigId}
-          adapterName={adapterConfigName}
+          adapter={configureAdapter}
           configurationInputs={inputParameters}
           isOpen={openModal}
           closeHandler={() => {

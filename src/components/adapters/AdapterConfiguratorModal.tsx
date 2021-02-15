@@ -2,12 +2,14 @@ import React, {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
 
-import {DaoConstants} from './config';
+import {Adapters, DaoConstants} from './config';
 import {StoreState} from '../../store/types';
 import {AsyncStatus, MetaMaskRPCError} from '../../util/types';
+import {Web3TxStatus} from '../web3/types';
+import {FormFieldErrors} from '../../util/enums';
 import {getValidationError} from '../../util/helpers';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
-import {Web3TxStatus} from '../web3/types';
+import {useValidation} from './hooks/useValidation';
 
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import InputError from '../../components/common/InputError';
@@ -18,8 +20,7 @@ import TimesSVG from '../../assets/svg/TimesSVG';
 
 type AdapterConfiguratorModalProps = {
   abiMethodName: string;
-  adapterId: string;
-  adapterName: string;
+  adapter: Adapters | undefined;
   configurationInputs: Record<string, any> | undefined;
   isOpen: boolean;
   closeHandler: () => void;
@@ -31,8 +32,7 @@ type RemoveAdapterArguments = [
 
 export default function AdapterConfiguratorModal({
   abiMethodName,
-  adapterId,
-  adapterName,
+  adapter,
   configurationInputs,
   isOpen,
   closeHandler,
@@ -68,6 +68,7 @@ export default function AdapterConfiguratorModal({
   } = useContractSend();
   const gasPrices = useETHGasPrice();
   const {connected, account} = useWeb3Modal();
+  const {isParamInputValid, getFormFieldError} = useValidation();
 
   /**
    * Their hooks
@@ -128,18 +129,18 @@ export default function AdapterConfiguratorModal({
   }
 
   /**
-   * removeAdapter()
-   * @param adapter
+   * handleRemoveAdapter()
    */
-  async function removeAdapter() {
-    console.log('remove: adapterId', adapterId);
+  async function handleRemoveAdapter(): Promise<void> {
     if (!DaoRegistryContract) return;
+
+    console.log('remove: adapterId', adapter?.adapterId);
 
     try {
       setRemoveAdapterStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       const removeAdapterArguments: RemoveAdapterArguments = [
-        adapterId, // [0]bytes32 adapterId
+        adapter?.adapterId || '', // [0]bytes32 adapterId
       ];
       const txArguments = {
         from: account || '',
@@ -168,17 +169,18 @@ export default function AdapterConfiguratorModal({
     }
   }
 
+  /**
+   * handleSubmit()
+   * @param values
+   */
   async function handleSubmit(values: Record<string, any>) {
     try {
-      console.log('values', values);
-
       setConfigureAdapterStatus(Web3TxStatus.PENDING);
 
       const {
         contractAddress,
         instance: {methods},
-      } = getAdapter(adapterName as DaoConstants);
-      console.log('adapterContract: contractAddress', contractAddress, methods);
+      } = getAdapter(adapter?.adapterName as DaoConstants);
 
       if (!isConnected) {
         throw new Error(
@@ -187,7 +189,7 @@ export default function AdapterConfiguratorModal({
       }
 
       if (!contractAddress) {
-        throw new Error(`No ${adapterName} contract found.`);
+        throw new Error(`No ${adapter?.adapterName} contract found.`);
       }
 
       if (!account) {
@@ -197,6 +199,7 @@ export default function AdapterConfiguratorModal({
       console.log('array values', Object.values(values));
 
       const adapterConfigArguments: string | number[] = Object.values(values);
+
       const txArguments = {
         from: account || '',
         // Set a fast gas price
@@ -204,6 +207,14 @@ export default function AdapterConfiguratorModal({
       };
 
       setConfigureAdapterStatus(Web3TxStatus.AWAITING_CONFIRM);
+
+      console.log(
+        'abiMethodName, methods, adapterConfigArguments, txArguments ====== ',
+        abiMethodName,
+        methods,
+        adapterConfigArguments,
+        txArguments
+      );
 
       // Execute contract call
       await txSend(abiMethodName, methods, adapterConfigArguments, txArguments);
@@ -213,9 +224,10 @@ export default function AdapterConfiguratorModal({
       // Set any errors from Web3 utils or explicitly set above.
       setSubmitError(error);
       setConfigureAdapterStatus(Web3TxStatus.REJECTED);
-      console.log('error', error);
     }
   }
+
+  console.log('errors', errors);
 
   return (
     <Modal
@@ -235,8 +247,8 @@ export default function AdapterConfiguratorModal({
           <TimesSVG />
         </span>
 
-        <h1>{adapterName.toUpperCase()}</h1>
-        <p>supplementary text...</p>
+        <h1>{adapter?.adapterName.toUpperCase()}</h1>
+        <p>{adapter?.adapterDescription}</p>
 
         <form className="form" onSubmit={(e) => e.preventDefault()}>
           {/* INPUT PARAMETERS */}
@@ -252,13 +264,17 @@ export default function AdapterConfiguratorModal({
                     placeholder={input.type}
                     type="text"
                     onChange={() =>
-                      setValue(
-                        [input.name],
-                        getValues()[input.name]
-                        // @todo  validate input
-                      )
+                      setValue([input.name], getValues()[input.name])
                     }
-                    ref={register}
+                    ref={register({
+                      validate: (value: string): string | boolean => {
+                        return value === ''
+                          ? FormFieldErrors.REQUIRED
+                          : isParamInputValid(value, input.type)
+                          ? true
+                          : getFormFieldError(input.type);
+                      },
+                    })}
                     disabled={isConfigureInProcessOrDone}
                   />
 
@@ -276,10 +292,12 @@ export default function AdapterConfiguratorModal({
             disabled={isConfigureInProcessOrDone}
             onClick={() => {
               if (isConfigureInProcessOrDone) return;
+
               if (!isValid) {
                 triggerValidation();
                 return;
               }
+
               handleSubmit(getValues());
             }}
             type="submit">
@@ -314,7 +332,7 @@ export default function AdapterConfiguratorModal({
               Delete this adapter. Once you delete this adapter, it can be
               re-added if the DAO isn't finalized.
             </p>
-            <button className="button--secondary" onClick={removeAdapter}>
+            <button className="button--secondary" onClick={handleRemoveAdapter}>
               {isRemoveInProcess ? (
                 <Loader />
               ) : isRemoveDone ? (

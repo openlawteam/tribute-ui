@@ -1,38 +1,42 @@
 import Web3 from 'web3';
 
-// DaoConstants defined solidity DaoConstants.sol contract
+/**
+ * DaoConstants as defined in the solidity DaoConstants.sol contract
+ * and the available adapters as detailed here:
+ * https://github.com/openlawteam/laoland
+ */
 export enum DaoConstants {
   BANK = 'bank',
   CONFIGURATION = 'configuration',
-  // EXECUTION = 'execution',
   FINANCING = 'financing',
   GUILDKICK = 'guildkick',
   ONBOARDING = 'onboarding',
   OFFCHAIN_VOTING = 'offchain-voting',
-  // NONVOTING_ONBOARDING = 'nonvoting-onboarding',
   MANAGING = 'managing',
   RAGEQUIT = 'ragequit',
+  TRIBUTE = 'tribute',
   VOTING = 'voting',
+  WITHDRAW = 'withdraw',
 }
 
 // Array of all adapters
 const daoConstants: Array<DaoConstants> = [
   DaoConstants.BANK,
   DaoConstants.CONFIGURATION,
-  // DaoConstants.EXECUTION,
   DaoConstants.FINANCING,
   DaoConstants.GUILDKICK,
   DaoConstants.MANAGING,
-  // DaoConstants.NONVOTING_ONBOARDING,
   DaoConstants.OFFCHAIN_VOTING,
   DaoConstants.ONBOARDING,
   DaoConstants.RAGEQUIT,
+  DaoConstants.TRIBUTE,
   DaoConstants.VOTING,
+  DaoConstants.WITHDRAW,
 ];
 
 export type Adapters = {
-  adapterId: string | null;
-  adapterName: string;
+  adapterId: string;
+  adapterName: DaoConstants;
   adapterDescription: string;
 };
 
@@ -44,23 +48,38 @@ export type Adapters = {
 export function getAdapters(): Array<Adapters> {
   return daoConstants.map((adapter: DaoConstants) => {
     return {
-      adapterId: sha3(adapter), // bytes32
+      adapterId: sha3(adapter) || '', // bytes32
       adapterName: adapter,
-      adapterDescription:
-        'Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla consectetur id nec massa. Aliquam erat volutpat.',
+      adapterDescription: adapterDescriptions[adapter],
     };
   });
 }
 
-/**
- * sha3()
- *
- * @returns string | null
- * @param value
- */
-function sha3(value: string): string | null {
-  return Web3.utils.sha3(value);
-}
+// Adapter descriptions taken from https://github.com/openlawteam/laoland
+const adapterDescriptions: Record<DaoConstants, string> = {
+  [DaoConstants.BANK]:
+    'Adds the banking capabilities to the DAO, and keeps track of the DAO accounts and internal token balances.',
+  [DaoConstants.CONFIGURATION]:
+    'Manages storing and retrieving per-DAO settings required by shared adapters.',
+  [DaoConstants.FINANCING]:
+    'Allows individuals and/or organizations to request funds to finance their projects, and the members of the DAO have the power to vote and decide which projects should be funded.',
+  [DaoConstants.GUILDKICK]:
+    'Gives the members the freedom to choose which individuals or organizations should really be part of the DAO.',
+  [DaoConstants.MANAGING]:
+    'Enhances the DAO capabilities by adding/updating the DAO Adapters through a voting process.',
+  [DaoConstants.OFFCHAIN_VOTING]:
+    'Adds the offchain voting governance process to the DAO to support gasless voting.',
+  [DaoConstants.ONBOARDING]:
+    'Triggers the process of minting internal tokens in exchange of a specific token at a fixed price.',
+  [DaoConstants.RAGEQUIT]:
+    'Gives the members the freedom to choose when it is the best time to exit the DAO for any given reason.',
+  [DaoConstants.TRIBUTE]:
+    'Allows potential and existing DAO members to contribute any amount of ERC-20 tokens to the DAO in exchange for any amount of DAO internal tokens.',
+  [DaoConstants.VOTING]:
+    'Adds the simple on chain voting governance process to the DAO.',
+  [DaoConstants.WITHDRAW]:
+    'Allows the members to withdraw their funds from the DAO bank.',
+};
 
 /**
  * configurationABIFunction()
@@ -71,24 +90,36 @@ export function configurationABIFunction(): Record<DaoConstants, string> {
   return {
     [DaoConstants.BANK]: '', //@todo
     [DaoConstants.CONFIGURATION]: 'submitConfigurationProposal', // ?!
-    // [DaoConstants.EXECUTION]: '', //@todo
     [DaoConstants.FINANCING]: 'createFinancingRequest', // ?!
     [DaoConstants.GUILDKICK]: 'submitKickProposal', // ?!
     [DaoConstants.MANAGING]: 'createAdapterChangeRequest', // ?!
-    // [DaoConstants.NONVOTING_ONBOARDING]: '', //@todo
     [DaoConstants.OFFCHAIN_VOTING]: 'configureDao',
     [DaoConstants.ONBOARDING]: 'configureDao',
     [DaoConstants.RAGEQUIT]: 'configureDao',
+    [DaoConstants.TRIBUTE]: '', //@todo
     [DaoConstants.VOTING]: 'configureDao',
+    [DaoConstants.WITHDRAW]: '', //@todo
   };
 }
+
+type AclFlag =  // @todo typify its deps
+  | 'ADD_ADAPTER'
+  | 'REMOVE_ADAPTER'
+  | 'JAIL_MEMBER'
+  | 'UNJAIL_MEMBER'
+  | 'SUBMIT_PROPOSAL'
+  | 'SPONSOR_PROPOSAL'
+  | 'PROCESS_PROPOSAL'
+  | 'UPDATE_DELEGATE_KEY'
+  | 'SET_CONFIGURATION'
+  | 'ADD_EXTENSION'
+  | 'REMOVE_EXTENSION'
+  | 'NEW_MEMBER';
 
 export function adapterAccessControlLayer(
   adapterName: string
 ): Record<string, any> {
-  //@note missing withdraw adapter.. was moved into Bank as an extension
-
-  const adapterFlags = {
+  const adapterFlags: Record<DaoConstants, any> = {
     [DaoConstants.BANK]: {},
     [DaoConstants.CONFIGURATION]: {
       SUBMIT_PROPOSAL: true,
@@ -96,7 +127,7 @@ export function adapterAccessControlLayer(
       SPONSOR_PROPOSAL: true,
       SET_CONFIGURATION: true,
     },
-    // [DaoConstants.EXECUTION]: {},
+    [DaoConstants.TRIBUTE]: {}, // @todo
     [DaoConstants.FINANCING]: {
       SUBMIT_PROPOSAL: true,
       SPONSOR_PROPOSAL: true,
@@ -121,7 +152,6 @@ export function adapterAccessControlLayer(
       REMOVE_ADAPTER: true,
       ADD_ADAPTER: true,
     },
-    // [DaoConstants.NONVOTING_ONBOARDING]: {},
     [DaoConstants.OFFCHAIN_VOTING]: {},
     [DaoConstants.ONBOARDING]: {
       SUBMIT_PROPOSAL: true,
@@ -138,6 +168,10 @@ export function adapterAccessControlLayer(
       INTERNAL_TRANSFER: true,
     },
     [DaoConstants.VOTING]: {},
+    [DaoConstants.WITHDRAW]: {
+      WITHDRAW: true,
+      SUB_FROM_BALANCE: true,
+    },
   };
 
   const flags = adapterFlags[adapterName];
@@ -162,6 +196,16 @@ function adapterAccess(flags: Record<string, boolean>): number {
   ];
 
   return entry(values) as number;
+}
+
+/**
+ * sha3()
+ *
+ * @returns string | null
+ * @param value
+ */
+function sha3(value: string): string | null {
+  return Web3.utils.sha3(value);
 }
 
 function entry(values: Boolean[]): number {
