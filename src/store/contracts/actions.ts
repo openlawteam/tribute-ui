@@ -184,10 +184,10 @@ export function initContractTribute(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
-        const lazyTributeABI = await import(
+        const {default: lazyTributeABI} = await import(
           '../../truffle-contracts/TributeContract.json'
         );
-        const tributeContract: Record<string, any> = lazyTributeABI;
+        const tributeContract: AbiItem[] = lazyTributeABI as any;
         /**
          * Get address via DAO Registry.
          *
@@ -198,14 +198,14 @@ export function initContractTribute(web3Instance: Web3) {
           getState().contracts.DaoRegistryContract?.instance
         );
         const instance = new web3Instance.eth.Contract(
-          tributeContract.abi,
+          tributeContract,
           contractAddress
         );
 
         dispatch(
           createContractAction({
             type: CONTRACT_TRIBUTE,
-            abi: tributeContract.abi,
+            abi: tributeContract,
             contractAddress,
             instance,
           })

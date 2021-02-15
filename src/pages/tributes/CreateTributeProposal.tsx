@@ -4,7 +4,7 @@ import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
-import {toBN} from 'web3-utils';
+import {toBN, AbiItem} from 'web3-utils';
 
 import {
   getValidationError,
@@ -216,10 +216,12 @@ export default function CreateTributeProposal() {
     }
 
     try {
-      const lazyERC20ABI = await import('../../truffle-contracts/ERC20.json');
-      const erc20Contract: Record<string, any> = lazyERC20ABI;
+      const {default: lazyERC20ABI} = await import(
+        '../../truffle-contracts/ERC20.json'
+      );
+      const erc20Contract: AbiItem[] = lazyERC20ABI as any;
       const instance = new web3Instance.eth.Contract(
-        erc20Contract.abi,
+        erc20Contract,
         erc20AddressValue
       );
       setERC20Contract(instance);
