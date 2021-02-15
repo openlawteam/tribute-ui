@@ -38,7 +38,7 @@ export default function Routes() {
         <Route
           key="membership-details"
           exact
-          path="/membership/:proposalHash"
+          path="/membership/:proposalId"
           render={() => <MembershipDetails />}
         />,
         <Route
@@ -56,7 +56,7 @@ export default function Routes() {
         <Route
           key="transfer-details"
           exact
-          path="/transfers/:proposalHash"
+          path="/transfers/:proposalId"
           render={() => <TransferDetails />}
         />,
         <Route
@@ -74,7 +74,7 @@ export default function Routes() {
         <Route
           key="tribute-details"
           exact
-          path="/tributes/:proposalHash"
+          path="/tributes/:proposalId"
           render={() => <TributeDetails />}
         />,
         <Route
@@ -92,7 +92,7 @@ export default function Routes() {
         <Route
           key="governance-proposal-details"
           exact
-          path="/governance-proposals/:proposalHash"
+          path="/governance-proposals/:proposalId"
           render={() => <GovernanceProposalDetails />}
         />,
         <Route

@@ -205,13 +205,19 @@ export default function CreateMembershipProposal() {
       // Maybe set proposal ID from previous attempt
       let proposalId: string = proposalData?.uniqueId || '';
 
+      const {ethAddress, ethAmount} = values;
+      const ethAmountInWei = Web3.utils.toWei(
+        stripFormatNumber(ethAmount),
+        'ether'
+      );
+
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
         // Sign and submit draft for snapshot-hub
         const {uniqueId} = await signAndSendProposal({
           partialProposalData: {
-            name: account,
-            body: `Membership for ${account}.`,
+            name: ethAddress,
+            body: `Membership for ${ethAddress}.`,
             metadata: {},
           },
           adapterName: ContractAdapterNames.onboarding,
@@ -220,12 +226,6 @@ export default function CreateMembershipProposal() {
 
         proposalId = uniqueId;
       }
-
-      const {ethAddress, ethAmount} = values;
-      const ethAmountInWei = Web3.utils.toWei(
-        stripFormatNumber(ethAmount),
-        'ether'
-      );
 
       const onboardArguments: OnboardArguments = [
         DaoRegistryContract.contractAddress,
@@ -331,7 +331,7 @@ export default function CreateMembershipProposal() {
       <form className="form" onSubmit={(e) => e.preventDefault()}>
         {/* ETH ADDRESS */}
         <div className="form__input-row">
-          <label className="form__input-row-label">ETH address</label>
+          <label className="form__input-row-label">Applicant Address</label>
           <div className="form__input-row-fieldwrap">
             <input
               aria-describedby={`error-${Fields.ethAddress}`}
