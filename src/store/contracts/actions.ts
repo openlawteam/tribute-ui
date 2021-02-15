@@ -1,4 +1,5 @@
 import Web3 from 'web3';
+import {AbiItem} from 'web3-utils/types';
 import {Dispatch} from 'redux';
 
 import {
@@ -29,10 +30,11 @@ export function initContractDaoRegistry(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
     try {
       if (web3Instance) {
-        const lazyDaoRegistryABI = await import(
+        const {default: lazyDaoRegistryABI} = await import(
           '../../truffle-contracts/DaoRegistry.json'
         );
-        const daoRegistryContract: Record<string, any> = lazyDaoRegistryABI;
+
+        const daoRegistryContract: AbiItem[] = lazyDaoRegistryABI as any;
         const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
 
         if (!contractAddress) {
@@ -40,14 +42,14 @@ export function initContractDaoRegistry(web3Instance: Web3) {
         }
 
         const instance = new web3Instance.eth.Contract(
-          daoRegistryContract.abi,
+          daoRegistryContract,
           contractAddress
         );
 
         dispatch(
           createContractAction({
             type: CONTRACT_DAO_REGISTRY,
-            abi: daoRegistryContract.abi,
+            abi: daoRegistryContract,
             contractAddress,
             instance,
           })
@@ -71,13 +73,10 @@ export function initContractVoting(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
-        const lazyOffchainVotingABI = await import(
+        const {default: lazyOffchainVotingABI} = await import(
           '../../truffle-contracts/OffchainVotingContract.json'
         );
-        const offchainVotingContract: Record<
-          string,
-          any
-        > = lazyOffchainVotingABI;
+        const offchainVotingContract: AbiItem[] = lazyOffchainVotingABI as any;
         /**
          * Get address via DAO Registry.
          *
@@ -88,14 +87,14 @@ export function initContractVoting(web3Instance: Web3) {
           getState().contracts.DaoRegistryContract?.instance
         );
         const instance = new web3Instance.eth.Contract(
-          offchainVotingContract.abi,
+          offchainVotingContract,
           contractAddress
         );
 
         dispatch(
           createContractAction({
             type: CONTRACT_VOTING,
-            abi: offchainVotingContract.abi,
+            abi: offchainVotingContract,
             contractAddress,
             instance,
           })
@@ -111,10 +110,10 @@ export function initContractOnboarding(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
-        const lazyOnboardingABI = await import(
+        const {default: lazyOnboardingABI} = await import(
           '../../truffle-contracts/OnboardingContract.json'
         );
-        const onboardingContract: Record<string, any> = lazyOnboardingABI;
+        const onboardingContract: AbiItem[] = lazyOnboardingABI as any;
         /**
          * Get address via DAO Registry.
          *
@@ -125,14 +124,14 @@ export function initContractOnboarding(web3Instance: Web3) {
           getState().contracts.DaoRegistryContract?.instance
         );
         const instance = new web3Instance.eth.Contract(
-          onboardingContract.abi,
+          onboardingContract,
           contractAddress
         );
 
         dispatch(
           createContractAction({
             type: CONTRACT_ONBOARDING,
-            abi: onboardingContract.abi,
+            abi: onboardingContract,
             contractAddress,
             instance,
           })
@@ -154,10 +153,10 @@ export function initContractBankExtension(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
-        const lazyBankExtensionABI = await import(
+        const {default: lazyBankExtensionABI} = await import(
           '../../truffle-contracts/BankExtension.json'
         );
-        const bankExtensionContract: Record<string, any> = lazyBankExtensionABI;
+        const bankExtensionContract: AbiItem[] = lazyBankExtensionABI as any;
         /**
          * Get address via DAO Registry.
          *
@@ -168,14 +167,14 @@ export function initContractBankExtension(web3Instance: Web3) {
           getState().contracts.DaoRegistryContract?.instance
         );
         const instance = new web3Instance.eth.Contract(
-          bankExtensionContract.abi,
+          bankExtensionContract,
           contractAddress
         );
 
         dispatch(
           createContractAction({
             type: CONTRACT_BANK_EXTENSION,
-            abi: bankExtensionContract.abi,
+            abi: bankExtensionContract,
             contractAddress,
             instance,
           })
