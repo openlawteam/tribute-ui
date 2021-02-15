@@ -174,6 +174,8 @@ export default function AdapterManager() {
   }
 
   function handleAddSelectedAdapters() {
+    if (!DaoFactoryContract) return;
+
     try {
       // Set the `Add` button states to true for all selected adapters
       for (const adapterName in selections) {
@@ -185,6 +187,7 @@ export default function AdapterManager() {
         }
       }
       console.log('selections', selections);
+      // addAdapters - tuple
     } catch (error) {
       setSubmitError(error);
     }
