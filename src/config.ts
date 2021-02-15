@@ -72,7 +72,7 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
 export const DAO_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0xc45120B62DDc75ac194419b5F326161f93BecDAa',
+  [CHAINS.RINKEBY]: '0x04151C7f016d6A6B7E186f79410f27d20545ff8A',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_FACTORY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.

@@ -1,8 +1,8 @@
 import {
+  CONTRACT_DAO_FACTORY,
   CONTRACT_DAO_REGISTRY,
   CONTRACT_BANK,
   CONTRACT_CONFIGURATION,
-  // CONTRACT_EXECUTION, // @todo
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
   CONTRACT_OFFCHAIN_VOTING,
@@ -15,9 +15,18 @@ import {
 import {ContractsState} from '../types';
 
 const initialState = {
+  DaoFactoryContract: null,
   DaoRegistryContract: null,
+  BankContract: null,
+  ConfigurationContract: null,
+  FinancingContract: null,
+  GuildBankContract: null,
   OffchainVotingContract: null,
   OnboardingContract: null,
+  VotingContract: null,
+  NonVotingOnboadingContract: null,
+  ManagingContract: null,
+  RagequitContract: null,
 };
 
 export default function reducer(
@@ -27,6 +36,8 @@ export default function reducer(
   const {type, ...payload} = action;
 
   switch (type) {
+    case CONTRACT_DAO_FACTORY:
+      return contractDAOFactory(state, payload);
     case CONTRACT_DAO_REGISTRY:
       return contractDAORegistry(state, payload);
     case CONTRACT_BANK:
@@ -52,6 +63,10 @@ export default function reducer(
     default:
       return state;
   }
+}
+
+function contractDAOFactory(state: ContractsState, payload: any) {
+  return {...state, DaoFactoryContract: {...payload}};
 }
 
 function contractDAORegistry(state: ContractsState, payload: any) {

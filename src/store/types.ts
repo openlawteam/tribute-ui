@@ -3,9 +3,18 @@ import {ThunkDispatch} from 'redux-thunk';
 import {SmartContractItem} from '../components/web3/types';
 
 export type ContractsState = {
+  DaoFactoryContract: SmartContractItem | null;
   DaoRegistryContract: SmartContractItem | null;
+  BankContract: SmartContractItem | null;
+  ConfigurationContract: SmartContractItem | null;
+  FinancingContract: SmartContractItem | null;
+  GuildBankContract: SmartContractItem | null;
   OnboardingContract: SmartContractItem | null;
   OffchainVotingContract: SmartContractItem | null;
+  VotingContract: SmartContractItem | null;
+  NonVotingOnboadingContract: SmartContractItem | null;
+  ManagingContract: SmartContractItem | null;
+  RagequitContract: SmartContractItem | null;
 };
 
 export type ConnectedMemberState = {

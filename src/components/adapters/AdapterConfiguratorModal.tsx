@@ -4,14 +4,18 @@ import {useSelector} from 'react-redux';
 
 import {Adapters, DaoConstants} from './config';
 import {StoreState} from '../../store/types';
-import {AsyncStatus, MetaMaskRPCError} from '../../util/types';
+import {MetaMaskRPCError} from '../../util/types';
 import {Web3TxStatus} from '../web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {getValidationError} from '../../util/helpers';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useValidation} from './hooks/useValidation';
 
+import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
+import CycleMessage from '../../components/feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
+import EtherscanURL from '../../components/web3/EtherscanURL';
+import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
 import Modal from '../common/Modal';
@@ -61,7 +65,7 @@ export default function AdapterConfiguratorModal({
    */
   const {
     txError,
-    // txEtherscanURL,
+    txEtherscanURL,
     txIsPromptOpen,
     txSend,
     txStatus,
@@ -81,7 +85,6 @@ export default function AdapterConfiguratorModal({
   /**
    * Variables
    */
-
   const {
     errors,
     formState,
@@ -99,28 +102,28 @@ export default function AdapterConfiguratorModal({
    */
   const {isValid} = formState;
 
-  const isConfigureInProcess = false; // temp
-  // txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-  // txStatus === Web3TxStatus.PENDING ||
-  // configureAdapterStatus === Web3TxStatus.AWAITING_CONFIRM ||
-  // configureAdapterStatus === Web3TxStatus.PENDING;
+  const isConfigureInProcess =
+    (txStatus === Web3TxStatus.AWAITING_CONFIRM ||
+      txStatus === Web3TxStatus.PENDING) &&
+    (configureAdapterStatus === Web3TxStatus.AWAITING_CONFIRM ||
+      configureAdapterStatus === Web3TxStatus.PENDING);
   const isRemoveInProcess =
-    txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-    txStatus === Web3TxStatus.PENDING ||
-    removeAdapterStatus === Web3TxStatus.AWAITING_CONFIRM ||
-    removeAdapterStatus === Web3TxStatus.PENDING;
+    (txStatus === Web3TxStatus.AWAITING_CONFIRM ||
+      txStatus === Web3TxStatus.PENDING) &&
+    (removeAdapterStatus === Web3TxStatus.AWAITING_CONFIRM ||
+      removeAdapterStatus === Web3TxStatus.PENDING);
 
-  const isConfigureDone = false; // temp
-  // txStatus === Web3TxStatus.FULFILLED &&
-  // configureAdapterStatus === Web3TxStatus.FULFILLED;
+  const isConfigureDone =
+    txStatus === Web3TxStatus.FULFILLED &&
+    configureAdapterStatus === Web3TxStatus.FULFILLED;
   const isRemoveDone =
     txStatus === Web3TxStatus.FULFILLED &&
     removeAdapterStatus === Web3TxStatus.FULFILLED;
 
   const isConfigureInProcessOrDone =
-    isConfigureInProcess || isConfigureDone || txIsPromptOpen;
-  // const isRemoveInProcessOrRemoveDone =
-  //   isRemoveInProcess || isRemoveDone || txIsPromptOpen;
+    (isConfigureInProcess || isConfigureDone) && txIsPromptOpen;
+  const isRemoveInProcessOrDone =
+    (isRemoveInProcess || isRemoveDone) && txIsPromptOpen;
 
   function getAdapter(adapterName: DaoConstants): Record<string, any> {
     return Object.keys(adapterContracts)
@@ -194,8 +197,6 @@ export default function AdapterConfiguratorModal({
         throw new Error('No account found.');
       }
 
-      console.log('array values', Object.values(values));
-
       const adapterConfigArguments: string | number[] = Object.values(values);
 
       const txArguments = {
@@ -214,6 +215,42 @@ export default function AdapterConfiguratorModal({
       // Set any errors from Web3 utils or explicitly set above.
       setSubmitError(error);
       setConfigureAdapterStatus(Web3TxStatus.REJECTED);
+    }
+  }
+
+  function renderSubmitStatus(): React.ReactNode {
+    // Chain tx
+    if (txStatus === Web3TxStatus.AWAITING_CONFIRM) {
+      return 'Awaiting your confirmation\u2026';
+    }
+
+    // Only for chain tx
+    switch (txStatus) {
+      case Web3TxStatus.PENDING:
+        return (
+          <>
+            <CycleMessage
+              intervalMs={2000}
+              messages={TX_CYCLE_MESSAGES}
+              useFirstItemStart
+              render={(message) => {
+                return <FadeIn key={message}>{message}</FadeIn>;
+              }}
+            />
+
+            <EtherscanURL url={txEtherscanURL} isPending />
+          </>
+        );
+      case Web3TxStatus.FULFILLED:
+        return (
+          <>
+            <div>Change submitted!</div>
+
+            <EtherscanURL url={txEtherscanURL} />
+          </>
+        );
+      default:
+        return null;
     }
   }
 
@@ -277,9 +314,7 @@ export default function AdapterConfiguratorModal({
           {/* SUBMIT */}
           <button
             className="button"
-            disabled={
-              isConfigureInProcessOrDone || isRemoveInProcess || isRemoveDone
-            }
+            disabled={isConfigureInProcessOrDone || isRemoveInProcessOrDone}
             onClick={() => {
               if (isConfigureInProcessOrDone) return;
 
@@ -300,10 +335,10 @@ export default function AdapterConfiguratorModal({
             )}
           </button>
 
-          {/* SUBMIT STATUS */}
-          {/* <div className="form__submit-status-container">
-          {isConfigureInProcessOrDone && renderSubmitStatus()}
-        </div> */}
+          {/* SUBMIT CONFIGURE STATUS */}
+          <div className="form__submit-status-container">
+            {isConfigureInProcessOrDone && renderSubmitStatus()}
+          </div>
 
           {/* SUBMIT ERROR */}
           {configureAdapterError &&
@@ -324,9 +359,7 @@ export default function AdapterConfiguratorModal({
             </p>
             <button
               className="button--secondary"
-              disabled={
-                isRemoveInProcess || isRemoveDone || isConfigureInProcessOrDone
-              }
+              disabled={isRemoveInProcessOrDone || isConfigureInProcessOrDone}
               onClick={handleRemoveAdapter}>
               {isRemoveInProcess ? (
                 <Loader />
@@ -336,7 +369,11 @@ export default function AdapterConfiguratorModal({
                 'Remove'
               )}
             </button>
-            {/** @todo maybe modal popup to configure and remove */}
+
+            {/* SUBMIT REMOVE STATUS */}
+            <div className="form__submit-status-container">
+              {isRemoveInProcessOrDone && renderSubmitStatus()}
+            </div>
           </div>
         </form>
       </>

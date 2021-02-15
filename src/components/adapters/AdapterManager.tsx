@@ -28,9 +28,11 @@ export default function AdapterManager() {
   /**
    * Selectors
    */
-  const {DaoRegistryContract, ...adapterContracts} = useSelector(
-    (state: StoreState) => state.contracts
-  );
+  const {
+    DaoRegistryContract,
+    DaoFactoryContract,
+    ...adapterContracts
+  } = useSelector((state: StoreState) => state.contracts);
 
   /**
    * States
@@ -108,11 +110,6 @@ export default function AdapterManager() {
       .filter((a) => a.adapterName === adapterName)[0];
   }
 
-  // console.log('txStatus', txStatus);
-  // console.log('txIsPromptOpen', txIsPromptOpen);
-  // console.log('txEtherscanURL', txEtherscanURL);
-  // console.log('txError', txError);
-
   /**
    * handleAddAdapter
    *
@@ -122,8 +119,6 @@ export default function AdapterManager() {
     if (!DaoRegistryContract) return;
 
     try {
-      console.log('add ', adapter);
-
       setIsInProcess((prevState) => ({
         ...prevState,
         [adapter.adapterName]: true,
@@ -179,8 +174,6 @@ export default function AdapterManager() {
   }
 
   function handleAddSelectedAdapters() {
-    console.log('handleAddSelectedAdapters');
-
     try {
       // Set the `Add` button states to true for all selected adapters
       for (const adapterName in selections) {
@@ -191,6 +184,7 @@ export default function AdapterManager() {
           }));
         }
       }
+      console.log('selections', selections);
     } catch (error) {
       setSubmitError(error);
     }
@@ -202,7 +196,6 @@ export default function AdapterManager() {
    * @param adapter
    */
   async function handleConfigureAdapter(adapter: Adapters) {
-    console.log('configure', adapter);
     try {
       // Get ABI function name
       const adapterABIFunctionName: string = configurationABIFunction()[
@@ -229,7 +222,6 @@ export default function AdapterManager() {
    */
   function handleFinalizeDao() {
     // window.confirm before proceeding
-    console.log('handleFinalizeDao');
   }
 
   // Handles the select all checkbox event

@@ -4,16 +4,17 @@ import {Dispatch} from 'redux';
 import {ContractAdapterNames} from '../../components/web3/types';
 import {
   DEFAULT_CHAIN,
+  DAO_FACTORY_CONTRACT_ADDRESS,
   DAO_REGISTRY_CONTRACT_ADDRESS,
   // BANK_CONTRACT_ADDRESS, // @todo
   CONFIGURATION_CONTRACT_ADDRESS,
-  // EXECUTION_CONTRACT_ADDRESS, // @todo
   FINANCING_CONTRACT_ADDRESS,
   GUILDKICK_CONTRACT_ADDRESS,
   // NONVOTING_ONBOARDING_CONTRACT_ADDRESS, // @todo
   MANAGING_CONTRACT_ADDRESS,
   // ONBOARDING_CONTRACT_ADDRESS, // @todo revise the current impl
   RAGEQUIT_CONTRACT_ADDRESS,
+  // TRIBUTE_CONTRACT_ADDRESS,
   VOTING_CONTRACT_ADDRESS,
   // WITHDRAW_CONTRACT_ADDRESS // @todo
 } from '../../config';
@@ -21,10 +22,10 @@ import {DaoConstants} from '../../components/adapters/config';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {StoreState} from '../types';
 
+export const CONTRACT_DAO_FACTORY = 'CONTRACT_DAO_FACTORY';
 export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
 export const CONTRACT_BANK = 'CONTRACT_BANK';
 export const CONTRACT_CONFIGURATION = 'CONTRACT_CONFIGURATION';
-export const CONTRACT_EXECUTION = 'CONTRACT_EXECUTION';
 export const CONTRACT_FINANCING = 'CONTRACT_FINANCING';
 export const CONTRACT_GUILDKICK = 'CONTRACT_GUILDKICK';
 export const CONTRACT_OFFCHAIN_VOTING = 'CONTRACT_OFFCHAIN_VOTING';
@@ -37,6 +38,33 @@ export const CONTRACT_VOTING = 'CONTRACT_VOTING';
 /**
  * @todo Add inits for Transfer and Tribute when ready
  */
+
+export function initContractDaoFactory(web3Instance: Web3) {
+  return async function (dispatch: Dispatch<any>) {
+    try {
+      if (web3Instance) {
+        const lazyDaoFactoryABI = await import(
+          '../../truffle-contracts/DaoFactory.json'
+        );
+        const daoFactoryContract: Record<string, any> = lazyDaoFactoryABI;
+        const contractAddress = DAO_FACTORY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+        const instance = new web3Instance.eth.Contract(
+          daoFactoryContract.abi,
+          contractAddress
+        );
+
+        dispatch({
+          type: CONTRACT_DAO_FACTORY,
+          abi: daoFactoryContract.abi,
+          contractAddress,
+          instance,
+        });
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+}
 
 export function initContractDaoRegistry(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
