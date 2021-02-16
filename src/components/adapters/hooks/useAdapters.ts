@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 
 import {GET_ADAPTERS} from '../../../gql';
 
-import {getAdapters, Adapters} from '../config';
+import {getAdapters, Adapters, DaoConstants} from '../config';
 import {GQL_QUERY_POLLING_INTERVAL} from '../../../config';
 
 export type AdapterType = {
@@ -21,6 +21,7 @@ export type AdapterType = {
 type UseAdaptersReturn = {
   adapterStatus: AsyncStatus;
   availableAdapters: Adapters[];
+  getAdapter: (adapterName: DaoConstants) => Record<string, any>;
   unusedAdapters: Adapters[] | undefined;
   usedAdapters: AdapterType[] | undefined;
 };
@@ -39,8 +40,8 @@ export function useAdapters(): UseAdaptersReturn {
   /**
    * Selectors
    */
-  const daoRegistryContract = useSelector(
-    (s: StoreState) => s.contracts.DaoRegistryContract
+  const {DaoRegistryContract, ...adapterContracts} = useSelector(
+    (s: StoreState) => s.contracts
   );
 
   /**
@@ -70,7 +71,7 @@ export function useAdapters(): UseAdaptersReturn {
 
   // Get GQL adapters
   useEffect(() => {
-    if (!daoRegistryContract?.contractAddress) return;
+    if (!DaoRegistryContract?.contractAddress) return;
 
     try {
       setAdapterStatus(AsyncStatus.PENDING);
@@ -80,7 +81,7 @@ export function useAdapters(): UseAdaptersReturn {
         const {adapters} = getUsedAdapters.data as Record<string, any>;
 
         // get dao address
-        const daoAddress = daoRegistryContract.contractAddress;
+        const daoAddress = DaoRegistryContract.contractAddress;
 
         // get all availables adapters for the dao
         const daoAdapters: [] = adapters.filter(
@@ -126,11 +127,24 @@ export function useAdapters(): UseAdaptersReturn {
       setUnusedAdapters(undefined);
       setAdapterStatus(AsyncStatus.REJECTED);
     }
-  }, [availableAdapters, daoRegistryContract, getUsedAdapters]);
+  }, [availableAdapters, DaoRegistryContract, getUsedAdapters]);
+
+  /**
+   * getAdapter
+   *
+   * @param adapterName DaoConstants
+   */
+  function getAdapter(adapterName: DaoConstants): Record<string, any> {
+    return Object.keys(adapterContracts)
+      .map((a) => adapterContracts[a])
+      .filter((a) => a) // filter out any `null` adapter objects
+      .filter((a) => a.adapterName === adapterName)[0];
+  }
 
   return {
     adapterStatus,
     availableAdapters,
+    getAdapter,
     unusedAdapters,
     usedAdapters: adapters,
   };

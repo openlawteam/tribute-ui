@@ -2,12 +2,11 @@ import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {StoreState} from '../../store/types';
-// import {AsyncStatus} from '../../util/types';
 import {
   Adapters,
-  DaoConstants,
   adapterAccessControlLayer,
   configurationABIFunction,
+  DaoConstants,
 } from './config';
 import {useAdapters} from './hooks/useAdapters';
 import {useDao} from '../../hooks';
@@ -28,11 +27,9 @@ export default function AdapterManager() {
   /**
    * Selectors
    */
-  const {
-    DaoRegistryContract,
-    DaoFactoryContract,
-    ...adapterContracts
-  } = useSelector((state: StoreState) => state.contracts);
+  const {DaoRegistryContract, DaoFactoryContract} = useSelector(
+    (state: StoreState) => state.contracts
+  );
 
   /**
    * States
@@ -58,7 +55,13 @@ export default function AdapterManager() {
    * Hooks
    */
   const {account} = useWeb3Modal();
-  const {adapterStatus, usedAdapters, unusedAdapters} = useAdapters();
+  const {
+    availableAdapters,
+    adapterStatus,
+    getAdapter,
+    usedAdapters,
+    unusedAdapters,
+  } = useAdapters();
   const {dao} = useDao();
 
   const {
@@ -100,23 +103,14 @@ export default function AdapterManager() {
   }, [selections]);
 
   /**
-   * getAdapter
-   *
-   * @param adapterName
-   */
-  function getAdapter(adapterName: DaoConstants): Record<string, any> {
-    return Object.keys(adapterContracts)
-      .map((a) => adapterContracts[a])
-      .filter((a) => a.adapterName === adapterName)[0];
-  }
-
-  /**
    * handleAddAdapter
    *
    * @param adapter
    */
   async function handleAddAdapter(adapter: Record<string, any>) {
     if (!DaoRegistryContract) return;
+
+    console.log('handleAddAdapter', adapter);
 
     try {
       setIsInProcess((prevState) => ({
@@ -125,7 +119,7 @@ export default function AdapterManager() {
       }));
 
       // Get adapters contract address
-      const {contractAddress} = getAdapter(adapter.adapterName);
+      const {contractAddress} = getAdapter(adapter.adapterName as DaoConstants);
 
       if (!contractAddress) {
         throw new Error('adapterAddress must not be empty');
@@ -173,22 +167,64 @@ export default function AdapterManager() {
     }
   }
 
-  function handleAddSelectedAdapters() {
-    if (!DaoFactoryContract) return;
+  async function handleAddSelectedAdapters() {
+    if (!DaoFactoryContract) {
+      throw new Error('DaoFactoryContract not found');
+    }
 
     try {
+      let adaptersArguments: AddAdapterArguments[] = [];
+
       // Set the `Add` button states to true for all selected adapters
       for (const adapterName in selections) {
         if (selections[adapterName]) {
+          // Get adapterId from `availableAdapters`
+          const {adapterId} = availableAdapters.filter(
+            (a: Adapters) => a.adapterName === adapterName
+          )[0];
+
+          // Get adapter contract address
+          const {contractAddress} = getAdapter(adapterName as DaoConstants);
+
+          // Get adapters access control layer (acl)
+          // these are the functions the adapter will have access to
+          const {acl} = adapterAccessControlLayer(adapterName);
+
+          adaptersArguments.push([
+            adapterId, // [0]bytes32 adapterId
+            contractAddress, // [1]address adapterAddress
+            acl, // [2]uint256 acl
+          ]);
+
           setIsInProcess((prevState) => ({
             ...prevState,
             [adapterName]: true,
           }));
         }
       }
-      console.log('selections', selections);
-      // addAdapters - tuple
+
+      const addAdaptersArguments: [string, AddAdapterArguments[]] = [
+        dao?.daoAddress,
+        adaptersArguments,
+      ];
+
+      const txArguments = {
+        from: account || '',
+        // Set a fast gas price
+        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+      };
+
+      // Execute contract call for `addAdapter`
+      await txSend(
+        'addAdapters',
+        DaoFactoryContract.instance.methods,
+        addAdaptersArguments,
+        txArguments
+      );
+
+      // Disable buttons
     } catch (error) {
+      console.log('error', error);
       setSubmitError(error);
     }
   }

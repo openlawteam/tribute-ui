@@ -10,7 +10,7 @@ type ValidationType =
   | 'uint256'
   | 'uint256[]';
 
-type ParamInputType = string | string[] | number | number[];
+export type ParamInputType = string | string[] | number | number[];
 
 enum ParamType {
   ADDRESS = 'address',
@@ -26,6 +26,7 @@ type UseValidationReturn = {
     paramType: ValidationType
   ) => boolean;
   getFormFieldError: (paramType: ValidationType) => string | FormFieldErrors;
+  formatInputByType: (inputValue: any, inputType: ParamType) => string;
 };
 
 /**
@@ -150,8 +151,23 @@ export function useValidation(): UseValidationReturn {
     return Array.from(parameter.split(',')).every((p) => Number(p));
   }
 
+  function formatInputByType(inputValue: any, inputType: any) {
+    const formatBytes32Array = (): string[] =>
+      Array.from(inputValue.split(','));
+    const formatUint256Array = (): number[] => {
+      return Array.from(inputValue.split(',').map((i: string) => Number(i)));
+    };
+
+    return inputType === ParamType.BYTES32_ARRAY
+      ? formatBytes32Array()
+      : inputType === ParamType.UINT256_ARRAY
+      ? formatUint256Array()
+      : inputValue;
+  }
+
   return {
     isParamInputValid,
     getFormFieldError,
+    formatInputByType,
   };
 }

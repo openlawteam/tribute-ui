@@ -95,7 +95,7 @@ export function configurationABIFunction(): Record<DaoConstants, string> {
     [DaoConstants.MANAGING]: 'createAdapterChangeRequest', // ?!
     [DaoConstants.OFFCHAIN_VOTING]: 'configureDao',
     [DaoConstants.ONBOARDING]: 'configureDao',
-    [DaoConstants.RAGEQUIT]: 'configureDao',
+    [DaoConstants.RAGEQUIT]: 'ragequit',
     [DaoConstants.TRIBUTE]: '', //@todo
     [DaoConstants.VOTING]: 'configureDao',
     [DaoConstants.WITHDRAW]: '', //@todo

@@ -3,6 +3,7 @@ import {useDispatch} from 'react-redux';
 
 // @todo Add inits for Transfer and Tribute when ready
 import {
+  initContractDaoFactory,
   initContractDaoRegistry,
   initContractOffchainVoting,
   initContractOnboarding,
@@ -55,6 +56,7 @@ export function useInitContracts() {
       if (!isDefaultChain) return;
 
       // Init contracts
+      await dispatch(initContractDaoFactory(web3Instance));
       await dispatch(initContractDaoRegistry(web3Instance));
       await dispatch(initContractOffchainVoting(web3Instance));
       await dispatch(initContractOnboarding(web3Instance));
