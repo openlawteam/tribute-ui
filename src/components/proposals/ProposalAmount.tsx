@@ -18,14 +18,14 @@ export default function ProposalAmount(props: ProposalAmountProps) {
   return (
     <div className="proposaldetails__amount">
       <span>
-        {amount} {amountUnit}
+        {`${amount} ${amountUnit}`}
         {/* assumes second amount is value requested from the DAO */}
         {amount2 && (
           <>
             <br />
             <small>for</small>
             <br />
-            {amount2} {amount2Unit}
+            {`${amount2} ${amount2Unit}`}
           </>
         )}
       </span>
