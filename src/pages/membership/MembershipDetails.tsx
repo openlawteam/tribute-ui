@@ -7,9 +7,10 @@ import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDet
 import FadeIn from '../../components/common/FadeIn';
 import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 import NotFound from '../subpages/NotFound';
-import ProposalActions from '../../components/proposals/ProposalActions';
+import ProposalWithOffchainVoteActions from '../../components/proposals/ProposalWithOffchainVoteActions';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
 import Wrap from '../../components/common/Wrap';
+import {ContractAdapterNames} from '../../components/web3/types';
 
 export default function MembershipDetails() {
   /**
@@ -27,7 +28,7 @@ export default function MembershipDetails() {
    */
 
   // Get hash for fetching the proposal.
-  const {proposalHash} = useParams<{proposalHash: string}>();
+  const {proposalId} = useParams<{proposalId: string}>();
 
   /**
    * @todo Get subgraph proposal and determine if it has been sponsored
@@ -46,7 +47,7 @@ export default function MembershipDetails() {
     proposalError,
     proposalNotFound,
     proposalStatus,
-  } = useProposalOrDraft(proposalHash);
+  } = useProposalOrDraft(proposalId);
 
   /**
    * Render
@@ -92,7 +93,12 @@ export default function MembershipDetails() {
       <RenderWrapper>
         <ProposalDetails
           proposal={proposalData}
-          renderActions={() => <ProposalActions proposal={proposalData} />}
+          renderActions={() => (
+            <ProposalWithOffchainVoteActions
+              adpaterName={ContractAdapterNames.onboarding}
+              proposal={proposalData}
+            />
+          )}
         />
       </RenderWrapper>
     );

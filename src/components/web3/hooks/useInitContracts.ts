@@ -4,8 +4,9 @@ import {useDispatch} from 'react-redux';
 // @todo Add inits for Transfer and Tribute when ready
 import {
   initContractDaoFactory,
+  initContractBankExtension,
   initContractDaoRegistry,
-  initContractOffchainVoting,
+  initContractVotingOpRollup,
   initContractOnboarding,
   initContractConfiguration,
   initContractFinancing,
@@ -58,7 +59,7 @@ export function useInitContracts() {
       // Init contracts
       await dispatch(initContractDaoFactory(web3Instance));
       await dispatch(initContractDaoRegistry(web3Instance));
-      await dispatch(initContractOffchainVoting(web3Instance));
+      await dispatch(initContractVotingOpRollup(web3Instance));
       await dispatch(initContractOnboarding(web3Instance));
       await dispatch(initContractConfiguration(web3Instance));
       await dispatch(initContractFinancing(web3Instance));
@@ -66,6 +67,7 @@ export function useInitContracts() {
       await dispatch(initContractManaging(web3Instance));
       await dispatch(initContractRagequit(web3Instance));
       await dispatch(initContractVoting(web3Instance));
+      await dispatch(initContractBankExtension(web3Instance));
 
       // @todo Add inits for Transfer and Tribute when ready
     } catch (error) {

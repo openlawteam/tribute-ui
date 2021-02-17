@@ -1,20 +1,24 @@
 import {Action} from 'redux';
 import {ThunkDispatch} from 'redux-thunk';
-import {SmartContractItem} from '../components/web3/types';
+import {AbiItem} from 'web3-utils/types';
+import {Contract as Web3Contract} from 'web3-eth-contract/types';
+
+import {DaoConstants} from '../components/adapters/config';
 
 export type ContractsState = {
-  DaoFactoryContract: SmartContractItem | null;
-  DaoRegistryContract: SmartContractItem | null;
-  BankContract: SmartContractItem | null;
-  ConfigurationContract: SmartContractItem | null;
-  FinancingContract: SmartContractItem | null;
-  GuildBankContract: SmartContractItem | null;
-  OnboardingContract: SmartContractItem | null;
-  OffchainVotingContract: SmartContractItem | null;
-  VotingContract: SmartContractItem | null;
-  NonVotingOnboadingContract: SmartContractItem | null;
-  ManagingContract: SmartContractItem | null;
-  RagequitContract: SmartContractItem | null;
+  DaoFactoryContract: ContractsStateEntry | null;
+  DaoRegistryContract: ContractsStateEntry | null;
+  BankContract: ContractsStateEntry | null;
+  ConfigurationContract: ContractsStateEntry | null;
+  FinancingContract: ContractsStateEntry | null;
+  GuildBankContract: ContractsStateEntry | null;
+  OffchainVotingContract: ContractsStateEntry | null;
+  NonVotingOnboadingContract: ContractsStateEntry | null;
+  ManagingContract: ContractsStateEntry | null;
+  RagequitContract: ContractsStateEntry | null;
+  BankExtensionContract: ContractsStateEntry | null;
+  OnboardingContract: ContractsStateEntry | null;
+  VotingContract: ContractsStateEntry | null;
 };
 
 export type ConnectedMemberState = {
@@ -26,6 +30,25 @@ export type ConnectedMemberState = {
 export type StoreState = {
   connectedMember: ConnectedMemberState;
   contracts: ContractsState;
+};
+
+export type ContractsStateEntry = {
+  /**
+   * Web3 `Contract` instance
+   */
+  instance: Web3Contract;
+  /**
+   * Contract JSON ABI
+   */
+  abi: AbiItem[];
+  /**
+   * (Optional) Adapter name, used for the Adapter Management
+   */
+  adapterName?: DaoConstants;
+  /**
+   * Address of the instantiated contract
+   */
+  contractAddress: string;
 };
 
 /**

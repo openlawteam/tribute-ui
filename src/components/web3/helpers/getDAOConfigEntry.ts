@@ -1,10 +1,11 @@
 import Web3 from 'web3';
 
-import {ContractDAOConfigKeys, SmartContractItem} from '../types';
+import {ContractsStateEntry} from '../../../store/types';
+import {ContractDAOConfigKeys} from '../types';
 
 export async function getDAOConfigEntry(
   configKey: ContractDAOConfigKeys,
-  daoContractInstance: SmartContractItem['instance'] | undefined
+  daoContractInstance: ContractsStateEntry['instance'] | undefined
 ): Promise<string> {
   try {
     if (!daoContractInstance) {

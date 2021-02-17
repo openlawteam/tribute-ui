@@ -29,14 +29,19 @@ export function SquareRootVotingBar({
   return (
     <div className="votingbar-container">
       <div className="votingbar">
+        {/* YES */}
         <div
           className="votingbar__segment--yes"
+          aria-label={`${percentYes}% yes votes`}
           style={{
             width: `${percentYes}%`,
           }}
         />
+
+        {/* NO */}
         <div
           className="votingbar__segment--no"
+          aria-label={`${percentNo}% no votes`}
           style={{
             width: `${percentNo}%`,
           }}
@@ -46,16 +51,19 @@ export function SquareRootVotingBar({
       <div className="votingbar__percentages">
         {showPercentages && (
           <>
+            {/* YES */}
             {votingExpired && yesShares > noShares && (
               <span className="yes-check">
-                <CheckSVG />
+                <CheckSVG aria-label="Vote has passed" />
               </span>
             )}
             <span className="yes-percent">{percentYes}%</span>
+
+            {/* NO */}
             <span className="no-percent">{percentNo}%</span>
             {votingExpired && yesShares <= noShares && (
               <span className="no-check">
-                <CheckSVG />
+                <CheckSVG aria-label="Vote has failed" />
               </span>
             )}
           </>

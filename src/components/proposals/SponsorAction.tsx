@@ -229,9 +229,12 @@ export default function SponsorAction(props: SponsorActionProps) {
         />
 
         {/* SUBMIT STATUS */}
-        <div className="form__submit-status-container">
-          {isInProcessOrDone && renderSubmitStatus()}
-        </div>
+
+        {isInProcessOrDone && (
+          <div className="form__submit-status-container">
+            {renderSubmitStatus()}
+          </div>
+        )}
 
         {isDisabled && (
           <button className="button--help" onClick={openWhyDisabledModal}>

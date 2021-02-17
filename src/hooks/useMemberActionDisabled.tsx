@@ -84,7 +84,7 @@ export function useMemberActionDisabled(): UseMemberActionDisabledReturn {
    */
 
   function handleSetOtherDisabledReasons(otherReasons: string[]) {
-    setOtherDisabledReasons(otherReasons);
+    setOtherDisabledReasons(otherReasons.filter(Boolean));
   }
 
   function getDisabledReason() {

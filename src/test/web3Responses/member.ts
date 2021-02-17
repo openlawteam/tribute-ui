@@ -1,8 +1,6 @@
 import {DEFAULT_ETH_ADDRESS} from '../helpers';
 import {TestWeb3ResponseArgs, TestWeb3ResponseReturn} from './types';
-import DaoRegistryJSON from '../../truffle-contracts/DaoRegistry.json';
-
-const daoRegistryABI = DaoRegistryJSON.abi;
+import DAORegistryABI from '../../truffle-contracts/DaoRegistry.json';
 
 /**
  * memberAddressesByDelegatedKey
@@ -18,6 +16,6 @@ export const memberAddressesByDelegatedKey = ({
   return [
     result ??
       web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
-    {abiMethodName: 'memberAddressesByDelegatedKey', abi: daoRegistryABI},
+    {abiMethodName: 'memberAddressesByDelegatedKey', abi: DAORegistryABI},
   ];
 };

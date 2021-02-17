@@ -16,6 +16,7 @@ import {
 } from './web3Responses';
 import * as useWeb3ModalToMock from '../components/web3/hooks/useWeb3Modal';
 import * as getAdapterAddressToMock from '../components/web3/helpers/getAdapterAddress';
+import * as getExtensionAddressToMock from '../components/web3/helpers/getExtensionAddress';
 import {CHAINS as mockChains} from '../config';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider, getNewStore} from './helpers';
 import Init, {InitError} from '../Init';
@@ -116,6 +117,14 @@ export default function Wrapper(
       .mockImplementation(() => Promise.resolve(DEFAULT_ETH_ADDRESS));
   }, [useWallet]);
 
+  const getExtensionAddressMock = useMemo(() => {
+    if (!useWallet) return;
+
+    return jest
+      .spyOn(getExtensionAddressToMock, 'getExtensionAddress')
+      .mockImplementation(() => Promise.resolve(DEFAULT_ETH_ADDRESS));
+  }, [useWallet]);
+
   /**
    * Effects
    */
@@ -133,6 +142,13 @@ export default function Wrapper(
       getAdapterAddressMock?.mockRestore();
     };
   }, [getAdapterAddressMock]);
+
+  useEffect(() => {
+    return () => {
+      // When `<Wrapper />` unmounts, restore the original function.
+      getExtensionAddressMock?.mockRestore();
+    };
+  }, [getExtensionAddressMock]);
 
   useEffect(() => {
     // @note For signing ERC712 with MetaMask's API provider.request

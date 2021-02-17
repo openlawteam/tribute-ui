@@ -1,6 +1,5 @@
 import {normalizeString} from '../../../util/helpers';
-import {SmartContractItem} from '../types';
-import {StoreState} from '../../../store/types';
+import {ContractsStateEntry, StoreState} from '../../../store/types';
 
 /**
  * getContractByAddress
@@ -15,7 +14,7 @@ import {StoreState} from '../../../store/types';
 export function getContractByAddress(
   address: string,
   contracts: StoreState['contracts']
-): SmartContractItem {
+): ContractsStateEntry {
   try {
     const contract = Object.values(contracts).find(
       (c) =>

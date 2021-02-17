@@ -1,7 +1,7 @@
 import {
   CONTRACT_DAO_FACTORY,
+  CONTRACT_BANK_EXTENSION,
   CONTRACT_DAO_REGISTRY,
-  CONTRACT_BANK,
   CONTRACT_CONFIGURATION,
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
@@ -10,7 +10,8 @@ import {
   CONTRACT_NONVOTING_ONBOARDING,
   CONTRACT_MANAGING,
   CONTRACT_RAGEQUIT,
-  CONTRACT_VOTING,
+  // CONTRACT_VOTING,
+  CONTRACT_VOTING_OP_ROLLUP,
 } from '../actions';
 import {ContractsState} from '../types';
 
@@ -22,8 +23,9 @@ const initialState = {
   FinancingContract: null,
   GuildBankContract: null,
   OffchainVotingContract: null,
-  OnboardingContract: null,
+  BankExtensionContract: null,
   VotingContract: null,
+  OnboardingContract: null,
   NonVotingOnboadingContract: null,
   ManagingContract: null,
   RagequitContract: null,
@@ -40,8 +42,8 @@ export default function reducer(
       return contractDAOFactory(state, payload);
     case CONTRACT_DAO_REGISTRY:
       return contractDAORegistry(state, payload);
-    case CONTRACT_BANK:
-      return contractBank(state, payload);
+    case CONTRACT_BANK_EXTENSION:
+      return contractBankExtension(state, payload);
     case CONTRACT_CONFIGURATION:
       return contractConfiguration(state, payload);
     case CONTRACT_FINANCING:
@@ -54,10 +56,11 @@ export default function reducer(
       return contractManaging(state, payload);
     case CONTRACT_RAGEQUIT:
       return contractRagequit(state, payload);
-    case CONTRACT_VOTING:
-      return contractVoting(state, payload);
+    // case CONTRACT_VOTING:
     case CONTRACT_ONBOARDING:
       return contractOnboarding(state, payload);
+    case CONTRACT_VOTING_OP_ROLLUP:
+      return contractVoting(state, payload);
     case CONTRACT_OFFCHAIN_VOTING:
       return contractOffchainVoting(state, payload);
     default:
@@ -73,8 +76,11 @@ function contractDAORegistry(state: ContractsState, payload: any) {
   return {...state, DaoRegistryContract: {...payload}};
 }
 
-function contractBank(state: ContractsState, payload: any) {
-  return {...state, BankContract: {...payload}};
+function contractBankExtension(
+  state: ContractsState,
+  payload: any
+): ContractsState {
+  return {...state, BankExtensionContract: {...payload}};
 }
 
 function contractConfiguration(state: ContractsState, payload: any) {
@@ -97,10 +103,6 @@ function contractOnboarding(state: ContractsState, payload: any) {
   return {...state, OnboardingContract: {...payload}};
 }
 
-function contractVoting(state: ContractsState, payload: any) {
-  return {...state, VotingContract: {...payload}};
-}
-
 function contractNonVotingOnboarding(state: ContractsState, payload: any) {
   return {...state, NonVotingOnboadingContract: {...payload}};
 }
@@ -111,4 +113,8 @@ function contractManaging(state: ContractsState, payload: any) {
 
 function contractRagequit(state: ContractsState, payload: any) {
   return {...state, RagequitContract: {...payload}};
+}
+
+function contractVoting(state: ContractsState, payload: any): ContractsState {
+  return {...state, VotingContract: {...payload}};
 }

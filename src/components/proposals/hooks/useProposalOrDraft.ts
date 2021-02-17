@@ -177,6 +177,7 @@ export function useProposalOrDraft(
       // Get the `SnapshotDraftResponseData` by the address key of the single result.
       const draft: SnapshotDraft = {
         idInDAO: idKey,
+        idInSnapshot: idKey,
         ...responseJSON[idKey],
       };
 
@@ -200,7 +201,7 @@ export function useProposalOrDraft(
        *   as a Moloch proposal's ID hash could be the Snapshot Draft's ID.
        */
       const response = await fetch(
-        `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/proposal/${id}?searchUniqueDraftId=true`,
+        `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/proposal/${id}?searchUniqueDraftId=true&includeVotes=true`,
         {signal: abortController?.signal}
       );
 
@@ -241,6 +242,7 @@ export function useProposalOrDraft(
       // Get the `SnapshotProposalResponseData` by the address key of the single result.
       const proposal: SnapshotProposal = {
         idInDAO: proposalId,
+        idInSnapshot: idKey,
         ...responseJSON[idKey],
       };
 

@@ -1,4 +1,5 @@
-import {CoreProposalVoteChoices, VoteChoices} from './types';
+import {CoreProposalVoteChoices} from '@openlaw/snapshot-js-erc712';
+import {VoteChoices} from './types';
 
 /**
  * WEB3 CONFIG for TRIBUTE DAO

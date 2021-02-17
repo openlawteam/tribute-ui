@@ -1,12 +1,15 @@
 import React, {useCallback, useEffect, useState} from 'react';
 
 type ProposalPeriodProps = {
+  startLabel?: React.ReactNode;
   startPeriodMs: number;
+  endLabel?: React.ReactNode;
+  endedLabel?: React.ReactNode;
   endPeriodMs: number;
 };
 
 export default function ProposalPeriod(props: ProposalPeriodProps) {
-  const {startPeriodMs, endPeriodMs} = props;
+  const {startLabel, startPeriodMs, endLabel, endedLabel, endPeriodMs} = props;
 
   /**
    * Variables
@@ -54,7 +57,7 @@ export default function ProposalPeriod(props: ProposalPeriodProps) {
       if (currentDate < startDate) {
         const start = (
           <span>
-            <span className="votingstatus">Starts:</span>{' '}
+            <span className="votingstatus">{startLabel || 'Starts:'}</span>{' '}
             <span className="votingstatus__timer">
               {displayCountdownCached(startDate, true)}
             </span>
@@ -65,7 +68,7 @@ export default function ProposalPeriod(props: ProposalPeriodProps) {
       } else if (currentDate < endDate) {
         const end = (
           <span>
-            <span className="votingstatus">Ends:</span>{' '}
+            <span className="votingstatus">{endLabel || 'Ends:'}</span>{' '}
             <span className="votingstatus__timer">
               {displayCountdownCached(endDate)}
             </span>
@@ -74,7 +77,9 @@ export default function ProposalPeriod(props: ProposalPeriodProps) {
 
         setProposalPeriod(end);
       } else {
-        const ended = <span className="votingstatus">Ended</span>;
+        const ended = (
+          <span className="votingstatus">{endedLabel || 'Ended'}</span>
+        );
 
         setProposalPeriod(ended);
         clearInterval(interval);
@@ -84,7 +89,14 @@ export default function ProposalPeriod(props: ProposalPeriodProps) {
     return () => {
       clearInterval(interval);
     };
-  }, [startPeriodMs, endPeriodMs, displayCountdownCached]);
+  }, [
+    displayCountdownCached,
+    endLabel,
+    endPeriodMs,
+    endedLabel,
+    startLabel,
+    startPeriodMs,
+  ]);
 
   /**
    * Functions
