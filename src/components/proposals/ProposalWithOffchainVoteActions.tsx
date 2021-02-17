@@ -9,6 +9,7 @@ import {ContractAdapterNames} from '../web3/types';
 import {ProposalData, ProposalFlowStatus} from './types';
 import {useProposalWithOffchainVoteStatus} from './hooks';
 import SponsorAction from './SponsorAction';
+import ProcessAction from './ProcessAction';
 
 type ProposalWithOffchainActionsProps = {
   adpaterName: ContractAdapterNames;
@@ -75,13 +76,13 @@ export default function ProposalWithOffchainVoteActions(
           />
         )}
 
-        {/* Disable when in grace period */}
         {(status === ProposalFlowStatus.OffchainVotingGracePeriod ||
           status === ProposalFlowStatus.Process) && (
-          <button
-            disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}>
-            Process
-          </button>
+          <ProcessAction
+            // Show during DAO proposal grace period, but set to disabled
+            disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
+            proposal={proposal}
+          />
         )}
       </div>
     </>
