@@ -1,14 +1,15 @@
 import React, {useCallback, useEffect, useState} from 'react';
 
 type ProposalPeriodProps = {
-  startLabel?: string;
+  startLabel?: React.ReactNode;
   startPeriodMs: number;
-  endLabel?: string;
+  endLabel?: React.ReactNode;
+  endedLabel?: React.ReactNode;
   endPeriodMs: number;
 };
 
 export default function ProposalPeriod(props: ProposalPeriodProps) {
-  const {startLabel, startPeriodMs, endLabel, endPeriodMs} = props;
+  const {startLabel, startPeriodMs, endLabel, endedLabel, endPeriodMs} = props;
 
   /**
    * Variables
@@ -76,7 +77,9 @@ export default function ProposalPeriod(props: ProposalPeriodProps) {
 
         setProposalPeriod(end);
       } else {
-        const ended = <span className="votingstatus">Ended</span>;
+        const ended = (
+          <span className="votingstatus">{endedLabel || 'Ended'}</span>
+        );
 
         setProposalPeriod(ended);
         clearInterval(interval);
@@ -90,6 +93,7 @@ export default function ProposalPeriod(props: ProposalPeriodProps) {
     displayCountdownCached,
     endLabel,
     endPeriodMs,
+    endedLabel,
     startLabel,
     startPeriodMs,
   ]);
