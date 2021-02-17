@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {
   createVote,
@@ -19,7 +19,6 @@ import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
 import {useMemberActionDisabled} from '../../../hooks';
 import {useWeb3Modal, useContractSend, useETHGasPrice} from '../../web3/hooks';
-import {VotingState} from './types';
 import CycleMessage from '../../feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../common/ErrorMessageWithDetails';
 import EtherscanURL from '../../web3/EtherscanURL';
@@ -76,9 +75,6 @@ export function OffchainOpRollupVotingSubmitResultAction(
   const offchainVotingMethods = useSelector(
     (s: StoreState) => s.contracts.VotingContract?.instance.methods
   );
-  const daoInstance = useSelector(
-    (s: StoreState) => s.contracts.DaoRegistryContract?.instance
-  );
   const daoRegistryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
   );
@@ -88,7 +84,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
    * Our hooks
    */
 
-  const {account, provider, connected} = useWeb3Modal();
+  const {account, provider} = useWeb3Modal();
 
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
 
@@ -115,33 +111,6 @@ export function OffchainOpRollupVotingSubmitResultAction(
     signatureStatus === Web3TxStatus.FULFILLED;
 
   const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
-
-  /**
-   * Effects
-   */
-
-  useEffect(() => {
-    if (
-      !connected ||
-      !daoInstance ||
-      !daoRegistryAddress ||
-      !snapshotProposal?.idInDAO
-    )
-      return;
-
-    offchainVotingMethods
-      ?.voteResult(daoRegistryAddress, snapshotProposal?.idInDAO)
-      .call()
-      .then((r: any) =>
-        console.log(VotingState[r] === VotingState[VotingState.NOT_PASS])
-      );
-  }, [
-    connected,
-    daoInstance,
-    daoRegistryAddress,
-    offchainVotingMethods,
-    snapshotProposal?.idInDAO,
-  ]);
 
   /**
    * Functions
@@ -180,7 +149,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
             voteYes: voteData.msg.payload.choice === VoteChoicesIndex.Yes,
             timestamp: Number(voteData.msg.timestamp),
             sig: voteData.sig,
-            // @todo use subgraph weight data
+            // @todo conditionally use subgraph weight data
             weight: await bankExtensionMethods
               .getPriorAmount(
                 voteData.address,
