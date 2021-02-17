@@ -7,7 +7,7 @@ import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDet
 import FadeIn from '../../components/common/FadeIn';
 import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 import NotFound from '../subpages/NotFound';
-import ProposalActions from '../../components/proposals/ProposalActions';
+import ProposalWithOffchainVoteActions from '../../components/proposals/ProposalWithOffchainVoteActions';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
 import Wrap from '../../components/common/Wrap';
 import {ContractAdapterNames} from '../../components/web3/types';
@@ -94,7 +94,7 @@ export default function MembershipDetails() {
         <ProposalDetails
           proposal={proposalData}
           renderActions={() => (
-            <ProposalActions
+            <ProposalWithOffchainVoteActions
               adpaterName={ContractAdapterNames.onboarding}
               proposal={proposalData}
             />
