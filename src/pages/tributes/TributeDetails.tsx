@@ -1,7 +1,9 @@
 import React from 'react';
 import {useHistory, useParams} from 'react-router-dom';
+import {toBN} from 'web3-utils';
 
 import {AsyncStatus} from '../../util/types';
+import {formatDecimal, formatNumber} from '../../util/helpers';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
@@ -9,6 +11,7 @@ import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 import NotFound from '../subpages/NotFound';
 import ProposalActions from '../../components/proposals/ProposalActions';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
+import ProposalAmount from '../../components/proposals/ProposalAmount';
 import Wrap from '../../components/common/Wrap';
 import {ContractAdapterNames} from '../../components/web3/types';
 
@@ -89,11 +92,47 @@ export default function TributeDetails() {
 
   // Render proposal
   if (proposalData) {
+    const {daoProposal} = proposalData;
+    const commonData = proposalData.getCommonSnapshotProposalData();
+
+    // @todo use amounts from proposal.subgraphproposal
+    let tributeAmount = '\u2026';
+    try {
+      const divisor = toBN(10).pow(
+        toBN(commonData?.msg.payload.metadata.tributeTokenDecimals)
+      );
+      const beforeDecimal = toBN(daoProposal?.tributeAmount).div(divisor);
+      const afterDecimal = toBN(daoProposal?.tributeAmount).mod(divisor);
+      const balanceReadable = afterDecimal.eq(toBN(0))
+        ? beforeDecimal.toString()
+        : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
+      const isTributeAmountInt = !balanceReadable.includes('.');
+      tributeAmount = isTributeAmountInt
+        ? balanceReadable
+        : formatDecimal(Number(balanceReadable));
+    } catch (error) {
+      // Fallback gracefully to ellipsis
+    }
+
+    let requestAmount = '\u2026';
+    try {
+      requestAmount = formatNumber(daoProposal?.requestAmount);
+    } catch (error) {
+      // Fallback gracefully to ellipsis
+    }
+
     return (
       <RenderWrapper>
         <ProposalDetails
           proposal={proposalData}
-          adapterName={ContractAdapterNames.tribute}
+          renderAmountBadge={() => (
+            <ProposalAmount
+              amount={tributeAmount}
+              amountUnit={commonData?.msg.payload.metadata.tributeAmountUnit}
+              amount2={requestAmount}
+              amount2Unit={commonData?.msg.payload.metadata.requestAmountUnit}
+            />
+          )}
           renderActions={() => (
             <ProposalActions
               adapterName={ContractAdapterNames.tribute}
