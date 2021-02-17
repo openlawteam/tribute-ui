@@ -61,15 +61,7 @@ export function initContractDaoRegistry(web3Instance: Web3) {
   };
 }
 
-/**
- * @todo Since there can only be one style of voting registered,
- *   we need to call the Registry to get the implemented voting style name.
- *   Therefore, we will know which contract to load into Redux.
- *
- * @todo We can add an optional param as well in case we want to directly state which
- *   voting adapter we want.
- */
-export function initContractVoting(web3Instance: Web3) {
+export function initContractVotingOpRollup(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {

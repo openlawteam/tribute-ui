@@ -5,7 +5,7 @@ import {useDispatch} from 'react-redux';
 import {
   initContractBankExtension,
   initContractDaoRegistry,
-  initContractVoting,
+  initContractVotingOpRollup,
   initContractOnboarding,
 } from '../../../store/actions';
 import {ReduxDispatch} from '../../../store/types';
@@ -51,7 +51,7 @@ export function useInitContracts() {
 
       // Init contracts
       await dispatch(initContractDaoRegistry(web3Instance));
-      await dispatch(initContractVoting(web3Instance));
+      await dispatch(initContractVotingOpRollup(web3Instance));
       await dispatch(initContractOnboarding(web3Instance));
       await dispatch(initContractBankExtension(web3Instance));
 
