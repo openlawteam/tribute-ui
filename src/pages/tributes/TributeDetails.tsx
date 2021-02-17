@@ -9,7 +9,7 @@ import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDet
 import FadeIn from '../../components/common/FadeIn';
 import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 import NotFound from '../subpages/NotFound';
-import ProposalActions from '../../components/proposals/ProposalActions';
+import ProposalWithOffchainVoteActions from '../../components/proposals/ProposalWithOffchainVoteActions';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
 import Wrap from '../../components/common/Wrap';
@@ -134,7 +134,7 @@ export default function TributeDetails() {
             />
           )}
           renderActions={() => (
-            <ProposalActions
+            <ProposalWithOffchainVoteActions
               adapterName={ContractAdapterNames.tribute}
               proposal={proposalData}
             />
