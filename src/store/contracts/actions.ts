@@ -13,12 +13,12 @@ import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAdd
 
 type ContractAction =
   | typeof CONTRACT_DAO_REGISTRY
-  | typeof CONTRACT_VOTING
+  | typeof CONTRACT_VOTING_OP_ROLLUP
   | typeof CONTRACT_ONBOARDING
   | typeof CONTRACT_BANK_EXTENSION;
 
 export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
-export const CONTRACT_VOTING = 'CONTRACT_VOTING';
+export const CONTRACT_VOTING_OP_ROLLUP = 'CONTRACT_VOTING_OP_ROLLUP';
 export const CONTRACT_ONBOARDING = 'CONTRACT_ONBOARDING';
 export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
 
@@ -93,7 +93,7 @@ export function initContractVoting(web3Instance: Web3) {
 
         dispatch(
           createContractAction({
-            type: CONTRACT_VOTING,
+            type: CONTRACT_VOTING_OP_ROLLUP,
             abi: offchainVotingContract,
             contractAddress,
             instance,
