@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
+import {AbiItem} from 'web3-utils/types';
 
 import {Adapters, DaoConstants} from './config';
 import {StoreState} from '../../store/types';
@@ -10,7 +11,7 @@ import {FormFieldErrors} from '../../util/enums';
 import {getValidationError} from '../../util/helpers';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useAdapters, useValidation} from './hooks';
-import {ParamInputType} from './hooks/useValidation';
+import {ParamInputType, ParamType} from './hooks/useValidation';
 
 // import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 // import CycleMessage from '../../components/feedback/CycleMessage';
@@ -21,9 +22,9 @@ import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
 
 type ConfigurationFormProps = {
+  abiConfigurationInputs: Record<string, any> | undefined;
   abiMethodName: string;
   adapter: Adapters | undefined;
-  configurationInputs: Record<string, any> | undefined;
   closeHandler?: () => void;
 };
 
@@ -32,9 +33,9 @@ type RemoveAdapterArguments = [
 ];
 
 export default function ConfigurationForm({
+  abiConfigurationInputs,
   abiMethodName,
   adapter,
-  configurationInputs,
   closeHandler,
 }: ConfigurationFormProps) {
   /**
@@ -174,8 +175,6 @@ export default function ConfigurationForm({
     try {
       setConfigureAdapterStatus(Web3TxStatus.PENDING);
 
-      console.log('values', values);
-
       const {
         contractAddress,
         instance: {methods},
@@ -195,7 +194,22 @@ export default function ConfigurationForm({
         throw new Error('No account found.');
       }
 
-      const adapterConfigArguments: string | number[] = Object.values(values);
+      let adapterConfigArguments: Array<ParamInputType> = [];
+      // construct method arguments
+      abiConfigurationInputs?.forEach((abiInput: AbiItem) => {
+        const inputValue = Object.entries(values).find(
+          (v: any) => v[0] === abiInput.name
+        );
+
+        if (inputValue) {
+          const formattedValue: ParamInputType = formatInputByType(
+            inputValue[1] as ParamInputType,
+            abiInput.type as ParamType
+          );
+
+          adapterConfigArguments.push(formattedValue);
+        }
+      });
 
       const txArguments = {
         from: account || '',
@@ -219,8 +233,8 @@ export default function ConfigurationForm({
   return (
     <form className="form" onSubmit={(e) => e.preventDefault()}>
       {/* INPUT PARAMETERS */}
-      {configurationInputs &&
-        configurationInputs.map((input: Record<string, any>) => (
+      {abiConfigurationInputs &&
+        abiConfigurationInputs.map((input: Record<string, any>) => (
           <div className="form__input-row" key={input.name}>
             <label className="form__input-row-label">{input.name}</label>
             <div className="form__input-row-fieldwrap">
@@ -230,17 +244,9 @@ export default function ConfigurationForm({
                 name={input.name}
                 placeholder={input.type}
                 type="text"
-                onChange={() => {
-                  const formattedValue: ParamInputType = formatInputByType(
-                    getValues()[input.name],
-                    input.type
-                  );
-
-                  // console.log('set formatted val', input.name, formattedValue);
-
-                  setValue(input.name, formattedValue);
-                  // console.log('getValues()', getValues());
-                }}
+                onChange={() =>
+                  setValue(input.name[0], getValues()[input.name])
+                }
                 ref={register({
                   validate: (value: string): string | boolean => {
                     return value === ''

@@ -34,10 +34,10 @@ export enum NetworkNames {
 export enum FormFieldErrors {
   REQUIRED = 'This field is required.',
   INVALID_BYTES32 = 'The value is not a bytes32.',
-  INVALID_BYTES32_ARRAY = 'The value is not a bytes32 array format, ie. 0x435435...,0x08767...',
+  INVALID_BYTES32_ARRAY = 'The value is not a comma-separated bytes32 format, ie. 0x435435...,0x08767...',
   INVALID_ETHEREUM_ADDRESS = 'The ethereum address is invalid.',
   INVALID_NUMBER = 'The value is not a number.',
-  INVALID_NUMBER_ARRAY = 'The value is not a number array format, ie. 42,5,124',
+  INVALID_NUMBER_ARRAY = 'The value is not a comma-separated number format, ie. 42,5,124',
 }
 
 export enum ProposalHeaderNames {

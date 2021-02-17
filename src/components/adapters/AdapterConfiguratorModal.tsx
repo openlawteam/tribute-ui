@@ -43,9 +43,9 @@ export default function AdapterConfiguratorModal({
         <p>{adapter?.adapterDescription}</p>
 
         <ConfigurationForm
+          abiConfigurationInputs={configurationInputs}
           abiMethodName={abiMethodName}
           adapter={adapter}
-          configurationInputs={configurationInputs}
           closeHandler={closeHandler}
         />
       </>

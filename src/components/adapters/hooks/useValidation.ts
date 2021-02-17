@@ -12,7 +12,7 @@ type ValidationType =
 
 export type ParamInputType = string | string[] | number | number[];
 
-enum ParamType {
+export enum ParamType {
   ADDRESS = 'address',
   BYTES32 = 'bytes32',
   BYTES32_ARRAY = 'bytes32[]',
@@ -162,6 +162,8 @@ export function useValidation(): UseValidationReturn {
       ? formatBytes32Array()
       : inputType === ParamType.UINT256_ARRAY
       ? formatUint256Array()
+      : inputType === ParamType.UINT256
+      ? Number(inputValue)
       : inputValue;
   }
 
