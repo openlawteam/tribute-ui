@@ -70,27 +70,27 @@ describe('useContractPoll unit tests', () => {
 
       // Assert initial result before first poll to be `injectResults[0]`
       expect(result.current.pollContractData).toEqual({
-        '0': '0x0000000000000000000000000000000000000000',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '1',
-        adapterAddress: '0x0000000000000000000000000000000000000000',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '1',
       });
 
       await new Promise((r) => setTimeout(r, 250));
 
       expect(result.current.pollContractData).toEqual({
-        '0': '0x0000000000000000000000000000000000000000',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '3',
-        adapterAddress: '0x0000000000000000000000000000000000000000',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '3',
       });
 
       await new Promise((r) => setTimeout(r, 250));
 
       expect(result.current.pollContractData).toEqual({
-        '0': '0x0000000000000000000000000000000000000000',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '7',
-        adapterAddress: '0x0000000000000000000000000000000000000000',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '7',
       });
     });
@@ -156,9 +156,9 @@ describe('useContractPoll unit tests', () => {
 
       await waitFor(() => {
         expect(result.current.pollContractData).toEqual({
-          '0': '0x0000000000000000000000000000000000000000',
+          '0': DEFAULT_ETH_ADDRESS,
           '1': '1',
-          adapterAddress: '0x0000000000000000000000000000000000000000',
+          adapterAddress: DEFAULT_ETH_ADDRESS,
           flags: '1',
         });
       });
@@ -166,9 +166,9 @@ describe('useContractPoll unit tests', () => {
       await new Promise((r) => setTimeout(r, 250));
 
       expect(result.current.pollContractData).toEqual({
-        '0': '0x0000000000000000000000000000000000000000',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '3',
-        adapterAddress: '0x0000000000000000000000000000000000000000',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '3',
       });
 
@@ -179,9 +179,9 @@ describe('useContractPoll unit tests', () => {
 
       // Assert result is same as last poll result, not `injectResults[2]`
       expect(result.current.pollContractData).toEqual({
-        '0': '0x0000000000000000000000000000000000000000',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '3',
-        adapterAddress: '0x0000000000000000000000000000000000000000',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '3',
       });
     });
@@ -253,27 +253,27 @@ describe('useContractPoll unit tests', () => {
       await new Promise((r) => setTimeout(r, 250));
 
       expect(result.current.pollContractData).toEqual({
-        '0': '0x0000000000000000000000000000000000000000',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '1',
-        adapterAddress: '0x0000000000000000000000000000000000000000',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '1',
       });
 
       await new Promise((r) => setTimeout(r, 250));
 
       expect(result.current.pollContractData).toEqual({
-        '0': '0x0000000000000000000000000000000000000000',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '3',
-        adapterAddress: '0x0000000000000000000000000000000000000000',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '3',
       });
 
       await new Promise((r) => setTimeout(r, 250));
 
       expect(result.current.pollContractData).toEqual({
-        '0': '0x0000000000000000000000000000000000000000',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '7',
-        adapterAddress: '0x0000000000000000000000000000000000000000',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '7',
       });
     });
