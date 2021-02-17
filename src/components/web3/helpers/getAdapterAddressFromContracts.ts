@@ -1,7 +1,9 @@
-import {SmartContractItem, ContractAdapterNames} from '../types';
-import {StoreState} from '../../../store/types';
+import {ContractAdapterNames} from '../types';
+import {ContractsStateEntry, StoreState} from '../../../store/types';
 
-function getContractAddressOrThrow(contract: SmartContractItem | null): string {
+function getContractAddressOrThrow(
+  contract: ContractsStateEntry | null
+): string {
   try {
     const address = contract?.contractAddress;
 

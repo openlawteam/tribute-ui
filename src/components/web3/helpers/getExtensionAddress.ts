@@ -1,10 +1,10 @@
 import Web3 from 'web3';
 
 import {ContractsStateEntry} from '../../../store/types';
-import {ContractDAOConfigKeys} from '../types';
+import {ContractExtensionNames} from '../types';
 
-export async function getDAOConfigEntry(
-  configKey: ContractDAOConfigKeys,
+export async function getExtensionAddress(
+  extensionName: ContractExtensionNames,
   daoContractInstance: ContractsStateEntry['instance'] | undefined
 ): Promise<string> {
   try {
@@ -13,7 +13,7 @@ export async function getDAOConfigEntry(
     }
 
     return await daoContractInstance.methods
-      .getConfiguration(Web3.utils.sha3(configKey))
+      .getExtensionAddress(Web3.utils.sha3(extensionName))
       .call();
   } catch (error) {
     throw error;

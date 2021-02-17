@@ -1,4 +1,6 @@
-export default function StopwatchSVG(props: any) {
+import {SVGAttributes} from 'react';
+
+export default function StopwatchSVG(props: SVGAttributes<HTMLOrSVGElement>) {
   return (
     <svg
       width="20px"

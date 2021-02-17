@@ -1,11 +1,13 @@
 import {Action} from 'redux';
 import {ThunkDispatch} from 'redux-thunk';
-import {SmartContractItem} from '../components/web3/types';
+import {AbiItem} from 'web3-utils/types';
+import {Contract as Web3Contract} from 'web3-eth-contract/types';
 
 export type ContractsState = {
-  DaoRegistryContract: SmartContractItem | null;
-  OnboardingContract: SmartContractItem | null;
-  OffchainVotingContract: SmartContractItem | null;
+  BankExtensionContract: ContractsStateEntry | null;
+  DaoRegistryContract: ContractsStateEntry | null;
+  OnboardingContract: ContractsStateEntry | null;
+  VotingContract: ContractsStateEntry | null;
 };
 
 export type ConnectedMemberState = {
@@ -17,6 +19,21 @@ export type ConnectedMemberState = {
 export type StoreState = {
   connectedMember: ConnectedMemberState;
   contracts: ContractsState;
+};
+
+export type ContractsStateEntry = {
+  /**
+   * Web3 `Contract` instance
+   */
+  instance: Web3Contract;
+  /**
+   * Contract JSON ABI
+   */
+  abi: AbiItem[];
+  /**
+   * Address of the instantiated contract
+   */
+  contractAddress: string;
 };
 
 /**

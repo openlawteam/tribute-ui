@@ -132,4 +132,44 @@ describe('useMemberActionDisabled unit tests', () => {
     expect(result.current.isDisabled).toBe(true);
     expect(result.current.disabledReason).toMatch(/some other reason!/i);
   });
+
+  test('should not be disabled if provided other reasons are empty strings', async () => {
+    // @note By default <Wrapper /> set the member to active when using `useWallet`
+    const {result, waitForNextUpdate} = renderHook(
+      () => useMemberActionDisabled(),
+      {
+        initialProps: {
+          useInit: true,
+          useWallet: true,
+        },
+        wrapper: Wrapper,
+      }
+    );
+
+    // Assert initial state
+    expect(result.current.isDisabled).toBe(true);
+    expect(result.current.disabledReason).toMatch(
+      /either you are not a member, or your membership is not active\./i
+    );
+    expect(result.current.openWhyDisabledModal).toBeInstanceOf(Function);
+    expect(result.current.WhyDisabledModal).toBeInstanceOf(Function);
+    expect(result.current.setOtherDisabledReasons).toBeInstanceOf(Function);
+
+    await waitForNextUpdate();
+
+    // Assert post-init state
+    expect(result.current.isDisabled).toBe(false);
+    expect(result.current.disabledReason).toBe('');
+    expect(result.current.openWhyDisabledModal).toBeInstanceOf(Function);
+    expect(result.current.WhyDisabledModal).toBeInstanceOf(Function);
+    expect(result.current.setOtherDisabledReasons).toBeInstanceOf(Function);
+
+    act(() => {
+      result.current.setOtherDisabledReasons(['', '', '']);
+    });
+
+    // Assert post-setOtherDisabledReasons state
+    expect(result.current.isDisabled).toBe(false);
+    expect(result.current.disabledReason).toBe('');
+  });
 });

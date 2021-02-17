@@ -6,6 +6,43 @@ import {
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
 
+/**
+ * ENUMS
+ */
+
+/**
+ * Reverse mapping of DaoRegistry proposal flags.
+ * The formula used to create the `flags` entry is:
+ *   `prevFlags + 2**nextFlagIndex`
+ *    i.e. to get the flag after `flags: 1` the formula is: `1 + 2**1 = 3`
+ *
+ * @note Order matters
+ *
+ * @see `ProposalFlag` in laoland `DaoRegistry.sol`
+ * @see `getFlag` in laoland `DaoConstants.sol`
+ * @see `setFlag` in laoland `DaoConstants.sol`
+ */
+export enum ProposalFlag {
+  EXISTS = 1,
+  SPONSORED = 3,
+  PROCESSED = 7,
+}
+
+// @todo Need more information about the vote challenge flow.
+export enum ProposalFlowStatus {
+  Sponsor = 'Sponsor',
+  OffchainVoting = 'OffchainVoting',
+  OffchainVotingSubmitResult = 'OffchainVotingSubmitResult',
+  OffchainVotingGracePeriod = 'OffchainVotingGracePeriod',
+  OnchainVoting = 'OnchainVoting',
+  Process = 'Process',
+  Completed = 'Completed',
+}
+
+/**
+ * TYPES
+ */
+
 // @todo Change the type to be precise
 export type SubgraphProposal = Record<string, any>;
 
@@ -17,6 +54,10 @@ export type SnapshotDraft = {
    * The ID used to reference the DAO.
    */
   idInDAO: string;
+  /**
+   * An ID helper to reference the Draft hash
+   */
+  idInSnapshot: string;
 } & SnapshotDraftResponseData;
 
 /**
@@ -27,6 +68,10 @@ export type SnapshotProposal = {
    * The ID used to reference the DAO.
    */
   idInDAO: string;
+  /**
+   * An ID helper to reference the Proposal hash
+   */
+  idInSnapshot: string;
 } & SnapshotProposalResponseData;
 
 /**

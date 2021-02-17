@@ -4,10 +4,15 @@ import {
   buildVoteMessage,
   getDomainDefinition,
   getSpace,
+  prepareVoteMessage,
   signMessage,
   SnapshotMessageVote,
+  SnapshotSubmitBaseReturn,
+  SnapshotType,
   SnapshotVoteData,
   SnapshotVoteProposal,
+  submitMessage,
+  VoteChoicesIndex,
 } from '@openlaw/snapshot-js-erc712';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
@@ -17,7 +22,7 @@ import {PRIMARY_TYPE_ERC712} from '../../web3/config';
 import {StoreState} from '../../../store/types';
 import {useWeb3Modal} from '../../web3/hooks/useWeb3Modal';
 
-type PrepareAndSignVoteDataParam = {
+type SignAndSendVoteDataParam = {
   choice: SnapshotMessageVote['choice'];
   /**
    * The address of a delegate voter for a member.
@@ -26,30 +31,33 @@ type PrepareAndSignVoteDataParam = {
   metadata?: Record<string, any>;
 };
 
-type UsePrepareAndSignVoteDataReturn = {
-  prepareAndSignVoteData: (
-    partialVoteData: PrepareAndSignVoteDataParam,
-    adapterName: ContractAdapterNames,
-    proposalHash: SnapshotVoteData['payload']['proposalHash']
-  ) => Promise<{
-    data: SnapshotVoteData;
-    signature: string;
-  }>;
-  proposalData: SnapshotVoteData | undefined;
-  proposalDataError: Error | undefined;
-  proposalDataStatus: Web3TxStatus;
-  proposalSignature: string;
+type UseSignAndSendVoteReturn = {
+  signAndSendVote: (data: {
+    partialVoteData: SignAndSendVoteDataParam;
+    adapterName: ContractAdapterNames;
+    proposalIdInDAO: SnapshotVoteData['payload']['proposalHash'];
+    proposalIdInSnapshot: string;
+  }) => Promise<SignAndSendVoteReturn>;
+  voteData: SignAndSendVoteReturn | undefined;
+  voteDataError: Error | undefined;
+  voteDataStatus: Web3TxStatus;
+};
+
+type SignAndSendVoteReturn = {
+  data: SnapshotVoteData;
+  signature: string;
+  uniqueId: SnapshotSubmitBaseReturn['uniqueId'];
 };
 
 /**
- * usePrepareAndSignVoteData
+ * useSignAndSendVote
  *
  * React hook which prepares proposal data for submission
  * to Snapshot and Moloch v3 and signs it (ERC712)
  *
  * @returns {Promise<BuildAndSignProposalDataReturn>} An object with the proposal data and the ERC712 signature string.
  */
-export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
+export function useSignAndSendVote(): UseSignAndSendVoteReturn {
   /**
    * Selectors
    */
@@ -69,10 +77,9 @@ export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
    * State
    */
 
-  const [proposalData, setVoteData] = useState<SnapshotVoteData>();
-  const [proposalDataError, setProposalDataError] = useState<Error>();
-  const [proposalSignature, setProposalSignature] = useState<string>('');
-  const [proposalDataStatus, setProposalDataStatus] = useState<Web3TxStatus>(
+  const [voteData, setVoteData] = useState<SignAndSendVoteReturn>();
+  const [voteDataError, setVoteDataError] = useState<Error>();
+  const [voteDataStatus, setVoteDataStatus] = useState<Web3TxStatus>(
     Web3TxStatus.STANDBY
   );
 
@@ -81,24 +88,38 @@ export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
    */
 
   /**
-   * prepareAndSignVoteData
+   * signAndSendVote
    *
-   * Builds the vote data for submission to Moloch v3 and Snapshot and signs it (ERC712).
+   * Builds the vote data for submission to Snapshot and signs it (ERC712).
    *
-   * @param {PrepareAndSignVoteDataParam}
+   * @param {SignAndSendVoteDataParam}
    * @param {adapterName} ContractAdapterNames - An adapter's contract address this data is related to.
    *   @note Does not accept voting adapter names.
    * @param {SnapshotVoteData['payload']['proposalHash']} proposalHash - The unique hash of the proposal from snapshot-hub.
    * @returns {Promise<BuildAndSignProposalDataReturn>} An object with the vote data and the ERC712 signature string.
    */
-  async function prepareAndSignVoteData(
-    partialVoteData: PrepareAndSignVoteDataParam,
-    adapterName: ContractAdapterNames,
-    proposalHash: SnapshotVoteData['payload']['proposalHash']
-  ): Promise<{
-    data: SnapshotVoteData;
-    signature: string;
-  }> {
+  async function signAndSendVote({
+    partialVoteData,
+    adapterName,
+    proposalIdInDAO,
+    proposalIdInSnapshot,
+  }: {
+    partialVoteData: SignAndSendVoteDataParam;
+    adapterName: ContractAdapterNames;
+    /**
+     * This is the hash of the content as submitted to the DAO.
+     * The hash should be the same as the Snapshot draft's, or
+     * proposal's (if not submitted as a draft), ID.
+     *
+     * We need to make sure this matches what has been submitted to
+     * the DAO for later signature verifications.
+     */
+    proposalIdInDAO: SnapshotVoteData['payload']['proposalHash'];
+    /**
+     * Must match a `proposal` type's ID in Snapshot so a `vote` may be attached.
+     */
+    proposalIdInSnapshot: string;
+  }): Promise<SignAndSendVoteReturn> {
     try {
       if (!web3Instance) {
         throw new Error('No Web3 instance was found.');
@@ -116,7 +137,7 @@ export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
         throw new Error('No "SNAPSHOT_HUB_API_URL" was found.');
       }
 
-      setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
+      setVoteDataStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       const adapterAddress = getAdapterAddressFromContracts(
         adapterName,
@@ -136,20 +157,28 @@ export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
       };
 
       const voteProposalData: SnapshotVoteProposal = {
-        proposalHash,
+        proposalHash: proposalIdInDAO,
         space: SPACE,
         token: snapshotSpace.token,
       };
 
-      // Check proposal type and get appropriate message
+      // 1. Check proposal type and get appropriate message
       const message = await buildVoteMessage(
         voteData,
         voteProposalData,
         SNAPSHOT_HUB_API_URL
       );
 
+      const erc712Message = prepareVoteMessage({
+        timestamp: message.timestamp,
+        payload: {
+          proposalHash: message.payload.proposalHash,
+          choice: VoteChoicesIndex[choice],
+        },
+      });
+
       const {domain, types} = getDomainDefinition(
-        message,
+        {...erc712Message, type: SnapshotType.vote},
         daoRegistryAddress,
         adapterAddress,
         DEFAULT_CHAIN
@@ -159,33 +188,57 @@ export function usePrepareAndSignVoteData(): UsePrepareAndSignVoteDataReturn {
         types: types,
         domain: domain,
         primaryType: PRIMARY_TYPE_ERC712,
-        message: message,
+        message: erc712Message,
       });
 
-      setProposalDataStatus(Web3TxStatus.AWAITING_CONFIRM);
+      const signature: string = await signMessage(
+        provider,
+        account,
+        dataToSign
+      );
 
-      const signature = await signMessage(provider, account, dataToSign);
+      setVoteDataStatus(Web3TxStatus.PENDING);
 
-      setProposalDataStatus(Web3TxStatus.FULFILLED);
-      setVoteData(message);
-      setProposalSignature(signature);
+      // 3. Send data to snapshot-hub
+      const {data} = await submitMessage<SnapshotSubmitBaseReturn>(
+        SNAPSHOT_HUB_API_URL,
+        account,
+        {
+          ...message,
+          // @note We pass the proposal's hash (ID) so we can vote on it.
+          payload: {...message.payload, proposalHash: proposalIdInSnapshot},
+        },
+        signature,
+        {
+          actionId: domain.actionId,
+          chainId: domain.chainId,
+          verifyingContract: domain.verifyingContract,
+          message: erc712Message,
+        }
+      );
 
-      return {
+      const dataToReturn = {
         data: message,
         signature,
+        uniqueId: data.uniqueId,
       };
+
+      setVoteDataStatus(Web3TxStatus.FULFILLED);
+      setVoteData(dataToReturn);
+
+      return dataToReturn;
     } catch (error) {
-      setProposalDataError(error);
+      setVoteDataStatus(Web3TxStatus.REJECTED);
+      setVoteDataError(error);
 
       throw error;
     }
   }
 
   return {
-    prepareAndSignVoteData,
-    proposalData,
-    proposalDataError,
-    proposalDataStatus,
-    proposalSignature,
+    signAndSendVote,
+    voteData,
+    voteDataError,
+    voteDataStatus,
   };
 }

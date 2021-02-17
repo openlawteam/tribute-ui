@@ -1,6 +1,6 @@
 import {Dispatch} from 'redux';
 
-import {SmartContractItem} from '../../components/web3/types';
+import {ConnectedMemberState, ContractsStateEntry} from '../types';
 
 export const SET_CONNECTED_MEMBER = 'SET_CONNECTED_MEMBER';
 export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
@@ -18,7 +18,7 @@ export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
  */
 export function getConnectedMember(
   account: string,
-  daoRegistryContract: SmartContractItem
+  daoRegistryContract: ContractsStateEntry
 ) {
   return async function (dispatch: Dispatch<any>) {
     const daoRegistryInstance = daoRegistryContract.instance;
@@ -40,10 +40,14 @@ export function getConnectedMember(
         .getCurrentDelegateKey(memberAddressByDelegateKey)
         .call({from: account});
 
+      const isActiveMemberChecks: boolean =
+        isActiveMember &&
+        !memberAddressByDelegateKey.startsWith('0x0000000000');
+
       dispatch(
         setConnectedMember({
           delegateKey: currentDelegateKey,
-          isActiveMember,
+          isActiveMember: isActiveMemberChecks,
           memberAddress: memberAddressByDelegateKey,
         })
       );
@@ -55,7 +59,7 @@ export function getConnectedMember(
   };
 }
 
-export function setConnectedMember(payload: Record<string, any>) {
+export function setConnectedMember(payload: ConnectedMemberState) {
   return {type: SET_CONNECTED_MEMBER, ...payload};
 }
 

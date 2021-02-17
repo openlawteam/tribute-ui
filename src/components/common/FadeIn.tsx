@@ -3,12 +3,16 @@ import React from 'react';
 import {Transition} from 'react-transition-group';
 
 type FadeInProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   duration?: number;
   /**
    * Defaults to `true`
    */
   show?: boolean;
+  /**
+   * Renders a `<span>` wrapper where the animation CSS is applied.
+   */
+  inline?: boolean;
 };
 
 const DEFAULT_DURATION = 300;
@@ -28,20 +32,32 @@ const transitionStyles: Record<string, any> = {
 };
 
 export default function FadeIn(props: FadeInProps) {
+  const {inline} = props;
+
   return (
     <Transition
       appear
       in={props.show !== undefined ? props.show : true}
       timeout={props.duration || DEFAULT_DURATION}>
-      {(transition) => (
-        <div
-          style={{
-            ...defaultStyle(props),
-            ...transitionStyles[transition],
-          }}>
-          {props.children}
-        </div>
-      )}
+      {(transition) =>
+        inline ? (
+          <span
+            style={{
+              ...defaultStyle(props),
+              ...transitionStyles[transition],
+            }}>
+            {props.children}
+          </span>
+        ) : (
+          <div
+            style={{
+              ...defaultStyle(props),
+              ...transitionStyles[transition],
+            }}>
+            {props.children}
+          </div>
+        )
+      }
     </Transition>
   );
 }

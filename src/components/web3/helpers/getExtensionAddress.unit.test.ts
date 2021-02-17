@@ -1,17 +1,17 @@
 import {AbiItem} from 'web3-utils/types';
 
-import {ContractAdapterNames} from '../types';
+import {ContractExtensionNames} from '../types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS, DEFAULT_CHAIN} from '../../../config';
-import {getAdapterAddress} from '.';
+import {getExtensionAddress} from '.';
 import {getWeb3Instance} from '../../../test/helpers';
-import DaoRegistryABI from '../../../truffle-contracts/DaoRegistry.json';
+import DAORegistryABI from '../../../truffle-contracts/DaoRegistry.json';
 
-describe('getAdapterAddress unit tests', () => {
+describe('getExtensionAddress unit tests', () => {
   test('should return correct address', async () => {
     const {web3, mockWeb3Provider} = getWeb3Instance();
     const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
     const instance = new web3.eth.Contract(
-      DaoRegistryABI as AbiItem[],
+      DAORegistryABI as AbiItem[],
       contractAddress
     );
 
@@ -22,11 +22,11 @@ describe('getAdapterAddress unit tests', () => {
       ),
     ];
 
-    // Inject Web3 result for `getAdapterAddress.call()`
+    // Inject Web3 result for `getExtensionAddress.call()`
     mockWeb3Provider.injectResult(...result);
 
-    const address = await getAdapterAddress(
-      ContractAdapterNames.onboarding,
+    const address = await getExtensionAddress(
+      ContractExtensionNames.bank,
       instance
     );
 
@@ -37,7 +37,7 @@ describe('getAdapterAddress unit tests', () => {
     let capturedError: string = '';
 
     try {
-      await getAdapterAddress(ContractAdapterNames.onboarding, undefined);
+      await getExtensionAddress(ContractExtensionNames.bank, undefined);
     } catch (error) {
       capturedError = error.message;
     }
