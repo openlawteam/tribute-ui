@@ -117,7 +117,7 @@ export default function MembershipDetails() {
           )}
           renderActions={() => (
             <ProposalWithOffchainVoteActions
-              adpaterName={ContractAdapterNames.onboarding}
+              adapterName={ContractAdapterNames.onboarding}
               proposal={proposalData}
             />
           )}

@@ -12,14 +12,14 @@ import SponsorAction from './SponsorAction';
 import ProcessAction from './ProcessAction';
 
 type ProposalWithOffchainActionsProps = {
-  adpaterName: ContractAdapterNames;
+  adapterName: ContractAdapterNames;
   proposal: ProposalData;
 };
 
 export default function ProposalWithOffchainVoteActions(
   props: ProposalWithOffchainActionsProps
 ) {
-  const {adpaterName, proposal} = props;
+  const {adapterName, proposal} = props;
 
   /**
    * Our hooks
@@ -64,14 +64,14 @@ export default function ProposalWithOffchainVoteActions(
 
         {/* OFF-CHAIN VOTING BUTTONS */}
         {status === ProposalFlowStatus.OffchainVoting && (
-          <OffchainVotingAction adapterName={adpaterName} proposal={proposal} />
+          <OffchainVotingAction adapterName={adapterName} proposal={proposal} />
         )}
 
         {/* OFF-CHAIN VOTING SUBMIT VOTE RESULT */}
         {/* @todo A wrapping component to get the correct off-chain voting component */}
         {status === ProposalFlowStatus.OffchainVotingSubmitResult && (
           <OffchainOpRollupVotingSubmitResultAction
-            adapterName={adpaterName}
+            adapterName={adapterName}
             proposal={proposal}
           />
         )}
