@@ -31,8 +31,12 @@ export function useContractPoll<T>(
    * State
    */
 
+  const [isPolling, setIsPolling] = useState<boolean>(false);
   const [pollContractData, setPollContractData] = useState<T>();
   const [pollContractError, setPollContractError] = useState<Error>();
+  const [stopPollingRequested, setStopPollingRequested] = useState<boolean>(
+    false
+  );
 
   /**
    * Cached callbacks
@@ -64,6 +68,18 @@ export function useContractPoll<T>(
   }, []);
 
   /**
+   * Check if stop polling was requested
+   * (`stopPollingContract` called but possibly before an interval could be set)
+   */
+  useEffect(() => {
+    if (intervalIdRef.current && isPolling && stopPollingRequested) {
+      clearInterval(intervalIdRef.current);
+      setStopPollingRequested(false);
+      setIsPolling(false);
+    }
+  }, [isPolling, stopPollingRequested]);
+
+  /**
    * Functions
    */
 
@@ -90,6 +106,8 @@ export function useContractPoll<T>(
         setPollContractData(responseData);
       };
 
+      setIsPolling(true);
+
       initialCallBeforeWait && intervalFunction();
 
       const intervalIdToSet = setInterval(intervalFunction, pollInterval);
@@ -101,7 +119,15 @@ export function useContractPoll<T>(
   }
 
   function stopPollingContract() {
-    intervalIdRef.current && clearInterval(intervalIdRef.current);
+    if (intervalIdRef.current) {
+      clearInterval(intervalIdRef.current);
+      setIsPolling(false);
+
+      return;
+    }
+
+    // Request stop
+    setStopPollingRequested(true);
   }
 
   return {
