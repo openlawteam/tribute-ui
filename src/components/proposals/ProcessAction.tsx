@@ -28,7 +28,7 @@ type ProcessActionProps = {
 export default function ProcessAction(props: ProcessActionProps) {
   const {
     disabled: propsDisabled,
-    proposal: {snapshotDraft},
+    proposal: {snapshotProposal},
   } = props;
 
   /**
@@ -84,15 +84,18 @@ export default function ProcessAction(props: ProcessActionProps) {
         throw new Error('No DAO Registry address was found.');
       }
 
-      if (!snapshotDraft) {
-        throw new Error('No Snapshot draft was found.');
+      if (!snapshotProposal) {
+        throw new Error('No Snapshot proposal was found.');
       }
 
-      const contract = getContractByAddress(snapshotDraft.actionId, contracts);
+      const contract = getContractByAddress(
+        snapshotProposal.actionId,
+        contracts
+      );
 
       const processArguments: ProcessArguments = [
         daoRegistryAddress,
-        snapshotDraft.idInDAO,
+        snapshotProposal.idInDAO,
       ];
 
       const txArguments = {
