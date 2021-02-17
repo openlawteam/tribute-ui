@@ -1,8 +1,11 @@
 import React from 'react';
 
+import {
+  OffchainVotingStatus,
+  OffchainVotingAction,
+  OffchainOpRollupVotingSubmitResultAction,
+} from './voting';
 import {ContractAdapterNames} from '../web3/types';
-import {OffchainOpRollupVotingSubmitResultAction} from './voting';
-import {OffchainVotingStatus, OffchainVotingAction} from './voting';
 import {ProposalData, ProposalFlowStatus} from './types';
 import {useProposalWithOffchainVoteStatus} from './hooks';
 import SponsorAction from './SponsorAction';
