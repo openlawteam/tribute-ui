@@ -21,6 +21,7 @@ import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {MetaMaskRPCError} from '../../util/types';
+import {truncateEthAddress} from '../../util/helpers';
 import {SHARES_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
@@ -381,11 +382,20 @@ export default function CreateTributeProposal() {
 
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
+        const bodyIntro =
+          applicantAddress.toLowerCase() === account.toLowerCase()
+            ? `Tribute from ${applicantAddress}.`
+            : `Tribute from ${truncateEthAddress(
+                account,
+                7
+              )} for applicant ${truncateEthAddress(applicantAddress, 7)}.`;
+        const body = description ? `${bodyIntro}\n${description}` : bodyIntro;
+
         // Sign and submit draft for snapshot-hub
         const {uniqueId} = await signAndSendProposal({
           partialProposalData: {
             name: applicantAddress,
-            body: description || `Tribute for ${applicantAddress}.`,
+            body,
             metadata: {},
           },
           adapterName: ContractAdapterNames.tribute,
@@ -687,15 +697,9 @@ export default function CreateTributeProposal() {
           <div className="form__input-row-fieldwrap">
             <textarea
               aria-describedby={`error-${Fields.description}`}
-              aria-invalid={errors.description ? 'true' : 'false'}
               name={Fields.description}
               placeholder="Say something about your tribute..."
               ref={register}
-            />
-
-            <InputError
-              error={getValidationError(Fields.description, errors)}
-              id={`error-${Fields.description}`}
             />
           </div>
         </div>
