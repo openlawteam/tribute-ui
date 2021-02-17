@@ -69,6 +69,14 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
   [CHAINS.KOVAN]: `https://kovan.etherscan.io`,
 };
 
+/**
+ * CORE CONTRACTS
+ * @note as per https://github.com/openlawteam/laoland#architecture
+ *
+ * - DAO Registry (@note uses dao address for the contract address)
+ * - DAO Factory
+ * - Bank Extension
+ */
 export const DAO_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
@@ -78,7 +86,6 @@ export const DAO_FACTORY_CONTRACT_ADDRESS = {
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_FACTORY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
-// @note dao contract address
 export const DAO_REGISTRY_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
@@ -88,7 +95,6 @@ export const DAO_REGISTRY_CONTRACT_ADDRESS = {
   [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
-// @note bank extension contract address
 export const BANK_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
@@ -98,6 +104,22 @@ export const BANK_CONTRACT_ADDRESS = {
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_BANK_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
+/**
+ * ADAPTER CONTRACTS
+ * @note as per https://github.com/openlawteam/laoland#architecture
+ *
+ * - Configuration
+ * - Managing
+ * - Onboarding
+ * - Voting
+ * - Offchain voting
+ * - Financing
+ * - Tribute
+ * - Distribute
+ * - Rage quit
+ * - Guild kick
+ * - Withdraw
+ */
 export const CONFIGURATION_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
