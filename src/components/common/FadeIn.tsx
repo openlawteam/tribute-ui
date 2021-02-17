@@ -3,7 +3,7 @@ import React from 'react';
 import {Transition} from 'react-transition-group';
 
 type FadeInProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   duration?: number;
   /**
    * Defaults to `true`
