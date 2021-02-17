@@ -2,7 +2,7 @@ import {
   CONTRACT_BANK_EXTENSION,
   CONTRACT_DAO_REGISTRY,
   CONTRACT_ONBOARDING,
-  CONTRACT_VOTING,
+  CONTRACT_VOTING_OP_ROLLUP,
 } from '../actions';
 import {ContractsState} from '../types';
 
@@ -26,7 +26,7 @@ export default function reducer(
       return contractDAORegistry(state, payload);
     case CONTRACT_ONBOARDING:
       return contractOnboarding(state, payload);
-    case CONTRACT_VOTING:
+    case CONTRACT_VOTING_OP_ROLLUP:
       return contractVoting(state, payload);
     default:
       return state;
