@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 
 import {ContractDAOConfigKeys} from '../../web3/types';
+import {CycleEllipsis} from '../../feedback';
 import {getDAOConfigEntry} from '../../web3/helpers';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
@@ -37,6 +38,8 @@ const gracePeriodEndedLabel = (
     </span>
   </span>
 );
+
+const cycleEllipsisFadeInProps = {duration: 150};
 
 /**
  * OffchainVotingStatus
@@ -117,7 +120,12 @@ export function OffchainVotingStatus({
   function renderStatus() {
     // On loading
     if (!offchainVotingStartEndInitReady) {
-      return '\u2026'; // ...
+      return (
+        <CycleEllipsis
+          intervalMs={200}
+          fadeInProps={cycleEllipsisFadeInProps}
+        />
+      );
     }
 
     // Do not show a label as we provide one in addition to the timer.
