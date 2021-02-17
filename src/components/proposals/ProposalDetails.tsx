@@ -118,10 +118,8 @@ export default function ProposalDetails(props: ProposalDetailsProps) {
         {/* SIDEBAR */}
         <div className="proposaldetails__status">
           {/* AMOUNT(S) FOR RELEVANT PROPOSALS */}
-          <div className="proposaldetails__amount">
-            {/* @todo use value(s) from proposal.subgraphproposal depending on the adapter */}
-            {showAmountBadge && renderProposalAmount()}
-          </div>
+          {/* @todo use value(s) from proposal.subgraphproposal depending on the adapter */}
+          {showAmountBadge && renderProposalAmount()}
 
           {/* SPONSOR & VOTING ACTIONS */}
           {renderActions({proposal})}
