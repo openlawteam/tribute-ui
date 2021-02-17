@@ -1,28 +1,15 @@
-import {useEffect, useState} from 'react';
-import Web3 from 'web3';
-
-import {formatDecimal} from '../../util/helpers';
-
 type ProposalAmountProps = {
   /**
    * Amount in WEI
    */
   amount: string;
+  amountUnit: string;
+  amount2?: string;
+  amount2Unit?: string;
 };
 
 export default function ProposalAmount(props: ProposalAmountProps) {
-  const {amount} = props;
-
-  const [amountETH, setAmountETH] = useState<string>();
-
-  useEffect(() => {
-    try {
-      setAmountETH(formatDecimal(Number(Web3.utils.fromWei(amount, 'ether'))));
-    } catch (error) {
-      // Fallback gracefully to ellipsis
-      setAmountETH('\u2026');
-    }
-  }, [amount]);
+  const {amount, amountUnit, amount2, amount2Unit} = props;
 
   /**
    * Render
@@ -30,7 +17,18 @@ export default function ProposalAmount(props: ProposalAmountProps) {
 
   return (
     <div className="proposaldetails__amount">
-      <span>{amountETH} ETH</span>
+      <span>
+        {amount} {amountUnit}
+        {/* assumes second amount is value requested from the DAO */}
+        {amount2 && (
+          <>
+            <br />
+            <small>for</small>
+            <br />
+            {amount2} {amount2Unit}
+          </>
+        )}
+      </span>
     </div>
   );
 }

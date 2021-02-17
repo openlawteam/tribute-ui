@@ -93,9 +93,10 @@ export default function TributeDetails() {
       <RenderWrapper>
         <ProposalDetails
           proposal={proposalData}
+          adapterName={ContractAdapterNames.tribute}
           renderActions={() => (
             <ProposalActions
-              adpaterName={ContractAdapterNames.tribute}
+              adapterName={ContractAdapterNames.tribute}
               proposal={proposalData}
             />
           )}

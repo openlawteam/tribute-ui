@@ -93,6 +93,7 @@ export default function MembershipDetails() {
       <RenderWrapper>
         <ProposalDetails
           proposal={proposalData}
+          adapterName={ContractAdapterNames.onboarding}
           renderActions={() => (
             <ProposalWithOffchainVoteActions
               adpaterName={ContractAdapterNames.onboarding}

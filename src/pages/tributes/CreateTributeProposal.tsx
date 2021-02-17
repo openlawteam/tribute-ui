@@ -396,7 +396,11 @@ export default function CreateTributeProposal() {
           partialProposalData: {
             name: applicantAddress,
             body,
-            metadata: {},
+            metadata: {
+              tributeAmountUnit: erc20Details.symbol,
+              tributeTokenDecimals: erc20Details.decimals,
+              requestAmountUnit: 'SHARES',
+            },
           },
           adapterName: ContractAdapterNames.tribute,
           type: SnapshotType.draft,
