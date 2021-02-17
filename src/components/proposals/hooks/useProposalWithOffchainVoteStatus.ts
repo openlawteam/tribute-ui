@@ -71,6 +71,7 @@ export function useProposalWithOffchainVoteStatus(
   const {
     pollContract: pollProposal,
     pollContractData: daoProposal,
+    stopPollingContract: stopPollProposal,
   } = useContractPoll<UseProposalWithOffchainVoteStatusReturn['daoProposal']>({
     pollInterval: 5000,
   });
@@ -78,6 +79,7 @@ export function useProposalWithOffchainVoteStatus(
   const {
     pollContract: pollProposalVoteResult,
     pollContractData: daoProposalVoteResult,
+    stopPollingContract: stopPollProposalVoteResult,
   } = useContractPoll<
     UseProposalWithOffchainVoteStatusReturn['daoProposalVoteResult']
   >({
@@ -87,6 +89,7 @@ export function useProposalWithOffchainVoteStatus(
   const {
     pollContract: pollProposalVotes,
     pollContractData: daoProposalVotes,
+    stopPollingContract: stopPollProposalVotes,
   } = useContractPoll<
     UseProposalWithOffchainVoteStatusReturn['daoProposalVotes']
   >({
@@ -163,6 +166,20 @@ export function useProposalWithOffchainVoteStatus(
     offchainVotingMethods,
     pollProposalVotes,
     proposalId,
+  ]);
+
+  // Stop polling if processed
+  useEffect(() => {
+    if (atProcessedInDAO) {
+      stopPollProposal();
+      stopPollProposalVoteResult();
+      stopPollProposalVotes();
+    }
+  }, [
+    atProcessedInDAO,
+    stopPollProposal,
+    stopPollProposalVoteResult,
+    stopPollProposalVotes,
   ]);
 
   /**
