@@ -15,15 +15,17 @@ type ContractAction =
   | typeof CONTRACT_DAO_REGISTRY
   | typeof CONTRACT_VOTING_OP_ROLLUP
   | typeof CONTRACT_ONBOARDING
-  | typeof CONTRACT_BANK_EXTENSION;
+  | typeof CONTRACT_BANK_EXTENSION
+  | typeof CONTRACT_TRIBUTE;
 
 export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
 export const CONTRACT_VOTING_OP_ROLLUP = 'CONTRACT_VOTING_OP_ROLLUP';
 export const CONTRACT_ONBOARDING = 'CONTRACT_ONBOARDING';
 export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
+export const CONTRACT_TRIBUTE = 'CONTRACT_TRIBUTE';
 
 /**
- * @todo Add inits for Transfer and Tribute when ready
+ * @todo Add init for Transfer when ready
  */
 
 export function initContractDaoRegistry(web3Instance: Web3) {
@@ -167,6 +169,43 @@ export function initContractBankExtension(web3Instance: Web3) {
           createContractAction({
             type: CONTRACT_BANK_EXTENSION,
             abi: bankExtensionContract,
+            contractAddress,
+            instance,
+          })
+        );
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+}
+
+export function initContractTribute(web3Instance: Web3) {
+  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
+    try {
+      if (web3Instance) {
+        const {default: lazyTributeABI} = await import(
+          '../../truffle-contracts/TributeContract.json'
+        );
+        const tributeContract: AbiItem[] = lazyTributeABI as any;
+        /**
+         * Get address via DAO Registry.
+         *
+         * @note The `DaoRegistryContract` must be set in Redux first.
+         */
+        const contractAddress = await getAdapterAddress(
+          ContractAdapterNames.tribute,
+          getState().contracts.DaoRegistryContract?.instance
+        );
+        const instance = new web3Instance.eth.Contract(
+          tributeContract,
+          contractAddress
+        );
+
+        dispatch(
+          createContractAction({
+            type: CONTRACT_TRIBUTE,
+            abi: tributeContract,
             contractAddress,
             instance,
           })

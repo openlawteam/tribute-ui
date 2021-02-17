@@ -218,7 +218,7 @@ export default function CreateMembershipProposal() {
           partialProposalData: {
             name: ethAddress,
             body: `Membership for ${ethAddress}.`,
-            metadata: {},
+            metadata: {amountUnit: 'ETH'},
           },
           adapterName: ContractAdapterNames.onboarding,
           type: SnapshotType.draft,

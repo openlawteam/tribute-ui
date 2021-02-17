@@ -1,7 +1,9 @@
 import React from 'react';
 import {useHistory, useParams} from 'react-router-dom';
+import Web3 from 'web3';
 
 import {AsyncStatus} from '../../util/types';
+import {formatDecimal} from '../../util/helpers';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
@@ -9,6 +11,7 @@ import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 import NotFound from '../subpages/NotFound';
 import ProposalWithOffchainVoteActions from '../../components/proposals/ProposalWithOffchainVoteActions';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
+import ProposalAmount from '../../components/proposals/ProposalAmount';
 import Wrap from '../../components/common/Wrap';
 import {ContractAdapterNames} from '../../components/web3/types';
 
@@ -89,13 +92,32 @@ export default function MembershipDetails() {
 
   // Render proposal
   if (proposalData) {
+    const {daoProposal} = proposalData;
+    const commonData = proposalData.getCommonSnapshotProposalData();
+
+    // @todo use amount from proposal.subgraphproposal
+    let amount = '\u2026';
+    try {
+      amount = formatDecimal(
+        Number(Web3.utils.fromWei(daoProposal?.amount, 'ether'))
+      );
+    } catch (error) {
+      // Fallback gracefully to ellipsis
+    }
+
     return (
       <RenderWrapper>
         <ProposalDetails
           proposal={proposalData}
+          renderAmountBadge={() => (
+            <ProposalAmount
+              amount={amount}
+              amountUnit={commonData?.msg.payload.metadata.amountUnit}
+            />
+          )}
           renderActions={() => (
             <ProposalWithOffchainVoteActions
-              adpaterName={ContractAdapterNames.onboarding}
+              adapterName={ContractAdapterNames.onboarding}
               proposal={proposalData}
             />
           )}

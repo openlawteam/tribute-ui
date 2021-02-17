@@ -1,12 +1,13 @@
 import {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
 
-// @todo Add inits for Transfer and Tribute when ready
+// @todo Add init for Transfer when ready
 import {
   initContractBankExtension,
   initContractDaoRegistry,
   initContractVotingOpRollup,
   initContractOnboarding,
+  initContractTribute,
 } from '../../../store/actions';
 import {ReduxDispatch} from '../../../store/types';
 import {useIsDefaultChain} from './useIsDefaultChain';
@@ -54,8 +55,9 @@ export function useInitContracts() {
       await dispatch(initContractVotingOpRollup(web3Instance));
       await dispatch(initContractOnboarding(web3Instance));
       await dispatch(initContractBankExtension(web3Instance));
+      await dispatch(initContractTribute(web3Instance));
 
-      // @todo Add inits for Transfer and Tribute when ready
+      // @todo Add init for Transfer when ready
     } catch (error) {
       throw error;
     }

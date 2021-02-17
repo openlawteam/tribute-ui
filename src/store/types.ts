@@ -7,6 +7,7 @@ export type ContractsState = {
   BankExtensionContract: ContractsStateEntry | null;
   DaoRegistryContract: ContractsStateEntry | null;
   OnboardingContract: ContractsStateEntry | null;
+  TributeContract: ContractsStateEntry | null;
   VotingContract: ContractsStateEntry | null;
 };
 

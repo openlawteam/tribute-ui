@@ -45,6 +45,8 @@ export function getAdapterAddressFromContracts(
         return getContractAddressOrThrow(contracts.OnboardingContract);
       case ContractAdapterNames.ragequit:
         return '';
+      case ContractAdapterNames.tribute:
+        return getContractAddressOrThrow(contracts.TributeContract);
       default:
         throw new Error(`Contract address was not found in the store.`);
     }
