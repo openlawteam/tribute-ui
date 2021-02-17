@@ -40,10 +40,14 @@ export function getConnectedMember(
         .getCurrentDelegateKey(memberAddressByDelegateKey)
         .call({from: account});
 
+      const isActiveMemberChecks: boolean =
+        isActiveMember &&
+        !memberAddressByDelegateKey.startsWith('0x0000000000');
+
       dispatch(
         setConnectedMember({
           delegateKey: currentDelegateKey,
-          isActiveMember,
+          isActiveMember: isActiveMemberChecks,
           memberAddress: memberAddressByDelegateKey,
         })
       );
