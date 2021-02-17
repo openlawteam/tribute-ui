@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {ContractAdapterNames} from '../web3/types';
-import {CycleEllipsis} from '../feedback';
 import {OffchainOpRollupVotingSubmitResultAction} from './voting';
 import {OffchainVotingStatus, OffchainVotingAction} from './voting';
 import {ProposalData, ProposalFlowStatus} from './types';
