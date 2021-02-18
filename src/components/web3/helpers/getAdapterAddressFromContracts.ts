@@ -22,8 +22,6 @@ function getContractAddressOrThrow(
  *
  * Gets an adapter's address by its name (`type ContractAdapterNames`) from the Redux contracts state slice.
  *
- * @note This is mainly for Adapters which submit proposals other than voting, so we have not included voting.
- *
  * @param {string} name
  * @param {StoreState['contracts']} contracts
  */
@@ -40,13 +38,15 @@ export function getAdapterAddressFromContracts(
       case ContractAdapterNames.guildkick:
         return '';
       case ContractAdapterNames.managing:
-        return '';
+        return getContractAddressOrThrow(contracts.ManagingContract);
       case ContractAdapterNames.onboarding:
         return getContractAddressOrThrow(contracts.OnboardingContract);
       case ContractAdapterNames.ragequit:
         return '';
       case ContractAdapterNames.tribute:
         return getContractAddressOrThrow(contracts.TributeContract);
+      case ContractAdapterNames.voting:
+        return getContractAddressOrThrow(contracts.VotingContract);
       default:
         throw new Error(`Contract address was not found in the store.`);
     }

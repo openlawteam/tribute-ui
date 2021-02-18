@@ -9,6 +9,9 @@ import Wrapper from '../../../test/Wrapper';
 describe('useSignAndSendVote unit tests', () => {
   test('should return correct data when calling signAndSendVote', async () => {
     await act(async () => {
+      let provider: any;
+      let web3: any;
+
       const {result, waitForNextUpdate} = renderHook(
         () => useSignAndSendVote(),
         {
@@ -16,6 +19,10 @@ describe('useSignAndSendVote unit tests', () => {
             useInit: true,
             useWallet: true,
             mockMetaMaskRequest: true,
+            getProps: ({mockWeb3Provider, web3Instance}) => {
+              provider = mockWeb3Provider;
+              web3 = web3Instance;
+            },
           },
           wrapper: Wrapper,
         }
@@ -33,6 +40,10 @@ describe('useSignAndSendVote unit tests', () => {
 
       // Call signAndSendVote
       act(() => {
+        // @note For signing ERC712 with MetaMask's API provider.request
+        provider.request = async () =>
+          web3.eth.abi.encodeParameter('uint256', 123);
+
         result.current.signAndSendVote({
           partialVoteData: {choice: VoteChoices.Yes},
           adapterName: ContractAdapterNames.onboarding,
@@ -88,6 +99,9 @@ describe('useSignAndSendVote unit tests', () => {
 
   test('should return correct data when calling signAndSendVote with delegate address', async () => {
     await act(async () => {
+      let provider: any;
+      let web3: any;
+
       const {result, waitForNextUpdate} = renderHook(
         () => useSignAndSendVote(),
         {
@@ -95,6 +109,10 @@ describe('useSignAndSendVote unit tests', () => {
             useInit: true,
             useWallet: true,
             mockMetaMaskRequest: true,
+            getProps: ({mockWeb3Provider, web3Instance}) => {
+              provider = mockWeb3Provider;
+              web3 = web3Instance;
+            },
           },
           wrapper: Wrapper,
         }
@@ -112,6 +130,10 @@ describe('useSignAndSendVote unit tests', () => {
 
       // Call signAndSendVote
       act(() => {
+        // @note For signing ERC712 with MetaMask's API provider.request
+        provider.request = async () =>
+          web3.eth.abi.encodeParameter('uint256', 123);
+
         result.current.signAndSendVote({
           partialVoteData: {
             choice: VoteChoices.Yes,

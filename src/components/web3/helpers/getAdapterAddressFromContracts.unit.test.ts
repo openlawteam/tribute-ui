@@ -21,14 +21,35 @@ describe('getAdapterAddressFromContracts unit tests', () => {
     // Wait for contracts to load
     await waitFor(() => {
       Object.keys(store.getState().contracts).forEach((c) => {
-        expect(c).not.toBeUndefined();
-        expect(c).not.toBeNull();
+        expect(store.getState().contracts[c]).not.toBeUndefined();
+        expect(store.getState().contracts[c]).not.toBeNull();
       });
     });
 
     expect(
       getAdapterAddressFromContracts(
         ContractAdapterNames.onboarding,
+        store.getState().contracts
+      )
+    ).toBe(DEFAULT_ETH_ADDRESS);
+
+    expect(
+      getAdapterAddressFromContracts(
+        ContractAdapterNames.tribute,
+        store.getState().contracts
+      )
+    ).toBe(DEFAULT_ETH_ADDRESS);
+
+    expect(
+      getAdapterAddressFromContracts(
+        ContractAdapterNames.managing,
+        store.getState().contracts
+      )
+    ).toBe(DEFAULT_ETH_ADDRESS);
+
+    expect(
+      getAdapterAddressFromContracts(
+        ContractAdapterNames.voting,
         store.getState().contracts
       )
     ).toBe(DEFAULT_ETH_ADDRESS);
@@ -60,33 +81,9 @@ describe('getAdapterAddressFromContracts unit tests', () => {
     // @todo Need to implement Adapter
     expect(
       getAdapterAddressFromContracts(
-        ContractAdapterNames.managing,
-        store.getState().contracts
-      )
-    ).toBe('');
-
-    // @todo Need to implement Adapter
-    expect(
-      getAdapterAddressFromContracts(
         ContractAdapterNames.ragequit,
         store.getState().contracts
       )
     ).toBe('');
-
-    // Should throw for voting adapters
-    expect(() =>
-      getAdapterAddressFromContracts(
-        ContractAdapterNames.voting,
-        store.getState().contracts
-      )
-    ).toThrow();
-
-    // Should throw for voting adapters
-    expect(() =>
-      getAdapterAddressFromContracts(
-        ContractAdapterNames.offchainvoting,
-        store.getState().contracts
-      )
-    ).toThrow();
   });
 });

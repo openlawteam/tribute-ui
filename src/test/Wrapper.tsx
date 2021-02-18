@@ -2,7 +2,7 @@ import {Store} from 'redux';
 import {MemoryRouter} from 'react-router-dom';
 import {provider as Web3Provider} from 'web3-core/types';
 import {Provider} from 'react-redux';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import Web3 from 'web3';
 
 import {
@@ -20,6 +20,7 @@ import * as getExtensionAddressToMock from '../components/web3/helpers/getExtens
 import {CHAINS as mockChains} from '../config';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider, getNewStore} from './helpers';
 import Init, {InitError} from '../Init';
+import ManagingABI from '../truffle-contracts/ManagingContract.json';
 
 export type WrapperReturnProps = {
   mockWeb3Provider: FakeHttpProvider;
@@ -150,17 +151,6 @@ export default function Wrapper(
     };
   }, [getExtensionAddressMock]);
 
-  useEffect(() => {
-    // @note For signing ERC712 with MetaMask's API provider.request
-    mockMetaMaskRequest &&
-      ((mockWeb3Provider as any).request = async () =>
-        web3Instance.eth.abi.encodeParameter('uint256', 123));
-
-    return () => {
-      mockMetaMaskRequest && delete (mockWeb3Provider as any).request;
-    };
-  }, [mockMetaMaskRequest, mockWeb3Provider, web3Instance.eth.abi]);
-
   // Inject initial results for calls made via getConnectedMember
   useEffect(() => {
     if (!useWallet) return;
@@ -170,6 +160,16 @@ export default function Wrapper(
     );
     mockWeb3Provider.injectResult(...isActiveMember({web3Instance}));
     mockWeb3Provider.injectResult(...getCurrentDelegateKey({web3Instance}));
+  }, [mockWeb3Provider, useWallet, web3Instance]);
+
+  // Inject result for getting voting adapter name via `initContracts`
+  useEffect(() => {
+    if (!useWallet) return;
+
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameter('string', 'OffchainVotingContract'),
+      {abi: ManagingABI, abiMethodName: 'getVotingAdapterName'}
+    );
   }, [mockWeb3Provider, useWallet, web3Instance]);
 
   /**
