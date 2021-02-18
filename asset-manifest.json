@@ -1,0 +1,38 @@
+{
+  "files": {
+    "main.css": "/tribute/static/css/main.4c34d149.chunk.css",
+    "main.js": "/tribute/static/js/main.7a4d2d33.chunk.js",
+    "main.js.map": "/tribute/static/js/main.7a4d2d33.chunk.js.map",
+    "runtime-main.js": "/tribute/static/js/runtime-main.73463cd1.js",
+    "runtime-main.js.map": "/tribute/static/js/runtime-main.73463cd1.js.map",
+    "static/css/2.ec02d681.chunk.css": "/tribute/static/css/2.ec02d681.chunk.css",
+    "static/js/2.3d136578.chunk.js": "/tribute/static/js/2.3d136578.chunk.js",
+    "static/js/2.3d136578.chunk.js.map": "/tribute/static/js/2.3d136578.chunk.js.map",
+    "static/js/3.74a43d3d.chunk.js": "/tribute/static/js/3.74a43d3d.chunk.js",
+    "static/js/3.74a43d3d.chunk.js.map": "/tribute/static/js/3.74a43d3d.chunk.js.map",
+    "static/js/4.19cd2147.chunk.js": "/tribute/static/js/4.19cd2147.chunk.js",
+    "static/js/4.19cd2147.chunk.js.map": "/tribute/static/js/4.19cd2147.chunk.js.map",
+    "static/js/5.56a3e8d5.chunk.js": "/tribute/static/js/5.56a3e8d5.chunk.js",
+    "static/js/5.56a3e8d5.chunk.js.map": "/tribute/static/js/5.56a3e8d5.chunk.js.map",
+    "static/js/6.4187073d.chunk.js": "/tribute/static/js/6.4187073d.chunk.js",
+    "static/js/6.4187073d.chunk.js.map": "/tribute/static/js/6.4187073d.chunk.js.map",
+    "static/js/7.3dc5a1eb.chunk.js": "/tribute/static/js/7.3dc5a1eb.chunk.js",
+    "static/js/7.3dc5a1eb.chunk.js.map": "/tribute/static/js/7.3dc5a1eb.chunk.js.map",
+    "static/js/8.00d40247.chunk.js": "/tribute/static/js/8.00d40247.chunk.js",
+    "static/js/8.00d40247.chunk.js.map": "/tribute/static/js/8.00d40247.chunk.js.map",
+    "static/js/9.2f450169.chunk.js": "/tribute/static/js/9.2f450169.chunk.js",
+    "static/js/9.2f450169.chunk.js.map": "/tribute/static/js/9.2f450169.chunk.js.map",
+    "index.html": "/tribute/index.html",
+    "static/css/2.ec02d681.chunk.css.map": "/tribute/static/css/2.ec02d681.chunk.css.map",
+    "static/css/main.4c34d149.chunk.css.map": "/tribute/static/css/main.4c34d149.chunk.css.map",
+    "static/js/2.3d136578.chunk.js.LICENSE.txt": "/tribute/static/js/2.3d136578.chunk.js.LICENSE.txt",
+    "static/media/style.scss": "/tribute/static/media/mirage.045b99c1.gif"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.73463cd1.js",
+    "static/css/2.ec02d681.chunk.css",
+    "static/js/2.3d136578.chunk.js",
+    "static/css/main.4c34d149.chunk.css",
+    "static/js/main.7a4d2d33.chunk.js"
+  ]
+}
