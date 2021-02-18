@@ -1,7 +1,6 @@
 import {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
 
-// @todo Add init for Transfer when ready
 import {
   initContractBankExtension,
   initContractDaoRegistry,
