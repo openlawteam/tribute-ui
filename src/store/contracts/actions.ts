@@ -281,18 +281,6 @@ export function initContractManaging(web3Instance: Web3) {
   };
 }
 
-function createContractAction({
-  type,
-  ...payload
-}: {
-  type: ContractAction;
-} & ContractsStateEntry) {
-  return {
-    type,
-    ...payload,
-  };
-}
-
 /**
  * Inits the currently registered `voting` contract.
  *
@@ -353,5 +341,17 @@ export function initRegisteredVotingAdapter(web3Instance: Web3) {
     } catch (error) {
       throw error;
     }
+  };
+}
+
+function createContractAction({
+  type,
+  ...payload
+}: {
+  type: ContractAction;
+} & ContractsStateEntry) {
+  return {
+    type,
+    ...payload,
   };
 }
