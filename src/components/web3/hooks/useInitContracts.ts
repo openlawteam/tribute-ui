@@ -5,9 +5,10 @@ import {useDispatch} from 'react-redux';
 import {
   initContractBankExtension,
   initContractDaoRegistry,
-  initContractVotingOpRollup,
+  initContractManaging,
   initContractOnboarding,
   initContractTribute,
+  initContractVotingOpRollup,
 } from '../../../store/actions';
 import {ReduxDispatch} from '../../../store/types';
 import {useIsDefaultChain} from './useIsDefaultChain';
@@ -56,6 +57,8 @@ export function useInitContracts() {
       await dispatch(initContractOnboarding(web3Instance));
       await dispatch(initContractBankExtension(web3Instance));
       await dispatch(initContractTribute(web3Instance));
+      await dispatch(initContractTribute(web3Instance));
+      await dispatch(initContractManaging(web3Instance));
 
       // @todo Add init for Transfer when ready
     } catch (error) {

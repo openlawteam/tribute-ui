@@ -1,6 +1,7 @@
 import {
   CONTRACT_BANK_EXTENSION,
   CONTRACT_DAO_REGISTRY,
+  CONTRACT_MANAGING,
   CONTRACT_ONBOARDING,
   CONTRACT_TRIBUTE,
   CONTRACT_VOTING_OP_ROLLUP,
@@ -10,9 +11,10 @@ import {ContractsState} from '../types';
 const initialState = {
   BankExtensionContract: null,
   DaoRegistryContract: null,
-  VotingContract: null,
+  ManagingContract: null,
   OnboardingContract: null,
   TributeContract: null,
+  VotingContract: null,
 };
 
 export default function reducer(
@@ -32,6 +34,8 @@ export default function reducer(
       return contractTribute(state, payload);
     case CONTRACT_VOTING_OP_ROLLUP:
       return contractVoting(state, payload);
+    case CONTRACT_MANAGING:
+      return contractManaging(state, payload);
     default:
       return state;
   }
@@ -64,4 +68,8 @@ function contractTribute(state: ContractsState, payload: any): ContractsState {
 
 function contractVoting(state: ContractsState, payload: any): ContractsState {
   return {...state, VotingContract: {...payload}};
+}
+
+function contractManaging(state: ContractsState, payload: any): ContractsState {
+  return {...state, ManagingContract: {...payload}};
 }

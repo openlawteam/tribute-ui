@@ -6,6 +6,7 @@ import {Contract as Web3Contract} from 'web3-eth-contract/types';
 export type ContractsState = {
   BankExtensionContract: ContractsStateEntry | null;
   DaoRegistryContract: ContractsStateEntry | null;
+  ManagingContract: ContractsStateEntry | null;
   OnboardingContract: ContractsStateEntry | null;
   TributeContract: ContractsStateEntry | null;
   VotingContract: ContractsStateEntry | null;
