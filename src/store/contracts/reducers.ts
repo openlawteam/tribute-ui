@@ -4,6 +4,7 @@ import {
   CONTRACT_MANAGING,
   CONTRACT_ONBOARDING,
   CONTRACT_TRIBUTE,
+  CONTRACT_VOTING,
   CONTRACT_VOTING_OP_ROLLUP,
 } from '../actions';
 import {ContractsState} from '../types';
@@ -32,6 +33,8 @@ export default function reducer(
       return contractOnboarding(state, payload);
     case CONTRACT_TRIBUTE:
       return contractTribute(state, payload);
+    case CONTRACT_VOTING:
+      return contractVoting(state, payload);
     case CONTRACT_VOTING_OP_ROLLUP:
       return contractVoting(state, payload);
     case CONTRACT_MANAGING:

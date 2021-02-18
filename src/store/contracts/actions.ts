@@ -17,6 +17,7 @@ type ContractAction =
   | typeof CONTRACT_MANAGING
   | typeof CONTRACT_ONBOARDING
   | typeof CONTRACT_TRIBUTE
+  | typeof CONTRACT_VOTING
   | typeof CONTRACT_VOTING_OP_ROLLUP;
 
 export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
@@ -24,6 +25,7 @@ export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
 export const CONTRACT_MANAGING = 'CONTRACT_MANAGING';
 export const CONTRACT_ONBOARDING = 'CONTRACT_ONBOARDING';
 export const CONTRACT_TRIBUTE = 'CONTRACT_TRIBUTE';
+export const CONTRACT_VOTING = 'CONTRACT_VOTING';
 export const CONTRACT_VOTING_OP_ROLLUP = 'CONTRACT_VOTING_OP_ROLLUP';
 
 /**
@@ -65,7 +67,50 @@ export function initContractDaoRegistry(web3Instance: Web3) {
   };
 }
 
-export function initContractVotingOpRollup(web3Instance: Web3) {
+export function initContractVoting(web3Instance: Web3, votingAddress?: string) {
+  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
+    try {
+      if (web3Instance) {
+        const {default: lazyVotingABI} = await import(
+          '../../truffle-contracts/VotingContract.json'
+        );
+        const votingContract: AbiItem[] = lazyVotingABI as any;
+
+        /**
+         * Uses `address` if provided;
+         * mainly for use with `initRegisteredVotingAdapter`.
+         */
+        const contractAddress =
+          votingAddress ||
+          (await getAdapterAddress(
+            ContractAdapterNames.voting,
+            getState().contracts.DaoRegistryContract?.instance
+          ));
+
+        const instance = new web3Instance.eth.Contract(
+          votingContract,
+          contractAddress
+        );
+
+        dispatch(
+          createContractAction({
+            type: CONTRACT_VOTING_OP_ROLLUP,
+            abi: votingContract,
+            contractAddress,
+            instance,
+          })
+        );
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+}
+
+export function initContractVotingOpRollup(
+  web3Instance: Web3,
+  votingAddress?: string
+) {
   return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
@@ -74,10 +119,17 @@ export function initContractVotingOpRollup(web3Instance: Web3) {
         );
         const offchainVotingContract: AbiItem[] = lazyOffchainVotingABI as any;
 
-        const contractAddress = await getAdapterAddress(
-          ContractAdapterNames.voting,
-          getState().contracts.DaoRegistryContract?.instance
-        );
+        /**
+         * Uses `address` if provided;
+         * mainly for use with `initRegisteredVotingAdapter`.
+         */
+        const contractAddress =
+          votingAddress ||
+          (await getAdapterAddress(
+            ContractAdapterNames.voting,
+            getState().contracts.DaoRegistryContract?.instance
+          ));
+
         const instance = new web3Instance.eth.Contract(
           offchainVotingContract,
           contractAddress
@@ -131,12 +183,6 @@ export function initContractOnboarding(web3Instance: Web3) {
   };
 }
 
-/**
- * @note
- *   Once subgraph is implemented we may not need this.
- *   Currently it is used for getting voting weight before
- *   submitting the off-chain result on-chain.
- */
 export function initContractBankExtension(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
@@ -244,5 +290,68 @@ function createContractAction({
   return {
     type,
     ...payload,
+  };
+}
+
+/**
+ * Inits the currently registered `voting` contract.
+ *
+ * @note The DaoRegistry and Managing contracts must be initialised beforehand.
+ */
+export function initRegisteredVotingAdapter(web3Instance: Web3) {
+  return async function (_dispatch: Dispatch<any>, getState: () => StoreState) {
+    try {
+      if (web3Instance) {
+        const daoRegistryInstance = getState().contracts.DaoRegistryContract
+          ?.instance;
+        const managingInstance = getState().contracts.ManagingContract
+          ?.instance;
+
+        if (!daoRegistryInstance) {
+          throw new Error(
+            'Please init the DaoRegistry contract before the voting contract.'
+          );
+        }
+
+        if (!managingInstance) {
+          throw new Error(
+            'Please init the Managing contract before the voting contract.'
+          );
+        }
+
+        // @todo Try to use multi-call for the below calls?
+        const votingContractAddress = await getAdapterAddress(
+          ContractAdapterNames.voting,
+          daoRegistryInstance
+        );
+
+        const votingAdapterName = await managingInstance.methods
+          .getVotingAdapterName(
+            getState().contracts.DaoRegistryContract?.contractAddress
+          )
+          .call();
+
+        /**
+         * @todo Move voting adapter enum names (see contracts: `ADAPTER_NAME`)
+         *   to an appropriate adapter config file.
+         */
+        switch (votingAdapterName) {
+          case 'VotingContract':
+            return await initContractVoting(
+              web3Instance,
+              votingContractAddress
+            )(_dispatch, getState);
+          case 'OffchainVotingContract':
+            return await initContractVotingOpRollup(
+              web3Instance,
+              votingContractAddress
+            )(_dispatch, getState);
+          default:
+            throw new Error('Voting contract name could not be found.');
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
   };
 }
