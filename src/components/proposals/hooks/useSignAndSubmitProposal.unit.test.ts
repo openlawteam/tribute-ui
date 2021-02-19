@@ -7,11 +7,13 @@ import {snapshotAPISubmitMessage} from '../../../test/restResponses';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useSignAndSubmitProposal} from '.';
 import Wrapper from '../../../test/Wrapper';
-import {DEFAULT_DAO_REGISTRY_ADDRESS} from '../../../test/helpers';
 
 describe('useSignAndSubmitProposal unit tests', () => {
   test('hook states should be correct when signing & sending (Draft)', async () => {
     await act(async () => {
+      let provider: any;
+      let web3: any;
+
       const {result, waitForNextUpdate} = renderHook(
         () => useSignAndSubmitProposal(),
         {
@@ -19,6 +21,10 @@ describe('useSignAndSubmitProposal unit tests', () => {
             useInit: true,
             useWallet: true,
             mockMetaMaskRequest: true,
+            getProps: ({mockWeb3Provider, web3Instance}) => {
+              provider = mockWeb3Provider;
+              web3 = web3Instance;
+            },
           },
           wrapper: Wrapper,
         }
@@ -38,6 +44,10 @@ describe('useSignAndSubmitProposal unit tests', () => {
 
       // Call signAndSendProposal
       act(() => {
+        // @note For signing ERC712 with MetaMask's API provider.request
+        provider.request = async () =>
+          web3.eth.abi.encodeParameter('uint256', 123);
+
         result.current.signAndSendProposal({
           partialProposalData: {
             name: 'Test Name',
@@ -118,6 +128,9 @@ describe('useSignAndSubmitProposal unit tests', () => {
     );
 
     await act(async () => {
+      let provider: any;
+      let web3: any;
+
       const {result, waitForNextUpdate} = renderHook(
         () => useSignAndSubmitProposal(),
         {
@@ -125,6 +138,10 @@ describe('useSignAndSubmitProposal unit tests', () => {
             useInit: true,
             useWallet: true,
             mockMetaMaskRequest: true,
+            getProps: ({mockWeb3Provider, web3Instance}) => {
+              provider = mockWeb3Provider;
+              web3 = web3Instance;
+            },
           },
           wrapper: Wrapper,
         }
@@ -144,6 +161,10 @@ describe('useSignAndSubmitProposal unit tests', () => {
 
       // Call signAndSendProposal
       act(() => {
+        // @note For signing ERC712 with MetaMask's API provider.request
+        provider.request = async () =>
+          web3.eth.abi.encodeParameter('uint256', 123);
+
         result.current.signAndSendProposal({
           partialProposalData: {
             name: 'Test Name',
@@ -224,11 +245,18 @@ describe('useSignAndSubmitProposal unit tests', () => {
 
   test('should return correct data when calling actions (Draft)', async () => {
     await act(async () => {
+      let provider: any;
+      let web3: any;
+
       const {result} = renderHook(() => useSignAndSubmitProposal(), {
         initialProps: {
           useInit: true,
           useWallet: true,
           mockMetaMaskRequest: true,
+          getProps: ({mockWeb3Provider, web3Instance}) => {
+            provider = mockWeb3Provider;
+            web3 = web3Instance;
+          },
         },
         wrapper: Wrapper,
       });
@@ -236,6 +264,10 @@ describe('useSignAndSubmitProposal unit tests', () => {
       await new Promise((r) => {
         setTimeout(r, 1000);
       });
+
+      // @note For signing ERC712 with MetaMask's API provider.request
+      provider.request = async () =>
+        web3.eth.abi.encodeParameter('uint256', 123);
 
       // Call signAndSendProposal
       const {
@@ -293,11 +325,18 @@ describe('useSignAndSubmitProposal unit tests', () => {
     );
 
     await act(async () => {
+      let provider: any;
+      let web3: any;
+
       const {result} = renderHook(() => useSignAndSubmitProposal(), {
         initialProps: {
           useInit: true,
           useWallet: true,
           mockMetaMaskRequest: true,
+          getProps: ({mockWeb3Provider, web3Instance}) => {
+            provider = mockWeb3Provider;
+            web3 = web3Instance;
+          },
         },
         wrapper: Wrapper,
       });
@@ -305,6 +344,10 @@ describe('useSignAndSubmitProposal unit tests', () => {
       await new Promise((r) => {
         setTimeout(r, 1000);
       });
+
+      // @note For signing ERC712 with MetaMask's API provider.request
+      provider.request = async () =>
+        web3.eth.abi.encodeParameter('uint256', 123);
 
       // Call signAndSendProposal
       const {

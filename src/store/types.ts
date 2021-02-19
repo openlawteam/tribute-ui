@@ -18,6 +18,7 @@ export type ContractsState = {
   RagequitContract: ContractsStateEntry | null;
   BankExtensionContract: ContractsStateEntry | null;
   OnboardingContract: ContractsStateEntry | null;
+  TributeContract: ContractsStateEntry | null;
   VotingContract: ContractsStateEntry | null;
 };
 

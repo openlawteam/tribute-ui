@@ -10,7 +10,10 @@ import {
   CONTRACT_NONVOTING_ONBOARDING,
   CONTRACT_MANAGING,
   CONTRACT_RAGEQUIT,
-  // CONTRACT_VOTING,
+  CONTRACT_MANAGING,
+  CONTRACT_ONBOARDING,
+  CONTRACT_TRIBUTE,
+  CONTRACT_VOTING,
   CONTRACT_VOTING_OP_ROLLUP,
 } from '../actions';
 import {ContractsState} from '../types';
@@ -24,11 +27,12 @@ const initialState = {
   GuildBankContract: null,
   OffchainVotingContract: null,
   BankExtensionContract: null,
-  VotingContract: null,
   OnboardingContract: null,
   NonVotingOnboadingContract: null,
   ManagingContract: null,
   RagequitContract: null,
+  TributeContract: null,
+  VotingContract: null,
 };
 
 export default function reducer(
@@ -59,6 +63,10 @@ export default function reducer(
     // case CONTRACT_VOTING:
     case CONTRACT_ONBOARDING:
       return contractOnboarding(state, payload);
+    case CONTRACT_TRIBUTE:
+      return contractTribute(state, payload);
+    case CONTRACT_VOTING:
+      return contractVoting(state, payload);
     case CONTRACT_VOTING_OP_ROLLUP:
       return contractVoting(state, payload);
     case CONTRACT_OFFCHAIN_VOTING:
@@ -107,14 +115,17 @@ function contractNonVotingOnboarding(state: ContractsState, payload: any) {
   return {...state, NonVotingOnboadingContract: {...payload}};
 }
 
-function contractManaging(state: ContractsState, payload: any) {
-  return {...state, ManagingContract: {...payload}};
-}
-
 function contractRagequit(state: ContractsState, payload: any) {
   return {...state, RagequitContract: {...payload}};
+
+function contractTribute(state: ContractsState, payload: any): ContractsState {
+  return {...state, TributeContract: {...payload}};
 }
 
 function contractVoting(state: ContractsState, payload: any): ContractsState {
   return {...state, VotingContract: {...payload}};
+}
+
+function contractManaging(state: ContractsState, payload: any): ContractsState {
+  return {...state, ManagingContract: {...payload}};
 }

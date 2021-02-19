@@ -96,6 +96,25 @@
         "internalType": "contract DaoRegistry",
         "name": "dao",
         "type": "address"
+      }
+    ],
+    "name": "getVotingAdapterName",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract DaoRegistry",
+        "name": "dao",
+        "type": "address"
       },
       {
         "internalType": "bytes32",

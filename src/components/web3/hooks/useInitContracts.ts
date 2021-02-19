@@ -1,12 +1,11 @@
 import {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
 
-// @todo Add inits for Transfer and Tribute when ready
 import {
   initContractDaoFactory,
   initContractBankExtension,
   initContractDaoRegistry,
-  initContractVotingOpRollup,
+  initContractManaging,
   initContractOnboarding,
   initContractConfiguration,
   initContractFinancing,
@@ -14,6 +13,8 @@ import {
   initContractManaging,
   initContractRagequit,
   initContractVoting,
+  initContractTribute,
+  initRegisteredVotingAdapter,
 } from '../../../store/actions';
 import {ReduxDispatch} from '../../../store/types';
 import {useIsDefaultChain} from './useIsDefaultChain';
@@ -56,10 +57,13 @@ export function useInitContracts() {
     try {
       if (!isDefaultChain) return;
 
-      // Init contracts
-      await dispatch(initContractDaoFactory(web3Instance));
+      // Init DaoRegistry and Managing contracts first
       await dispatch(initContractDaoRegistry(web3Instance));
-      await dispatch(initContractVotingOpRollup(web3Instance));
+      await dispatch(initContractManaging(web3Instance));
+
+      // Init more contracts
+      await dispatch(initContractDaoFactory(web3Instance));
+      await dispatch(initRegisteredVotingAdapter(web3Instance));
       await dispatch(initContractOnboarding(web3Instance));
       await dispatch(initContractConfiguration(web3Instance));
       await dispatch(initContractFinancing(web3Instance));
@@ -68,8 +72,7 @@ export function useInitContracts() {
       await dispatch(initContractRagequit(web3Instance));
       await dispatch(initContractVoting(web3Instance));
       await dispatch(initContractBankExtension(web3Instance));
-
-      // @todo Add inits for Transfer and Tribute when ready
+      await dispatch(initContractTribute(web3Instance));
     } catch (error) {
       throw error;
     }

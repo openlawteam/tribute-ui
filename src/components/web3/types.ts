@@ -20,6 +20,7 @@ export enum ContractAdapterNames {
   managing = 'managing',
   onboarding = 'onboarding',
   ragequit = 'ragequit',
+  tribute = 'tribute',
   voting = 'voting',
 }
 
