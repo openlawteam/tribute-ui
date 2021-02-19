@@ -3,17 +3,17 @@ import {useHistory, useParams} from 'react-router-dom';
 import Web3 from 'web3';
 
 import {AsyncStatus} from '../../util/types';
+import {ContractAdapterNames} from '../../components/web3/types';
 import {formatDecimal} from '../../util/helpers';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 import NotFound from '../subpages/NotFound';
-import ProposalWithOffchainVoteActions from '../../components/proposals/ProposalWithOffchainVoteActions';
-import ProposalDetails from '../../components/proposals/ProposalDetails';
+import ProposalActions from '../../components/proposals/ProposalActions';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
+import ProposalDetails from '../../components/proposals/ProposalDetails';
 import Wrap from '../../components/common/Wrap';
-import {ContractAdapterNames} from '../../components/web3/types';
 
 export default function MembershipDetails() {
   /**
@@ -102,7 +102,7 @@ export default function MembershipDetails() {
         Number(Web3.utils.fromWei(daoProposal?.amount, 'ether'))
       );
     } catch (error) {
-      // Fallback gracefully to ellipsis
+      amount = '\u2026';
     }
 
     return (
@@ -116,7 +116,7 @@ export default function MembershipDetails() {
             />
           )}
           renderActions={() => (
-            <ProposalWithOffchainVoteActions
+            <ProposalActions
               adapterName={ContractAdapterNames.onboarding}
               proposal={proposalData}
             />

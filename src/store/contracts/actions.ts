@@ -343,7 +343,7 @@ export function initRegisteredVotingAdapter(web3Instance: Web3) {
   };
 }
 
-function createContractAction({
+export function createContractAction({
   type,
   ...payload
 }: {
