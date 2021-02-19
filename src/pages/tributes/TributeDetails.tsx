@@ -3,17 +3,17 @@ import {useHistory, useParams} from 'react-router-dom';
 import {toBN} from 'web3-utils';
 
 import {AsyncStatus} from '../../util/types';
+import {ContractAdapterNames} from '../../components/web3/types';
 import {formatDecimal, formatNumber} from '../../util/helpers';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 import NotFound from '../subpages/NotFound';
-import ProposalWithOffchainVoteActions from '../../components/proposals/ProposalWithOffchainVoteActions';
-import ProposalDetails from '../../components/proposals/ProposalDetails';
+import ProposalActions from '../../components/proposals/ProposalActions';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
+import ProposalDetails from '../../components/proposals/ProposalDetails';
 import Wrap from '../../components/common/Wrap';
-import {ContractAdapterNames} from '../../components/web3/types';
 
 export default function TributeDetails() {
   /**
@@ -134,7 +134,7 @@ export default function TributeDetails() {
             />
           )}
           renderActions={() => (
-            <ProposalWithOffchainVoteActions
+            <ProposalActions
               adapterName={ContractAdapterNames.tribute}
               proposal={proposalData}
             />
