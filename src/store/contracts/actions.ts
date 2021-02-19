@@ -42,7 +42,7 @@ type ContractAction =
   | typeof CONTRACT_ONBOARDING
   | typeof CONTRACT_BANK_EXTENSION
   | typeof CONTRACT_WITHDRAW
-  | typeof CONTRACT_TRIBUTE;
+  | typeof CONTRACT_TRIBUTE
   | typeof CONTRACT_VOTING_OP_ROLLUP;
 
 export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
@@ -57,9 +57,7 @@ export const CONTRACT_NONVOTING_ONBOARDING = 'CONTRACT_NONVOTING_ONBOARDING';
 export const CONTRACT_MANAGING = 'CONTRACT_MANAGING';
 export const CONTRACT_RAGEQUIT = 'CONTRACT_RAGEQUIT';
 export const CONTRACT_VOTING = 'CONTRACT_VOTING';
-export const CONTRACT_VOTING_OP_ROLLUP = 'CONTRACT_VOTING_OP_ROLLUP';
 export const CONTRACT_ONBOARDING = 'CONTRACT_ONBOARDING';
-export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
 export const CONTRACT_WITHDRAW = 'CONTRACT_WITHDRAW';
 export const CONTRACT_TRIBUTE = 'CONTRACT_TRIBUTE';
 
@@ -150,6 +148,8 @@ export function initContractVoting(web3Instance: Web3, votingAddress?: string) {
             ContractAdapterNames.voting,
             getState().contracts.DaoRegistryContract?.instance
           ));
+
+        // VOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN]
 
         const instance = new web3Instance.eth.Contract(
           votingContract,
@@ -341,37 +341,6 @@ export function initContractGuildKick(web3Instance: Web3) {
   };
 }
 
-// MANAGING_CONTRACT_ADDRESS
-export function initContractManaging(web3Instance: Web3) {
-  return async function (dispatch: Dispatch<any>) {
-    try {
-      if (web3Instance) {
-        const {default: lazyManagingABI} = await import(
-          '../../truffle-contracts/ManagingContract.json'
-        );
-        const managingContract: AbiItem[] = lazyManagingABI as any;
-        const contractAddress = MANAGING_CONTRACT_ADDRESS[DEFAULT_CHAIN];
-        const instance = new web3Instance.eth.Contract(
-          managingContract,
-          contractAddress
-        );
-
-        dispatch(
-          createContractAction({
-            type: CONTRACT_MANAGING,
-            abi: managingContract,
-            adapterName: DaoConstants.MANAGING,
-            contractAddress,
-            instance,
-          })
-        );
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-}
-
 // RAGEQUIT_CONTRACT_ADDRESS
 export function initContractRagequit(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
@@ -392,37 +361,6 @@ export function initContractRagequit(web3Instance: Web3) {
             type: CONTRACT_RAGEQUIT,
             abi: ragequitContract,
             adapterName: DaoConstants.RAGEQUIT,
-            contractAddress,
-            instance,
-          })
-        );
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-}
-
-// VOTING_CONTRACT_ADDRESS
-export function initContractVoting(web3Instance: Web3) {
-  return async function (dispatch: Dispatch<any>) {
-    try {
-      if (web3Instance) {
-        const {default: lazyVotingABI} = await import(
-          '../../truffle-contracts/VotingContract.json'
-        );
-        const votingContract: AbiItem[] = lazyVotingABI as any;
-        const contractAddress = VOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN];
-        const instance = new web3Instance.eth.Contract(
-          votingContract,
-          contractAddress
-        );
-
-        dispatch(
-          createContractAction({
-            type: CONTRACT_VOTING,
-            abi: votingContract,
-            adapterName: DaoConstants.VOTING,
             contractAddress,
             instance,
           })
@@ -509,10 +447,11 @@ export function initContractManaging(web3Instance: Web3) {
           '../../truffle-contracts/ManagingContract.json'
         );
         const managingContract: AbiItem[] = lazyManagingABI as any;
-        const contractAddress = await getAdapterAddress(
-          ContractAdapterNames.managing,
-          getState().contracts.DaoRegistryContract?.instance
-        );
+        const contractAddress =
+          (await getAdapterAddress(
+            ContractAdapterNames.managing,
+            getState().contracts.DaoRegistryContract?.instance
+          )) || MANAGING_CONTRACT_ADDRESS[DEFAULT_CHAIN];
         const instance = new web3Instance.eth.Contract(
           managingContract,
           contractAddress

@@ -10,7 +10,6 @@ import {
   initContractConfiguration,
   initContractFinancing,
   initContractGuildKick,
-  initContractManaging,
   initContractRagequit,
   initContractVoting,
   initContractTribute,

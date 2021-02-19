@@ -6,9 +6,7 @@ import {
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
   CONTRACT_OFFCHAIN_VOTING,
-  CONTRACT_ONBOARDING,
   CONTRACT_NONVOTING_ONBOARDING,
-  CONTRACT_MANAGING,
   CONTRACT_RAGEQUIT,
   CONTRACT_MANAGING,
   CONTRACT_ONBOARDING,
@@ -60,7 +58,6 @@ export default function reducer(
       return contractManaging(state, payload);
     case CONTRACT_RAGEQUIT:
       return contractRagequit(state, payload);
-    // case CONTRACT_VOTING:
     case CONTRACT_ONBOARDING:
       return contractOnboarding(state, payload);
     case CONTRACT_TRIBUTE:
@@ -117,6 +114,7 @@ function contractNonVotingOnboarding(state: ContractsState, payload: any) {
 
 function contractRagequit(state: ContractsState, payload: any) {
   return {...state, RagequitContract: {...payload}};
+}
 
 function contractTribute(state: ContractsState, payload: any): ContractsState {
   return {...state, TributeContract: {...payload}};
