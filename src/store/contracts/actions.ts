@@ -10,6 +10,7 @@ import {ContractsStateEntry, StoreState} from '../types';
 import {DEFAULT_CHAIN, DAO_REGISTRY_CONTRACT_ADDRESS} from '../../config';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
+import {VotingAdapterName} from '../../components/adpaters/enums';
 
 type ContractAction =
   | typeof CONTRACT_BANK_EXTENSION
@@ -96,6 +97,7 @@ export function initContractVoting(web3Instance: Web3, votingAddress?: string) {
           createContractAction({
             type: CONTRACT_VOTING_OP_ROLLUP,
             abi: votingContract,
+            adapterName: VotingAdapterName.VotingContract,
             contractAddress,
             instance,
           })
@@ -139,6 +141,7 @@ export function initContractVotingOpRollup(
           createContractAction({
             type: CONTRACT_VOTING_OP_ROLLUP,
             abi: offchainVotingContract,
+            adapterName: VotingAdapterName.OffchainVotingContract,
             contractAddress,
             instance,
           })
