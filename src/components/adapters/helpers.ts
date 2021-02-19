@@ -20,11 +20,11 @@ export function getAdapters(): Array<Adapters> {
 }
 
 /**
- * configurationABIFunction()
+ * getConfigurationABIFunction()
  *
  * Returns the ABI functions used to configure adapters
  */
-export function configurationABIFunction(): Record<DaoConstants, string> {
+export function getConfigurationABIFunction(): Record<DaoConstants, string> {
   return {
     [DaoConstants.BANK]: '', //@todo
     [DaoConstants.CONFIGURATION]: 'submitConfigurationProposal', // ?!
@@ -40,7 +40,12 @@ export function configurationABIFunction(): Record<DaoConstants, string> {
   };
 }
 
-export function adapterAccessControlLayer(
+/**
+ * getAdapterAccessControlLayer
+ *
+ * @param adapterName
+ */
+export function getAdapterAccessControlLayer(
   adapterName: string
 ): Record<string, any> {
   const adapterFlags: Record<DaoConstants, any> = {
@@ -103,6 +108,15 @@ export function adapterAccessControlLayer(
   return {acl: adapterAccess(flags)};
 }
 
+/**
+ *   === INTERNAL HELPER FUNCTIONS ===
+ */
+
+/**
+ * adapterAccess()
+ *
+ * @param flags
+ */
 function adapterAccess(flags: Record<string, boolean>): number {
   const values = [
     flags.ADD_ADAPTER,
@@ -132,6 +146,11 @@ function sha3(value: string): string | null {
   return Web3.utils.sha3(value);
 }
 
+/**
+ * entry()
+ *
+ * @param values
+ */
 function entry(values: Boolean[]): number {
   return values
     .map((v: any, idx: number) => (v !== undefined ? 2 ** idx : 0))

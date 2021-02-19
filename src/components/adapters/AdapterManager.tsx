@@ -2,7 +2,10 @@ import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {StoreState} from '../../store/types';
-import {adapterAccessControlLayer, configurationABIFunction} from './helpers';
+import {
+  getAdapterAccessControlLayer,
+  getConfigurationABIFunction,
+} from './helpers';
 import {Adapters} from './types';
 import {DaoConstants} from './enums';
 import {useAdapters} from './hooks/useAdapters';
@@ -119,7 +122,7 @@ export default function AdapterManager() {
 
       // Get adapters access control layer (acl)
       // these are the functions the adapter will have access to
-      const {acl} = adapterAccessControlLayer(adapter.adapterName);
+      const {acl} = getAdapterAccessControlLayer(adapter.adapterName);
 
       const addAdapterArguments: AddAdapterArguments = [
         adapter.adapterId,
@@ -180,7 +183,7 @@ export default function AdapterManager() {
 
           // Get adapters access control layer (acl)
           // these are the functions the adapter will have access to
-          const {acl} = adapterAccessControlLayer(adapterName);
+          const {acl} = getAdapterAccessControlLayer(adapterName);
 
           adaptersArguments.push([
             adapterId, // [0]bytes32 adapterId
@@ -229,7 +232,7 @@ export default function AdapterManager() {
   async function handleConfigureAdapter(adapter: Adapters) {
     try {
       // Get ABI function name
-      const adapterABIFunctionName: string = configurationABIFunction()[
+      const adapterABIFunctionName: string = getConfigurationABIFunction()[
         adapter.adapterName
       ];
       // Get adapters ABI
