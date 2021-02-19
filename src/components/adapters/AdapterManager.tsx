@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {StoreState} from '../../store/types';
-import {adapterAccessControlLayer, configurationABIFunction} from './config';
+import {adapterAccessControlLayer, configurationABIFunction} from './helpers';
 import {Adapters} from './types';
 import {DaoConstants} from './enums';
 import {useAdapters} from './hooks/useAdapters';

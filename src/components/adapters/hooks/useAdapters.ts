@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 
 import {GET_ADAPTERS} from '../../../gql';
 
-import {getAdapters} from '../config';
+import {getAdapters} from '../helpers';
 import {Adapters} from '../types';
 import {DaoConstants} from '../enums';
 import {GQL_QUERY_POLLING_INTERVAL} from '../../../config';
