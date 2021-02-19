@@ -71,8 +71,13 @@ export default function AdapterManager() {
   /**
    * Variables
    */
-  const noAvailableAdapters =
-    usedAdapters === undefined && unusedAdapters === undefined;
+  const isDAOExisting = dao;
+  // grammatically naming is incorrect :)
+  const isAdaptersUnavailable =
+    adapterStatus === AsyncStatus.REJECTED &&
+    usedAdapters === undefined &&
+    unusedAdapters === undefined;
+  const isLoadingAdapters = adapterStatus === AsyncStatus.PENDING;
 
   // Sets the initial checkbox selections for unused adapters to `false`
   // and sets the `Select All` checkbox to disabled if no adapters are available
@@ -289,7 +294,7 @@ export default function AdapterManager() {
             label={`${selectionCount} selected`}
             checked={selectAll === true}
             disabled={
-              noAvailableAdapters /* 
+              isAdaptersUnavailable /* 
               @todo 
               - also disable when selection is processing 
               - when there are no more unused adapters to select
@@ -310,14 +315,13 @@ export default function AdapterManager() {
         </div>
       </div>
 
-      {adapterStatus === AsyncStatus.PENDING && <Loader />}
+      {isLoadingAdapters && <Loader />}
 
-      {adapterStatus === AsyncStatus.REJECTED && noAvailableAdapters && (
-        <p>No adapters available</p>
-      )}
+      {isAdaptersUnavailable && <p>No adapters available</p>}
 
       {/** UNUSED ADAPTERS TO ADD */}
-      {unusedAdapters &&
+      {isDAOExisting &&
+        unusedAdapters &&
         unusedAdapters?.length &&
         unusedAdapters.map((adapter: Record<string, any>) => (
           <div
@@ -370,7 +374,8 @@ export default function AdapterManager() {
         ))}
 
       {/** CURRENTLY USED ADAPTERS TO CONFIGURE OR REMOVE */}
-      {usedAdapters &&
+      {isDAOExisting &&
+        usedAdapters &&
         usedAdapters?.length &&
         usedAdapters.map((adapter: Record<string, any>) => (
           <div
@@ -404,7 +409,7 @@ export default function AdapterManager() {
           <button
             className="button--secondary"
             disabled={
-              noAvailableAdapters /* 
+              isAdaptersUnavailable /* 
               @todo 
               - also disable when selection is processing 
               - when there are no more unused adapters to select
