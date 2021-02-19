@@ -2,7 +2,7 @@ import Web3 from 'web3';
 import {AbiItem} from 'web3-utils/types';
 import {Dispatch} from 'redux';
 
-import {DaoConstants} from '../../components/adapters/config';
+import {DaoConstants} from '../../components/adapters/enums';
 import {
   ContractAdapterNames,
   ContractExtensionNames,

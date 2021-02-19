@@ -1,3 +1,11 @@
+import {DaoConstants} from './enums';
+
+export type Adapters = {
+  adapterId: string;
+  adapterName: DaoConstants;
+  adapterDescription: string;
+};
+
 export type AddAdapterArguments = [
   // `adapterId`
   string,

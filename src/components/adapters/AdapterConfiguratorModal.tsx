@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Adapters} from './config';
+import {Adapters} from './types';
 import ConfigurationForm from './ConfigurationForm';
 import Modal from '../common/Modal';
 

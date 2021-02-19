@@ -3,11 +3,11 @@ import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
 
-import {Adapters, DaoConstants} from './config';
+import {DaoConstants} from './enums';
+import {AdapterFormArguments, Adapters} from './types';
 import {StoreState} from '../../store/types';
 import {MetaMaskRPCError} from '../../util/types';
 import {Web3TxStatus} from '../web3/types';
-import {AdapterFormArguments} from './types';
 import {FormFieldErrors} from '../../util/enums';
 import {getValidationError} from '../../util/helpers';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';

@@ -2,12 +2,9 @@ import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {StoreState} from '../../store/types';
-import {
-  Adapters,
-  adapterAccessControlLayer,
-  configurationABIFunction,
-  DaoConstants,
-} from './config';
+import {adapterAccessControlLayer, configurationABIFunction} from './config';
+import {Adapters} from './types';
+import {DaoConstants} from './enums';
 import {useAdapters} from './hooks/useAdapters';
 import {useDao} from '../../hooks';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
