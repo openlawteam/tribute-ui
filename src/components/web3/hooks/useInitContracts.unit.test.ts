@@ -4,6 +4,7 @@ import {renderHook, act} from '@testing-library/react-hooks';
 import {StoreState} from '../../../store/types';
 import {useInitContracts} from './useInitContracts';
 import Wrapper from '../../../test/Wrapper';
+import {VotingAdapterName} from '../../adpaters/enums';
 
 describe('useInitContracts unit tests', () => {
   test('should load contracts into Redux when called', async () => {
@@ -65,6 +66,10 @@ describe('useInitContracts unit tests', () => {
         expect(
           reduxStore.getState().contracts.VotingContract?.contractAddress
         ).toBeTruthy();
+
+        expect(
+          reduxStore.getState().contracts.VotingContract?.adapterName
+        ).toBe(VotingAdapterName.OffchainVotingContract);
 
         expect(
           reduxStore.getState().contracts.VotingContract?.instance
