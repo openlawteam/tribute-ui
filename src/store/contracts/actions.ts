@@ -287,21 +287,19 @@ export function initContractManaging(web3Instance: Web3) {
  * @note The DaoRegistry and Managing contracts must be initialised beforehand.
  */
 export function initRegisteredVotingAdapter(web3Instance: Web3) {
-  return async function (_dispatch: Dispatch<any>, getState: () => StoreState) {
+  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
-        const daoRegistryInstance = getState().contracts.DaoRegistryContract
-          ?.instance;
-        const managingInstance = getState().contracts.ManagingContract
-          ?.instance;
+        const daoRegistryContract = getState().contracts.DaoRegistryContract;
+        const managingContract = getState().contracts.ManagingContract;
 
-        if (!daoRegistryInstance) {
+        if (!daoRegistryContract) {
           throw new Error(
             'Please init the DaoRegistry contract before the voting contract.'
           );
         }
 
-        if (!managingInstance) {
+        if (!managingContract) {
           throw new Error(
             'Please init the Managing contract before the voting contract.'
           );
@@ -310,13 +308,11 @@ export function initRegisteredVotingAdapter(web3Instance: Web3) {
         // @todo Try to use multi-call for the below calls?
         const votingContractAddress = await getAdapterAddress(
           ContractAdapterNames.voting,
-          daoRegistryInstance
+          daoRegistryContract.instance
         );
 
-        const votingAdapterName = await managingInstance.methods
-          .getVotingAdapterName(
-            getState().contracts.DaoRegistryContract?.contractAddress
-          )
+        const votingAdapterName = await managingContract.instance.methods
+          .getVotingAdapterName(daoRegistryContract.contractAddress)
           .call();
 
         /**
@@ -328,12 +324,12 @@ export function initRegisteredVotingAdapter(web3Instance: Web3) {
             return await initContractVoting(
               web3Instance,
               votingContractAddress
-            )(_dispatch, getState);
+            )(dispatch, getState);
           case 'OffchainVotingContract':
             return await initContractVotingOpRollup(
               web3Instance,
               votingContractAddress
-            )(_dispatch, getState);
+            )(dispatch, getState);
           default:
             throw new Error('Voting contract name could not be found.');
         }
