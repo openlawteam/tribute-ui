@@ -27,16 +27,16 @@ export function getAdapters(): Array<Adapters> {
 export function getConfigurationABIFunction(): Record<DaoConstants, string> {
   return {
     [DaoConstants.BANK]: '', //@todo
-    [DaoConstants.CONFIGURATION]: 'submitConfigurationProposal', // ?!
-    [DaoConstants.FINANCING]: 'createFinancingRequest', // ?!
-    [DaoConstants.GUILDKICK]: 'submitKickProposal', // ?!
-    [DaoConstants.MANAGING]: 'createAdapterChangeRequest', // ?!
+    [DaoConstants.CONFIGURATION]: 'submitConfigurationProposal',
+    [DaoConstants.FINANCING]: 'createFinancingRequest',
+    [DaoConstants.GUILDKICK]: 'submitKickProposal',
+    [DaoConstants.MANAGING]: 'createAdapterChangeRequest',
     [DaoConstants.OFFCHAIN_VOTING]: 'configureDao',
     [DaoConstants.ONBOARDING]: 'configureDao',
     [DaoConstants.RAGEQUIT]: 'ragequit',
-    [DaoConstants.TRIBUTE]: '', //@todo
+    [DaoConstants.TRIBUTE]: 'configureDao',
     [DaoConstants.VOTING]: 'configureDao',
-    [DaoConstants.WITHDRAW]: '', //@todo
+    [DaoConstants.WITHDRAW]: 'withdraw',
   };
 }
 

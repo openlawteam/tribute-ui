@@ -80,7 +80,7 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
 export const DAO_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x04151C7f016d6A6B7E186f79410f27d20545ff8A',
+  [CHAINS.RINKEBY]: '0xC40757FF6aa46284eB792fD3284cccd733a191a3',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_FACTORY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -89,19 +89,19 @@ export const DAO_FACTORY_CONTRACT_ADDRESS = {
 export const DAO_REGISTRY_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x2cece2e7024b442c5ea76988df594dddb4242cfb',
+  [CHAINS.RINKEBY]: '0xf01c1c422ebc1fe2114fe76999df61c5e0a34689',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
-export const BANK_CONTRACT_ADDRESS = {
+export const BANK_EXTENSION_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x2FA7dDF1A7Fb8667D5077b04Bb8ffBc774BF5202',
+  [CHAINS.RINKEBY]: '0x30F8A9928c49C37508BD639F678AE4d98bAd6992',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_BANK_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
+  // [CHAINS.GANACHE]: REACT_APP_GANACHE_BANK_EXTENSION_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
 /**
@@ -151,7 +151,7 @@ export const GUILDKICK_CONTRACT_ADDRESS = {
 export const MANAGING_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x2cece2e7024b442c5ea76988df594dddb4242cfb',
+  [CHAINS.RINKEBY]: '0xB447b6A88a991004A99503bA6e115b7c9c2E9DaF',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_MANAGING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.

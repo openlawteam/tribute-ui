@@ -13,6 +13,7 @@ import {
   CONTRACT_TRIBUTE,
   CONTRACT_VOTING,
   CONTRACT_VOTING_OP_ROLLUP,
+  CONTRACT_WITHDRAW,
 } from '../actions';
 import {ContractsState} from '../types';
 
@@ -31,6 +32,7 @@ const initialState = {
   RagequitContract: null,
   TributeContract: null,
   VotingContract: null,
+  WithdrawContract: null,
 };
 
 export default function reducer(
@@ -68,6 +70,8 @@ export default function reducer(
       return contractVoting(state, payload);
     case CONTRACT_OFFCHAIN_VOTING:
       return contractOffchainVoting(state, payload);
+    case CONTRACT_WITHDRAW:
+      return contractWithdraw(state, payload);
     default:
       return state;
   }
@@ -126,4 +130,8 @@ function contractVoting(state: ContractsState, payload: any): ContractsState {
 
 function contractManaging(state: ContractsState, payload: any): ContractsState {
   return {...state, ManagingContract: {...payload}};
+}
+
+function contractWithdraw(state: ContractsState, payload: any): ContractsState {
+  return {...state, WithdrawContract: {...payload}};
 }

@@ -20,6 +20,7 @@ export type ContractsState = {
   OnboardingContract: ContractsStateEntry | null;
   TributeContract: ContractsStateEntry | null;
   VotingContract: ContractsStateEntry | null;
+  WithdrawContract: ContractsStateEntry | null;
 };
 
 export type ConnectedMemberState = {

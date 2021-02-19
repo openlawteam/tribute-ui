@@ -11,17 +11,6 @@ import {
   DEFAULT_CHAIN,
   DAO_FACTORY_CONTRACT_ADDRESS,
   DAO_REGISTRY_CONTRACT_ADDRESS,
-  // BANK_CONTRACT_ADDRESS, // @todo
-  CONFIGURATION_CONTRACT_ADDRESS,
-  FINANCING_CONTRACT_ADDRESS,
-  GUILDKICK_CONTRACT_ADDRESS,
-  // NONVOTING_ONBOARDING_CONTRACT_ADDRESS, // @todo
-  MANAGING_CONTRACT_ADDRESS,
-  // ONBOARDING_CONTRACT_ADDRESS, // @todo revise the current impl
-  RAGEQUIT_CONTRACT_ADDRESS,
-  // TRIBUTE_CONTRACT_ADDRESS,
-  VOTING_CONTRACT_ADDRESS,
-  // WITHDRAW_CONTRACT_ADDRESS // @todo
 } from '../../config';
 import {ContractsStateEntry, StoreState} from '../types';
 import {getAdapterAddress} from '../../components/web3/helpers';
@@ -250,14 +239,17 @@ export function initContractOnboarding(web3Instance: Web3) {
 
 // CONTRACT_CONFIGURATION
 export function initContractConfiguration(web3Instance: Web3) {
-  return async function (dispatch: Dispatch<any>) {
+  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
         const {default: lazyConfigurationABI} = await import(
           '../../truffle-contracts/ConfigurationContract.json'
         );
         const configurationContract: AbiItem[] = lazyConfigurationABI as any;
-        const contractAddress = CONFIGURATION_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+        const contractAddress = await getAdapterAddress(
+          ContractAdapterNames.configuration,
+          getState().contracts.DaoRegistryContract?.instance
+        );
         const instance = new web3Instance.eth.Contract(
           configurationContract,
           contractAddress
@@ -281,14 +273,17 @@ export function initContractConfiguration(web3Instance: Web3) {
 
 // FINANCING_CONTRACT_ADDRESS
 export function initContractFinancing(web3Instance: Web3) {
-  return async function (dispatch: Dispatch<any>) {
+  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
         const {default: lazyFinancingABI} = await import(
           '../../truffle-contracts/FinancingContract.json'
         );
         const financingContract: AbiItem[] = lazyFinancingABI as any;
-        const contractAddress = FINANCING_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+        const contractAddress = await getAdapterAddress(
+          ContractAdapterNames.financing,
+          getState().contracts.DaoRegistryContract?.instance
+        );
         const instance = new web3Instance.eth.Contract(
           financingContract,
           contractAddress
@@ -312,14 +307,17 @@ export function initContractFinancing(web3Instance: Web3) {
 
 // GUILDKICK_CONTRACT_ADDRESS
 export function initContractGuildKick(web3Instance: Web3) {
-  return async function (dispatch: Dispatch<any>) {
+  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
         const {default: lazyGuildKickABI} = await import(
           '../../truffle-contracts/GuildKickContract.json'
         );
         const guildKickContract: AbiItem[] = lazyGuildKickABI as any;
-        const contractAddress = GUILDKICK_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+        const contractAddress = await getAdapterAddress(
+          ContractAdapterNames.guildkick,
+          getState().contracts.DaoRegistryContract?.instance
+        );
         const instance = new web3Instance.eth.Contract(
           guildKickContract,
           contractAddress
@@ -343,14 +341,17 @@ export function initContractGuildKick(web3Instance: Web3) {
 
 // RAGEQUIT_CONTRACT_ADDRESS
 export function initContractRagequit(web3Instance: Web3) {
-  return async function (dispatch: Dispatch<any>) {
+  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
         const {default: lazyRagequitABI} = await import(
           '../../truffle-contracts/RagequitContract.json'
         );
         const ragequitContract: AbiItem[] = lazyRagequitABI as any;
-        const contractAddress = RAGEQUIT_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+        const contractAddress = await getAdapterAddress(
+          ContractAdapterNames.ragequit,
+          getState().contracts.DaoRegistryContract?.instance
+        );
         const instance = new web3Instance.eth.Contract(
           ragequitContract,
           contractAddress
@@ -428,6 +429,7 @@ export function initContractTribute(web3Instance: Web3) {
           createContractAction({
             type: CONTRACT_TRIBUTE,
             abi: tributeContract,
+            adapterName: DaoConstants.TRIBUTE,
             contractAddress,
             instance,
           })
@@ -447,11 +449,10 @@ export function initContractManaging(web3Instance: Web3) {
           '../../truffle-contracts/ManagingContract.json'
         );
         const managingContract: AbiItem[] = lazyManagingABI as any;
-        const contractAddress =
-          (await getAdapterAddress(
-            ContractAdapterNames.managing,
-            getState().contracts.DaoRegistryContract?.instance
-          )) || MANAGING_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+        const contractAddress = await getAdapterAddress(
+          ContractAdapterNames.managing,
+          getState().contracts.DaoRegistryContract?.instance
+        );
         const instance = new web3Instance.eth.Contract(
           managingContract,
           contractAddress
@@ -461,6 +462,40 @@ export function initContractManaging(web3Instance: Web3) {
           createContractAction({
             type: CONTRACT_MANAGING,
             abi: managingContract,
+            adapterName: DaoConstants.MANAGING,
+            contractAddress,
+            instance,
+          })
+        );
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+}
+
+export function initContractWithdraw(web3Instance: Web3) {
+  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
+    try {
+      if (web3Instance) {
+        const {default: lazyWithdrawABI} = await import(
+          '../../truffle-contracts/WithdrawContract.json'
+        );
+        const withdrawContract: AbiItem[] = lazyWithdrawABI as any;
+        const contractAddress = await getAdapterAddress(
+          ContractAdapterNames.managing,
+          getState().contracts.DaoRegistryContract?.instance
+        );
+        const instance = new web3Instance.eth.Contract(
+          withdrawContract,
+          contractAddress
+        );
+
+        dispatch(
+          createContractAction({
+            type: CONTRACT_WITHDRAW,
+            abi: withdrawContract,
+            adapterName: DaoConstants.WITHDRAW,
             contractAddress,
             instance,
           })

@@ -14,6 +14,7 @@ import {
   initContractVoting,
   initContractTribute,
   initRegisteredVotingAdapter,
+  initContractWithdraw,
 } from '../../../store/actions';
 import {ReduxDispatch} from '../../../store/types';
 import {useIsDefaultChain} from './useIsDefaultChain';
@@ -72,6 +73,7 @@ export function useInitContracts() {
       await dispatch(initContractVoting(web3Instance));
       await dispatch(initContractBankExtension(web3Instance));
       await dispatch(initContractTribute(web3Instance));
+      await dispatch(initContractWithdraw(web3Instance));
     } catch (error) {
       throw error;
     }

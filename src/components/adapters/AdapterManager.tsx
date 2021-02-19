@@ -252,6 +252,8 @@ export default function AdapterManager() {
       setInputParameters(inputs);
       setOpenModal(true);
     } catch (error) {
+      console.log(adapter.adapterName, 'not found'); // @todo handle this
+      console.log('handleConfigureAdapter: error', adapter.adapterName, error);
       setSubmitError(error);
     }
   }
