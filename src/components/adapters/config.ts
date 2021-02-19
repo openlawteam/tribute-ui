@@ -102,20 +102,6 @@ export function configurationABIFunction(): Record<DaoConstants, string> {
   };
 }
 
-type AclFlag =  // @todo typify its deps
-  | 'ADD_ADAPTER'
-  | 'REMOVE_ADAPTER'
-  | 'JAIL_MEMBER'
-  | 'UNJAIL_MEMBER'
-  | 'SUBMIT_PROPOSAL'
-  | 'SPONSOR_PROPOSAL'
-  | 'PROCESS_PROPOSAL'
-  | 'UPDATE_DELEGATE_KEY'
-  | 'SET_CONFIGURATION'
-  | 'ADD_EXTENSION'
-  | 'REMOVE_EXTENSION'
-  | 'NEW_MEMBER';
-
 export function adapterAccessControlLayer(
   adapterName: string
 ): Record<string, any> {

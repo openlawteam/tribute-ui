@@ -7,6 +7,7 @@ import {Adapters, DaoConstants} from './config';
 import {StoreState} from '../../store/types';
 import {MetaMaskRPCError} from '../../util/types';
 import {Web3TxStatus} from '../web3/types';
+import {AdapterFormArguments} from './types';
 import {FormFieldErrors} from '../../util/enums';
 import {getValidationError} from '../../util/helpers';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';

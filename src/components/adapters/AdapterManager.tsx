@@ -16,12 +16,7 @@ import AdapterConfiguratorModal from './AdapterConfiguratorModal';
 import Loader from '../../components/feedback/Loader';
 import Checkbox, {CheckboxSize} from '../../components/common/Checkbox';
 import {AsyncStatus} from '../../util/types';
-
-type AddAdapterArguments = [
-  string, // `adapterId`
-  string, // `adapterAddress`
-  number // `acl`
-];
+import {AddAdapterArguments} from './types';
 
 export default function AdapterManager() {
   /**
@@ -130,9 +125,9 @@ export default function AdapterManager() {
       const {acl} = adapterAccessControlLayer(adapter.adapterName);
 
       const addAdapterArguments: AddAdapterArguments = [
-        adapter.adapterId, // [0]bytes32 adapterId
-        contractAddress, // [1]address adapterAddress
-        acl, // [2]uint256 acl
+        adapter.adapterId,
+        contractAddress,
+        acl,
       ];
 
       const txArguments = {
