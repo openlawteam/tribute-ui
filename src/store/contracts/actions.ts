@@ -95,7 +95,7 @@ export function initContractVoting(web3Instance: Web3, votingAddress?: string) {
 
         dispatch(
           createContractAction({
-            type: CONTRACT_VOTING_OP_ROLLUP,
+            type: CONTRACT_VOTING,
             abi: votingContract,
             adapterName: VotingAdapterName.VotingContract,
             contractAddress,
