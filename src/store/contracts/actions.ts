@@ -10,7 +10,7 @@ import {ContractsStateEntry, StoreState} from '../types';
 import {DEFAULT_CHAIN, DAO_REGISTRY_CONTRACT_ADDRESS} from '../../config';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
-import {VotingAdapterName} from '../../components/adpaters/enums';
+import {DaoConstants, VotingAdapterName} from '../../components/adpaters/enums';
 
 type ContractAction =
   | typeof CONTRACT_BANK_EXTENSION
@@ -99,6 +99,7 @@ export function initContractOnboarding(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_ONBOARDING,
+    adapterNameForRedux: DaoConstants.ONBOARDING,
     adapterOrExtensionName: ContractAdapterNames.onboarding,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/OnboardingContract.json'),
@@ -112,6 +113,7 @@ export function initContractBankExtension(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_BANK_EXTENSION,
+    adapterNameForRedux: DaoConstants.BANK,
     adapterOrExtensionName: ContractExtensionNames.bank,
     contractAddress,
     isExtension: true,
@@ -126,6 +128,7 @@ export function initContractTribute(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_TRIBUTE,
+    adapterNameForRedux: DaoConstants.TRIBUTE,
     adapterOrExtensionName: ContractAdapterNames.tribute,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/TributeContract.json'),
@@ -139,6 +142,7 @@ export function initContractManaging(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_MANAGING,
+    adapterNameForRedux: DaoConstants.MANAGING,
     adapterOrExtensionName: ContractAdapterNames.managing,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/ManagingContract.json'),
