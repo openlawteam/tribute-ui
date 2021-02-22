@@ -33,7 +33,7 @@ jobs:
         env:
           REACT_APP_ENVIRONMENT: development
           REACT_APP_INFURA_PROJECT_ID_DEV: ${{ secrets.REACT_APP_INFURA_PROJECT_ID_DEV }}
-          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: 0x252e780E5ef2Ba689034BfD7453438A33c73FCfF
+          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0x252e780E5ef2Ba689034BfD7453438A33c73FCfF"
           REACT_APP_SNAPSHOT_HUB_API_URL: https://snapshot-hub-erc712.dev.thelao.io/api
         run: npm run build
 
