@@ -29,10 +29,6 @@ export const CONTRACT_TRIBUTE = 'CONTRACT_TRIBUTE';
 export const CONTRACT_VOTING = 'CONTRACT_VOTING';
 export const CONTRACT_VOTING_OP_ROLLUP = 'CONTRACT_VOTING_OP_ROLLUP';
 
-/**
- * @todo Add init for Transfer when ready
- */
-
 export function initContractDaoRegistry(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
     try {
@@ -68,220 +64,86 @@ export function initContractDaoRegistry(web3Instance: Web3) {
   };
 }
 
-export function initContractVoting(web3Instance: Web3, votingAddress?: string) {
-  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
-    try {
-      if (web3Instance) {
-        const {default: lazyVotingABI} = await import(
-          '../../truffle-contracts/VotingContract.json'
-        );
-        const votingContract: AbiItem[] = lazyVotingABI as any;
-
-        /**
-         * Uses `address` if provided;
-         * mainly for use with `initRegisteredVotingAdapter`.
-         */
-        const contractAddress =
-          votingAddress ||
-          (await getAdapterAddress(
-            ContractAdapterNames.voting,
-            getState().contracts.DaoRegistryContract?.instance
-          ));
-
-        const instance = new web3Instance.eth.Contract(
-          votingContract,
-          contractAddress
-        );
-
-        dispatch(
-          createContractAction({
-            type: CONTRACT_VOTING,
-            abi: votingContract,
-            adapterName: VotingAdapterName.VotingContract,
-            contractAddress,
-            instance,
-          })
-        );
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
+export function initContractVoting(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_VOTING,
+    adapterOrExtensionName: ContractAdapterNames.voting,
+    adapterNameForRedux: VotingAdapterName.VotingContract,
+    contractAddress,
+    lazyImport: () => import('../../truffle-contracts/VotingContract.json'),
+    web3Instance,
+  });
 }
 
 export function initContractVotingOpRollup(
   web3Instance: Web3,
-  votingAddress?: string
+  contractAddress?: string
 ) {
-  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
-    try {
-      if (web3Instance) {
-        const {default: lazyOffchainVotingABI} = await import(
-          '../../truffle-contracts/OffchainVotingContract.json'
-        );
-        const offchainVotingContract: AbiItem[] = lazyOffchainVotingABI as any;
-
-        /**
-         * Uses `address` if provided;
-         * mainly for use with `initRegisteredVotingAdapter`.
-         */
-        const contractAddress =
-          votingAddress ||
-          (await getAdapterAddress(
-            ContractAdapterNames.voting,
-            getState().contracts.DaoRegistryContract?.instance
-          ));
-
-        const instance = new web3Instance.eth.Contract(
-          offchainVotingContract,
-          contractAddress
-        );
-
-        dispatch(
-          createContractAction({
-            type: CONTRACT_VOTING_OP_ROLLUP,
-            abi: offchainVotingContract,
-            adapterName: VotingAdapterName.OffchainVotingContract,
-            contractAddress,
-            instance,
-          })
-        );
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
+  return initContractThunkFactory({
+    actionType: CONTRACT_VOTING_OP_ROLLUP,
+    adapterOrExtensionName: ContractAdapterNames.voting,
+    adapterNameForRedux: VotingAdapterName.OffchainVotingContract,
+    contractAddress,
+    lazyImport: () =>
+      import('../../truffle-contracts/OffchainVotingContract.json'),
+    web3Instance,
+  });
 }
 
-export function initContractOnboarding(web3Instance: Web3) {
-  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
-    try {
-      if (web3Instance) {
-        const {default: lazyOnboardingABI} = await import(
-          '../../truffle-contracts/OnboardingContract.json'
-        );
-        const onboardingContract: AbiItem[] = lazyOnboardingABI as any;
-
-        const contractAddress = await getAdapterAddress(
-          ContractAdapterNames.onboarding,
-          getState().contracts.DaoRegistryContract?.instance
-        );
-        const instance = new web3Instance.eth.Contract(
-          onboardingContract,
-          contractAddress
-        );
-
-        dispatch(
-          createContractAction({
-            type: CONTRACT_ONBOARDING,
-            abi: onboardingContract,
-            contractAddress,
-            instance,
-          })
-        );
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
+export function initContractOnboarding(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_ONBOARDING,
+    adapterOrExtensionName: ContractAdapterNames.onboarding,
+    contractAddress,
+    lazyImport: () => import('../../truffle-contracts/OnboardingContract.json'),
+    web3Instance,
+  });
 }
 
-export function initContractBankExtension(web3Instance: Web3) {
-  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
-    try {
-      if (web3Instance) {
-        const {default: lazyBankExtensionABI} = await import(
-          '../../truffle-contracts/BankExtension.json'
-        );
-        const bankExtensionContract: AbiItem[] = lazyBankExtensionABI as any;
-
-        const contractAddress = await getExtensionAddress(
-          ContractExtensionNames.bank,
-          getState().contracts.DaoRegistryContract?.instance
-        );
-        const instance = new web3Instance.eth.Contract(
-          bankExtensionContract,
-          contractAddress
-        );
-
-        dispatch(
-          createContractAction({
-            type: CONTRACT_BANK_EXTENSION,
-            abi: bankExtensionContract,
-            contractAddress,
-            instance,
-          })
-        );
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
+export function initContractBankExtension(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_BANK_EXTENSION,
+    adapterOrExtensionName: ContractExtensionNames.bank,
+    contractAddress,
+    isExtension: true,
+    lazyImport: () => import('../../truffle-contracts/BankExtension.json'),
+    web3Instance,
+  });
 }
 
-export function initContractTribute(web3Instance: Web3) {
-  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
-    try {
-      if (web3Instance) {
-        const {default: lazyTributeABI} = await import(
-          '../../truffle-contracts/TributeContract.json'
-        );
-        const tributeContract: AbiItem[] = lazyTributeABI as any;
-
-        const contractAddress = await getAdapterAddress(
-          ContractAdapterNames.tribute,
-          getState().contracts.DaoRegistryContract?.instance
-        );
-        const instance = new web3Instance.eth.Contract(
-          tributeContract,
-          contractAddress
-        );
-
-        dispatch(
-          createContractAction({
-            type: CONTRACT_TRIBUTE,
-            abi: tributeContract,
-            contractAddress,
-            instance,
-          })
-        );
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
+export function initContractTribute(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_TRIBUTE,
+    adapterOrExtensionName: ContractAdapterNames.tribute,
+    contractAddress,
+    lazyImport: () => import('../../truffle-contracts/TributeContract.json'),
+    web3Instance,
+  });
 }
 
-export function initContractManaging(web3Instance: Web3) {
-  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
-    try {
-      if (web3Instance) {
-        const {default: lazyManagingABI} = await import(
-          '../../truffle-contracts/ManagingContract.json'
-        );
-        const managingContract: AbiItem[] = lazyManagingABI as any;
-        const contractAddress = await getAdapterAddress(
-          ContractAdapterNames.managing,
-          getState().contracts.DaoRegistryContract?.instance
-        );
-        const instance = new web3Instance.eth.Contract(
-          managingContract,
-          contractAddress
-        );
-
-        dispatch(
-          createContractAction({
-            type: CONTRACT_MANAGING,
-            abi: managingContract,
-            contractAddress,
-            instance,
-          })
-        );
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
+export function initContractManaging(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_MANAGING,
+    adapterOrExtensionName: ContractAdapterNames.managing,
+    contractAddress,
+    lazyImport: () => import('../../truffle-contracts/ManagingContract.json'),
+    web3Instance,
+  });
 }
 
 /**
@@ -289,7 +151,10 @@ export function initContractManaging(web3Instance: Web3) {
  *
  * @note The DaoRegistry and Managing contracts must be initialised beforehand.
  */
-export function initRegisteredVotingAdapter(web3Instance: Web3) {
+export function initRegisteredVotingAdapter(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
   return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
     try {
       if (web3Instance) {
@@ -308,11 +173,12 @@ export function initRegisteredVotingAdapter(web3Instance: Web3) {
           );
         }
 
-        // @todo Try to use multi-call for the below calls?
-        const votingContractAddress = await getAdapterAddress(
-          ContractAdapterNames.voting,
-          daoRegistryContract.instance
-        );
+        const address =
+          contractAddress ||
+          (await getAdapterAddress(
+            ContractAdapterNames.voting,
+            daoRegistryContract.instance
+          ));
 
         const votingAdapterName = await managingContract.instance.methods
           .getVotingAdapterName(daoRegistryContract.contractAddress)
@@ -324,15 +190,15 @@ export function initRegisteredVotingAdapter(web3Instance: Web3) {
          */
         switch (votingAdapterName) {
           case 'VotingContract':
-            return await initContractVoting(
-              web3Instance,
-              votingContractAddress
-            )(dispatch, getState);
+            return await initContractVoting(web3Instance, address)(
+              dispatch,
+              getState
+            );
           case 'OffchainVotingContract':
-            return await initContractVotingOpRollup(
-              web3Instance,
-              votingContractAddress
-            )(dispatch, getState);
+            return await initContractVotingOpRollup(web3Instance, address)(
+              dispatch,
+              getState
+            );
           default:
             throw new Error('Voting contract name could not be found.');
         }
@@ -352,5 +218,67 @@ export function createContractAction({
   return {
     type,
     ...payload,
+  };
+}
+
+export function initContractThunkFactory({
+  actionType,
+  adapterNameForRedux,
+  adapterOrExtensionName,
+  contractAddress,
+  isExtension = false,
+  lazyImport,
+  web3Instance,
+}: {
+  actionType: ContractAction;
+  adapterOrExtensionName: ContractAdapterNames | ContractExtensionNames;
+  /**
+   * The name to be shown in Redux state as `adapterName`.
+   */
+  adapterNameForRedux?: ContractsStateEntry['adapterName'];
+  contractAddress?: string;
+  /**
+   * If set to `true` an Extenion address will be searched for instead of an Adapter.
+   */
+  isExtension?: boolean;
+  /**
+   * Provide a Dynamic Import wrapped in a function.
+   *
+   * e.g. `() => import('./path/to/import')`
+   */
+  lazyImport: () => any;
+  web3Instance: Web3;
+}) {
+  // Return a Redux Thunk
+  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
+    try {
+      const {default: lazyABI} = await lazyImport();
+
+      const contractABI: AbiItem[] = lazyABI as any;
+
+      const address =
+        contractAddress ||
+        (isExtension
+          ? await getExtensionAddress(
+              (adapterOrExtensionName as unknown) as ContractExtensionNames,
+              getState().contracts.DaoRegistryContract?.instance
+            )
+          : await getAdapterAddress(
+              (adapterOrExtensionName as unknown) as ContractAdapterNames,
+              getState().contracts.DaoRegistryContract?.instance
+            ));
+
+      dispatch(
+        createContractAction({
+          type: actionType,
+          abi: contractABI,
+          contractAddress: address,
+          adapterName: adapterNameForRedux,
+          instance: new web3Instance.eth.Contract(contractABI, address),
+        })
+      );
+    } catch (error) {
+      throw error;
+    }
   };
 }
