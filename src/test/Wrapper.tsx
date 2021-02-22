@@ -5,6 +5,9 @@ import {Provider} from 'react-redux';
 import React, {useEffect, useMemo, useState} from 'react';
 import Web3 from 'web3';
 
+import * as useWeb3ModalToMock from '../components/web3/hooks/useWeb3Modal';
+import * as getAdapterAddressToMock from '../components/web3/helpers/getAdapterAddress';
+import * as getExtensionAddressToMock from '../components/web3/helpers/getExtensionAddress';
 import {
   Web3ModalContext,
   Web3ModalContextValue,
@@ -14,9 +17,6 @@ import {
   isActiveMember,
   memberAddressesByDelegatedKey,
 } from './web3Responses';
-import * as useWeb3ModalToMock from '../components/web3/hooks/useWeb3Modal';
-import * as getAdapterAddressToMock from '../components/web3/helpers/getAdapterAddress';
-import * as getExtensionAddressToMock from '../components/web3/helpers/getExtensionAddress';
 import {CHAINS as mockChains} from '../config';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider, getNewStore} from './helpers';
 import Init, {InitError} from '../Init';
@@ -49,10 +49,6 @@ type WrapperProps = {
    * Web3 modal manager context options
    */
   web3ModalContext?: Web3ModalContextValue;
-  /**
-   * Option to Mock provider.request from MetaMask
-   */
-  mockMetaMaskRequest?: boolean;
 };
 
 /**
@@ -67,7 +63,6 @@ export default function Wrapper(
 ) {
   const {
     getProps,
-    mockMetaMaskRequest = false,
     useInit = false,
     useWallet = false,
     web3ModalContext,

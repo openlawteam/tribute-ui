@@ -3,7 +3,7 @@ import {ThunkDispatch} from 'redux-thunk';
 import {AbiItem} from 'web3-utils/types';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
 
-import {DaoConstants} from '../components/adapters/enums';
+import {DaoConstants, VotingAdapterName} from '../components/adpaters/enums';
 
 export type ContractsState = {
   DaoFactoryContract: ContractsStateEntry | null;
@@ -46,7 +46,7 @@ export type ContractsStateEntry = {
   /**
    * (Optional) Adapter name, used for the Adapter Management
    */
-  adapterName?: DaoConstants;
+  adapterName?: DaoConstants | VotingAdapterName;
   /**
    * Address of the instantiated contract
    */
