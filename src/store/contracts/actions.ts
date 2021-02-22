@@ -166,15 +166,17 @@ export function initRegisteredVotingAdapter(
         const managingContract = getState().contracts.ManagingContract;
 
         if (!daoRegistryContract) {
-          throw new Error(
+          console.warn(
             'Please init the DaoRegistry contract before the voting contract.'
           );
+          return;
         }
 
         if (!managingContract) {
-          throw new Error(
+          console.warn(
             'Please init the Managing contract before the voting contract.'
           );
+          return;
         }
 
         const address =
