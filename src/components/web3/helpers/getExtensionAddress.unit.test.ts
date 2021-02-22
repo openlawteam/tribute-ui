@@ -1,7 +1,7 @@
 import {AbiItem} from 'web3-utils/types';
 
 import {ContractExtensionNames} from '../types';
-import {DAO_REGISTRY_CONTRACT_ADDRESS, DEFAULT_CHAIN} from '../../../config';
+import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
 import {getExtensionAddress} from '.';
 import {getWeb3Instance} from '../../../test/helpers';
 import DAORegistryABI from '../../../truffle-contracts/DaoRegistry.json';
@@ -9,7 +9,7 @@ import DAORegistryABI from '../../../truffle-contracts/DaoRegistry.json';
 describe('getExtensionAddress unit tests', () => {
   test('should return correct address', async () => {
     const {web3, mockWeb3Provider} = getWeb3Instance();
-    const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+    const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS;
     const instance = new web3.eth.Contract(
       DAORegistryABI as AbiItem[],
       contractAddress

@@ -6,7 +6,7 @@ import {EnvironmentName} from './util/types';
 
 const {
   REACT_APP_ENVIRONMENT,
-  REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS,
+  REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS,
   REACT_APP_INFURA_PROJECT_ID_DEV,
   REACT_APP_INFURA_PROJECT_ID_LOCAL,
   REACT_APP_INFURA_PROJECT_ID_PROD,
@@ -65,14 +65,8 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
   [CHAINS.KOVAN]: `https://kovan.etherscan.io`,
 };
 
-export const DAO_REGISTRY_CONTRACT_ADDRESS = {
-  [CHAINS.MAINNET]: '',
-  [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x69c0c049b1F2E7Abe8DaC47B2baCAC927839D49a',
-  [CHAINS.GOERLI]: '',
-  [CHAINS.KOVAN]: '',
-  [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
-};
+// If developing locally, include your DaoRegistry contract address in your `.env` file.
+export const DAO_REGISTRY_CONTRACT_ADDRESS = REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS;
 
 export const DEFAULT_CHAIN =
   REACT_APP_ENVIRONMENT === 'production'

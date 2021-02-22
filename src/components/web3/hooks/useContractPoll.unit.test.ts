@@ -2,7 +2,7 @@ import {AbiItem} from 'web3-utils/types';
 import {renderHook, act} from '@testing-library/react-hooks';
 import {waitFor} from '@testing-library/react';
 
-import {DAO_REGISTRY_CONTRACT_ADDRESS, DEFAULT_CHAIN} from '../../../config';
+import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
 import {DEFAULT_ETH_ADDRESS, getWeb3Instance} from '../../../test/helpers';
 import {useContractPoll} from './useContractPoll';
 import DAORegistryABI from '../../../truffle-contracts/DaoRegistry.json';
@@ -15,7 +15,7 @@ describe('useContractPoll unit tests', () => {
       );
 
       const {web3, mockWeb3Provider} = getWeb3Instance();
-      const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+      const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS;
       const instance = new web3.eth.Contract(
         DAORegistryABI as AbiItem[],
         contractAddress
@@ -103,7 +103,7 @@ describe('useContractPoll unit tests', () => {
       );
 
       const {web3, mockWeb3Provider} = getWeb3Instance();
-      const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+      const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS;
       const instance = new web3.eth.Contract(
         DAORegistryABI as AbiItem[],
         contractAddress
@@ -194,7 +194,7 @@ describe('useContractPoll unit tests', () => {
       );
 
       const {web3, mockWeb3Provider} = getWeb3Instance();
-      const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+      const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS;
       const instance = new web3.eth.Contract(
         DAORegistryABI as AbiItem[],
         contractAddress
