@@ -4,3 +4,4 @@ export * from './getAdapterAddressFromContracts';
 export * from './getContractByAddress';
 export * from './getDAOConfigEntry';
 export * from './getExtensionAddress';
+export * from './multicall';
