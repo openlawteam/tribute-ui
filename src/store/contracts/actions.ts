@@ -7,7 +7,7 @@ import {
   ContractExtensionNames,
 } from '../../components/web3/types';
 import {ContractsStateEntry, StoreState} from '../types';
-import {DEFAULT_CHAIN, DAO_REGISTRY_CONTRACT_ADDRESS} from '../../config';
+import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../config';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
 import {DaoConstants, VotingAdapterName} from '../../components/adpaters/enums';
@@ -38,7 +38,7 @@ export function initContractDaoRegistry(web3Instance: Web3) {
         );
 
         const daoRegistryContract: AbiItem[] = lazyDaoRegistryABI as any;
-        const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+        const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS;
 
         if (!contractAddress) {
           throw new Error('No DAO Registry contract address was found.');
