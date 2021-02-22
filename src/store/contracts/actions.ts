@@ -100,7 +100,7 @@ export function initContractOnboarding(
   return initContractThunkFactory({
     actionType: CONTRACT_ONBOARDING,
     adapterNameForRedux: DaoConstants.ONBOARDING,
-    adapterOrExtensionName: ContractAdapterNames.onboarding,
+    adapterOrExtensionName: ContractAdapterNames.ragequit,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/OnboardingContract.json'),
     web3Instance,
@@ -282,7 +282,10 @@ export function initContractThunkFactory({
         })
       );
     } catch (error) {
-      throw error;
+      // Warn instead of throwing as we want the Dapp to fail gracefully.
+      console.warn(
+        `The contract "${adapterOrExtensionName}" could not be found in the DAO. Are you sure you meant to add this contract's ABI?`
+      );
     }
   };
 }
