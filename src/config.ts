@@ -89,7 +89,7 @@ export const DAO_FACTORY_CONTRACT_ADDRESS = {
 export const DAO_REGISTRY_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0xf01c1c422ebc1fe2114fe76999df61c5e0a34689',
+  [CHAINS.RINKEBY]: '0xf01c1C422EBC1fe2114FE76999DF61c5E0A34689',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -170,7 +170,7 @@ export const OFFCHAIN_VOTING_CONTRACT_ADDRESS = {
 export const ONBOARDING_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x0fB9C41e67BA9941189932A2bFAB1C8F75A17B76',
+  [CHAINS.RINKEBY]: '0x8A2474c4A437DAEaF2cb19f4bec3C4E09Ca7c6b3',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_ONBOARDING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -249,7 +249,7 @@ export const DAI_TOKEN_ADDRESS: string =
  * with its own proposals and votes.
  */
 export const SPACES: Record<EnvironmentName, string> = {
-  development: '',
+  development: 'thelao',
   // @todo Get local Docker snapshot and "registered" space set up.
   localhost: 'thelao',
   production: '',
