@@ -6,6 +6,7 @@
     "type": "git",
     "url": "https://github.com/openlawteam/tribute.git"
   },
+  "homepage": "https://openlawteam.github.io/tribute",
   "author": "OpenLaw Team",
   "license": "Apache-2.0",
   "description": "A modular DAO framework developed and coordinated by its members",
