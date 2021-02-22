@@ -2,7 +2,6 @@ import Web3 from 'web3';
 import {AbiItem} from 'web3-utils/types';
 import {Dispatch} from 'redux';
 
-import {DaoConstants} from '../../components/adapters/enums';
 import {
   ContractAdapterNames,
   ContractExtensionNames,
@@ -200,7 +199,7 @@ export function initContractManaging(
     web3Instance,
   });
 }
-                                  
+
 export function initContractWithdraw(
   web3Instance: Web3,
   contractAddress?: string
@@ -214,7 +213,7 @@ export function initContractWithdraw(
     web3Instance,
   });
 }
-                                  
+
 export function initContractRagequit(
   web3Instance: Web3,
   contractAddress?: string
@@ -228,7 +227,7 @@ export function initContractRagequit(
     web3Instance,
   });
 }
-                                  
+
 export function initContractGuildKick(
   web3Instance: Web3,
   contractAddress?: string
@@ -242,7 +241,7 @@ export function initContractGuildKick(
     web3Instance,
   });
 }
-                                  
+
 export function initContractFinancing(
   web3Instance: Web3,
   contractAddress?: string
@@ -256,7 +255,7 @@ export function initContractFinancing(
     web3Instance,
   });
 }
-                                  
+
 export function initContractConfiguration(
   web3Instance: Web3,
   contractAddress?: string
@@ -266,7 +265,8 @@ export function initContractConfiguration(
     adapterNameForRedux: DaoConstants.CONFIGURATION,
     adapterOrExtensionName: ContractAdapterNames.configuration,
     contractAddress,
-    lazyImport: () => import('../../truffle-contracts/ConfigurationContract.json'),
+    lazyImport: () =>
+      import('../../truffle-contracts/ConfigurationContract.json'),
     web3Instance,
   });
 }

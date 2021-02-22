@@ -22,6 +22,7 @@ export enum ContractAdapterNames {
   ragequit = 'ragequit',
   tribute = 'tribute',
   voting = 'voting',
+  withdraw = 'withdraw',
 }
 
 /**
