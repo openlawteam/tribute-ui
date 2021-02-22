@@ -4,6 +4,21 @@ import {Adapters} from './types';
 import {DaoConstants} from './enums';
 import {daoConstants, adapterDescriptions} from './config';
 
+// fallback adaptet contract address
+// @todo remove when this is done https://github.com/openlawteam/laoland/issues/184
+import {
+  DEFAULT_CHAIN,
+  BANK_EXTENSION_CONTRACT_ADDRESS,
+  CONFIGURATION_CONTRACT_ADDRESS,
+  FINANCING_CONTRACT_ADDRESS,
+  GUILDKICK_CONTRACT_ADDRESS,
+  MANAGING_CONTRACT_ADDRESS,
+  ONBOARDING_CONTRACT_ADDRESS,
+  RAGEQUIT_CONTRACT_ADDRESS,
+  TRIBUTE_CONTRACT_ADDRESS,
+  VOTING_CONTRACT_ADDRESS,
+  WITHDRAW_CONTRACT_ADDRESS,
+} from '../../config';
 /**
  * getAdapters()
  *
@@ -20,6 +35,26 @@ export function getAdapters(): Array<Adapters> {
 }
 
 /**
+ * getAdapterContractAddress
+ *
+ * [important] fallback adaptet contract address
+ *  @todo remove when this is done https://github.com/openlawteam/laoland/issues/184
+ */
+export function getAdapterContractAddress() {
+  return {
+    [DaoConstants.BANK]: BANK_EXTENSION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    [DaoConstants.CONFIGURATION]: CONFIGURATION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    [DaoConstants.FINANCING]: FINANCING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    [DaoConstants.GUILDKICK]: GUILDKICK_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    [DaoConstants.MANAGING]: MANAGING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    [DaoConstants.ONBOARDING]: ONBOARDING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    [DaoConstants.RAGEQUIT]: RAGEQUIT_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    [DaoConstants.TRIBUTE]: TRIBUTE_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    [DaoConstants.VOTING]: VOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    [DaoConstants.WITHDRAW]: WITHDRAW_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+  };
+}
+/**
  * getConfigurationABIFunction()
  *
  * Returns the ABI functions used to configure adapters
@@ -31,7 +66,7 @@ export function getConfigurationABIFunction(): Record<DaoConstants, string> {
     [DaoConstants.FINANCING]: 'createFinancingRequest',
     [DaoConstants.GUILDKICK]: 'submitKickProposal',
     [DaoConstants.MANAGING]: 'createAdapterChangeRequest',
-    [DaoConstants.OFFCHAIN_VOTING]: 'configureDao',
+    [DaoConstants.OFFCHAINVOTING]: 'configureDao',
     [DaoConstants.ONBOARDING]: 'configureDao',
     [DaoConstants.RAGEQUIT]: 'ragequit',
     [DaoConstants.TRIBUTE]: 'configureDao',
@@ -81,7 +116,7 @@ export function getAdapterAccessControlLayer(
       REMOVE_ADAPTER: true,
       ADD_ADAPTER: true,
     },
-    [DaoConstants.OFFCHAIN_VOTING]: {},
+    [DaoConstants.OFFCHAINVOTING]: {},
     [DaoConstants.ONBOARDING]: {
       SUBMIT_PROPOSAL: true,
       SPONSOR_PROPOSAL: true,

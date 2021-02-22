@@ -7,7 +7,7 @@ export const daoConstants: Array<DaoConstants> = [
   DaoConstants.FINANCING,
   DaoConstants.GUILDKICK,
   DaoConstants.MANAGING,
-  DaoConstants.OFFCHAIN_VOTING,
+  DaoConstants.OFFCHAINVOTING,
   DaoConstants.ONBOARDING,
   DaoConstants.RAGEQUIT,
   DaoConstants.TRIBUTE,
@@ -27,7 +27,7 @@ export const adapterDescriptions: Record<DaoConstants, string> = {
     'Gives the members the freedom to choose which individuals or organizations should really be part of the DAO.',
   [DaoConstants.MANAGING]:
     'Enhances the DAO capabilities by adding/updating the DAO Adapters through a voting process.',
-  [DaoConstants.OFFCHAIN_VOTING]:
+  [DaoConstants.OFFCHAINVOTING]:
     'Adds the offchain voting governance process to the DAO to support gasless voting.',
   [DaoConstants.ONBOARDING]:
     'Triggers the process of minting internal tokens in exchange of a specific token at a fixed price.',

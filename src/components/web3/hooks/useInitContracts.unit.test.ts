@@ -4,7 +4,7 @@ import {renderHook, act} from '@testing-library/react-hooks';
 import {StoreState} from '../../../store/types';
 import {useInitContracts} from './useInitContracts';
 import Wrapper from '../../../test/Wrapper';
-import {VotingAdapterName} from '../../adpaters/enums';
+import {VotingAdapterName} from '../../adapters/enums';
 
 describe('useInitContracts unit tests', () => {
   test('should load contracts into Redux when called', async () => {

@@ -13,9 +13,12 @@ import {useDao} from '../../hooks';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 
 import AdapterConfiguratorModal from './AdapterConfiguratorModal';
-import Loader from '../../components/feedback/Loader';
 import Checkbox, {CheckboxSize} from '../../components/common/Checkbox';
+import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
+import Loader from '../../components/feedback/Loader';
+
 import {AsyncStatus} from '../../util/types';
+import {truncateEthAddress} from '../../util/helpers';
 import {AddAdapterArguments} from './types';
 
 export default function AdapterManager() {
@@ -57,7 +60,7 @@ export default function AdapterManager() {
     usedAdapters,
     unusedAdapters,
   } = useAdapters();
-  const {dao} = useDao();
+  const {dao, gqlError} = useDao();
 
   const {
     // txError,
@@ -83,7 +86,6 @@ export default function AdapterManager() {
   // and sets the `Select All` checkbox to disabled if no adapters are available
   useEffect(() => {
     if (!unusedAdapters) return;
-
     unusedAdapters &&
       unusedAdapters?.forEach((adapter: Record<string, any>) => {
         setSelections((prevState: Record<string, boolean> | undefined) => ({
@@ -109,8 +111,6 @@ export default function AdapterManager() {
    */
   async function handleAddAdapter(adapter: Record<string, any>) {
     if (!DaoRegistryContract) return;
-
-    console.log('handleAddAdapter', adapter);
 
     try {
       setIsInProcess((prevState) => ({
@@ -163,7 +163,8 @@ export default function AdapterManager() {
         [adapter.adapterName]: false,
       }));
 
-      setSubmitError(error);
+      const errorMessage = new Error('Unable to add selected adapter' || error);
+      setSubmitError(errorMessage);
     }
   }
 
@@ -222,10 +223,20 @@ export default function AdapterManager() {
         txArguments
       );
 
-      // Disable buttons
+      // enable buttons @todo
     } catch (error) {
-      console.log('error', error);
-      setSubmitError(error);
+      const errorMessage = new Error('Unable to add adapters' || error);
+      setSubmitError(errorMessage);
+
+      // reset all the checkboxes for the selected adapters
+      checkboxesSelection(false);
+      // reset all the buttons for the selected adapters
+      for (const adapterName in selections) {
+        setIsInProcess((prevState) => ({
+          ...prevState,
+          [adapterName]: false,
+        }));
+      }
     }
   }
 
@@ -252,9 +263,11 @@ export default function AdapterManager() {
       setInputParameters(inputs);
       setOpenModal(true);
     } catch (error) {
-      console.log(adapter.adapterName, 'not found'); // @todo handle this
-      console.log('handleConfigureAdapter: error', adapter.adapterName, error);
-      setSubmitError(error);
+      const errorMessage = new Error(
+        `${adapter.adapterName} contract not found` || error
+      );
+
+      setSubmitError(errorMessage);
     }
   }
 
@@ -267,28 +280,64 @@ export default function AdapterManager() {
 
   // Handles the select all checkbox event
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
+    checkboxesSelection(event.target.checked);
+  }
+
+  function checkboxesSelection(checked: boolean) {
     // Update the select all checkbox
-    setSelectAll(event.target.checked);
+    setSelectAll(checked);
 
     // Update all unused adapter options
     for (const key in selections) {
       setSelections((s) => ({
         ...s,
-        [key]: event.target.checked,
+        [key]: checked,
       }));
+    }
+  }
+
+  function renderDaoName() {
+    if (!dao && gqlError) {
+      return (
+        <ErrorMessageWithDetails
+          error={gqlError}
+          renderText="Something went wrong"
+        />
+      );
+    }
+
+    if (dao) {
+      return (
+        <h2>
+          {dao.name} <small>{truncateEthAddress(dao.daoAddress, 7)}</small>
+        </h2>
+      );
+    }
+  }
+
+  function renderErrorMessage() {
+    if (submitError) {
+      return (
+        <ErrorMessageWithDetails
+          error={submitError}
+          renderText="Something went wrong"
+        />
+      );
+    } else {
+      return <></>;
     }
   }
 
   return (
     <div className="adaptermanager">
       <h1>Adapter Manager</h1>
-      {dao && <h2>{dao?.name}</h2>}
+      {renderDaoName()}
+      {renderErrorMessage()}
       <p>
         Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
         consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut lacus
         dictum fermentum vel tincidunt neque. Sed sed lacinia...
       </p>
-
       <div className="adaptermanager__selection">
         <div>
           <Checkbox
@@ -296,10 +345,11 @@ export default function AdapterManager() {
             label={`${selectionCount} selected`}
             checked={selectAll === true}
             disabled={
-              isAdaptersUnavailable /* 
+              isAdaptersUnavailable ||
+              !isDAOExisting /* 
               @todo 
-              - also disable when selection is processing 
-              - when there are no more unused adapters to select
+              - disable when selection is processing 
+              - disable when there are no more unused adapters to select
               */
             }
             name={'select-all'}
@@ -318,9 +368,7 @@ export default function AdapterManager() {
       </div>
 
       {isLoadingAdapters && <Loader />}
-
       {isAdaptersUnavailable && <p>No adapters available</p>}
-
       {/** UNUSED ADAPTERS TO ADD */}
       {isDAOExisting &&
         unusedAdapters &&
@@ -374,7 +422,6 @@ export default function AdapterManager() {
             </div>
           </div>
         ))}
-
       {/** CURRENTLY USED ADAPTERS TO CONFIGURE OR REMOVE */}
       {isDAOExisting &&
         usedAdapters &&
@@ -401,7 +448,6 @@ export default function AdapterManager() {
             </div>
           </div>
         ))}
-
       <div className="adaptermanager_finalize">
         <p>
           If you're happy with your setup, you can finalize your DAO. After your
@@ -411,7 +457,8 @@ export default function AdapterManager() {
           <button
             className="button--secondary"
             disabled={
-              isAdaptersUnavailable /* 
+              isAdaptersUnavailable ||
+              !isDAOExisting /* 
               @todo 
               - also disable when selection is processing 
               - when there are no more unused adapters to select
@@ -422,7 +469,6 @@ export default function AdapterManager() {
           </button>
         </div>
       </div>
-
       {openModal && (
         <AdapterConfiguratorModal
           abiMethodName={abiMethodName}

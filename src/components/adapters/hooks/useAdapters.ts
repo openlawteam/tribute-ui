@@ -82,8 +82,8 @@ export function useAdapters(): UseAdaptersReturn {
         // get adapters
         const {adapters} = getUsedAdapters.data as Record<string, any>;
 
-        // get dao address
-        const daoAddress = DaoRegistryContract.contractAddress;
+        // get dao address, must be lowercase due to lower casing of addresses in subgraph
+        const daoAddress = DaoRegistryContract.contractAddress.toLowerCase();
 
         // get all availables adapters for the dao
         const daoAdapters: [] = adapters.filter(
@@ -112,7 +112,10 @@ export function useAdapters(): UseAdaptersReturn {
         // add any unused adapters
         const unusedAdapters = availableAdapters.filter(
           (unused) =>
-            !usedAdapters.find((used) => used.adapterId === unused.adapterId)
+            !usedAdapters.find(
+              (used) =>
+                used.adapterId.toLowerCase() === unused.adapterId.toLowerCase()
+            )
         );
 
         usedAdapters.length && setAdapters(usedAdapters);

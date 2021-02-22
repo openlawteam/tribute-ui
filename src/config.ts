@@ -89,7 +89,7 @@ export const DAO_FACTORY_CONTRACT_ADDRESS = {
 export const DAO_REGISTRY_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0xf01c1C422EBC1fe2114FE76999DF61c5E0A34689',
+  [CHAINS.RINKEBY]: '0x199cdee33c81f4f722a3f9bca99246bdd9853536',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -106,6 +106,7 @@ export const BANK_EXTENSION_CONTRACT_ADDRESS = {
 
 /**
  * ADAPTER CONTRACTS
+ * @todo move these out, get from subgraph instead
  * @note as per https://github.com/openlawteam/laoland#architecture
  *
  * - Configuration
@@ -158,13 +159,13 @@ export const MANAGING_CONTRACT_ADDRESS = {
 };
 
 //@todo
-export const OFFCHAIN_VOTING_CONTRACT_ADDRESS = {
+export const OFFCHAINVOTING_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
   [CHAINS.RINKEBY]: '',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_OFFCHAIN_VOTING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
+  // [CHAINS.GANACHE]: REACT_APP_GANACHE_OFFCHAINVOTING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
 export const ONBOARDING_CONTRACT_ADDRESS = {

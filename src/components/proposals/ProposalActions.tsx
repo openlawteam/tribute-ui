@@ -5,7 +5,7 @@ import {ContractAdapterNames} from '../web3/types';
 import {CycleEllipsis} from '../feedback';
 import {ProposalData} from './types';
 import {StoreState} from '../../store/types';
-import {VotingAdapterName} from '../adpaters/enums';
+import {VotingAdapterName} from '../adapters/enums';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 
 type ProposalActionsProps = {

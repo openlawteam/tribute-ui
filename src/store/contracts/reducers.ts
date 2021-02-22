@@ -5,7 +5,7 @@ import {
   CONTRACT_CONFIGURATION,
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
-  CONTRACT_OFFCHAIN_VOTING,
+  CONTRACT_OFFCHAINVOTING,
   CONTRACT_NONVOTING_ONBOARDING,
   CONTRACT_RAGEQUIT,
   CONTRACT_MANAGING,
@@ -68,7 +68,7 @@ export default function reducer(
       return contractVoting(state, payload);
     case CONTRACT_VOTING_OP_ROLLUP:
       return contractVoting(state, payload);
-    case CONTRACT_OFFCHAIN_VOTING:
+    case CONTRACT_OFFCHAINVOTING:
       return contractOffchainVoting(state, payload);
     case CONTRACT_WITHDRAW:
       return contractWithdraw(state, payload);

@@ -45,10 +45,6 @@ export function useInitContracts() {
   ]);
 
   /**
-   * Functions
-   */
-
-  /**
    * Init contracts
    *
    * If we are connected to the correct network, init contracts

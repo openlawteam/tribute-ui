@@ -14,7 +14,8 @@ import {
 import {ContractsStateEntry, StoreState} from '../types';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
-import {DaoConstants, VotingAdapterName} from '../../components/adpaters/enums';
+import {DaoConstants, VotingAdapterName} from '../../components/adapters/enums';
+import {getAdapterContractAddress} from '../../components/adapters/helpers';
 
 type ContractAction =
   | typeof CONTRACT_DAO_FACTORY
@@ -22,7 +23,7 @@ type ContractAction =
   | typeof CONTRACT_CONFIGURATION
   | typeof CONTRACT_FINANCING
   | typeof CONTRACT_GUILDKICK
-  | typeof CONTRACT_OFFCHAIN_VOTING
+  | typeof CONTRACT_OFFCHAINVOTING
   | typeof CONTRACT_NONVOTING_ONBOARDING
   | typeof CONTRACT_MANAGING
   | typeof CONTRACT_RAGEQUIT
@@ -41,7 +42,7 @@ export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
 export const CONTRACT_CONFIGURATION = 'CONTRACT_CONFIGURATION';
 export const CONTRACT_FINANCING = 'CONTRACT_FINANCING';
 export const CONTRACT_GUILDKICK = 'CONTRACT_GUILDKICK';
-export const CONTRACT_OFFCHAIN_VOTING = 'CONTRACT_OFFCHAIN_VOTING';
+export const CONTRACT_OFFCHAINVOTING = 'CONTRACT_OFFCHAINVOTING';
 export const CONTRACT_NONVOTING_ONBOARDING = 'CONTRACT_NONVOTING_ONBOARDING';
 export const CONTRACT_MANAGING = 'CONTRACT_MANAGING';
 export const CONTRACT_RAGEQUIT = 'CONTRACT_RAGEQUIT';
@@ -287,15 +288,24 @@ export function initRegisteredVotingAdapter(
         const managingContract = getState().contracts.ManagingContract;
 
         if (!daoRegistryContract) {
-          throw new Error(
+          console.warn(
             'Please init the DaoRegistry contract before the voting contract.'
           );
+          return;
+          // throw new Error(
+          //   'Please init the DaoRegistry contract before the voting contract.'
+          // );
         }
 
         if (!managingContract) {
-          throw new Error(
+          console.warn(
             'Please init the Managing contract before the voting contract.'
           );
+
+          return;
+          // throw new Error(
+          //   'Please init the Managing contract before the voting contract.'
+          // );
         }
 
         const address =
@@ -391,7 +401,8 @@ export function initContractThunkFactory({
           : await getAdapterAddress(
               (adapterOrExtensionName as unknown) as ContractAdapterNames,
               getState().contracts.DaoRegistryContract?.instance
-            ));
+            )) ||
+        getAdapterContractAddress()[adapterOrExtensionName];
 
       dispatch(
         createContractAction({
