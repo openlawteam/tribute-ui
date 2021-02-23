@@ -5,8 +5,9 @@ import {EnvironmentName} from './util/types';
  */
 
 const {
-  REACT_APP_ENVIRONMENT,
   REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS,
+  REACT_APP_DEFAULT_CHAIN_NAME_LOCAL,
+  REACT_APP_ENVIRONMENT,
   REACT_APP_INFURA_PROJECT_ID_DEV,
   REACT_APP_INFURA_PROJECT_ID_LOCAL,
   REACT_APP_INFURA_PROJECT_ID_PROD,
@@ -73,7 +74,9 @@ export const DEFAULT_CHAIN =
     ? CHAINS.MAINNET
     : REACT_APP_ENVIRONMENT === 'development'
     ? CHAINS.RINKEBY
-    : CHAINS.GANACHE; // "localhost" environment defaults to your Ganache private network
+    : REACT_APP_DEFAULT_CHAIN_NAME_LOCAL // Set this to change local development chain
+    ? CHAINS[REACT_APP_DEFAULT_CHAIN_NAME_LOCAL]
+    : CHAINS.GANACHE; // Defaults to a Ganache private network (1337)
 
 /**
  * These addresses are important as the contracts use them in their configs.
@@ -103,10 +106,10 @@ export const DAI_TOKEN_ADDRESS: string =
  * with its own proposals and votes.
  */
 export const SPACES: Record<EnvironmentName, string> = {
-  development: '',
+  development: 'thelao',
   // @todo Get local Docker snapshot and "registered" space set up.
   localhost: 'thelao',
-  production: '',
+  production: 'thelao',
 };
 
 // Defaults to `localhost` space if `ENVIRONMENT` is `undefined`.
