@@ -27,13 +27,13 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: npm install
+        run: npm ci
 
       - name: Create production build
         env:
           REACT_APP_ENVIRONMENT: development
           REACT_APP_INFURA_PROJECT_ID_DEV: ${{ secrets.REACT_APP_INFURA_PROJECT_ID_DEV }}
-          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0x252e780E5ef2Ba689034BfD7453438A33c73FCfF"
+          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0xf1912ea06051024E610587d9bf926a252dD7560B"
           REACT_APP_SNAPSHOT_HUB_API_URL: https://snapshot-hub-erc712.dev.thelao.io
         run: npm run build
 
