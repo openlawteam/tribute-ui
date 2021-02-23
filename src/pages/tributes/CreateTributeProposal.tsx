@@ -206,6 +206,11 @@ export default function CreateTributeProposal() {
     getUserERC20BalanceCached();
   }, [getUserERC20BalanceCached]);
 
+  // Set the value of `applicantAddress` if the `account` changes
+  useEffect(() => {
+    setValue(Fields.applicantAddress, account);
+  }, [account, setValue]);
+
   /**
    * Functions
    */
@@ -536,11 +541,11 @@ export default function CreateTributeProposal() {
         <div className="form__input-row">
           <label className="form__input-row-label">Applicant Address</label>
           <div className="form__input-row-fieldwrap">
+            {/* @note We don't need the default value as it's handled in the useEffect above. */}
             <input
               aria-describedby={`error-${Fields.applicantAddress}`}
               aria-invalid={errors.applicantAddress ? 'true' : 'false'}
               name={Fields.applicantAddress}
-              defaultValue={account}
               ref={register({
                 validate: (applicantAddress: string): string | boolean => {
                   return !applicantAddress
