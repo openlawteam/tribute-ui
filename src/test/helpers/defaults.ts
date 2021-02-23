@@ -1,8 +1,8 @@
 export const DEFAULT_ETH_ADDRESS: string =
   '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D';
-export const DEFAULT_SPACE: string = 'tributetest';
+export const DEFAULT_SPACE: string = 'molochv3test';
 export const DEFAULT_DAO_REGISTRY_ADDRESS: string =
-  process.env.REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS || '';
+  process.env.REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS || '';
 export const DEFAULT_PROPOSAL_HASH: string =
   '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75';
 export const DEFAULT_DRAFT_HASH: string =

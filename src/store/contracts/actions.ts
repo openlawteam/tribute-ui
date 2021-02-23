@@ -89,7 +89,7 @@ export function initContractDaoRegistry(web3Instance: Web3) {
         );
 
         const daoRegistryContract: AbiItem[] = lazyDaoRegistryABI as any;
-        const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+        const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS;
 
         if (!contractAddress) {
           throw new Error('No DAO Registry contract address was found.');
@@ -292,20 +292,13 @@ export function initRegisteredVotingAdapter(
             'Please init the DaoRegistry contract before the voting contract.'
           );
           return;
-          // throw new Error(
-          //   'Please init the DaoRegistry contract before the voting contract.'
-          // );
         }
 
         if (!managingContract) {
           console.warn(
             'Please init the Managing contract before the voting contract.'
           );
-
           return;
-          // throw new Error(
-          //   'Please init the Managing contract before the voting contract.'
-          // );
         }
 
         const address =

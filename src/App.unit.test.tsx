@@ -15,7 +15,7 @@ describe('App unit tests', () => {
 
     await waitFor(() => {
       // Header
-      expect(screen.getByText(/TRIBUTE/)).toBeInTheDocument();
+      expect(screen.getByText(/MOLOCH v3/)).toBeInTheDocument();
       // Subtitle
       expect(
         screen.getByText(/for the ongoing development of moloch v3/i)
@@ -45,7 +45,7 @@ describe('App unit tests', () => {
 
     await waitFor(() => {
       // Header
-      expect(screen.getByText(/TRIBUTE/)).toBeInTheDocument();
+      expect(screen.getByText(/MOLOCH v3/)).toBeInTheDocument();
       // Burger icon
       expect(screen.getByLabelText(/menu/i)).toBeInTheDocument();
       expect(

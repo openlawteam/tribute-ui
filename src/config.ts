@@ -6,7 +6,7 @@ import {EnvironmentName} from './util/types';
 
 const {
   REACT_APP_ENVIRONMENT,
-  REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS,
+  REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS,
   REACT_APP_INFURA_PROJECT_ID_DEV,
   REACT_APP_INFURA_PROJECT_ID_LOCAL,
   REACT_APP_INFURA_PROJECT_ID_PROD,
@@ -77,6 +77,7 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
  * - DAO Factory
  * - Bank Extension
  */
+
 export const DAO_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
@@ -86,14 +87,8 @@ export const DAO_FACTORY_CONTRACT_ADDRESS = {
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_FACTORY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
-export const DAO_REGISTRY_CONTRACT_ADDRESS = {
-  [CHAINS.MAINNET]: '',
-  [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x199cdee33c81f4f722a3f9bca99246bdd9853536',
-  [CHAINS.GOERLI]: '',
-  [CHAINS.KOVAN]: '',
-  [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_REGISTRY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
-};
+// If developing locally, include your DaoRegistry contract address in your `.env` file.
+export const DAO_REGISTRY_CONTRACT_ADDRESS = REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS;
 
 export const BANK_EXTENSION_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
@@ -121,6 +116,7 @@ export const BANK_EXTENSION_CONTRACT_ADDRESS = {
  * - Guild kick
  * - Withdraw
  */
+
 export const CONFIGURATION_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
