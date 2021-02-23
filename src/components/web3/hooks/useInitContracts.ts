@@ -11,7 +11,6 @@ import {
   initContractFinancing,
   initContractGuildKick,
   initContractRagequit,
-  initContractVoting,
   initContractTribute,
   initRegisteredVotingAdapter,
   initContractWithdraw,
@@ -66,7 +65,6 @@ export function useInitContracts() {
       await dispatch(initContractGuildKick(web3Instance));
       await dispatch(initContractManaging(web3Instance));
       await dispatch(initContractRagequit(web3Instance));
-      await dispatch(initContractVoting(web3Instance));
       await dispatch(initContractBankExtension(web3Instance));
       await dispatch(initContractTribute(web3Instance));
       await dispatch(initContractWithdraw(web3Instance));

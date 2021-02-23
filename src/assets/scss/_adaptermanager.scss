@@ -50,7 +50,7 @@
   }
 }
 
-.used-adapters {
+.registered-adapters {
   .adaptermanager__info {
     padding-left: 10%;
   }
@@ -63,7 +63,7 @@
 }
 
 // includes room for the checkbox
-.unused-adapters {
+.unregistered-adapters {
   .adaptermanager__checkbox {
     flex: 10%;
   }
@@ -124,5 +124,9 @@
   .button--secondary {
     background-color: #dce7f2;
     color: #547ac4;
+  }
+
+  .finalize {
+    margin-bottom: 1rem;
   }
 }

@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {StoreState} from '../../store/types';
@@ -9,8 +9,9 @@ import {
 import {Adapters} from './types';
 import {DaoConstants} from './enums';
 import {useAdapters} from './hooks/useAdapters';
-import {useDao} from '../../hooks';
+import {useDao, useMemberActionDisabled} from '../../hooks';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
+import {getDaoState, DaoState} from '../web3/helpers';
 
 import AdapterConfiguratorModal from './AdapterConfiguratorModal';
 import Checkbox, {CheckboxSize} from '../../components/common/Checkbox';
@@ -20,6 +21,11 @@ import Loader from '../../components/feedback/Loader';
 import {AsyncStatus} from '../../util/types';
 import {truncateEthAddress} from '../../util/helpers';
 import {AddAdapterArguments} from './types';
+
+enum WhyDisableModalTitles {
+  FINALIZED_REASON = 'Why is finalizing disabled?',
+  ADAPTERS_REASON = 'Why are adapter configurations disabled?',
+}
 
 export default function AdapterManager() {
   /**
@@ -48,6 +54,10 @@ export default function AdapterManager() {
   const [isInProcess, setIsInProcess] = useState<
     Record<string, boolean> | undefined
   >();
+  const [daoState, setDaoState] = useState<DaoState>();
+  const [whyDisabledReason, setWhyDisabledReason] = useState<
+    WhyDisableModalTitles | undefined
+  >();
 
   /**
    * Hooks
@@ -70,6 +80,12 @@ export default function AdapterManager() {
     // txStatus,
   } = useContractSend();
   const gasPrices = useETHGasPrice();
+  const {
+    isDisabled,
+    openWhyDisabledModal,
+    setOtherDisabledReasons,
+    WhyDisabledModal,
+  } = useMemberActionDisabled();
 
   /**
    * Variables
@@ -82,6 +98,17 @@ export default function AdapterManager() {
     unRegisteredAdapters === undefined;
   const isLoadingAdapters = adapterStatus === AsyncStatus.PENDING;
 
+  const checkDaoStateCached = useCallback(checkDaoState, [
+    DaoRegistryContract,
+    dao?.name,
+    setOtherDisabledReasons,
+  ]);
+
+  // Check the Dao state
+  useEffect(() => {
+    checkDaoStateCached();
+  }, [checkDaoStateCached, DaoRegistryContract]);
+
   // Sets the initial checkbox selections for non-registered adapters to `false`
   // and sets the `Select All` checkbox to disabled if no adapters are available
   useEffect(() => {
@@ -93,7 +120,7 @@ export default function AdapterManager() {
           [adapter.adapterName]: false,
         }));
       });
-  }, [unRegisteredAdapters]);
+  }, [isDisabled, unRegisteredAdapters]);
 
   // Updates checkbox selection counter when user selects a checkbox
   useEffect(() => {
@@ -103,6 +130,24 @@ export default function AdapterManager() {
           .length
       );
   }, [selections]);
+
+  async function checkDaoState() {
+    if (!DaoRegistryContract) {
+      return;
+    }
+
+    try {
+      const finalizedMessage = `${dao?.name} is already finalized`;
+
+      const daoRegistryState = await getDaoState(DaoRegistryContract.instance);
+      setDaoState(daoRegistryState);
+
+      daoRegistryState === DaoState.READY &&
+        setOtherDisabledReasons([finalizedMessage]);
+    } catch (error) {
+      setDaoState(undefined);
+    }
+  }
 
   /**
    * handleAddAdapter
@@ -364,6 +409,7 @@ export default function AdapterManager() {
             checked={selectAll === true}
             disabled={
               isAdaptersUnavailable ||
+              isDisabled || // connected user is not an active member
               !isDAOExisting /* 
               @todo 
               - disable when selection is processing 
@@ -378,7 +424,7 @@ export default function AdapterManager() {
         <div>
           <button
             className="button--secondary"
-            disabled={selectionCount === 0}
+            disabled={selectionCount === 0 || isDisabled}
             onClick={handleAddSelectedAdapters}>
             Add selected
           </button>
@@ -387,13 +433,14 @@ export default function AdapterManager() {
 
       {isLoadingAdapters && <Loader />}
       {isAdaptersUnavailable && <p>No adapters available</p>}
+
       {/** UNUSED ADAPTERS TO ADD */}
       {isDAOExisting &&
         unRegisteredAdapters &&
         unRegisteredAdapters?.length &&
         unRegisteredAdapters.map((adapter: Record<string, any>) => (
           <div
-            className="adaptermanager__grid unused-adapters"
+            className="adaptermanager__grid unregistered-adapters"
             key={adapter.adapterId}>
             <div className="adaptermanager__checkbox">
               <Checkbox
@@ -403,7 +450,7 @@ export default function AdapterManager() {
                   (selections && selections[adapter.adapterName] === true) ||
                   false
                 }
-                disabled={false /*state.disableConfirmDelgation*/}
+                disabled={isDisabled}
                 name={adapter.adapterName}
                 size={CheckboxSize.LARGE}
                 onChange={(event) => {
@@ -427,7 +474,10 @@ export default function AdapterManager() {
             <div className="adaptermanager__add">
               <button
                 className="button--secondary"
-                disabled={isInProcess && isInProcess[adapter.adapterName]}
+                disabled={
+                  (isInProcess && isInProcess[adapter.adapterName]) ||
+                  isDisabled
+                }
                 onClick={() => handleAddAdapter(adapter)}>
                 {isInProcess && isInProcess[adapter.adapterName] ? (
                   <Loader />
@@ -446,7 +496,7 @@ export default function AdapterManager() {
         registeredAdapters?.length &&
         registeredAdapters.map((adapter: Record<string, any>) => (
           <div
-            className="adaptermanager__grid used-adapters"
+            className="adaptermanager__grid registered-adapters"
             key={adapter.adapterId}>
             <div className="adaptermanager__info">
               <span className="adaptermanager__name">
@@ -460,12 +510,27 @@ export default function AdapterManager() {
             <div className="adaptermanager__configure">
               <button
                 className="button--secondary"
+                disabled={isDisabled}
                 onClick={() => handleConfigureAdapter(adapter as Adapters)}>
                 Configure
               </button>
             </div>
           </div>
         ))}
+
+      {isDisabled && (
+        <div>
+          <button
+            className="button--help"
+            onClick={() => {
+              openWhyDisabledModal();
+              setWhyDisabledReason(WhyDisableModalTitles.ADAPTERS_REASON);
+            }}>
+            {WhyDisableModalTitles.ADAPTERS_REASON}
+          </button>
+        </div>
+      )}
+
       <div className="adaptermanager_finalize">
         <p>
           If you're happy with your setup, you can finalize your DAO. After your
@@ -473,10 +538,12 @@ export default function AdapterManager() {
         </p>
         <div>
           <button
-            className="button--secondary"
+            className="button--secondary finalize"
             disabled={
               isAdaptersUnavailable ||
-              !isDAOExisting /* 
+              !isDAOExisting ||
+              daoState ===
+                DaoState.READY /* 
               @todo 
               - also disable when selection is processing 
               - when there are no more unused adapters to select
@@ -486,7 +553,23 @@ export default function AdapterManager() {
             Finalize Dao
           </button>
         </div>
+
+        {isDisabled && (
+          <div>
+            <button
+              className="button--help"
+              onClick={() => {
+                openWhyDisabledModal();
+                setWhyDisabledReason(WhyDisableModalTitles.FINALIZED_REASON);
+              }}>
+              {WhyDisableModalTitles.FINALIZED_REASON}
+            </button>
+          </div>
+        )}
+
+        <WhyDisabledModal title={whyDisabledReason} />
       </div>
+
       {openModal && (
         <AdapterConfiguratorModal
           abiMethodName={abiMethodName}
