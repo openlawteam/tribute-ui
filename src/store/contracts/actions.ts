@@ -100,7 +100,7 @@ export function initContractOnboarding(
   return initContractThunkFactory({
     actionType: CONTRACT_ONBOARDING,
     adapterNameForRedux: DaoConstants.ONBOARDING,
-    adapterOrExtensionName: ContractAdapterNames.ragequit,
+    adapterOrExtensionName: ContractAdapterNames.onboarding,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/OnboardingContract.json'),
     web3Instance,
