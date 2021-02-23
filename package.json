@@ -1,10 +1,9 @@
 {
-  "name": "tribute",
+  "name": "molochv3-ui",
   "version": "0.1.2-1",
-  "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/openlawteam/tribute.git"
+    "url": "https://github.com/openlawteam/molochv3-ui.git"
   },
   "homepage": "https://molochv3.org",
   "author": "OpenLaw Team",
