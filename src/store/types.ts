@@ -8,7 +8,6 @@ import {DaoConstants, VotingAdapterName} from '../components/adapters/enums';
 export type ContractsState = {
   DaoFactoryContract: ContractsStateEntry | null;
   DaoRegistryContract: ContractsStateEntry | null;
-  BankContract: ContractsStateEntry | null;
   ConfigurationContract: ContractsStateEntry | null;
   FinancingContract: ContractsStateEntry | null;
   GuildBankContract: ContractsStateEntry | null;

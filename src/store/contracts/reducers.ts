@@ -20,7 +20,6 @@ import {ContractsState} from '../types';
 const initialState = {
   DaoFactoryContract: null,
   DaoRegistryContract: null,
-  BankContract: null,
   ConfigurationContract: null,
   FinancingContract: null,
   GuildBankContract: null,

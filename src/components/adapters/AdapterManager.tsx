@@ -57,8 +57,8 @@ export default function AdapterManager() {
     availableAdapters,
     adapterStatus,
     getAdapter,
-    usedAdapters,
-    unusedAdapters,
+    registeredAdapters,
+    unRegisteredAdapters,
   } = useAdapters();
   const {dao, gqlError} = useDao();
 
@@ -78,22 +78,22 @@ export default function AdapterManager() {
   // grammatically naming is incorrect :)
   const isAdaptersUnavailable =
     adapterStatus === AsyncStatus.REJECTED &&
-    usedAdapters === undefined &&
-    unusedAdapters === undefined;
+    registeredAdapters === undefined &&
+    unRegisteredAdapters === undefined;
   const isLoadingAdapters = adapterStatus === AsyncStatus.PENDING;
 
-  // Sets the initial checkbox selections for unused adapters to `false`
+  // Sets the initial checkbox selections for non-registered adapters to `false`
   // and sets the `Select All` checkbox to disabled if no adapters are available
   useEffect(() => {
-    if (!unusedAdapters) return;
-    unusedAdapters &&
-      unusedAdapters?.forEach((adapter: Record<string, any>) => {
+    if (!unRegisteredAdapters) return;
+    unRegisteredAdapters &&
+      unRegisteredAdapters?.forEach((adapter: Record<string, any>) => {
         setSelections((prevState: Record<string, boolean> | undefined) => ({
           ...prevState,
           [adapter.adapterName]: false,
         }));
       });
-  }, [unusedAdapters]);
+  }, [unRegisteredAdapters]);
 
   // Updates checkbox selection counter when user selects a checkbox
   useEffect(() => {
@@ -110,6 +110,8 @@ export default function AdapterManager() {
    * @param adapter
    */
   async function handleAddAdapter(adapter: Record<string, any>) {
+    setSubmitError(undefined);
+
     if (!DaoRegistryContract) return;
 
     try {
@@ -169,6 +171,8 @@ export default function AdapterManager() {
   }
 
   async function handleAddSelectedAdapters() {
+    setSubmitError(undefined);
+
     if (!DaoFactoryContract) {
       throw new Error('DaoFactoryContract not found');
     }
@@ -246,6 +250,8 @@ export default function AdapterManager() {
    * @param adapter
    */
   async function handleConfigureAdapter(adapter: Adapters) {
+    setSubmitError(undefined);
+
     try {
       // Get ABI function name
       const adapterABIFunctionName: string = getConfigurationABIFunction()[
@@ -298,6 +304,12 @@ export default function AdapterManager() {
 
   function renderDaoName() {
     if (!dao && gqlError) {
+      window.scrollTo({
+        top: 0,
+        left: 200,
+        behavior: 'smooth',
+      });
+
       return (
         <ErrorMessageWithDetails
           error={gqlError}
@@ -317,6 +329,12 @@ export default function AdapterManager() {
 
   function renderErrorMessage() {
     if (submitError) {
+      window.scrollTo({
+        top: 0,
+        left: 200,
+        behavior: 'smooth',
+      });
+
       return (
         <ErrorMessageWithDetails
           error={submitError}
@@ -371,9 +389,9 @@ export default function AdapterManager() {
       {isAdaptersUnavailable && <p>No adapters available</p>}
       {/** UNUSED ADAPTERS TO ADD */}
       {isDAOExisting &&
-        unusedAdapters &&
-        unusedAdapters?.length &&
-        unusedAdapters.map((adapter: Record<string, any>) => (
+        unRegisteredAdapters &&
+        unRegisteredAdapters?.length &&
+        unRegisteredAdapters.map((adapter: Record<string, any>) => (
           <div
             className="adaptermanager__grid unused-adapters"
             key={adapter.adapterId}>
@@ -424,9 +442,9 @@ export default function AdapterManager() {
         ))}
       {/** CURRENTLY USED ADAPTERS TO CONFIGURE OR REMOVE */}
       {isDAOExisting &&
-        usedAdapters &&
-        usedAdapters?.length &&
-        usedAdapters.map((adapter: Record<string, any>) => (
+        registeredAdapters &&
+        registeredAdapters?.length &&
+        registeredAdapters.map((adapter: Record<string, any>) => (
           <div
             className="adaptermanager__grid used-adapters"
             key={adapter.adapterId}>

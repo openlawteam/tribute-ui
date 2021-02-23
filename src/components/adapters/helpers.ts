@@ -37,7 +37,7 @@ export function getAdapters(): Array<Adapters> {
 /**
  * getAdapterContractAddress
  *
- * [important] fallback adaptet contract address
+ * [important] fallback adapter contract addresses
  *  @todo remove when this is done https://github.com/openlawteam/laoland/issues/184
  */
 export function getAdapterContractAddress() {

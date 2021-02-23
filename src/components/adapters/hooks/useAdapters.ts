@@ -24,8 +24,8 @@ type UseAdaptersReturn = {
   adapterStatus: AsyncStatus;
   availableAdapters: Adapters[];
   getAdapter: (adapterName: DaoConstants) => Record<string, any>;
-  unusedAdapters: Adapters[] | undefined;
-  usedAdapters: AdapterType[] | undefined;
+  registeredAdapters: AdapterType[] | undefined;
+  unRegisteredAdapters: Adapters[] | undefined;
 };
 
 export type AdaptersType = AdapterType & Adapters;
@@ -49,15 +49,17 @@ export function useAdapters(): UseAdaptersReturn {
   /**
    * Their hooks
    */
-  const getUsedAdapters = useQuery(GET_ADAPTERS, {
+  const getRegisteredAdapters = useQuery(GET_ADAPTERS, {
     pollInterval: GQL_QUERY_POLLING_INTERVAL,
   });
 
   /**
    * State
    */
-  const [adapters, setAdapters] = useState<AdapterType[] | undefined>();
-  const [unusedAdapters, setUnusedAdapters] = useState<
+  const [registeredAdapters, setRegisteredAdapters] = useState<
+    AdapterType[] | undefined
+  >();
+  const [unRegisteredAdapters, setUnRegisteredAdapters] = useState<
     Adapters[] | undefined
   >();
   const [adapterStatus, setAdapterStatus] = useState<AsyncStatus>(
@@ -78,9 +80,9 @@ export function useAdapters(): UseAdaptersReturn {
     try {
       setAdapterStatus(AsyncStatus.PENDING);
 
-      if (!getUsedAdapters.loading && getUsedAdapters.data) {
+      if (!getRegisteredAdapters.loading && getRegisteredAdapters.data) {
         // get adapters
-        const {adapters} = getUsedAdapters.data as Record<string, any>;
+        const {adapters} = getRegisteredAdapters.data as Record<string, any>;
 
         // get dao address, must be lowercase due to lower casing of addresses in subgraph
         const daoAddress = DaoRegistryContract.contractAddress.toLowerCase();
@@ -110,7 +112,7 @@ export function useAdapters(): UseAdaptersReturn {
         });
 
         // add any unused adapters
-        const unusedAdapters = availableAdapters.filter(
+        const nonRegisteredAdapters = availableAdapters.filter(
           (unused) =>
             !usedAdapters.find(
               (used) =>
@@ -118,21 +120,23 @@ export function useAdapters(): UseAdaptersReturn {
             )
         );
 
-        usedAdapters.length && setAdapters(usedAdapters);
-        unusedAdapters.length && setUnusedAdapters(unusedAdapters);
+        usedAdapters.length && setRegisteredAdapters(usedAdapters);
+        nonRegisteredAdapters.length &&
+          setUnRegisteredAdapters(nonRegisteredAdapters);
 
         setAdapterStatus(AsyncStatus.FULFILLED);
       } else {
-        if (getUsedAdapters.error) {
-          throw new Error(getUsedAdapters.error.message);
+        if (getRegisteredAdapters.error) {
+          throw new Error(getRegisteredAdapters.error.message);
         }
       }
     } catch (error) {
-      setAdapters(undefined);
-      setUnusedAdapters(undefined);
+      setRegisteredAdapters(undefined);
+      setUnRegisteredAdapters(undefined);
+
       setAdapterStatus(AsyncStatus.REJECTED);
     }
-  }, [availableAdapters, DaoRegistryContract, getUsedAdapters]);
+  }, [availableAdapters, DaoRegistryContract, getRegisteredAdapters]);
 
   /**
    * getAdapter
@@ -150,7 +154,7 @@ export function useAdapters(): UseAdaptersReturn {
     adapterStatus,
     availableAdapters,
     getAdapter,
-    unusedAdapters,
-    usedAdapters: adapters,
+    registeredAdapters,
+    unRegisteredAdapters,
   };
 }
