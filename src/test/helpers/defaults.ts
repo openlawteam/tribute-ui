@@ -1,6 +1,6 @@
 export const DEFAULT_ETH_ADDRESS: string =
   '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D';
-export const DEFAULT_SPACE: string = 'tributetest';
+export const DEFAULT_SPACE: string = 'molochv3test';
 export const DEFAULT_DAO_REGISTRY_ADDRESS: string =
   process.env.REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS || '';
 export const DEFAULT_PROPOSAL_HASH: string =

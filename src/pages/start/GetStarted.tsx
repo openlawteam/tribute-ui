@@ -8,7 +8,7 @@ import {NavLinks} from '../../components/Nav';
 import FadeIn from '../../components/common/FadeIn';
 import Wrap from '../../components/common/Wrap';
 
-const TributeCube = React.memo(() => {
+const MolochV3Cube = React.memo(() => {
   return (
     <div
       className="cube"
@@ -56,7 +56,7 @@ export default function GetStarted() {
           </div>
 
           <div className="landing__img">
-            <TributeCube />
+            <MolochV3Cube />
           </div>
 
           <div className="landing__button">

@@ -2,7 +2,7 @@ import {CoreProposalVoteChoices} from '@openlaw/snapshot-js-erc712';
 import {VoteChoices} from './types';
 
 /**
- * WEB3 CONFIG for TRIBUTE DAO
+ * WEB3 CONFIG for MOLOCH v3
  */
 
 // Vote choices should be "yes", "no" unless Moloch v3 contracts change.

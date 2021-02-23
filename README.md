@@ -1,4 +1,4 @@
-# TRIBUTE dao
+# Moloch v3
 
 ## Developer Setup
 
@@ -29,7 +29,7 @@ When you set up your Ganache network workspace in the [Ganache GUI app](https://
 
 Deployments for the development environment are handled automatically with a GitHub Action:
 
-- `GitHub Pages development deployment`: push to `main` branch -> https://openlawteam.github.io/tribute
+- `GitHub Pages development deployment`: push to `main` branch -> https://molochv3.org
 
 ---
 
