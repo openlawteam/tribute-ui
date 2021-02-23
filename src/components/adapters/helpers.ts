@@ -19,28 +19,33 @@ import {
   VOTING_CONTRACT_ADDRESS,
   WITHDRAW_CONTRACT_ADDRESS,
 } from '../../config';
+
 /**
  * getAdapters()
  *
  * @returns Array<Adapters>
  */
 export function getAdapters(): Array<Adapters> {
-  return daoConstants.map((adapter: DaoConstants) => {
+  return daoConstants.map((adapterName: DaoConstants) => {
     return {
-      adapterId: sha3(adapter) || '', // bytes32
-      adapterName: adapter,
-      adapterDescription: adapterDescriptions[adapter],
+      adapterId: getAdapterId(adapterName) || '', // bytes32 type
+      adapterName,
+      adapterDescription: adapterDescriptions[adapterName],
     };
   });
 }
 
+export function getAdapterId(adapterName: DaoConstants): string {
+  return sha3(adapterName) as string;
+}
+
 /**
- * getAdapterContractAddress
+ * getAdapterOrExtensionContractAddress
  *
  * [important] fallback adapter contract addresses
  *  @todo remove when this is done https://github.com/openlawteam/laoland/issues/184
  */
-export function getAdapterContractAddress() {
+export function getAdapterOrExtensionContractAddress() {
   return {
     [DaoConstants.BANK]: BANK_EXTENSION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     [DaoConstants.CONFIGURATION]: CONFIGURATION_CONTRACT_ADDRESS[DEFAULT_CHAIN],

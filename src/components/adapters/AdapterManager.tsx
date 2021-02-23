@@ -2,31 +2,44 @@ import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {StoreState} from '../../store/types';
+import {AsyncStatus} from '../../util/types';
+import {AddAdapterArguments, Adapters} from './types';
+
+import {DaoConstants} from './enums';
+
 import {
+  getAdapterId,
   getAdapterAccessControlLayer,
   getConfigurationABIFunction,
+  getAdapterOrExtensionContractAddress,
 } from './helpers';
-import {Adapters} from './types';
-import {DaoConstants} from './enums';
+import {getDaoState, DaoState} from '../web3/helpers';
+import {truncateEthAddress} from '../../util/helpers';
+
 import {useAdapters} from './hooks/useAdapters';
 import {useDao, useMemberActionDisabled} from '../../hooks';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
-import {getDaoState, DaoState} from '../web3/helpers';
 
 import AdapterConfiguratorModal from './AdapterConfiguratorModal';
 import Checkbox, {CheckboxSize} from '../../components/common/Checkbox';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import Loader from '../../components/feedback/Loader';
 
-import {AsyncStatus} from '../../util/types';
-import {truncateEthAddress} from '../../util/helpers';
-import {AddAdapterArguments} from './types';
-
 enum WhyDisableModalTitles {
   FINALIZED_REASON = 'Why is finalizing disabled?',
   ADAPTERS_REASON = 'Why are adapter configurations disabled?',
 }
-
+/**
+ * AdapterManager()
+ *
+ * This components lists all the registered and unregistered adapters
+ * from the list of available adapters in the `daoConstants` in `./config.ts`
+ *
+ * It allows for adding unregisted adapters, configurating registered adapters
+ * and finalizing the DAO.
+ *
+ * @note it is not possible to manage the adapters if the DAO is finalized.
+ */
 export default function AdapterManager() {
   /**
    * Selectors
@@ -39,10 +52,11 @@ export default function AdapterManager() {
    * States
    */
   const [abiMethodName, setABIMethodName] = useState<string>('');
-  const [inputParameters, setInputParameters] = useState<Record<string, any>>();
-  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [daoState, setDaoState] = useState<DaoState>();
   const [isDone, setIsDone] = useState<Record<string, boolean> | undefined>();
+  const [inputParameters, setInputParameters] = useState<Record<string, any>>();
   const [submitError, setSubmitError] = useState<Error>();
+  const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [selectionCount, setSelectionCount] = useState<number>(0);
   const [selections, setSelections] = useState<
@@ -54,7 +68,6 @@ export default function AdapterManager() {
   const [isInProcess, setIsInProcess] = useState<
     Record<string, boolean> | undefined
   >();
-  const [daoState, setDaoState] = useState<DaoState>();
   const [whyDisabledReason, setWhyDisabledReason] = useState<
     WhyDisableModalTitles | undefined
   >();
@@ -154,7 +167,47 @@ export default function AdapterManager() {
    *
    * @param adapter
    */
-  async function handleAddAdapter(adapter: Record<string, any>) {
+  function handleAddAdapter(adapter: Record<string, any>) {
+    // let adapterOrExtensionContractAddress: string = '';
+
+    const adapterOrExtensionAddress = new Promise<any>((resolve, reject) => {
+      try {
+        // Get adapters contract address
+        const {contractAddress} = getAdapter(
+          adapter.adapterName as DaoConstants
+        );
+
+        resolve(contractAddress);
+      } catch (error) {
+        // try and get the default contract address
+        const contractAddress = getAdapterOrExtensionContractAddress()[
+          adapter.adapterName
+        ];
+
+        if (contractAddress) {
+          resolve(contractAddress);
+        } else {
+          reject(error);
+        }
+      }
+    });
+
+    adapterOrExtensionAddress
+      .then((addr: string) => {
+        addAdapterOrExtension(addr, adapter.adapterName);
+      })
+      .catch((error) => {
+        console.warn(
+          `Dao adapter contract not found, try adding the default "${adapter.adapterName}" contract`
+        );
+      });
+  }
+
+  async function addAdapterOrExtension(
+    contractAddress: string,
+    adapterName: DaoConstants
+  ) {
+    //Record<string, any>
     setSubmitError(undefined);
 
     if (!DaoRegistryContract) return;
@@ -162,22 +215,25 @@ export default function AdapterManager() {
     try {
       setIsInProcess((prevState) => ({
         ...prevState,
-        [adapter.adapterName]: true,
+        [adapterName]: true,
       }));
 
       // Get adapters contract address
-      const {contractAddress} = getAdapter(adapter.adapterName as DaoConstants);
+      // const {contractAddress} = getAdapter(adapter.adapterName as DaoConstants);
 
       if (!contractAddress) {
         throw new Error('adapterAddress must not be empty');
       }
 
-      // Get adapters access control layer (acl)
+      // 1. Get the bytes32 hash of the adapter name
+      const adapterId = getAdapterId(adapterName);
+
+      // 2. Get adapters access control layer (acl)
       // these are the functions the adapter will have access to
-      const {acl} = getAdapterAccessControlLayer(adapter.adapterName);
+      const {acl} = getAdapterAccessControlLayer(adapterName);
 
       const addAdapterArguments: AddAdapterArguments = [
-        adapter.adapterId,
+        adapterId,
         contractAddress,
         acl,
       ];
@@ -188,7 +244,7 @@ export default function AdapterManager() {
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      // Execute contract call for `addAdapter`
+      // Execute contract call for `addAdapter` or `addExtension` @todo
       await txSend(
         'addAdapter',
         DaoRegistryContract.instance.methods,
@@ -198,19 +254,25 @@ export default function AdapterManager() {
 
       setIsInProcess((prevState) => ({
         ...prevState,
-        [adapter.adapterName]: false,
+        [adapterName]: false,
       }));
       setIsDone((prevState) => ({
         ...prevState,
-        [adapter.adapterName]: true,
+        [adapterName]: true,
       }));
+
+      // @todo re-initContracts
     } catch (error) {
       setIsInProcess((prevState) => ({
         ...prevState,
-        [adapter.adapterName]: false,
+        [adapterName]: false,
       }));
 
-      const errorMessage = new Error('Unable to add selected adapter' || error);
+      const errorMessage = new Error(
+        error && error?.code === 4001
+          ? error.message
+          : `Unable to add ${adapterName} adapter`
+      );
       setSubmitError(errorMessage);
     }
   }
@@ -240,11 +302,7 @@ export default function AdapterManager() {
           // these are the functions the adapter will have access to
           const {acl} = getAdapterAccessControlLayer(adapterName);
 
-          adaptersArguments.push([
-            adapterId, // [0]bytes32 adapterId
-            contractAddress, // [1]address adapterAddress
-            acl, // [2]uint256 acl
-          ]);
+          adaptersArguments.push([adapterId, contractAddress, acl]);
 
           setIsInProcess((prevState) => ({
             ...prevState,
@@ -273,8 +331,11 @@ export default function AdapterManager() {
       );
 
       // enable buttons @todo
+      // re-init contracts @todo
     } catch (error) {
-      const errorMessage = new Error('Unable to add adapters' || error);
+      const errorMessage = new Error(
+        error && error?.code === 4001 ? error.message : `Unable to add adapters`
+      );
       setSubmitError(errorMessage);
 
       // reset all the checkboxes for the selected adapters
@@ -315,9 +376,10 @@ export default function AdapterManager() {
       setOpenModal(true);
     } catch (error) {
       const errorMessage = new Error(
-        `${adapter.adapterName} contract not found` || error
+        error && error?.code === 4001
+          ? error.message
+          : `${adapter.adapterName} contract not found`
       );
-
       setSubmitError(errorMessage);
     }
   }
@@ -404,7 +466,7 @@ export default function AdapterManager() {
       <div className="adaptermanager__selection">
         <div>
           <Checkbox
-            id={'select-all'}
+            id="select-all"
             label={`${selectionCount} selected`}
             checked={selectAll === true}
             disabled={
@@ -416,7 +478,7 @@ export default function AdapterManager() {
               - disable when there are no more unused adapters to select
               */
             }
-            name={'select-all'}
+            name="select-all"
             size={CheckboxSize.LARGE}
             onChange={handleOnChange}
           />

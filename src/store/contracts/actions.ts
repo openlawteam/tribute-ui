@@ -15,7 +15,6 @@ import {ContractsStateEntry, StoreState} from '../types';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
 import {DaoConstants, VotingAdapterName} from '../../components/adapters/enums';
-import {getAdapterContractAddress} from '../../components/adapters/helpers';
 
 type ContractAction =
   | typeof CONTRACT_DAO_FACTORY
@@ -394,8 +393,7 @@ export function initContractThunkFactory({
           : await getAdapterAddress(
               (adapterOrExtensionName as unknown) as ContractAdapterNames,
               getState().contracts.DaoRegistryContract?.instance
-            )) ||
-        getAdapterContractAddress()[adapterOrExtensionName];
+            ));
 
       dispatch(
         createContractAction({
