@@ -30,6 +30,3 @@ yarn-error.log*
 .env
 # We need the `[..]/test/.env` for tests
 !src/test/.env
-
-# Local Netlify folder
-.netlify

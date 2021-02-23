@@ -1,4 +1,4 @@
-name: Netlify develop deployment
+name: GitHub Pages development deployment
 
 on:
   push:
@@ -27,22 +27,20 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: npm install
+        run: npm ci
 
       - name: Create production build
         env:
           REACT_APP_ENVIRONMENT: development
           REACT_APP_INFURA_PROJECT_ID_DEV: ${{ secrets.REACT_APP_INFURA_PROJECT_ID_DEV }}
+          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0x252e780E5ef2Ba689034BfD7453438A33c73FCfF"
+          REACT_APP_SNAPSHOT_HUB_API_URL: https://snapshot-hub-erc712.dev.thelao.io
         run: npm run build
 
-      - name: Get sha for deploy message
-        id: sha-short
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-
-      - name: Deploy to Netlify develop site
-        uses: netlify/actions/cli@master
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      - name: Deploy to GitHub Pages site
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          args: deploy --dir=build --alias=develop --message='${{ steps.sha-short.outputs.sha_short }}-${{ github.event.head_commit.message }}'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+          commit_message: ${{ github.event.head_commit.message }}
+          cname: molochv3.org
