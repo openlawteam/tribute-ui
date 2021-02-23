@@ -106,10 +106,10 @@ export const DAI_TOKEN_ADDRESS: string =
  * with its own proposals and votes.
  */
 export const SPACES: Record<EnvironmentName, string> = {
-  development: '',
+  development: 'thelao',
   // @todo Get local Docker snapshot and "registered" space set up.
   localhost: 'thelao',
-  production: '',
+  production: 'thelao',
 };
 
 // Defaults to `localhost` space if `ENVIRONMENT` is `undefined`.
