@@ -1,2 +1,2 @@
 export * from './queryDao';
-export * from './queryAdapters';
+export * from './queryAdaptersAndExtensions';

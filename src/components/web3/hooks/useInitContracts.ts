@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 
 import {
   initContractDaoFactory,
@@ -15,7 +15,7 @@ import {
   initRegisteredVotingAdapter,
   initContractWithdraw,
 } from '../../../store/actions';
-import {ReduxDispatch, StoreState} from '../../../store/types';
+import {ReduxDispatch} from '../../../store/types';
 import {useIsDefaultChain} from './useIsDefaultChain';
 import {useWeb3Modal} from '.';
 
@@ -25,9 +25,6 @@ import {useWeb3Modal} from '.';
  * Initates contracts used in the app
  */
 export function useInitContracts() {
-  // const daoRegistryAddress = useSelector(
-  //   (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
-  // );
   /**
    * Their hooks
    */

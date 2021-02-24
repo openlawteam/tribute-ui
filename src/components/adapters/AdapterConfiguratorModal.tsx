@@ -39,8 +39,8 @@ export default function AdapterConfiguratorModal({
           <TimesSVG />
         </span>
 
-        <h1>{adapter?.adapterName.toUpperCase()}</h1>
-        <p>{adapter?.adapterDescription}</p>
+        <h1>{adapter?.name.toUpperCase()}</h1>
+        <p>{adapter?.description}</p>
 
         <AdapterConfigurationForm
           abiConfigurationInputs={configurationInputs}

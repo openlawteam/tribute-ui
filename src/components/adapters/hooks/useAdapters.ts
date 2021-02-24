@@ -1,14 +1,14 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useQuery} from '@apollo/react-hooks';
 
 import {StoreState} from '../../../store/types';
 import {AsyncStatus} from '../../../util/types';
 import {useSelector} from 'react-redux';
 
-import {GET_ADAPTERS} from '../../../gql';
+import {GET_ADAPTERS_AND_EXTENSIONS} from '../../../gql';
 
-import {getAdapters} from '../helpers';
-import {Adapters} from '../types';
+import {defaultAdaptersAndExtensions} from '../config';
+import {Adapters, Extensions} from '../types';
 import {DaoConstants} from '../enums';
 import {GQL_QUERY_POLLING_INTERVAL} from '../../../config';
 
@@ -20,15 +20,22 @@ export type AdapterType = {
   adapterAddress: string;
 };
 
+export type ExtensionType = {
+  __typename: string;
+  id: string;
+  extensionId: string;
+  extensionAddress: string;
+};
+
 type UseAdaptersReturn = {
   adapterStatus: AsyncStatus;
-  availableAdapters: Adapters[];
-  getAdapter: (adapterName: DaoConstants) => Record<string, any>;
+  getAdapterFromRedux: (adapterName: DaoConstants) => Record<string, any>;
   registeredAdapters: AdapterType[] | undefined;
   unRegisteredAdapters: Adapters[] | undefined;
 };
 
 export type AdaptersType = AdapterType & Adapters;
+export type ExtensionsType = ExtensionType & Extensions;
 
 /**
  * useAdapters
@@ -49,9 +56,12 @@ export function useAdapters(): UseAdaptersReturn {
   /**
    * Their hooks
    */
-  const getRegisteredAdapters = useQuery(GET_ADAPTERS, {
-    pollInterval: GQL_QUERY_POLLING_INTERVAL,
-  });
+  const getRegisteredAdaptersAndExtensions = useQuery(
+    GET_ADAPTERS_AND_EXTENSIONS,
+    {
+      pollInterval: GQL_QUERY_POLLING_INTERVAL,
+    }
+  );
 
   /**
    * State
@@ -66,68 +76,65 @@ export function useAdapters(): UseAdaptersReturn {
     AsyncStatus.STANDBY
   );
 
-  /**
-   * Variables
-   */
-  // Memoize calling `getAdapters` because it's an expensive
-  // operation and because eslint-plugin-react-hooks was complaining :)
-  const availableAdapters: Adapters[] = useMemo(() => getAdapters(), []);
-
-  // Get GQL adapters
+  // Get adapters and extensions from GQL
   useEffect(() => {
     if (!DaoRegistryContract?.contractAddress) return;
 
     try {
       setAdapterStatus(AsyncStatus.PENDING);
 
-      if (!getRegisteredAdapters.loading && getRegisteredAdapters.data) {
-        // get adapters
-        const {adapters} = getRegisteredAdapters.data as Record<string, any>;
+      if (
+        !getRegisteredAdaptersAndExtensions.loading &&
+        getRegisteredAdaptersAndExtensions.data
+      ) {
+        // extract adapters and extensions from gql data
+        const {
+          adapters,
+          extensions,
+        } = getRegisteredAdaptersAndExtensions.data as Record<string, any>;
 
         // get dao address, must be lowercase due to lower casing of addresses in subgraph
         const daoAddress = DaoRegistryContract.contractAddress.toLowerCase();
-
-        // get all availables adapters for the dao
+        // get all registered adapters for the dao
         const daoAdapters: [] = adapters.filter(
           (adapter: AdapterType) => adapter.id.startsWith(daoAddress) && adapter
         );
-
-        let usedAdapters: AdaptersType[] = [];
-
-        // assign the adapter name for each used adapter
-        daoAdapters.forEach((a: AdapterType) => {
-          const adapter: Adapters | undefined = availableAdapters.find(
-            (aa: Adapters) =>
-              aa.adapterId?.toLowerCase() === a.adapterId?.toLowerCase() &&
-              aa.adapterName
-          );
-
-          if (adapter) {
-            usedAdapters.push({
-              ...a,
-              adapterName: adapter.adapterName,
-              adapterDescription: adapter.adapterDescription,
-            });
-          }
-        });
-
-        // add any unused adapters
-        const nonRegisteredAdapters = availableAdapters.filter(
-          (unused) =>
-            !usedAdapters.find(
-              (used) =>
-                used.adapterId.toLowerCase() === unused.adapterId.toLowerCase()
-            )
+        // get all registered extensions for the dao
+        const daoExtensions: [] = extensions.filter(
+          (extension: ExtensionType) =>
+            extension.id.startsWith(daoAddress) && extension
         );
 
-        usedAdapters.length && setRegisteredAdapters(usedAdapters);
-        nonRegisteredAdapters.length &&
-          setUnRegisteredAdapters(nonRegisteredAdapters);
+        // find adapter props from the `defaultAdaptersAndExtensions` object
+        const {registeredAdapters, unRegisteredAdapters} = getAdapters(
+          daoAdapters
+        );
 
+        // find extension props from the `defaultAdaptersAndExtensions` object
+        const {registeredExtensions, unRegisteredExtensions} = getExtensions(
+          daoExtensions
+        );
+
+        // @todo if there is a list need to find
+        // un/registered to show radio button options
+
+        const registeredAandE = [
+          ...registeredAdapters,
+          ...registeredExtensions,
+        ];
+        const unRegisteredAandE = [
+          ...unRegisteredAdapters,
+          ...unRegisteredExtensions,
+        ];
+
+        registeredAandE.length && setRegisteredAdapters(registeredAandE);
+        unRegisteredAandE.length && setUnRegisteredAdapters(unRegisteredAandE);
+
+        // done; set status to fulfilled
         setAdapterStatus(AsyncStatus.FULFILLED);
       } else {
-        if (getRegisteredAdapters.error) {
-          throw new Error(getRegisteredAdapters.error.message);
+        if (getRegisteredAdaptersAndExtensions.error) {
+          throw new Error(getRegisteredAdaptersAndExtensions.error.message);
         }
       }
     } catch (error) {
@@ -136,14 +143,109 @@ export function useAdapters(): UseAdaptersReturn {
 
       setAdapterStatus(AsyncStatus.REJECTED);
     }
-  }, [availableAdapters, DaoRegistryContract, getRegisteredAdapters]);
+  }, [DaoRegistryContract, getRegisteredAdaptersAndExtensions]);
 
   /**
-   * getAdapter
+   * getAdapters
+   *
+   * Find all registered and un-registered adapters
+   * @param daoAdapters
+   */
+  function getAdapters(daoAdapters: any): Record<string, any> {
+    //@todo types
+    let registeredAdapters: AdaptersType[] = [];
+
+    // add registered adapters
+    daoAdapters.forEach((a: AdapterType) => {
+      const adapter: Adapters | undefined = defaultAdaptersAndExtensions.find(
+        (aa: Adapters) =>
+          aa.adapterId?.toLowerCase() === a.adapterId?.toLowerCase() && aa.name
+      );
+
+      if (adapter) {
+        registeredAdapters.push({
+          ...a,
+          name: adapter.name,
+          description: adapter.description,
+        });
+      }
+    });
+
+    // add any un-registered adapters
+    const unRegisteredAdapters = defaultAdaptersAndExtensions.filter(
+      (unused: any) => {
+        return (
+          !unused?.isExtension &&
+          !registeredAdapters.find(
+            (used) =>
+              used.adapterId?.toLowerCase() === unused.adapterId?.toLowerCase()
+          )
+        );
+      }
+    );
+
+    return {
+      registeredAdapters,
+      unRegisteredAdapters,
+    };
+  }
+
+  /**
+   * getExtensions
+   *
+   * Find all registered and un-registered extensions
+   * @param daoExtensions
+   */
+  function getExtensions(daoExtensions: any): Record<string, any> {
+    // @todo
+    let registeredExtensions: ExtensionsType[] = [];
+
+    // add registered extensions
+    daoExtensions.forEach((e: ExtensionType) => {
+      const extension:
+        | Extensions
+        | undefined = defaultAdaptersAndExtensions.find(
+        (ee: Extensions) =>
+          ee.extensionId?.toLowerCase() === e.extensionId?.toLowerCase() &&
+          ee.name
+      );
+
+      if (extension) {
+        registeredExtensions.push({
+          ...e,
+          name: extension.name,
+          description: extension.description,
+        });
+      }
+    });
+
+    // add any un-registered extensions
+    const unRegisteredExtensions = defaultAdaptersAndExtensions.filter(
+      (unused: any) => {
+        return (
+          unused?.isExtension &&
+          !registeredExtensions.find((used) => {
+            return (
+              used.extensionId.toLowerCase() ===
+                unused.extensionId.toLowerCase() && unused.isExtension
+            );
+          })
+        );
+      }
+    );
+
+    return {
+      registeredExtensions,
+      unRegisteredExtensions,
+    };
+  }
+
+  /**
+   * getAdapterFromRedux
    *
    * @param adapterName DaoConstants
    */
-  function getAdapter(adapterName: DaoConstants): Record<string, any> {
+  function getAdapterFromRedux(adapterName: DaoConstants): Record<string, any> {
     return Object.keys(adapterContracts)
       .map((a) => adapterContracts[a])
       .filter((a) => a) // filter out any `null` adapter objects
@@ -152,8 +254,7 @@ export function useAdapters(): UseAdaptersReturn {
 
   return {
     adapterStatus,
-    availableAdapters,
-    getAdapter,
+    getAdapterFromRedux,
     registeredAdapters,
     unRegisteredAdapters,
   };

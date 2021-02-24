@@ -75,7 +75,7 @@ export default function AdapterConfigurationForm({
     getFormFieldError,
     formatInputByType,
   } = useValidation();
-  const {getAdapter} = useAdapters();
+  const {getAdapterFromRedux} = useAdapters();
 
   /**
    * Their hooks
@@ -179,7 +179,7 @@ export default function AdapterConfigurationForm({
       const {
         contractAddress,
         instance: {methods},
-      } = getAdapter(adapter?.adapterName as DaoConstants);
+      } = getAdapterFromRedux(adapter?.name as DaoConstants);
 
       if (!isConnected) {
         throw new Error(
@@ -188,7 +188,7 @@ export default function AdapterConfigurationForm({
       }
 
       if (!contractAddress) {
-        throw new Error(`No ${adapter?.adapterName} contract found.`);
+        throw new Error(`No ${adapter?.name} contract found.`);
       }
 
       if (!account) {

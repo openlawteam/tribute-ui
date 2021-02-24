@@ -1,67 +1,11 @@
 import Web3 from 'web3';
 
-import {Adapters} from './types';
 import {DaoConstants} from './enums';
-import {daoConstants, adapterDescriptions} from './config';
-
-// Fallback adaptet contract address
-// @todo remove when this is done https://github.com/openlawteam/laoland/issues/184
-import {
-  DEFAULT_CHAIN,
-  BANK_EXTENSION_CONTRACT_ADDRESS,
-  CONFIGURATION_CONTRACT_ADDRESS,
-  FINANCING_CONTRACT_ADDRESS,
-  GUILDKICK_CONTRACT_ADDRESS,
-  MANAGING_CONTRACT_ADDRESS,
-  ONBOARDING_CONTRACT_ADDRESS,
-  RAGEQUIT_CONTRACT_ADDRESS,
-  TRIBUTE_CONTRACT_ADDRESS,
-  VOTING_CONTRACT_ADDRESS,
-  WITHDRAW_CONTRACT_ADDRESS,
-  OFFCHAINVOTING_CONTRACT_ADDRESS,
-} from '../../config';
-
-/**
- * getAdapters()
- *
- * @returns Array<Adapters>
- */
-export function getAdapters(): Array<Adapters> {
-  return daoConstants.map((adapterName: DaoConstants) => {
-    return {
-      adapterId: getAdapterOrExtensionId(adapterName) || '', // bytes32 type
-      adapterName,
-      adapterDescription: adapterDescriptions[adapterName],
-    };
-  });
-}
 
 export function getAdapterOrExtensionId(adapterName: DaoConstants): string {
   return sha3(adapterName) as string;
 }
 
-/**
- * getAdapterOrExtensionContractAddress
- *
- * [important] fallback adapter contract addresses
- *  @todo remove when this is done https://github.com/openlawteam/laoland/issues/184
- */
-export function getAdapterOrExtensionContractAddress() {
-  return {
-    [DaoConstants.BANK]: BANK_EXTENSION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    [DaoConstants.CONFIGURATION]: CONFIGURATION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    [DaoConstants.FINANCING]: FINANCING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    [DaoConstants.GUILDKICK]: GUILDKICK_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    [DaoConstants.MANAGING]: MANAGING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    [DaoConstants.ONBOARDING]: ONBOARDING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    [DaoConstants.RAGEQUIT]: RAGEQUIT_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    [DaoConstants.TRIBUTE]: TRIBUTE_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    [DaoConstants.VOTING]: VOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    [DaoConstants.WITHDRAW]: WITHDRAW_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    [DaoConstants.OFFCHAINVOTING]:
-      OFFCHAINVOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-  };
-}
 /**
  * getConfigurationABIFunction()
  *
@@ -84,11 +28,11 @@ export function getConfigurationABIFunction(): Record<DaoConstants, string> {
 }
 
 /**
- * getAdapterAccessControlLayer
+ * getAccessControlLayer
  *
  * @param adapterName
  */
-export function getAdapterAccessControlLayer(
+export function getAccessControlLayer(
   adapterName: string
 ): Record<string, any> {
   const adapterFlags: Record<DaoConstants, any> = {
@@ -148,7 +92,7 @@ export function getAdapterAccessControlLayer(
 
   const flags = adapterFlags[adapterName];
 
-  return {acl: adapterAccess(flags)};
+  return {acl: accessFlags(flags)};
 }
 
 /**
@@ -156,11 +100,11 @@ export function getAdapterAccessControlLayer(
  */
 
 /**
- * adapterAccess()
+ * accessFlags()
  *
  * @param flags
  */
-function adapterAccess(flags: Record<string, boolean>): number {
+function accessFlags(flags: Record<string, boolean>): number {
   const values = [
     flags.ADD_ADAPTER,
     flags.REMOVE_ADAPTER,

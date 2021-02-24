@@ -7,11 +7,12 @@ import {AddAdapterArguments, Adapters} from './types';
 
 import {DaoConstants} from './enums';
 
+import {defaultAdaptersAndExtensions} from './config';
+
 import {
   getAdapterOrExtensionId,
-  getAdapterAccessControlLayer,
+  getAccessControlLayer,
   getConfigurationABIFunction,
-  getAdapterOrExtensionContractAddress,
 } from './helpers';
 import {getDaoState, DaoState} from '../web3/helpers';
 import {truncateEthAddress} from '../../util/helpers';
@@ -27,7 +28,7 @@ import Loader from '../../components/feedback/Loader';
 
 enum WhyDisableModalTitles {
   FINALIZED_REASON = 'Why is finalizing disabled?',
-  ADAPTERS_REASON = 'Why are adapter configurations disabled?',
+  ADAPTERS_REASON = 'Why are configurations disabled?',
 }
 /**
  * AdapterManager()
@@ -77,9 +78,8 @@ export default function AdapterManager() {
    */
   const {account} = useWeb3Modal();
   const {
-    availableAdapters,
     adapterStatus,
-    getAdapter,
+    getAdapterFromRedux,
     registeredAdapters,
     unRegisteredAdapters,
   } = useAdapters();
@@ -168,21 +168,20 @@ export default function AdapterManager() {
    * @param adapter
    */
   function handleAddAdapter(adapter: Record<string, any>) {
-    // let adapterOrExtensionContractAddress: string = '';
-    console.log('adapter', adapter);
     const adapterOrExtensionAddress = new Promise<any>((resolve, reject) => {
       try {
         // Get adapters contract address
-        const {contractAddress} = getAdapter(
-          adapter.adapterName as DaoConstants
+        const {contractAddress} = getAdapterFromRedux(
+          adapter.name as DaoConstants
         );
 
         resolve(contractAddress);
       } catch (error) {
+        const defaultAdapterorEExtension = defaultAdaptersAndExtensions.filter(
+          (ae: any) => ae.name === adapter.name
+        )[0];
         // try and get the default contract address
-        const contractAddress = getAdapterOrExtensionContractAddress()[
-          adapter.adapterName
-        ];
+        const contractAddress = defaultAdapterorEExtension.contractAddress;
 
         if (contractAddress) {
           resolve(contractAddress);
@@ -194,13 +193,26 @@ export default function AdapterManager() {
 
     adapterOrExtensionAddress
       .then((addr: string) => {
-        addAdapterOrExtension(addr, adapter.adapterName);
+        addAdapterOrExtension(addr, adapter.name);
       })
       .catch((error) => {
         console.warn(
-          `Dao adapter contract not found, try adding the default "${adapter.adapterName}" contract`
+          `Dao adapter contract not found, try adding the default "${adapter.name}" contract`
         );
       });
+  }
+
+  async function handleAddExtension(extension: any) {
+    console.log('add extension', extension);
+
+    // can bank extension be configured?
+    // to remove use `removeExtension`
+    // pass type
+
+    //  Inputs:
+    // [0]bytes32 extensionId
+    // [1]address extension - contractAddr
+    // [2]address creator - connectedUser
   }
 
   async function addAdapterOrExtension(
@@ -230,7 +242,7 @@ export default function AdapterManager() {
 
       // 2. Get adapters access control layer (acl)
       // these are the functions the adapter will have access to
-      const {acl} = getAdapterAccessControlLayer(adapterName);
+      const {acl} = getAccessControlLayer(adapterName);
 
       const addAdapterArguments: AddAdapterArguments = [
         adapterId,
@@ -290,17 +302,20 @@ export default function AdapterManager() {
       // Set the `Add` button states to true for all selected adapters
       for (const adapterName in selections) {
         if (selections[adapterName]) {
-          // Get adapterId from `availableAdapters`
-          const {adapterId} = availableAdapters.filter(
-            (a: Adapters) => a.adapterName === adapterName
+          // @todo check for extension
+          // Get adapterOrExtensionId from `defaultAdaptersAndExtensions`
+          const {adapterId} = defaultAdaptersAndExtensions.filter(
+            (a: Adapters) => a.name === adapterName
           )[0];
 
           // Get adapter contract address
-          const {contractAddress} = getAdapter(adapterName as DaoConstants);
+          const {contractAddress} = getAdapterFromRedux(
+            adapterName as DaoConstants
+          );
 
           // Get adapters access control layer (acl)
           // these are the functions the adapter will have access to
-          const {acl} = getAdapterAccessControlLayer(adapterName);
+          const {acl} = getAccessControlLayer(adapterName);
 
           adaptersArguments.push([adapterId, contractAddress, acl]);
 
@@ -361,10 +376,10 @@ export default function AdapterManager() {
     try {
       // Get ABI function name
       const adapterABIFunctionName: string = getConfigurationABIFunction()[
-        adapter.adapterName
+        adapter.name
       ];
       // Get adapters ABI
-      const {abi} = getAdapter(adapter.adapterName);
+      const {abi} = getAdapterFromRedux(adapter.name);
       // Get adapters configure function input parameters
       const {inputs} = abi.filter(
         (p: Record<string, any>) => p.name === adapterABIFunctionName
@@ -378,7 +393,7 @@ export default function AdapterManager() {
       const errorMessage = new Error(
         error && error?.code === 4001
           ? error.message
-          : `${adapter.adapterName} contract not found`
+          : `${adapter.name} contract not found`
       );
       setSubmitError(errorMessage);
     }
@@ -392,6 +407,7 @@ export default function AdapterManager() {
     // window.confirm before proceeding
 
     try {
+      // get getDaoState when done
     } catch (error) {}
   }
 
@@ -500,29 +516,28 @@ export default function AdapterManager() {
       {isLoadingAdapters && <Loader />}
       {isAdaptersUnavailable && <p>No adapters available</p>}
 
-      {/** UNUSED ADAPTERS TO ADD */}
+      {/** UNUSED ADAPTERS AND EXTENSIONS TO ADD */}
       {isDAOExisting &&
         unRegisteredAdapters &&
         unRegisteredAdapters?.length &&
         unRegisteredAdapters.map((adapter: Record<string, any>) => (
           <div
             className="adaptermanager__grid unregistered-adapters"
-            key={adapter.adapterId}>
+            key={adapter.id}>
             <div className="adaptermanager__checkbox">
               <Checkbox
-                id={adapter.adapterName}
+                id={adapter.name}
                 label={''}
                 checked={
-                  (selections && selections[adapter.adapterName] === true) ||
-                  false
+                  (selections && selections[adapter.name] === true) || false
                 }
                 disabled={isDisabled}
-                name={adapter.adapterName}
+                name={adapter.name}
                 size={CheckboxSize.LARGE}
                 onChange={(event) => {
                   setSelections((s) => ({
                     ...s,
-                    [adapter.adapterName]: event.target.checked,
+                    [adapter.name]: event.target.checked,
                   }));
                 }}
               />
@@ -530,10 +545,10 @@ export default function AdapterManager() {
 
             <div className="adaptermanager__info">
               <span className="adaptermanager__name">
-                {adapter.adapterName}
+                {adapter.name} {adapter?.isExtension && '(EXTENSION)'}
               </span>
               <span className="adaptermanager__desc">
-                {adapter.adapterDescription}
+                {adapter.description}
               </span>
             </div>
 
@@ -541,10 +556,13 @@ export default function AdapterManager() {
               <button
                 className="button--secondary"
                 disabled={
-                  (isInProcess && isInProcess[adapter.adapterName]) ||
-                  isDisabled
+                  (isInProcess && isInProcess[adapter.name]) || isDisabled
                 }
-                onClick={() => handleAddAdapter(adapter)}>
+                onClick={() =>
+                  adapter?.isExtension
+                    ? handleAddExtension(adapter)
+                    : handleAddAdapter(adapter)
+                }>
                 {isInProcess && isInProcess[adapter.adapterName] ? (
                   <Loader />
                 ) : isDone && isDone[adapter.adapterName] ? (
@@ -556,20 +574,20 @@ export default function AdapterManager() {
             </div>
           </div>
         ))}
-      {/** CURRENTLY USED ADAPTERS TO CONFIGURE OR REMOVE */}
+      {/** CURRENTLY USED ADAPTERS AND EXTENSIONS TO CONFIGURE OR REMOVE */}
       {isDAOExisting &&
         registeredAdapters &&
         registeredAdapters?.length &&
         registeredAdapters.map((adapter: Record<string, any>) => (
           <div
             className="adaptermanager__grid registered-adapters"
-            key={adapter.adapterId}>
+            key={adapter.id}>
             <div className="adaptermanager__info">
               <span className="adaptermanager__name">
-                {adapter.adapterName}
+                {adapter.name} {adapter?.isExtension && '(EXTENSION)'}
               </span>
               <span className="adaptermanager__desc">
-                {adapter.adapterDescription}
+                {adapter.description}
               </span>
             </div>
 

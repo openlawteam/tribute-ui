@@ -69,16 +69,25 @@ export const apolloClient:
   | undefined = new ApolloClient({
   uri: GRAPH_API_URL,
   cache: new InMemoryCache({
-    // Cache data may be lost when replacing the `adapters`
+    // Cache data may be lost when replacing the `adapters|extensions`
     // field of a Query object. To address this problem
     // (which is not a bug in Apollo Client), define a custom
-    // merge function for the Query.adapters field, so
+    // merge function for the Query.adapters|extensions field, so
     // InMemoryCache can safely merge these objects
     // https://www.apollographql.com/docs/react/caching/cache-field-behavior/#the-merge-function
     typePolicies: {
       Adapter: {
         fields: {
           adapters: {
+            merge(existing = [], incoming: any[]) {
+              return [...existing, ...incoming];
+            },
+          },
+        },
+      },
+      Extension: {
+        fields: {
+          extensions: {
             merge(existing = [], incoming: any[]) {
               return [...existing, ...incoming];
             },
