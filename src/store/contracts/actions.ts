@@ -12,7 +12,7 @@ import {
   DAO_REGISTRY_CONTRACT_ADDRESS,
 } from '../../config';
 import {ContractsStateEntry, StoreState} from '../types';
-import {getAdapterAddress} from '../../components/web3/helpers';
+import {getAdapterAddress, multicall} from '../../components/web3/helpers';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
 import {DaoConstants, VotingAdapterName} from '../../components/adapters/enums';
 
@@ -303,16 +303,42 @@ export function initRegisteredVotingAdapter(
           return;
         }
 
-        const address =
-          contractAddress ||
-          (await getAdapterAddress(
-            ContractAdapterNames.voting,
-            daoRegistryContract.instance
-          ));
-        // @note breaks here if no voting adapter exists
-        const votingAdapterName = await managingContract.instance.methods
-          .getVotingAdapterName(daoRegistryContract.contractAddress)
-          .call();
+        let votingAdapterName: string = '';
+        let address: string = contractAddress || '';
+
+        if (address) {
+          votingAdapterName = await managingContract.instance.methods
+            .getVotingAdapterName(daoRegistryContract.contractAddress)
+            .call();
+        }
+
+        if (!address && !votingAdapterName) {
+          const [getAdapterAddressABIItem] = daoRegistryContract.abi.filter(
+            (item) => item.name === 'getAdapterAddress'
+          );
+          const [getVotingAdapterNameABIItem] = managingContract.abi.filter(
+            (item) => item.name === 'getVotingAdapterName'
+          );
+
+          const [addressResult, votingAdapterNameResult] = await multicall({
+            calls: [
+              [
+                daoRegistryContract.contractAddress,
+                getAdapterAddressABIItem,
+                [Web3.utils.sha3(ContractAdapterNames.voting) || ''],
+              ],
+              [
+                managingContract.contractAddress,
+                getVotingAdapterNameABIItem,
+                [daoRegistryContract.contractAddress],
+              ],
+            ],
+            web3Instance,
+          });
+
+          address = addressResult;
+          votingAdapterName = votingAdapterNameResult;
+        }
 
         /**
          * @todo Move voting adapter enum names (see contracts: `ADAPTER_NAME`)

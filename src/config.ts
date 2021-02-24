@@ -11,6 +11,7 @@ const {
   REACT_APP_INFURA_PROJECT_ID_DEV,
   REACT_APP_INFURA_PROJECT_ID_LOCAL,
   REACT_APP_INFURA_PROJECT_ID_PROD,
+  REACT_APP_MULTICALL_CONTRACT_ADDRESS,
   REACT_APP_SNAPSHOT_HUB_API_URL,
   REACT_APP_GRAPH_API_URL,
 } = process.env;
@@ -223,6 +224,8 @@ export const WITHDRAW_CONTRACT_ADDRESS = {
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_WITHDRAW_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
+// If developing locally, include your Multicall contract address in your `.env` file.
+export const MULTICALL_CONTRACT_ADDRESS = REACT_APP_MULTICALL_CONTRACT_ADDRESS;
 
 export const DEFAULT_CHAIN =
   REACT_APP_ENVIRONMENT === 'production'

@@ -5,3 +5,4 @@ export * from './getContractByAddress';
 export * from './getDAOConfigEntry';
 export * from './getExtensionAddress';
 export * from './getDaoState';
+export * from './multicall';
