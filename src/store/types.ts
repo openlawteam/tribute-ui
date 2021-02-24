@@ -13,6 +13,7 @@ export type ContractsState = {
   ConfigurationContract: ContractsStateEntry | null;
   DaoFactoryContract: ContractsStateEntry | null;
   DaoRegistryContract: ContractsStateEntry | null;
+  DistributeContract: ContractsStateEntry | null;
   FinancingContract: ContractsStateEntry | null;
   GuildBankContract: ContractsStateEntry | null;
   ManagingContract: ContractsStateEntry | null;

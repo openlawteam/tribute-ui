@@ -1,16 +1,17 @@
 import {
-  CONTRACT_DAO_FACTORY,
   CONTRACT_BANK_EXTENSION,
-  CONTRACT_DAO_REGISTRY,
   CONTRACT_CONFIGURATION,
+  CONTRACT_DAO_FACTORY,
+  CONTRACT_DAO_REGISTRY,
+  CONTRACT_DISTRIBUTE,
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
-  CONTRACT_RAGEQUIT,
   CONTRACT_MANAGING,
   CONTRACT_ONBOARDING,
+  CONTRACT_RAGEQUIT,
   CONTRACT_TRIBUTE,
-  CONTRACT_VOTING,
   CONTRACT_VOTING_OP_ROLLUP,
+  CONTRACT_VOTING,
   CONTRACT_WITHDRAW,
 } from '../actions';
 import {ContractsState} from '../types';
@@ -20,6 +21,7 @@ const initialState = {
   ConfigurationContract: null,
   DaoFactoryContract: null,
   DaoRegistryContract: null,
+  DistributeContract: null,
   FinancingContract: null,
   GuildBankContract: null,
   ManagingContract: null,
@@ -37,24 +39,26 @@ export default function reducer(
   const {type, ...payload} = action;
 
   switch (type) {
-    case CONTRACT_DAO_FACTORY:
-      return contractDAOFactory(state, payload);
-    case CONTRACT_DAO_REGISTRY:
-      return contractDAORegistry(state, payload);
     case CONTRACT_BANK_EXTENSION:
       return contractBankExtension(state, payload);
     case CONTRACT_CONFIGURATION:
       return contractConfiguration(state, payload);
+    case CONTRACT_DAO_FACTORY:
+      return contractDAOFactory(state, payload);
+    case CONTRACT_DAO_REGISTRY:
+      return contractDAORegistry(state, payload);
+    case CONTRACT_DISTRIBUTE:
+      return contractDistribute(state, payload);
     case CONTRACT_FINANCING:
       return contractFinancing(state, payload);
     case CONTRACT_GUILDKICK:
       return contractGuildBank(state, payload);
     case CONTRACT_MANAGING:
       return contractManaging(state, payload);
-    case CONTRACT_RAGEQUIT:
-      return contractRagequit(state, payload);
     case CONTRACT_ONBOARDING:
       return contractOnboarding(state, payload);
+    case CONTRACT_RAGEQUIT:
+      return contractRagequit(state, payload);
     case CONTRACT_TRIBUTE:
       return contractTribute(state, payload);
     case CONTRACT_VOTING:
@@ -85,6 +89,13 @@ function contractBankExtension(
 
 function contractConfiguration(state: ContractsState, payload: any) {
   return {...state, ConfigurationContract: {...payload}};
+}
+
+function contractDistribute(
+  state: ContractsState,
+  payload: any
+): ContractsState {
+  return {...state, DistributeContract: {...payload}};
 }
 
 function contractFinancing(state: ContractsState, payload: any) {

@@ -15,6 +15,7 @@
  */
 export enum ContractAdapterNames {
   configuration = 'configuration',
+  distribute = 'distribute',
   financing = 'financing',
   guildkick = 'guildkick',
   managing = 'managing',

@@ -20,34 +20,35 @@ import {
 } from '../../components/adapters-extensions/enums';
 
 type ContractAction =
+  | typeof CONTRACT_BANK_EXTENSION
+  | typeof CONTRACT_CONFIGURATION
   | typeof CONTRACT_DAO_FACTORY
   | typeof CONTRACT_DAO_REGISTRY
-  | typeof CONTRACT_CONFIGURATION
+  | typeof CONTRACT_DISTRIBUTE
   | typeof CONTRACT_FINANCING
   | typeof CONTRACT_GUILDKICK
   | typeof CONTRACT_MANAGING
+  | typeof CONTRACT_ONBOARDING
   | typeof CONTRACT_RAGEQUIT
+  | typeof CONTRACT_TRIBUTE
   | typeof CONTRACT_VOTING
   | typeof CONTRACT_VOTING_OP_ROLLUP
-  | typeof CONTRACT_ONBOARDING
-  | typeof CONTRACT_BANK_EXTENSION
-  | typeof CONTRACT_WITHDRAW
-  | typeof CONTRACT_TRIBUTE
-  | typeof CONTRACT_VOTING_OP_ROLLUP;
+  | typeof CONTRACT_WITHDRAW;
 
 export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
-export const CONTRACT_VOTING_OP_ROLLUP = 'CONTRACT_VOTING_OP_ROLLUP';
+export const CONTRACT_CONFIGURATION = 'CONTRACT_CONFIGURATION';
 export const CONTRACT_DAO_FACTORY = 'CONTRACT_DAO_FACTORY';
 export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
-export const CONTRACT_CONFIGURATION = 'CONTRACT_CONFIGURATION';
+export const CONTRACT_DISTRIBUTE = 'CONTRACT_DISTRIBUTE';
 export const CONTRACT_FINANCING = 'CONTRACT_FINANCING';
 export const CONTRACT_GUILDKICK = 'CONTRACT_GUILDKICK';
 export const CONTRACT_MANAGING = 'CONTRACT_MANAGING';
-export const CONTRACT_RAGEQUIT = 'CONTRACT_RAGEQUIT';
-export const CONTRACT_VOTING = 'CONTRACT_VOTING';
 export const CONTRACT_ONBOARDING = 'CONTRACT_ONBOARDING';
-export const CONTRACT_WITHDRAW = 'CONTRACT_WITHDRAW';
+export const CONTRACT_RAGEQUIT = 'CONTRACT_RAGEQUIT';
 export const CONTRACT_TRIBUTE = 'CONTRACT_TRIBUTE';
+export const CONTRACT_VOTING = 'CONTRACT_VOTING';
+export const CONTRACT_VOTING_OP_ROLLUP = 'CONTRACT_VOTING_OP_ROLLUP';
+export const CONTRACT_WITHDRAW = 'CONTRACT_WITHDRAW';
 
 export function initContractDaoFactory(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
@@ -181,6 +182,20 @@ export function initContractTribute(
     adapterOrExtensionName: ContractAdapterNames.tribute,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/TributeContract.json'),
+    web3Instance,
+  });
+}
+
+export function initContractDistribute(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_DISTRIBUTE,
+    adapterNameForRedux: DaoConstants.DISTRIBUTE,
+    adapterOrExtensionName: ContractAdapterNames.distribute,
+    contractAddress,
+    lazyImport: () => import('../../truffle-contracts/DistributeContract.json'),
     web3Instance,
   });
 }
