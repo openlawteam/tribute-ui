@@ -11,6 +11,7 @@ const {
   REACT_APP_INFURA_PROJECT_ID_DEV,
   REACT_APP_INFURA_PROJECT_ID_LOCAL,
   REACT_APP_INFURA_PROJECT_ID_PROD,
+  REACT_APP_MULTICALL_CONTRACT_ADDRESS,
   REACT_APP_SNAPSHOT_HUB_API_URL,
 } = process.env;
 
@@ -68,6 +69,8 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
 
 // If developing locally, include your DaoRegistry contract address in your `.env` file.
 export const DAO_REGISTRY_CONTRACT_ADDRESS = REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS;
+
+export const MULTICALL_CONTRACT_ADDRESS = REACT_APP_MULTICALL_CONTRACT_ADDRESS;
 
 export const DEFAULT_CHAIN =
   REACT_APP_ENVIRONMENT === 'production'
