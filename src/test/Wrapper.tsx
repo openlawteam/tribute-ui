@@ -20,7 +20,7 @@ import {
 import {CHAINS as mockChains} from '../config';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider, getNewStore} from './helpers';
 import Init, {InitError} from '../Init';
-import ManagingABI from '../truffle-contracts/ManagingContract.json';
+import MulticallABI from '../truffle-contracts/Multicall.json';
 
 export type WrapperReturnProps = {
   mockWeb3Provider: FakeHttpProvider;
@@ -146,6 +146,22 @@ export default function Wrapper(
     };
   }, [getExtensionAddressMock]);
 
+  useEffect(() => {
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
+        [
+          0,
+          [
+            web3Instance.utils.padLeft(DEFAULT_ETH_ADDRESS, 64),
+            '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000164f6666636861696e566f74696e67436f6e747261637400000000000000000000',
+          ],
+        ]
+      ),
+      {abi: MulticallABI, abiMethodName: 'aggregate'}
+    );
+  }, [mockWeb3Provider, web3Instance.eth.abi, web3Instance.utils]);
+
   // Inject initial results for calls made via getConnectedMember
   useEffect(() => {
     if (!useWallet) return;
@@ -155,16 +171,6 @@ export default function Wrapper(
     );
     mockWeb3Provider.injectResult(...isActiveMember({web3Instance}));
     mockWeb3Provider.injectResult(...getCurrentDelegateKey({web3Instance}));
-  }, [mockWeb3Provider, useWallet, web3Instance]);
-
-  // Inject result for getting voting adapter name via `initContracts`
-  useEffect(() => {
-    if (!useWallet) return;
-
-    mockWeb3Provider.injectResult(
-      web3Instance.eth.abi.encodeParameter('string', 'OffchainVotingContract'),
-      {abi: ManagingABI, abiMethodName: 'getVotingAdapterName'}
-    );
   }, [mockWeb3Provider, useWallet, web3Instance]);
 
   /**
@@ -201,6 +207,10 @@ export default function Wrapper(
       childrenToRender
     );
   }
+
+  /**
+   * Other mocks
+   */
 
   return (
     <Provider store={store}>
