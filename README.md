@@ -10,14 +10,16 @@ When running locally you'll need a `.env` file in the root directory with the fo
 REACT_APP_ENVIRONMENT=localhost
 REACT_APP_INFURA_PROJECT_ID_LOCAL=...
 REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS=...
+REACT_APP_MULTICALL_CONTRACT_ADDRESS=...
 REACT_APP_SNAPSHOT_HUB_API_URL=http://localhost:8081
 ```
 
 NOTE:
 
-- `REACT_APP_SNAPSHOT_HUB_API_URL` is the url of [snaphot-hub](https://github.com/openlawteam/snapshot-hub) running locally in a container.
 - `REACT_APP_INFURA_PROJECT_ID_LOCAL` can be the same value you use for LAO local development.
 - `REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS` is the address of the `DaoRegistry` smart contract deployed to your network.
+- `REACT_APP_MULTICALL_CONTRACT_ADDRESS` is the address of the `Multicall` smart contract deployed to your network.
+- `REACT_APP_SNAPSHOT_HUB_API_URL` is the url of [snaphot-hub](https://github.com/openlawteam/snapshot-hub) running locally in a container.
 
 #### Optional env vars for local development
 

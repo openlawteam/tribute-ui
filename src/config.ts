@@ -70,6 +70,7 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
 // If developing locally, include your DaoRegistry contract address in your `.env` file.
 export const DAO_REGISTRY_CONTRACT_ADDRESS = REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS;
 
+// If developing locally, include your Multicall contract address in your `.env` file.
 export const MULTICALL_CONTRACT_ADDRESS = REACT_APP_MULTICALL_CONTRACT_ADDRESS;
 
 export const DEFAULT_CHAIN =
