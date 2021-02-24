@@ -82,13 +82,11 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
 export const DAO_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0xC40757FF6aa46284eB792fD3284cccd733a191a3',
+  [CHAINS.RINKEBY]: '0xC3014c82dB7677032ed3C136B740563978505c34',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_FACTORY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
-
-// BANK FACTORY @todo
 
 // If developing locally, include your DaoRegistry contract address in your `.env` file.
 export const DAO_REGISTRY_CONTRACT_ADDRESS = REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS;
@@ -96,7 +94,7 @@ export const DAO_REGISTRY_CONTRACT_ADDRESS = REACT_APP_DAO_REGISTRY_CONTRACT_ADD
 export const BANK_EXTENSION_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x30F8A9928c49C37508BD639F678AE4d98bAd6992',
+  [CHAINS.RINKEBY]: '0x46507c42B98C68FD489a52D22b3dD29EAaBd1589',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_BANK_EXTENSION_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -107,13 +105,14 @@ export const BANK_EXTENSION_CONTRACT_ADDRESS = {
  * @note as per https://github.com/openlawteam/laoland#architecture
  *
  * - Configuration
+ * - CouponOnboardingContract @todo add to initContracts
  * - Managing
  * - Onboarding
  * - Voting
  * - Offchain voting
  * - Financing
  * - Tribute
- * - Distribute
+ * - Distribute @todo add to initContracts
  * - Rage quit
  * - Guild kick
  * - Withdraw
@@ -122,16 +121,32 @@ export const BANK_EXTENSION_CONTRACT_ADDRESS = {
 export const CONFIGURATION_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0xc06F981A361E7225faa270ee01310c23b8fa32A5',
+  [CHAINS.RINKEBY]: '0xa09aCC174ca17348A6aB5205a8246ad54fBD7ED5',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_CONFIGURATION_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
+export const COUPONONBOARDING_CONTRACT_ADDRESS = {
+  [CHAINS.MAINNET]: '',
+  [CHAINS.ROPSTEN]: '',
+  [CHAINS.RINKEBY]: '0xe5bd0cc99ba8e244cf069c3e2cd867c6ced37b3b',
+  [CHAINS.GOERLI]: '',
+  [CHAINS.KOVAN]: '',
+};
+
+export const DISTRIBUTE_CONTRACT_ADDRESS = {
+  [CHAINS.MAINNET]: '',
+  [CHAINS.ROPSTEN]: '',
+  [CHAINS.RINKEBY]: '0xb7C40EBB165C192ded733FbE32492a3Cf75f9481',
+  [CHAINS.GOERLI]: '',
+  [CHAINS.KOVAN]: '',
+};
+
 export const FINANCING_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x18707799f8bE12d618f7696de6579cdF5223aB75',
+  [CHAINS.RINKEBY]: '0xc57808D712B21F903E7c4AeCfD3ee0ec78133B91',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_FINANCING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -140,7 +155,7 @@ export const FINANCING_CONTRACT_ADDRESS = {
 export const GUILDKICK_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0xF4D5B0DfF96c7Ee175E92B714A9cEAFe74769303',
+  [CHAINS.RINKEBY]: '0x0baba15Ff09410255c35A1a06298577148BE5D89',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_GUILDKICK_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -149,7 +164,7 @@ export const GUILDKICK_CONTRACT_ADDRESS = {
 export const MANAGING_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0xB447b6A88a991004A99503bA6e115b7c9c2E9DaF',
+  [CHAINS.RINKEBY]: '0xa1c948eFc43d714321dFC6Ceb58c24A0aBcc3FC0',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_MANAGING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -158,7 +173,7 @@ export const MANAGING_CONTRACT_ADDRESS = {
 export const OFFCHAINVOTING_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x037fc6EE74957E4B4AAE2D6C089D77b5bbC39241',
+  [CHAINS.RINKEBY]: '0x7bCd7C6B38ef352842F5c22756585D8a8c28ADFA',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_OFFCHAINVOTING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -167,7 +182,7 @@ export const OFFCHAINVOTING_CONTRACT_ADDRESS = {
 export const ONBOARDING_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x8A2474c4A437DAEaF2cb19f4bec3C4E09Ca7c6b3',
+  [CHAINS.RINKEBY]: '0xe02e1332d59ADA2348A952A44b41356c9C0cC2f4',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_ONBOARDING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -176,7 +191,7 @@ export const ONBOARDING_CONTRACT_ADDRESS = {
 export const RAGEQUIT_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x5Cf75b1CccbfDB8d9CfA25C19fb4406dCA83140b',
+  [CHAINS.RINKEBY]: '0xAE08FC11da9897f114DE9C249D5d7De9E5DB3434',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_RAGEQUIT_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -185,7 +200,7 @@ export const RAGEQUIT_CONTRACT_ADDRESS = {
 export const TRIBUTE_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0x0301653bDf446dbD3073737041aC2fB46f34513b',
+  [CHAINS.RINKEBY]: '0xA7CedB234b9A61Dd5919f0566fc6dbc80b8cDD9b',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_TRIBUTE_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -194,7 +209,7 @@ export const TRIBUTE_CONTRACT_ADDRESS = {
 export const VOTING_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0xdAA7a83C306e7ea2AF6473B3Dc81c3013dF1FC13',
+  [CHAINS.RINKEBY]: '0x614dd6193Bfe7fBAF1f1e9FB562AE13764Cbf6Db',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_VOTING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
@@ -203,7 +218,7 @@ export const VOTING_CONTRACT_ADDRESS = {
 export const WITHDRAW_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0xbCf98BA41a930e85Ce8607b99491a59572834c96',
+  [CHAINS.RINKEBY]: '0x5F50297C1ddb887596526de87C0e2d1CDeF8C0d5',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   // [CHAINS.GANACHE]: REACT_APP_GANACHE_WITHDRAW_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
