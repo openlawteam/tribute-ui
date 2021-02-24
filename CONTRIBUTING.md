@@ -9,8 +9,6 @@ Organization](https://github.com/openlawteam) on GitHub.
 
 [Code of Conduct](#code-of-conduct)
 
-[Questions](#questions)
-
 [How Can I Contribute?](#how-can-i-contribute)
 
 - [Reporting Bugs](#reporting-bugs)
