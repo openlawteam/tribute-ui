@@ -3,6 +3,8 @@ import {renderHook, act} from '@testing-library/react-hooks';
 import {isActiveMember} from '../test/web3Responses';
 import {useMemberActionDisabled} from '.';
 import Wrapper from '../test/Wrapper';
+import {SET_CONNECTED_MEMBER} from '../store/actions';
+import {waitFor} from '@testing-library/react';
 
 describe('useMemberActionDisabled unit tests', () => {
   test('should return correct data when wallet is disconnected', async () => {
@@ -24,41 +26,48 @@ describe('useMemberActionDisabled unit tests', () => {
   });
 
   test('should return correct data when user is not member', async () => {
-    const {result, waitForNextUpdate} = renderHook(
-      () => useMemberActionDisabled(),
-      {
+    await act(async () => {
+      let reduxStore: any;
+
+      const {result} = await renderHook(() => useMemberActionDisabled(), {
         initialProps: {
-          getProps: ({mockWeb3Provider, web3Instance}) => {
-            mockWeb3Provider.injectResult(
-              ...isActiveMember({result: false, web3Instance})
-            );
+          getProps: ({mockWeb3Provider, web3Instance, store}) => {
+            reduxStore = store;
           },
           useInit: true,
           useWallet: true,
         },
         wrapper: Wrapper,
-      }
-    );
+      });
 
-    // Assert initial state
-    expect(result.current.isDisabled).toBe(true);
-    expect(result.current.disabledReason).toMatch(
-      /either you are not a member, or your membership is not active\./i
-    );
-    expect(result.current.openWhyDisabledModal).toBeInstanceOf(Function);
-    expect(result.current.WhyDisabledModal).toBeInstanceOf(Function);
-    expect(result.current.setOtherDisabledReasons).toBeInstanceOf(Function);
+      // Assert initial state
+      expect(result.current.isDisabled).toBe(true);
+      expect(result.current.disabledReason).toMatch(
+        /either you are not a member, or your membership is not active\./i
+      );
+      expect(result.current.openWhyDisabledModal).toBeInstanceOf(Function);
+      expect(result.current.WhyDisabledModal).toBeInstanceOf(Function);
+      expect(result.current.setOtherDisabledReasons).toBeInstanceOf(Function);
 
-    await waitForNextUpdate();
+      await waitFor(() => {
+        expect(reduxStore.getState().connectedMember).not.toBeNull();
+      });
 
-    // Assert post-init state
-    expect(result.current.isDisabled).toBe(true);
-    expect(result.current.disabledReason).toMatch(
-      /either you are not a member, or your membership is not active\./i
-    );
-    expect(result.current.openWhyDisabledModal).toBeInstanceOf(Function);
-    expect(result.current.WhyDisabledModal).toBeInstanceOf(Function);
-    expect(result.current.setOtherDisabledReasons).toBeInstanceOf(Function);
+      reduxStore.dispatch({
+        type: SET_CONNECTED_MEMBER,
+        ...reduxStore.getState().connectedMember,
+        isActiveMember: false,
+      });
+
+      // Assert post-init state
+      expect(result.current.isDisabled).toBe(true);
+      expect(result.current.disabledReason).toMatch(
+        /either you are not a member, or your membership is not active\./i
+      );
+      expect(result.current.openWhyDisabledModal).toBeInstanceOf(Function);
+      expect(result.current.WhyDisabledModal).toBeInstanceOf(Function);
+      expect(result.current.setOtherDisabledReasons).toBeInstanceOf(Function);
+    });
   });
 
   test('should return correct data when user is member', async () => {
