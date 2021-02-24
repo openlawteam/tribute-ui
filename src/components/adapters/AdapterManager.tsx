@@ -8,7 +8,7 @@ import {AddAdapterArguments, Adapters} from './types';
 import {DaoConstants} from './enums';
 
 import {
-  getAdapterId,
+  getAdapterOrExtensionId,
   getAdapterAccessControlLayer,
   getConfigurationABIFunction,
   getAdapterOrExtensionContractAddress,
@@ -169,7 +169,7 @@ export default function AdapterManager() {
    */
   function handleAddAdapter(adapter: Record<string, any>) {
     // let adapterOrExtensionContractAddress: string = '';
-
+    console.log('adapter', adapter);
     const adapterOrExtensionAddress = new Promise<any>((resolve, reject) => {
       try {
         // Get adapters contract address
@@ -226,7 +226,7 @@ export default function AdapterManager() {
       }
 
       // 1. Get the bytes32 hash of the adapter name
-      const adapterId = getAdapterId(adapterName);
+      const adapterId = getAdapterOrExtensionId(adapterName);
 
       // 2. Get adapters access control layer (acl)
       // these are the functions the adapter will have access to
@@ -322,7 +322,7 @@ export default function AdapterManager() {
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      // Execute contract call for `addAdapter`
+      // Execute contract call for `addAdapters`
       await txSend(
         'addAdapters',
         DaoFactoryContract.instance.methods,
@@ -387,8 +387,12 @@ export default function AdapterManager() {
   /**
    * finalizeDao
    */
-  function handleFinalizeDao() {
+  async function handleFinalizeDao() {
+    console.log('handleFinalizeDao');
     // window.confirm before proceeding
+
+    try {
+    } catch (error) {}
   }
 
   // Handles the select all checkbox event

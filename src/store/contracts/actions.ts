@@ -157,10 +157,13 @@ export function initContractOnboarding(
   });
 }
 
-export function initContractBankExtension(
-  web3Instance: Web3,
-  contractAddress?: string
-) {
+export function initContractBankExtension(web3Instance: Web3) {
+  const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS;
+
+  if (!contractAddress) {
+    throw new Error('No DAO Registry contract address was found.');
+  }
+
   return initContractThunkFactory({
     actionType: CONTRACT_BANK_EXTENSION,
     adapterNameForRedux: DaoConstants.BANK,
@@ -306,7 +309,7 @@ export function initRegisteredVotingAdapter(
             ContractAdapterNames.voting,
             daoRegistryContract.instance
           ));
-
+        // @note breaks here if no voting adapter exists
         const votingAdapterName = await managingContract.instance.methods
           .getVotingAdapterName(daoRegistryContract.contractAddress)
           .call();
@@ -331,7 +334,8 @@ export function initRegisteredVotingAdapter(
         }
       }
     } catch (error) {
-      throw error;
+      console.error('error');
+      // throw error;
     }
   };
 }

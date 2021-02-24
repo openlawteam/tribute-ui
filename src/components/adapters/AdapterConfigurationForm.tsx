@@ -16,13 +16,13 @@ import {ParamInputType, ParamType} from './hooks/useValidation';
 
 // import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 // import CycleMessage from '../../components/feedback/CycleMessage';
-import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
+import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 // import EtherscanURL from '../../components/web3/EtherscanURL';
 // import FadeIn from '../../components/common/FadeIn';
-import InputError from '../../components/common/InputError';
-import Loader from '../../components/feedback/Loader';
+import InputError from '../common/InputError';
+import Loader from '../feedback/Loader';
 
-type ConfigurationFormProps = {
+type AdapterConfigurationFormProps = {
   abiConfigurationInputs: Record<string, any> | undefined;
   abiMethodName: string;
   adapter: Adapters | undefined;
@@ -33,12 +33,12 @@ type RemoveAdapterArguments = [
   string // `adapterId`
 ];
 
-export default function ConfigurationForm({
+export default function AdapterConfigurationForm({
   abiConfigurationInputs,
   abiMethodName,
   adapter,
   closeHandler,
-}: ConfigurationFormProps) {
+}: AdapterConfigurationFormProps) {
   /**
    * Selectors
    */

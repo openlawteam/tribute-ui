@@ -98,14 +98,14 @@ export type AddAdapterFunction =
 
 // type AclFlag =  // @todo typify its deps
 //   | 'ADD_ADAPTER'
-//   | 'REMOVE_ADAPTER'
+//   | 'ADD_EXTENSION'
 //   | 'JAIL_MEMBER'
-//   | 'UNJAIL_MEMBER'
+//   | 'PROCESS_PROPOSAL'
 //   | 'SUBMIT_PROPOSAL'
 //   | 'SPONSOR_PROPOSAL'
-//   | 'PROCESS_PROPOSAL'
-//   | 'UPDATE_DELEGATE_KEY'
 //   | 'SET_CONFIGURATION'
-//   | 'ADD_EXTENSION'
+//   | 'REMOVE_ADAPTER'
 //   | 'REMOVE_EXTENSION'
-//   | 'NEW_MEMBER';
+//   | 'NEW_MEMBER'
+//   | 'UNJAIL_MEMBER'
+//   | 'UPDATE_DELEGATE_KEY';

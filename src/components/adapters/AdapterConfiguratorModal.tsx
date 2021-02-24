@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Adapters} from './types';
-import ConfigurationForm from './ConfigurationForm';
+import AdapterConfigurationForm from './AdapterConfigurationForm';
 import Modal from '../common/Modal';
 
 import TimesSVG from '../../assets/svg/TimesSVG';
@@ -42,7 +42,7 @@ export default function AdapterConfiguratorModal({
         <h1>{adapter?.adapterName.toUpperCase()}</h1>
         <p>{adapter?.adapterDescription}</p>
 
-        <ConfigurationForm
+        <AdapterConfigurationForm
           abiConfigurationInputs={configurationInputs}
           abiMethodName={abiMethodName}
           adapter={adapter}

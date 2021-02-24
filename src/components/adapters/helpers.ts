@@ -4,7 +4,7 @@ import {Adapters} from './types';
 import {DaoConstants} from './enums';
 import {daoConstants, adapterDescriptions} from './config';
 
-// fallback adaptet contract address
+// Fallback adaptet contract address
 // @todo remove when this is done https://github.com/openlawteam/laoland/issues/184
 import {
   DEFAULT_CHAIN,
@@ -18,6 +18,7 @@ import {
   TRIBUTE_CONTRACT_ADDRESS,
   VOTING_CONTRACT_ADDRESS,
   WITHDRAW_CONTRACT_ADDRESS,
+  OFFCHAINVOTING_CONTRACT_ADDRESS,
 } from '../../config';
 
 /**
@@ -28,14 +29,14 @@ import {
 export function getAdapters(): Array<Adapters> {
   return daoConstants.map((adapterName: DaoConstants) => {
     return {
-      adapterId: getAdapterId(adapterName) || '', // bytes32 type
+      adapterId: getAdapterOrExtensionId(adapterName) || '', // bytes32 type
       adapterName,
       adapterDescription: adapterDescriptions[adapterName],
     };
   });
 }
 
-export function getAdapterId(adapterName: DaoConstants): string {
+export function getAdapterOrExtensionId(adapterName: DaoConstants): string {
   return sha3(adapterName) as string;
 }
 
@@ -57,6 +58,8 @@ export function getAdapterOrExtensionContractAddress() {
     [DaoConstants.TRIBUTE]: TRIBUTE_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     [DaoConstants.VOTING]: VOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     [DaoConstants.WITHDRAW]: WITHDRAW_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    [DaoConstants.OFFCHAINVOTING]:
+      OFFCHAINVOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
   };
 }
 /**
