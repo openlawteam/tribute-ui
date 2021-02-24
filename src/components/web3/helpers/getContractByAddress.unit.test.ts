@@ -20,8 +20,10 @@ describe('getContractByAddress unit tests', () => {
     // Wait for contracts to load
     await waitFor(() => {
       Object.keys(store.getState().contracts).forEach((c) => {
-        expect(c).not.toBeUndefined();
-        expect(c).not.toBeNull();
+        const contract = store.getState().contracts[c];
+
+        expect(contract).not.toBeUndefined();
+        expect(contract).not.toBeNull();
       });
     });
 
