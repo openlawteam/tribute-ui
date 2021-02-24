@@ -3,7 +3,7 @@ import {AbiItem} from 'web3-utils/types';
 
 import {MULTICALL_CONTRACT_ADDRESS} from '../../../config';
 
-type MulticallTuple = [
+export type MulticallTuple = [
   contractAddress: string,
   functionABI: AbiItem,
   parameters: string[]
