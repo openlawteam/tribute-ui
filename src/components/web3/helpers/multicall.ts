@@ -1,31 +1,49 @@
 import Web3 from 'web3';
 import {AbiItem} from 'web3-utils/types';
 
-import MulticallABI from '../../../truffle-contracts/Multicall.json';
+import {MULTICALL_CONTRACT_ADDRESS} from '../../../config';
 
-export async function multicall(
-  network: string,
+type MulticallTuple = [
+  contractAddress: string,
   functionABI: AbiItem,
-  calls: any[],
-  web3Instance: Web3
-) {
-  const {methods: multicallMethods} = new web3Instance.eth.Contract(
-    MulticallABI as AbiItem[]
+  parameters: string[]
+];
+
+export async function multicall({
+  blockNumber = 'latest',
+  calls,
+  web3Instance,
+}: {
+  /**
+   * Defaults to `latest`
+   */
+  blockNumber?: number | string | ReturnType<typeof Web3.utils.toBN>;
+  calls: MulticallTuple[];
+  web3Instance: Web3;
+}) {
+  const {default: lazyMulticallABI} = await import(
+    '../../../truffle-contracts/Multicall.json'
   );
 
-  // const itf = new Interface(abi);
+  try {
+    const {methods: multicallMethods} = new web3Instance.eth.Contract(
+      lazyMulticallABI as AbiItem[],
+      MULTICALL_CONTRACT_ADDRESS
+    );
 
-  // try {
-  //   const [, res] = await multicallMethods.aggregate(
-  //     calls.map((call) => [
-  //       call[0].toLowerCase(),
-  //       // itf.encodeFunctionData(call[1], call[2])
-  //       web3Instance.eth.abi.encodeFunctionCall(functionABI)
-  //     ]),
-  //     options || {}
-  //   );
-  //   return res.map((call, i) => itf.decodeFunctionResult(calls[i][1], call));
-  // } catch (e) {
-  //   return Promise.reject(e);
-  // }
+    const {returnData} = await multicallMethods
+      .aggregate(
+        calls.map(([address, abi, params]) => [
+          address.toLowerCase(),
+          web3Instance.eth.abi.encodeFunctionCall(abi, params),
+        ])
+      )
+      .call({}, blockNumber);
+
+    return returnData.map((hexString: string, i: number) =>
+      web3Instance.eth.abi.decodeParameter(calls[i][1].outputs?.[0], hexString)
+    );
+  } catch (error) {
+    throw error;
+  }
 }
