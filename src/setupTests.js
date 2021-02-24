@@ -6,9 +6,16 @@ const path = require('path');
  * Require any env vars for testing environment
  * as early as possible
  */
-require('dotenv').config({
+const {parsed: parsedEnv} = require('dotenv').config({
   path: `${path.resolve(process.cwd(), 'src/test/.env')}`,
 });
+
+// @note Merge the env vars, as the root `.env` gets loaded first, somehow in the test env (maybe CRA).
+process.env = {
+  ...process.env,
+  ...parsedEnv,
+  REACT_APP_DEFAULT_CHAIN_NAME_LOCAL: '',
+};
 
 const {server} = require('./test/server');
 
