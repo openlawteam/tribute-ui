@@ -19,9 +19,18 @@ NOTE:
 - `REACT_APP_INFURA_PROJECT_ID_LOCAL` can be the same value you use for LAO local development.
 - `REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS` is the address of the `DaoRegistry` smart contract deployed to your network.
 
+#### Optional env vars for local development
+
+`REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>`
+
 ### Ganache Workspace Setup
 
 When you set up your Ganache network workspace in the [Ganache GUI app](https://www.trufflesuite.com/ganache), change the Network ID to `1337`. That is necessary in order to connect MetaMask to your Ganache network. The DApp is configured for Ganache to be `chainId` `1337`.
+
+Alternatively (and for now the more stable method), you can run the network with the [Ganache CLI](https://github.com/trufflesuite/ganache-cli):
+
+- `npm install -g ganache-cli` (if not already installed)
+- `ganache-cli --port 7545 --networkId 1337`
 
 **Remember**: After you deploy the `DaoRegistry` smart contract on your local Ganache network you must include the deployed contract's address in your local root `.env` file.
 

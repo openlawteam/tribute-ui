@@ -25,15 +25,21 @@ jobs:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
 
+      - name: Setup SSH to install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        uses: webfactory/ssh-agent@v0.5.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: npm install
+        run: npm ci
 
       - name: Create production build
         env:
           REACT_APP_ENVIRONMENT: development
           REACT_APP_INFURA_PROJECT_ID_DEV: ${{ secrets.REACT_APP_INFURA_PROJECT_ID_DEV }}
-          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0x252e780E5ef2Ba689034BfD7453438A33c73FCfF"
+          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0xf1912ea06051024E610587d9bf926a252dD7560B"
           REACT_APP_SNAPSHOT_HUB_API_URL: https://snapshot-hub-erc712.dev.thelao.io
         run: npm run build
 

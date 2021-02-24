@@ -160,6 +160,11 @@ export default function CreateMembershipProposal() {
     getUserAccountBalanceCached();
   }, [getUserAccountBalanceCached]);
 
+  // Set the value of `ethAddress` if the `account` changes
+  useEffect(() => {
+    setValue(Fields.ethAddress, account);
+  }, [account, setValue]);
+
   /**
    * Functions
    */
@@ -333,11 +338,11 @@ export default function CreateMembershipProposal() {
         <div className="form__input-row">
           <label className="form__input-row-label">Applicant Address</label>
           <div className="form__input-row-fieldwrap">
+            {/* @note We don't need the default value as it's handled in the useEffect above. */}
             <input
               aria-describedby={`error-${Fields.ethAddress}`}
               aria-invalid={errors.ethAddress ? 'true' : 'false'}
               name={Fields.ethAddress}
-              defaultValue={account}
               ref={register({
                 validate: (ethAddress: string): string | boolean => {
                   return !ethAddress
