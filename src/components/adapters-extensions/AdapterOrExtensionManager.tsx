@@ -20,12 +20,12 @@ import {
 import {getDaoState, DaoState} from '../web3/helpers';
 import {truncateEthAddress} from '../../util/helpers';
 
-import {useAdapters} from './hooks/useAdapters';
+import {useAdaptersOrExtensions} from './hooks/useAdaptersOrExtensions';
 import {useDao, useMemberActionDisabled} from '../../hooks';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 
-import AdapterConfiguratorModal from './AdapterConfiguratorModal';
-import AdapterExtensionSelectTarget from './AdapterExtensionSelectTarget';
+import AdapterConfiguratorModal from './ConfigurationModal';
+import AdapterExtensionSelectTarget from './AdapterOrExtensionSelectTarget';
 import Checkbox, {CheckboxSize} from '../common/Checkbox';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import Loader from '../feedback/Loader';
@@ -86,7 +86,7 @@ export default function AdapterManager() {
     getAdapterFromRedux,
     registeredAdapters,
     unRegisteredAdapters,
-  } = useAdapters();
+  } = useAdaptersOrExtensions();
   const {dao, gqlError} = useDao();
 
   const {

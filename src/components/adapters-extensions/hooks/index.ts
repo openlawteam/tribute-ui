@@ -1,2 +1,2 @@
-export * from './useAdapters';
+export * from './useAdaptersOrExtensions';
 export * from './useValidation';

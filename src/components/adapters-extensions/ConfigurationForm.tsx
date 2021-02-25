@@ -11,7 +11,7 @@ import {Web3TxStatus} from '../web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {getValidationError} from '../../util/helpers';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
-import {useAdapters, useValidation} from './hooks';
+import {useAdaptersOrExtensions, useValidation} from './hooks';
 import {ParamInputType, ParamType} from './hooks/useValidation';
 
 // import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
@@ -75,7 +75,7 @@ export default function AdapterConfigurationForm({
     getFormFieldError,
     formatInputByType,
   } = useValidation();
-  const {getAdapterFromRedux} = useAdapters();
+  const {getAdapterFromRedux} = useAdaptersOrExtensions();
 
   /**
    * Their hooks

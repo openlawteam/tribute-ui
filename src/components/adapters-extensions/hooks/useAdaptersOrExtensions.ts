@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useState} from 'react';
-import {useQuery} from '@apollo/react-hooks';
+import {useLazyQuery} from '@apollo/react-hooks';
 import {useSelector} from 'react-redux';
 
 import {StoreState} from '../../../store/types';
@@ -16,8 +16,6 @@ import {GQL_QUERY_POLLING_INTERVAL} from '../../../config';
 
 import {DaoConstants} from '../enums';
 
-import {useInitContracts} from '../../web3/hooks';
-
 export type AdapterType = {
   __typename: string;
   id: string;
@@ -33,7 +31,7 @@ export type ExtensionType = {
   extensionAddress: string;
 };
 
-type UseAdaptersReturn = {
+type UseAdaptersOrExtensionsReturn = {
   adapterStatus: AsyncStatus;
   getAdapterFromRedux: (adapterName: DaoConstants) => Record<string, any>;
   registeredAdapters: AdapterType[] | undefined;
@@ -44,14 +42,14 @@ export type AdaptersType = AdapterType & Adapters;
 export type ExtensionsType = ExtensionType & Extensions;
 
 /**
- * useAdapters
+ * useAdaptersOrExtensions
  *
  * This component queries The Graph API to get the daos adapters.
  * It returns the available adapters filtered by a search on the current dao.
  *
- * @returns {UseAdaptersReturn}
+ * @returns {UseAdaptersOrExtensionsReturn}
  */
-export function useAdapters(): UseAdaptersReturn {
+export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
   /**
    * Selectors
    */
@@ -60,19 +58,15 @@ export function useAdapters(): UseAdaptersReturn {
   );
 
   /**
-   * Our hooks
-   */
-  const {initContracts} = useInitContracts();
-
-  /**
    * Their hooks
    */
-  const getRegisteredAdaptersAndExtensions = useQuery(
-    GET_ADAPTERS_AND_EXTENSIONS,
-    {
-      pollInterval: GQL_QUERY_POLLING_INTERVAL,
-    }
-  );
+  const [
+    getRegisteredAdaptersAndExtensions,
+    {called, loading, data, error},
+  ] = useLazyQuery(GET_ADAPTERS_AND_EXTENSIONS, {
+    pollInterval: GQL_QUERY_POLLING_INTERVAL,
+    variables: {daoAddress: DaoRegistryContract?.contractAddress.toLowerCase()},
+  });
 
   /**
    * State
@@ -92,6 +86,12 @@ export function useAdapters(): UseAdaptersReturn {
     []
   );
 
+  useEffect(() => {
+    if (!called) {
+      getRegisteredAdaptersAndExtensions();
+    }
+  }, [called, getRegisteredAdaptersAndExtensions]);
+
   // Get adapters and extensions from GQL
   useEffect(() => {
     if (!DaoRegistryContract?.contractAddress) return;
@@ -99,33 +99,15 @@ export function useAdapters(): UseAdaptersReturn {
     try {
       setAdapterStatus(AsyncStatus.PENDING);
 
-      if (
-        !getRegisteredAdaptersAndExtensions.loading &&
-        getRegisteredAdaptersAndExtensions.data
-      ) {
+      if (data) {
         // extract adapters and extensions from gql data
-        const {
-          adapters,
-          extensions,
-        } = getRegisteredAdaptersAndExtensions.data as Record<string, any>;
-
-        // get dao address, must be lowercase due to lower casing of addresses in subgraph
-        const daoAddress = DaoRegistryContract.contractAddress.toLowerCase();
-        // get all registered adapters for the searched dao address
-        const daoAdapters: [] = adapters.filter(
-          (adapter: AdapterType) => adapter.id.startsWith(daoAddress) && adapter
-        );
-        // get all registered extensions for the searched dao address
-        const daoExtensions: [] = extensions.filter(
-          (extension: ExtensionType) =>
-            extension.id.startsWith(daoAddress) && extension
-        );
+        const {adapters, extensions} = data.molochv3S[0] as Record<string, any>;
 
         // create a list of registered and un-registered adapters and extensions
         const {
           registeredList,
           unRegisteredList,
-        } = getAdaptersAndExtensionsCached(daoAdapters, daoExtensions);
+        } = getAdaptersAndExtensionsCached(adapters, extensions);
 
         setRegisteredAdapters(registeredList);
         setUnRegisteredAdapters(unRegisteredList);
@@ -133,8 +115,8 @@ export function useAdapters(): UseAdaptersReturn {
         // done; lets set status to fulfilled
         setAdapterStatus(AsyncStatus.FULFILLED);
       } else {
-        if (getRegisteredAdaptersAndExtensions.error) {
-          throw new Error(getRegisteredAdaptersAndExtensions.error.message);
+        if (error) {
+          throw new Error(error.message);
         }
       }
     } catch (error) {
@@ -145,9 +127,11 @@ export function useAdapters(): UseAdaptersReturn {
     }
   }, [
     DaoRegistryContract,
+    called,
+    data,
+    error,
     getAdaptersAndExtensionsCached,
-    getRegisteredAdaptersAndExtensions,
-    initContracts,
+    loading,
   ]);
 
   /**
@@ -201,9 +185,14 @@ export function useAdapters(): UseAdaptersReturn {
             } as AdaptersAndExtensionsType);
           }
         } else if (adapterOrExtension?.options) {
-          // Check options for adapters and extensions
+          let shouldSkip = false;
 
+          // Check options for adapters and extensions
           adapterOrExtension?.options?.forEach((option: any) => {
+            if (shouldSkip) {
+              return;
+            }
+
             if (option?.isExtension) {
               const gqlExtension = getExtensionFromGql(option.extensionId);
               if (gqlExtension) {
@@ -214,6 +203,9 @@ export function useAdapters(): UseAdaptersReturn {
                   name: option.name as DaoConstants,
                   description: option.description,
                 } as AdaptersAndExtensionsType);
+
+                shouldSkip = true;
+                return;
               } else {
                 unRegisteredList.push({
                   ...option,
@@ -231,6 +223,9 @@ export function useAdapters(): UseAdaptersReturn {
                   name: option.name as DaoConstants,
                   description: option.description,
                 } as AdaptersAndExtensionsType);
+
+                shouldSkip = true;
+                return;
               } else {
                 unRegisteredList.push({
                   ...option,
@@ -260,15 +255,6 @@ export function useAdapters(): UseAdaptersReturn {
         }
       }
     );
-
-    // if (registeredList) {
-    //   // init contracts
-    //   initContracts();
-    //   console.log('initContracts');
-    // }
-
-    // console.log('registeredList', registeredList);
-    // console.log('unRegisteredList', unRegisteredList);
 
     return {
       registeredList,

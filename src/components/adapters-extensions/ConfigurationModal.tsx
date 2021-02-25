@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Adapters} from './types';
-import AdapterConfigurationForm from './AdapterConfigurationForm';
+import AdapterConfigurationForm from './ConfigurationForm';
 import Modal from '../common/Modal';
 
 import TimesSVG from '../../assets/svg/TimesSVG';
