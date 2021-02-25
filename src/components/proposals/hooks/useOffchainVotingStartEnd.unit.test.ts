@@ -1,4 +1,4 @@
-import {renderHook} from '@testing-library/react-hooks';
+import {act, renderHook} from '@testing-library/react-hooks';
 import {waitFor} from '@testing-library/react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 
@@ -9,106 +9,128 @@ describe('useOffchainVotingStartEnd unit tests', () => {
   test('hook returns correct data throughout the voting period', async () => {
     const nowSeconds = Math.floor(Date.now() / 1000);
 
-    const {result, waitForNextUpdate} = await renderHook(() =>
-      useOffchainVotingStartEnd({
-        snapshotProposal: {
-          msg: {
-            payload: {start: nowSeconds, end: nowSeconds + 2},
-            type: SnapshotType.proposal,
+    await act(async () => {
+      const {result, waitForNextUpdate} = await renderHook(() =>
+        useOffchainVotingStartEnd({
+          snapshotProposal: {
+            msg: {
+              payload: {start: nowSeconds, end: nowSeconds + 3},
+              type: SnapshotType.proposal,
+            },
           },
-        },
-      } as ProposalData)
-    );
+        } as ProposalData)
+      );
 
-    // Assert initial state
-    expect(result.current.offchainVotingStartEndInitReady).toBe(false);
-    expect(result.current.hasOffchainVotingStarted).toBe(false);
-    expect(result.current.hasOffchainVotingEnded).toBe(false);
+      // Assert initial state
+      expect(result.current.offchainVotingStartEndInitReady).toBe(false);
+      expect(result.current.hasOffchainVotingStarted).toBe(false);
+      expect(result.current.hasOffchainVotingEnded).toBe(false);
 
-    await waitForNextUpdate();
+      await waitForNextUpdate();
+      await new Promise((r) => setTimeout(r, 100));
 
-    // Assert initial state
-    expect(result.current.offchainVotingStartEndInitReady).toBe(true);
-    expect(result.current.hasOffchainVotingStarted).toBe(true);
-    expect(result.current.hasOffchainVotingEnded).toBe(false);
+      expect(result.current.offchainVotingStartEndInitReady).toBe(true);
+      expect(result.current.hasOffchainVotingStarted).toBe(true);
+      expect(result.current.hasOffchainVotingEnded).toBe(false);
 
-    await waitForNextUpdate();
+      await waitForNextUpdate();
+      await new Promise((r) => setTimeout(r, 100));
 
-    // Assert initial state
-    expect(result.current.offchainVotingStartEndInitReady).toBe(true);
-    expect(result.current.hasOffchainVotingStarted).toBe(true);
-    expect(result.current.hasOffchainVotingEnded).toBe(true);
-  });
+      expect(result.current.offchainVotingStartEndInitReady).toBe(true);
+      expect(result.current.hasOffchainVotingStarted).toBe(true);
+      expect(result.current.hasOffchainVotingEnded).toBe(false);
 
-  test('should provide "true" if voting already started', async () => {
-    const nowSeconds = Math.floor(Date.now() / 1000);
+      await waitForNextUpdate();
+      await new Promise((r) => setTimeout(r, 100));
 
-    const {result, waitForNextUpdate} = await renderHook(() =>
-      useOffchainVotingStartEnd({
-        snapshotProposal: {
-          msg: {
-            payload: {start: nowSeconds - 1, end: nowSeconds + 3},
-            type: SnapshotType.proposal,
-          },
-        },
-      } as ProposalData)
-    );
-
-    // Assert initial state
-    expect(result.current.offchainVotingStartEndInitReady).toBe(false);
-    expect(result.current.hasOffchainVotingStarted).toBe(false);
-    expect(result.current.hasOffchainVotingEnded).toBe(false);
-
-    await waitForNextUpdate();
-
-    expect(result.current.offchainVotingStartEndInitReady).toBe(true);
-    expect(result.current.hasOffchainVotingStarted).toBe(true);
-    expect(result.current.hasOffchainVotingEnded).toBe(false);
-  });
-
-  test('should provide "true" if voting already ended', async () => {
-    const nowSeconds = Math.floor(Date.now() / 1000);
-
-    const {result, waitForNextUpdate} = await renderHook(() =>
-      useOffchainVotingStartEnd({
-        snapshotProposal: {
-          msg: {
-            payload: {start: nowSeconds - 180, end: nowSeconds - 5},
-            type: SnapshotType.proposal,
-          },
-        },
-      } as ProposalData)
-    );
-
-    // Assert initial state
-    expect(result.current.offchainVotingStartEndInitReady).toBe(false);
-    expect(result.current.hasOffchainVotingStarted).toBe(false);
-    expect(result.current.hasOffchainVotingEnded).toBe(false);
-
-    await waitForNextUpdate();
-
-    await waitFor(() => {
       expect(result.current.offchainVotingStartEndInitReady).toBe(true);
       expect(result.current.hasOffchainVotingStarted).toBe(true);
       expect(result.current.hasOffchainVotingEnded).toBe(true);
     });
   });
 
-  test('should provide "false" if proposal is a draft / snapshotProposal does not exist', async () => {
-    const {result} = await renderHook(() =>
-      useOffchainVotingStartEnd({
-        snapshotDraft: {
-          msg: {
-            payload: {},
-            type: SnapshotType.draft,
-          },
-        },
-      } as ProposalData)
-    );
+  test('should provide "true" if voting already started', async () => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
 
-    // Assert initial state
-    expect(result.current.offchainVotingStartEndInitReady).toBe(true);
-    expect(result.current.hasOffchainVotingStarted).toBe(false);
-    expect(result.current.hasOffchainVotingEnded).toBe(false);
+    await act(async () => {
+      const {result, waitForNextUpdate} = await renderHook(() =>
+        useOffchainVotingStartEnd({
+          snapshotProposal: {
+            msg: {
+              payload: {start: nowSeconds - 1, end: nowSeconds + 3},
+              type: SnapshotType.proposal,
+            },
+          },
+        } as ProposalData)
+      );
+
+      // Assert initial state
+      expect(result.current.offchainVotingStartEndInitReady).toBe(false);
+      expect(result.current.hasOffchainVotingStarted).toBe(false);
+      expect(result.current.hasOffchainVotingEnded).toBe(false);
+
+      await waitForNextUpdate();
+      await new Promise((r) => setTimeout(r, 100));
+
+      expect(result.current.offchainVotingStartEndInitReady).toBe(true);
+      expect(result.current.hasOffchainVotingStarted).toBe(true);
+      expect(result.current.hasOffchainVotingEnded).toBe(false);
+    });
+  });
+
+  test('should provide "true" if voting already ended', async () => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+
+    await act(async () => {
+      const {result, waitForNextUpdate} = await renderHook(() =>
+        useOffchainVotingStartEnd({
+          snapshotProposal: {
+            msg: {
+              payload: {start: nowSeconds - 180, end: nowSeconds - 5},
+              type: SnapshotType.proposal,
+            },
+          },
+        } as ProposalData)
+      );
+
+      // Assert initial state
+      expect(result.current.offchainVotingStartEndInitReady).toBe(false);
+      expect(result.current.hasOffchainVotingStarted).toBe(false);
+      expect(result.current.hasOffchainVotingEnded).toBe(false);
+
+      await waitForNextUpdate();
+
+      await waitFor(() => {
+        expect(result.current.offchainVotingStartEndInitReady).toBe(true);
+        expect(result.current.hasOffchainVotingStarted).toBe(true);
+        expect(result.current.hasOffchainVotingEnded).toBe(true);
+      });
+    });
+  });
+
+  test('should provide "false" if proposal is a draft / snapshotProposal does not exist', async () => {
+    await act(async () => {
+      const {result, waitForNextUpdate} = await renderHook(() =>
+        useOffchainVotingStartEnd({
+          snapshotDraft: {
+            msg: {
+              payload: {},
+              type: SnapshotType.draft,
+            },
+          },
+        } as ProposalData)
+      );
+
+      // Assert initial state
+      expect(result.current.offchainVotingStartEndInitReady).toBe(false);
+      expect(result.current.hasOffchainVotingStarted).toBe(false);
+      expect(result.current.hasOffchainVotingEnded).toBe(false);
+
+      await waitForNextUpdate();
+
+      expect(result.current.offchainVotingStartEndInitReady).toBe(true);
+      expect(result.current.hasOffchainVotingStarted).toBe(false);
+      expect(result.current.hasOffchainVotingEnded).toBe(false);
+    });
   });
 });
