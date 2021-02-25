@@ -98,42 +98,26 @@ export function useAdapters(): UseAdaptersReturn {
 
         // get dao address, must be lowercase due to lower casing of addresses in subgraph
         const daoAddress = DaoRegistryContract.contractAddress.toLowerCase();
-        // get all registered adapters for the dao
+        // get all registered adapters for the searched dao address
         const daoAdapters: [] = adapters.filter(
           (adapter: AdapterType) => adapter.id.startsWith(daoAddress) && adapter
         );
-        // get all registered extensions for the dao
+        // get all registered extensions for the searched dao address
         const daoExtensions: [] = extensions.filter(
           (extension: ExtensionType) =>
             extension.id.startsWith(daoAddress) && extension
         );
 
-        // find adapter props from the `defaultAdaptersAndExtensions` object
-        const {registeredAdapters, unRegisteredAdapters} = getAdapters(
-          daoAdapters
-        );
-
-        // find extension props from the `defaultAdaptersAndExtensions` object
-        const {registeredExtensions, unRegisteredExtensions} = getExtensions(
+        // create a list of registered and un-registered adapters and extensions
+        const {registeredList, unRegisteredList} = getAdaptersAndExtensions(
+          daoAdapters,
           daoExtensions
         );
 
-        // @todo if there is a list need to find
-        // un/registered to show radio button options
+        setRegisteredAdapters(registeredList);
+        setUnRegisteredAdapters(unRegisteredList);
 
-        const registeredAandE = [
-          ...registeredAdapters,
-          ...registeredExtensions,
-        ];
-        const unRegisteredAandE = [
-          ...unRegisteredAdapters,
-          ...unRegisteredExtensions,
-        ];
-
-        registeredAandE.length && setRegisteredAdapters(registeredAandE);
-        unRegisteredAandE.length && setUnRegisteredAdapters(unRegisteredAandE);
-
-        // done; set status to fulfilled
+        // done; lets set status to fulfilled
         setAdapterStatus(AsyncStatus.FULFILLED);
       } else {
         if (getRegisteredAdaptersAndExtensions.error) {
@@ -154,95 +138,117 @@ export function useAdapters(): UseAdaptersReturn {
    * Find all registered and un-registered adapters
    * @param daoAdapters
    */
-  function getAdapters(daoAdapters: any): Record<string, any> {
+  function getAdaptersAndExtensions(
+    daoAdapters: any,
+    daoExtensions: any
+  ): Record<string, any> {
     //@todo types
-    let registeredAdapters: AdaptersType[] = [];
 
-    // add registered adapters
-    daoAdapters.forEach((a: AdapterType) => {
-      const adapter:
-        | AdaptersAndExtensionsType
-        | undefined = defaultAdaptersAndExtensions.find(
-        (adt: AdaptersAndExtensionsType) =>
-          adt.adapterId?.toLowerCase() === a.adapterId?.toLowerCase() &&
-          adt.name
-      );
+    let registeredList: AdaptersAndExtensionsType[] = [];
+    let unRegisteredList: AdaptersAndExtensionsType[] = [];
 
-      if (adapter) {
-        registeredAdapters.push({
-          ...a,
-          name: adapter.name as DaoConstants,
-          description: adapter.description,
-        } as any);
-      }
-    });
-
-    // add any un-registered adapters
-    const unRegisteredAdapters = defaultAdaptersAndExtensions.filter(
-      (unused: any) => {
-        return (
-          !unused?.isExtension &&
-          !registeredAdapters.find(
-            (used) =>
-              used.adapterId?.toLowerCase() === unused.adapterId?.toLowerCase()
-          )
-        );
-      }
-    );
-
-    return {
-      registeredAdapters,
-      unRegisteredAdapters,
+    const getAdapterFromGql = (adapterId: string) => {
+      return daoAdapters.find((adapter: AdaptersAndExtensionsType) => {
+        return adapter.adapterId?.toLowerCase() === adapterId?.toLowerCase();
+      });
     };
-  }
 
-  /**
-   * getExtensions
-   *
-   * Find all registered and un-registered extensions
-   * @param daoExtensions
-   */
-  function getExtensions(daoExtensions: any): Record<string, any> {
-    // @todo
-    let registeredExtensions: ExtensionsType[] = [];
-
-    // add registered extensions
-    daoExtensions.forEach((e: ExtensionType) => {
-      const extension:
-        | AdaptersAndExtensionsType
-        | undefined = defaultAdaptersAndExtensions.find(
-        (ext: AdaptersAndExtensionsType) =>
-          ext.extensionId?.toLowerCase() === e.extensionId?.toLowerCase() &&
-          ext.name
-      );
-
-      if (extension) {
-        registeredExtensions.push({
-          ...e,
-          name: extension.name as DaoConstants,
-          description: extension.description,
-        } as any);
-      }
-    });
-
-    // add any un-registered extensions
-    const unRegisteredExtensions = defaultAdaptersAndExtensions.filter(
-      (unused: any) => {
+    const getExtensionFromGql = (extensionId: string) => {
+      return daoExtensions.find((extension: AdaptersAndExtensionsType) => {
         return (
-          unused?.isExtension &&
-          !registeredExtensions.find((used) => {
-            return (
-              used.extensionId.toLowerCase() ===
-                unused.extensionId.toLowerCase() && unused.isExtension
-            );
-          })
+          extension.extensionId?.toLowerCase() === extensionId?.toLowerCase()
         );
+      });
+    };
+
+    defaultAdaptersAndExtensions.forEach(
+      (adapterOrExtension: AdaptersAndExtensionsType | any) => {
+        if (adapterOrExtension?.isExtension) {
+          // Add an extenaion
+          const gqlExtension = getExtensionFromGql(
+            adapterOrExtension.extensionId
+          );
+
+          if (gqlExtension) {
+            registeredList.push({
+              ...gqlExtension,
+              name: adapterOrExtension.name as DaoConstants,
+              description: adapterOrExtension.description,
+            } as AdaptersAndExtensionsType);
+          } else {
+            unRegisteredList.push({
+              ...adapterOrExtension,
+              name: adapterOrExtension.name as DaoConstants,
+              description: adapterOrExtension.description,
+            } as AdaptersAndExtensionsType);
+          }
+        } else if (adapterOrExtension?.options) {
+          // Check options for adapters and extensions
+
+          adapterOrExtension?.options?.forEach((option: any) => {
+            if (option?.isExtension) {
+              const gqlExtension = getExtensionFromGql(option.extensionId);
+              if (gqlExtension) {
+                // @todo for now we are adding all found options that match the register
+                // need to check which adapter contract type was added to de-dupe
+                registeredList.push({
+                  ...gqlExtension,
+                  name: option.name as DaoConstants,
+                  description: option.description,
+                } as AdaptersAndExtensionsType);
+              } else {
+                unRegisteredList.push({
+                  ...option,
+                  name: option.name as DaoConstants,
+                  description: option.description,
+                } as AdaptersAndExtensionsType);
+              }
+            } else {
+              const gqlAdapter = getAdapterFromGql(option.adapterId);
+              if (gqlAdapter) {
+                // @todo for now we are adding all found options that match the register
+                // need to check which adapter contract type was added to de-dupe
+                registeredList.push({
+                  ...gqlAdapter,
+                  name: option.name as DaoConstants,
+                  description: option.description,
+                } as AdaptersAndExtensionsType);
+              } else {
+                unRegisteredList.push({
+                  ...option,
+                  name: option.name as DaoConstants,
+                  description: option.description,
+                } as AdaptersAndExtensionsType);
+              }
+            }
+          });
+        } else {
+          // Add an adapter
+          const gqlAdapter = getAdapterFromGql(adapterOrExtension.adapterId);
+
+          if (gqlAdapter) {
+            registeredList.push({
+              ...gqlAdapter,
+              name: adapterOrExtension.name as DaoConstants,
+              description: adapterOrExtension.description,
+            } as AdaptersAndExtensionsType);
+          } else {
+            unRegisteredList.push({
+              ...adapterOrExtension,
+              name: adapterOrExtension.name as DaoConstants,
+              description: adapterOrExtension.description,
+            } as AdaptersAndExtensionsType);
+          }
+        }
       }
     );
 
+    // console.log('registeredList', registeredList);
+    // console.log('unRegisteredList', unRegisteredList);
+
     return {
-      registeredExtensions,
-      unRegisteredExtensions,
+      registeredList,
+      unRegisteredList,
     };
   }
 

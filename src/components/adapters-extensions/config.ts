@@ -98,7 +98,8 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
   {
     options: [
       {
-        name: DaoConstants.OFFCHAINVOTING,
+        name: DaoConstants.VOTING,
+        displayName: DaoConstants.OFFCHAINVOTING,
         adapterId: getAdapterOrExtensionId(DaoConstants.VOTING),
         contractAddress: OFFCHAINVOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
         description:
@@ -106,6 +107,7 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
       },
       {
         name: DaoConstants.VOTING,
+        displayName: DaoConstants.VOTING,
         adapterId: getAdapterOrExtensionId(DaoConstants.VOTING),
         contractAddress: VOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
         description:

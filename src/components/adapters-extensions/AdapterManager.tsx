@@ -229,6 +229,12 @@ export default function AdapterManager() {
     contractAddress: string,
     adapterName: DaoConstants
   ) {
+    console.log(
+      'addAdapterOrExtension: adapterName',
+      adapterName,
+      'contractAddress',
+      contractAddress
+    );
     setSubmitError(undefined);
 
     if (!DaoRegistryContract) return;
@@ -430,7 +436,7 @@ export default function AdapterManager() {
     // Update the select all checkbox
     setSelectAll(checked);
 
-    // Update all unused adapter options
+    // Update all un-registered adapter/extension
     for (const key in selections) {
       setSelections((s) => ({
         ...s,
@@ -497,7 +503,7 @@ export default function AdapterManager() {
 
   return (
     <div className="adaptermanager">
-      <h1>Adapter Manager</h1>
+      <h1>Adapter/Extension Manager</h1>
       {renderDaoName()}
       {renderErrorMessage()}
       <p>
@@ -678,10 +684,10 @@ export default function AdapterManager() {
       {isDAOExisting &&
         registeredAdapters &&
         registeredAdapters?.length &&
-        registeredAdapters.map((adapter: Record<string, any>) => (
+        registeredAdapters.map((adapter: Record<string, any>, idx: number) => (
           <div
             className="adaptermanager__grid registered-adapters"
-            key={adapter.id}>
+            key={`${adapter.id}-${idx}`}>
             <div className="adaptermanager__info">
               <span className="adaptermanager__name">
                 {adapter.name} {adapter?.isExtension && '(EXTENSION)'}

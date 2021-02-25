@@ -65,23 +65,33 @@ export default function AdapterExtensionSelectTarget(
   ) {
     const {value} = event.target;
 
+    console.log('value', value);
+
     setSelectedTargetOption(value as AdapterExtensionTarget);
 
-    const selectedTarget: string = adapterOrExtension?.options.find(
-      (selectedOption: any) => selectedOption.name === value
+    const selectedTargetProps: string = adapterOrExtension?.options.find(
+      (selectedOption: any) => selectedOption.displayName === value
     );
 
-    setSelectedTargetOptionProps(selectedTarget);
+    console.log('selectedTargetProps', selectedTargetProps);
+
+    setSelectedTargetOptionProps(selectedTargetProps);
   }
 
   function renderDescription(selectedTargetOption: DaoConstants | null) {
     if (!selectedTargetOption) return null;
 
-    const description: string = adapterOrExtension?.options.find(
-      (selectedOption: any) => selectedOption.name === selectedTargetOption
-    ).description;
+    try {
+      const description: string =
+        adapterOrExtension?.options.find(
+          (selectedOption: any) =>
+            selectedOption.displayName === selectedTargetOption
+        ).description || '';
 
-    return <span className="adaptermanager__desc">{description}</span>;
+      return <span className="adaptermanager__desc">{description}</span>;
+    } catch (error) {
+      console.warn(error);
+    }
   }
 
   return (
@@ -106,8 +116,8 @@ export default function AdapterExtensionSelectTarget(
           </option>
 
           {adapterOrExtension?.options.map((option: any) => (
-            <option key={option.name} value={option.name}>
-              {option.name.toUpperCase()}
+            <option key={option.displayName} value={option.displayName}>
+              {option.displayName.toUpperCase()}
             </option>
           ))}
         </select>
