@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
-import {fromUtf8} from 'web3-utils';
+import {toBN, fromUtf8} from 'web3-utils';
 
 import {
   getValidationError,
@@ -56,6 +56,15 @@ type TransferArguments = [
   string // `data`
 ];
 
+type TokenDetails = {
+  name: string;
+  symbol: string;
+  address: string;
+  daoBalance: string;
+};
+
+type BN = ReturnType<typeof toBN>;
+
 export default function CreateTransferProposal() {
   /**
    * Selectors
@@ -66,6 +75,9 @@ export default function CreateTransferProposal() {
   );
   const DaoRegistryContract = useSelector(
     (state: StoreState) => state.contracts?.DaoRegistryContract
+  );
+  const BankExtensionContract = useSelector(
+    (state: StoreState) => state.contracts?.BankExtensionContract
   );
 
   /**
@@ -104,6 +116,7 @@ export default function CreateTransferProposal() {
    */
 
   const [submitError, setSubmitError] = useState<Error>();
+  const [daoTokens, setDaoTokens] = useState<TokenDetails[]>();
 
   /**
    * Variables
@@ -143,8 +156,37 @@ export default function CreateTransferProposal() {
   const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
 
   /**
+   * Cached callbacks
+   */
+
+  const getDaoTokensCached = useCallback(getDaoTokens, [
+    BankExtensionContract,
+    account,
+  ]);
+
+  /**
+   * Effects
+   */
+
+  useEffect(() => {
+    getDaoTokensCached();
+  }, [getDaoTokensCached]);
+
+  /**
    * Functions
    */
+
+  async function getDaoTokens() {
+    if (!account || !BankExtensionContract) {
+      setDaoTokens(undefined);
+      return;
+    }
+
+    const fetchedTokens = await BankExtensionContract.instance.methods
+      .getTokens()
+      .call();
+    console.log({fetchedTokens});
+  }
 
   async function handleSubmit(values: FormInputs) {
     try {
@@ -344,24 +386,30 @@ export default function CreateTransferProposal() {
 
         {/* TOKEN ADDRESS */}
         <div className="form__input-row">
-          <label className="form__input-row-label">Token Address</label>
+          <label className="form__input-row-label">Asset</label>
           <div className="form__input-row-fieldwrap">
-            <input
+            <select
               aria-describedby={`error-${Fields.tokenAddress}`}
               aria-invalid={errors.tokenAddress ? 'true' : 'false'}
               name={Fields.tokenAddress}
               ref={register({
-                validate: (tokenAddress: string): string | boolean => {
-                  return !tokenAddress
-                    ? FormFieldErrors.REQUIRED
-                    : !isEthAddressValid(tokenAddress)
-                    ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
-                    : true;
-                },
+                required: FormFieldErrors.REQUIRED,
               })}
-              type="text"
-              disabled={isInProcessOrDone}
-            />
+              disabled={isInProcessOrDone}>
+              <option value="">Select from DAO assets</option>
+              <option value="0x0000000000000000000000000000000000000000">
+                ETH
+              </option>
+              <option value="0x8CF54B5422Cc49571D3b7BA67Fe1114436EE7280">
+                OLT
+              </option>
+              <option value="0xc1d55803652F10E33d59bC6D853200Ce54C6BCCB">
+                TT1
+              </option>
+              <option value="0x2bF80a7274e52583654596EdAfD08352Ab0f708C">
+                TT2
+              </option>
+            </select>
 
             <InputError
               error={getValidationError(Fields.tokenAddress, errors)}
