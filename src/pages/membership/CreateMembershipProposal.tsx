@@ -315,9 +315,6 @@ export default function CreateMembershipProposal() {
     );
   }
 
-  // @todo Consider adding check to see if user ethereum address is either
-  // already a member or has a pending member proposal.
-
   return (
     <RenderWrapper>
       <form className="form" onSubmit={(e) => e.preventDefault()}>
