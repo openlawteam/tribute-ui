@@ -70,16 +70,18 @@ describe('useOffchainVotingStartEnd unit tests', () => {
       expect(result.current.hasOffchainVotingEnded).toBe(false);
 
       await waitForNextUpdate();
-
-      expect(result.current.offchainVotingStartEndInitReady).toBe(false);
-      expect(result.current.hasOffchainVotingStarted).toBe(true);
-      expect(result.current.hasOffchainVotingEnded).toBe(false);
-
-      await waitForNextUpdate();
+      await new Promise((r) => setTimeout(r, 100));
 
       expect(result.current.offchainVotingStartEndInitReady).toBe(true);
       expect(result.current.hasOffchainVotingStarted).toBe(true);
       expect(result.current.hasOffchainVotingEnded).toBe(false);
+
+      // await waitForNextUpdate();
+      // await new Promise((r) => setTimeout(r, 100));
+
+      // expect(result.current.offchainVotingStartEndInitReady).toBe(true);
+      // expect(result.current.hasOffchainVotingStarted).toBe(true);
+      // expect(result.current.hasOffchainVotingEnded).toBe(false);
     });
   });
 
