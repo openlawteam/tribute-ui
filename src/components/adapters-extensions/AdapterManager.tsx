@@ -180,7 +180,6 @@ export default function AdapterManager() {
    * @param adapter
    */
   function handleAddAdapter(adapter: Record<string, any>) {
-    console.log('handleAddAdapter: adapter', adapter);
     const adapterOrExtensionAddress = new Promise<any>((resolve, reject) => {
       try {
         // Get contract address
@@ -214,7 +213,6 @@ export default function AdapterManager() {
 
   async function handleAddExtension(extension: any) {
     console.log('add extension', extension);
-
     // can bank extension be configured?
     // to remove use `removeExtension`
     // pass type
@@ -223,18 +221,14 @@ export default function AdapterManager() {
     // [0]bytes32 extensionId
     // [1]address extension - contractAddr
     // [2]address creator - connectedUser
+    try {
+    } catch (error) {}
   }
 
   async function addAdapterOrExtension(
     contractAddress: string,
     adapterName: DaoConstants
   ) {
-    console.log(
-      'addAdapterOrExtension: adapterName',
-      adapterName,
-      'contractAddress',
-      contractAddress
-    );
     setSubmitError(undefined);
 
     if (!DaoRegistryContract) return;
@@ -256,6 +250,7 @@ export default function AdapterManager() {
       // these are the functions the adapter will have access to
       const {acl} = getAccessControlLayer(adapterName);
 
+      //
       const addAdapterArguments: AddAdapterArguments = [
         adapterId,
         contractAddress,
@@ -388,7 +383,7 @@ export default function AdapterManager() {
    */
   async function handleConfigureAdapter(adapter: Adapters) {
     setSubmitError(undefined);
-
+    console.log('adapter', adapter);
     try {
       // Get ABI function name
       const adapterABIFunctionName: string = getConfigurationABIFunction()[
@@ -418,9 +413,14 @@ export default function AdapterManager() {
   /**
    * finalizeDao
    */
+  function confirmFinalizePrompt() {
+    if (window.confirm('Do you really want to finalize this DAO?')) {
+      handleFinalizeDao();
+    }
+  }
+
   async function handleFinalizeDao() {
-    console.log('handleFinalizeDao');
-    // window.confirm before proceeding
+    window.alert(`Sorry, finalizing isn't ready yet!`);
 
     try {
       // get getDaoState when done
@@ -739,7 +739,7 @@ export default function AdapterManager() {
               - when there are no more unused adapters to select
               */
             }
-            onClick={handleFinalizeDao}>
+            onClick={confirmFinalizePrompt}>
             Finalize Dao
           </button>
         </div>

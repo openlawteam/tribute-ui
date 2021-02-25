@@ -1,9 +1,10 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useQuery} from '@apollo/react-hooks';
+import {useSelector} from 'react-redux';
 
 import {StoreState} from '../../../store/types';
 import {AsyncStatus} from '../../../util/types';
-import {useSelector} from 'react-redux';
+import {Adapters, Extensions} from '../types';
 
 import {GET_ADAPTERS_AND_EXTENSIONS} from '../../../gql';
 
@@ -11,9 +12,11 @@ import {
   defaultAdaptersAndExtensions,
   AdaptersAndExtensionsType,
 } from '../config';
-import {Adapters, Extensions} from '../types';
-import {DaoConstants} from '../enums';
 import {GQL_QUERY_POLLING_INTERVAL} from '../../../config';
+
+import {DaoConstants} from '../enums';
+
+import {useInitContracts} from '../../web3/hooks';
 
 export type AdapterType = {
   __typename: string;
@@ -57,6 +60,11 @@ export function useAdapters(): UseAdaptersReturn {
   );
 
   /**
+   * Our hooks
+   */
+  const {initContracts} = useInitContracts();
+
+  /**
    * Their hooks
    */
   const getRegisteredAdaptersAndExtensions = useQuery(
@@ -77,6 +85,11 @@ export function useAdapters(): UseAdaptersReturn {
   >();
   const [adapterStatus, setAdapterStatus] = useState<AsyncStatus>(
     AsyncStatus.STANDBY
+  );
+
+  const getAdaptersAndExtensionsCached = useCallback(
+    getAdaptersAndExtensions,
+    []
   );
 
   // Get adapters and extensions from GQL
@@ -109,10 +122,10 @@ export function useAdapters(): UseAdaptersReturn {
         );
 
         // create a list of registered and un-registered adapters and extensions
-        const {registeredList, unRegisteredList} = getAdaptersAndExtensions(
-          daoAdapters,
-          daoExtensions
-        );
+        const {
+          registeredList,
+          unRegisteredList,
+        } = getAdaptersAndExtensionsCached(daoAdapters, daoExtensions);
 
         setRegisteredAdapters(registeredList);
         setUnRegisteredAdapters(unRegisteredList);
@@ -130,7 +143,12 @@ export function useAdapters(): UseAdaptersReturn {
 
       setAdapterStatus(AsyncStatus.REJECTED);
     }
-  }, [DaoRegistryContract, getRegisteredAdaptersAndExtensions]);
+  }, [
+    DaoRegistryContract,
+    getAdaptersAndExtensionsCached,
+    getRegisteredAdaptersAndExtensions,
+    initContracts,
+  ]);
 
   /**
    * getAdapters
@@ -242,6 +260,12 @@ export function useAdapters(): UseAdaptersReturn {
         }
       }
     );
+
+    // if (registeredList) {
+    //   // init contracts
+    //   initContracts();
+    //   console.log('initContracts');
+    // }
 
     // console.log('registeredList', registeredList);
     // console.log('unRegisteredList', unRegisteredList);

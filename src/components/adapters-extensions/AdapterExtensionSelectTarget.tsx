@@ -65,15 +65,11 @@ export default function AdapterExtensionSelectTarget(
   ) {
     const {value} = event.target;
 
-    console.log('value', value);
-
     setSelectedTargetOption(value as AdapterExtensionTarget);
 
     const selectedTargetProps: string = adapterOrExtension?.options.find(
       (selectedOption: any) => selectedOption.displayName === value
     );
-
-    console.log('selectedTargetProps', selectedTargetProps);
 
     setSelectedTargetOptionProps(selectedTargetProps);
   }
