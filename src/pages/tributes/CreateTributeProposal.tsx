@@ -144,8 +144,9 @@ export default function CreateTributeProposal() {
     setValue,
     register,
     triggerValidation,
+    watch,
   } = form;
-  const erc20AddressValue = getValues().erc20Address;
+  const erc20AddressValue = watch('erc20Address');
 
   const createTributeError = submitError || txError || txErrorTokenApprove;
   const isConnected = connected && account;
@@ -641,8 +642,8 @@ export default function CreateTributeProposal() {
 
             <div className="form__input-description">
               This amount will be held in escrow pending a member vote. If the
-              proposal is accepted, the funds will automatically be sent to the
-              DAO. If the proposal fails, the funds will be refunded to you.
+              proposal passes, the funds will automatically be sent to the DAO.
+              If the proposal fails, the funds will be refunded to you.
             </div>
           </div>
 
