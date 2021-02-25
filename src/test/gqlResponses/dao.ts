@@ -1,7 +1,7 @@
 import {DEFAULT_ETH_ADDRESS, DEFAULT_DAO_NAME} from '../helpers';
 
 export const daoResponse = {
-  laolands: [
+  molochv3S: [
     {
       id: DEFAULT_ETH_ADDRESS,
       daoAddress: DEFAULT_ETH_ADDRESS,
@@ -11,7 +11,7 @@ export const daoResponse = {
         id: DEFAULT_ETH_ADDRESS,
         bankAddress: DEFAULT_ETH_ADDRESS,
       },
-      __typename: 'Laoland',
+      __typename: 'Molochv3S',
     },
   ],
 };

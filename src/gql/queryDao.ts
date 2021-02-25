@@ -2,7 +2,7 @@ import {gql} from '@apollo/client';
 
 export const GET_DAO = gql`
   query GetDao($id: ID) {
-    laolands(where: {id: $id}) {
+    molochv3S(where: {id: $id}) {
       id # dao address
       daoAddress
       name

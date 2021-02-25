@@ -48,9 +48,9 @@ export function useDao(): UseDaoReturn {
   function getDaoRegistry() {
     try {
       if (!getDao.loading && getDao.data) {
-        setDao(getDao.data.laolands[0]);
+        setDao(getDao.data.molochv3S[0]);
 
-        if (getDao.data.laolands.length === 0) {
+        if (getDao.data.molochv3S.length === 0) {
           const error = new Error(
             `"${daoRegistryContract?.contractAddress}" dao address not found.`
           );
