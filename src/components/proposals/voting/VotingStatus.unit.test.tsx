@@ -4,13 +4,15 @@ import {VotingStatus} from './VotingStatus';
 
 describe('VotingStatus unit tests', () => {
   test('can render and show correct UI', async () => {
+    const nowMs = Date.now();
+
     // Voting started
     const {rerender} = render(
       <VotingStatus
         renderTimer={(ProposalPeriodComponent) => (
           <ProposalPeriodComponent
-            startPeriodMs={Date.now()}
-            endPeriodMs={Date.now() + 3000}
+            startPeriodMs={nowMs}
+            endPeriodMs={nowMs + 3000}
           />
         )}
         renderStatus={() => 'You are in voting'}
