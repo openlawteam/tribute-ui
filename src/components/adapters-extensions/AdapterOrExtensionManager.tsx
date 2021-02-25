@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 
 import {StoreState} from '../../store/types';
 import {AsyncStatus} from '../../util/types';
-import {AddAdapterArguments, Adapters} from './types';
+import {AddAdapterArguments, Adapters, AddExtensionArguments} from './types';
 
 import {DaoConstants} from './enums';
 
@@ -202,7 +202,7 @@ export default function AdapterManager() {
 
     adapterOrExtensionAddress
       .then((addr: string) => {
-        addAdapterOrExtension(addr, adapter.name);
+        addAdapterOrExtension(addr, adapter.name, 'ADAPTER');
       })
       .catch((error) => {
         console.warn(
@@ -211,23 +211,45 @@ export default function AdapterManager() {
       });
   }
 
-  async function handleAddExtension(extension: any) {
+  function handleAddExtension(extension: any) {
     console.log('add extension', extension);
-    // can bank extension be configured?
-    // to remove use `removeExtension`
-    // pass type
 
-    //  Inputs:
-    // [0]bytes32 extensionId
-    // [1]address extension - contractAddr
-    // [2]address creator - connectedUser
-    try {
-    } catch (error) {}
+    const adapterOrExtensionAddress = new Promise<any>((resolve, reject) => {
+      try {
+        // Get contract address
+        const {contractAddress} = getAdapterFromRedux(
+          extension.name as DaoConstants
+        );
+
+        resolve(contractAddress);
+      } catch (error) {
+        // try and get the default contract address from the arg `adapter`
+        const contractAddress = extension.contractAddress;
+
+        if (contractAddress) {
+          resolve(contractAddress);
+        } else {
+          reject(error);
+        }
+      }
+    });
+
+    adapterOrExtensionAddress
+      .then((addr: string) => {
+        addAdapterOrExtension(addr, extension.name, 'EXTENSION');
+      })
+      .catch((error) => {
+        console.warn(
+          `Dao extension contract not found, try adding the default "${extension.name}" contract`,
+          error
+        );
+      });
   }
 
   async function addAdapterOrExtension(
     contractAddress: string,
-    adapterName: DaoConstants
+    adapterOrExtensionName: DaoConstants,
+    adapterOrExtensionType: 'ADAPTER' | 'EXTENSION'
   ) {
     setSubmitError(undefined);
 
@@ -236,26 +258,29 @@ export default function AdapterManager() {
     try {
       setIsInProcess((prevState) => ({
         ...prevState,
-        [adapterName]: true,
+        [adapterOrExtensionName]: true,
       }));
 
       if (!contractAddress) {
-        throw new Error('adapterAddress must not be empty');
+        throw new Error(`${adapterOrExtensionType} address must not be empty`);
       }
 
       // 1. Get the bytes32 hash of the adapter name
-      const adapterId = getAdapterOrExtensionId(adapterName);
+      const adapterOrExtensionId = getAdapterOrExtensionId(
+        adapterOrExtensionName
+      );
 
       // 2. Get adapters access control layer (acl)
       // these are the functions the adapter will have access to
-      const {acl} = getAccessControlLayer(adapterName);
+      const {acl} = getAccessControlLayer(adapterOrExtensionName);
 
-      //
-      const addAdapterArguments: AddAdapterArguments = [
-        adapterId,
-        contractAddress,
-        acl,
-      ];
+      // 3. Contract the function arguments base of its type
+      const addAdapterOrExtensionArguments:
+        | AddAdapterArguments
+        | AddExtensionArguments =
+        adapterOrExtensionType === 'ADAPTER'
+          ? [adapterOrExtensionId, contractAddress, acl]
+          : [adapterOrExtensionId, contractAddress, account];
 
       const txArguments = {
         from: account || '',
@@ -263,34 +288,34 @@ export default function AdapterManager() {
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      // Execute contract call for `addAdapter` or `addExtension` @todo
+      // Execute contract call for `addAdapter` or `addExtension`
       await txSend(
-        'addAdapter',
+        adapterOrExtensionType === 'ADAPTER' ? 'addAdapter' : 'addExtension',
         DaoRegistryContract.instance.methods,
-        addAdapterArguments,
+        addAdapterOrExtensionArguments,
         txArguments
       );
 
       setIsInProcess((prevState) => ({
         ...prevState,
-        [adapterName]: false,
+        [adapterOrExtensionName]: false,
       }));
       setIsDone((prevState) => ({
         ...prevState,
-        [adapterName]: true,
+        [adapterOrExtensionName]: true,
       }));
 
       // @todo re-initContracts
     } catch (error) {
       setIsInProcess((prevState) => ({
         ...prevState,
-        [adapterName]: false,
+        [adapterOrExtensionName]: false,
       }));
 
       const errorMessage = new Error(
         error && error?.code === 4001
           ? error.message
-          : `Unable to add ${adapterName} adapter`
+          : `Unable to add ${adapterOrExtensionName} ${adapterOrExtensionType}; ${error}`
       );
       setSubmitError(errorMessage);
     }
@@ -360,7 +385,9 @@ export default function AdapterManager() {
       // re-init contracts @todo
     } catch (error) {
       const errorMessage = new Error(
-        error && error?.code === 4001 ? error.message : `Unable to add adapters`
+        error && error?.code === 4001
+          ? error.message
+          : `Unable to add adapters; ${error}`
       );
       setSubmitError(errorMessage);
 

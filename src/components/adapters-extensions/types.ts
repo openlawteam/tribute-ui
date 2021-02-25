@@ -21,6 +21,15 @@ export type AddAdapterArguments = [
   number
 ];
 
+export type AddExtensionArguments = [
+  // `extensionId`
+  string,
+  // `extension`
+  string,
+  // `creator`
+  string
+];
+
 export type ConfigurationArguments = [
   // `dao`
   string,
