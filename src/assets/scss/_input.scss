@@ -58,6 +58,10 @@ select {
   background-repeat: no-repeat;
   background-position: right 1em top 50%;
   background-size: 0.875em auto;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 /* change autocomplete styles */
