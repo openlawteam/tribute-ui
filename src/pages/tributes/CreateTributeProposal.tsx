@@ -706,10 +706,10 @@ export default function CreateTributeProposal() {
           <label className="form__input-row-label">Description</label>
           <div className="form__input-row-fieldwrap">
             <textarea
-              aria-describedby={`error-${Fields.description}`}
               name={Fields.description}
               placeholder="Say something about your tribute..."
               ref={register}
+              disabled={isInProcessOrDone}
             />
           </div>
         </div>
