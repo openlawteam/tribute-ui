@@ -25,6 +25,12 @@ export async function multicall({
     '../../../truffle-contracts/Multicall.json'
   );
 
+  // Let's `console.error` and exit instead of throwing.
+  if (!MULTICALL_CONTRACT_ADDRESS) {
+    console.error('No Multicall address was found. Are you sure it is set?');
+    return;
+  }
+
   try {
     const {methods: multicallMethods} = new web3Instance.eth.Contract(
       lazyMulticallABI as AbiItem[],
