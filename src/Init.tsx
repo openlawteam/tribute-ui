@@ -76,7 +76,7 @@ export default function Init(props: InitProps) {
    * Our hooks
    */
 
-  const {initContracts, contractsFetchStatus} = useInitContracts();
+  const initContracts = useInitContracts();
   const {account, connected, provider, web3Instance} = useWeb3Modal();
   const {defaultChainError} = useIsDefaultChain();
   const {isMountedRef} = useIsMounted();
@@ -111,18 +111,8 @@ export default function Init(props: InitProps) {
   }, [processReadyMap]);
 
   useEffect(() => {
-    connected &&
-      provider &&
-      web3Instance &&
-      contractsFetchStatus === AsyncStatus.FULFILLED &&
-      handleInitContractsCached();
-  }, [
-    connected,
-    contractsFetchStatus,
-    handleInitContractsCached,
-    provider,
-    web3Instance,
-  ]);
+    connected && provider && web3Instance && handleInitContractsCached();
+  }, [connected, handleInitContractsCached, provider, web3Instance]);
 
   useEffect(() => {
     connected &&
