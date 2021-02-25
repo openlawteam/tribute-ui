@@ -5,7 +5,7 @@ import {CycleEllipsis} from '../../feedback';
 import {getDAOConfigEntry} from '../../web3/helpers';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
-import {useOffchainVotingStartEnd} from '../hooks';
+import {useOffchainVotingResults, useOffchainVotingStartEnd} from '../hooks';
 import {useSelector} from 'react-redux';
 import {VotingStatus} from './VotingStatus';
 
@@ -71,6 +71,18 @@ export function OffchainVotingStatus({
   const [gracePeriodEndMs, setGracePeriodEndMs] = useState<number>(0);
 
   /**
+   * Our hooks
+   */
+
+  const {
+    hasOffchainVotingStarted,
+    hasOffchainVotingEnded,
+    offchainVotingStartEndInitReady,
+  } = useOffchainVotingStartEnd(proposal);
+
+  const votingResults = useOffchainVotingResults(proposal);
+
+  /**
    * Variables
    */
 
@@ -80,16 +92,6 @@ export function OffchainVotingStatus({
   const yesShares = 0;
   const noShares = 0;
   const totalShares = 10000000;
-
-  /**
-   * Our hooks
-   */
-
-  const {
-    hasOffchainVotingStarted,
-    hasOffchainVotingEnded,
-    offchainVotingStartEndInitReady,
-  } = useOffchainVotingStartEnd(proposal);
 
   /**
    * Effects
