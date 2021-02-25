@@ -4,7 +4,7 @@ import {useHistory, useParams} from 'react-router-dom';
 import {truncateEthAddress} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
-import AdapterManager from '../../components/adapters/AdapterManager';
+import AdapterManager from '../../components/adapters-extensions/AdapterManager';
 import {fakeMembers, FakeMember} from './_mockData';
 
 export default function MemberProfile() {

@@ -80,17 +80,16 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
  * - Bank Extension
  */
 
+// If developing locally, include your DaoRegistry contract address in your `.env` file.
+export const DAO_REGISTRY_CONTRACT_ADDRESS = REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS;
+
 export const DAO_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
   [CHAINS.RINKEBY]: '0xC3014c82dB7677032ed3C136B740563978505c34',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_DAO_FACTORY_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
-
-// If developing locally, include your DaoRegistry contract address in your `.env` file.
-export const DAO_REGISTRY_CONTRACT_ADDRESS = REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS;
 
 export const BANK_EXTENSION_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
@@ -98,7 +97,6 @@ export const BANK_EXTENSION_CONTRACT_ADDRESS = {
   [CHAINS.RINKEBY]: '0x46507c42B98C68FD489a52D22b3dD29EAaBd1589',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_BANK_EXTENSION_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
 /**
@@ -125,7 +123,6 @@ export const CONFIGURATION_CONTRACT_ADDRESS = {
   [CHAINS.RINKEBY]: '0xa09aCC174ca17348A6aB5205a8246ad54fBD7ED5',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_CONFIGURATION_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
 export const COUPONONBOARDING_CONTRACT_ADDRESS = {
@@ -150,7 +147,6 @@ export const FINANCING_CONTRACT_ADDRESS = {
   [CHAINS.RINKEBY]: '0xc57808D712B21F903E7c4AeCfD3ee0ec78133B91',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_FINANCING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
 export const GUILDKICK_CONTRACT_ADDRESS = {
@@ -159,7 +155,6 @@ export const GUILDKICK_CONTRACT_ADDRESS = {
   [CHAINS.RINKEBY]: '0x0baba15Ff09410255c35A1a06298577148BE5D89',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_GUILDKICK_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
 export const MANAGING_CONTRACT_ADDRESS = {
@@ -168,7 +163,6 @@ export const MANAGING_CONTRACT_ADDRESS = {
   [CHAINS.RINKEBY]: '0xa1c948eFc43d714321dFC6Ceb58c24A0aBcc3FC0',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_MANAGING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
 export const OFFCHAINVOTING_CONTRACT_ADDRESS = {
@@ -177,7 +171,6 @@ export const OFFCHAINVOTING_CONTRACT_ADDRESS = {
   [CHAINS.RINKEBY]: '0x7bCd7C6B38ef352842F5c22756585D8a8c28ADFA',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_OFFCHAINVOTING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
 export const ONBOARDING_CONTRACT_ADDRESS = {
@@ -195,7 +188,6 @@ export const RAGEQUIT_CONTRACT_ADDRESS = {
   [CHAINS.RINKEBY]: '0xAE08FC11da9897f114DE9C249D5d7De9E5DB3434',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_RAGEQUIT_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
 export const TRIBUTE_CONTRACT_ADDRESS = {
@@ -204,7 +196,6 @@ export const TRIBUTE_CONTRACT_ADDRESS = {
   [CHAINS.RINKEBY]: '0xA7CedB234b9A61Dd5919f0566fc6dbc80b8cDD9b',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_TRIBUTE_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
 export const VOTING_CONTRACT_ADDRESS = {
@@ -213,7 +204,6 @@ export const VOTING_CONTRACT_ADDRESS = {
   [CHAINS.RINKEBY]: '0x614dd6193Bfe7fBAF1f1e9FB562AE13764Cbf6Db',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_VOTING_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
 
 export const WITHDRAW_CONTRACT_ADDRESS = {
@@ -222,8 +212,8 @@ export const WITHDRAW_CONTRACT_ADDRESS = {
   [CHAINS.RINKEBY]: '0x5F50297C1ddb887596526de87C0e2d1CDeF8C0d5',
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
-  // [CHAINS.GANACHE]: REACT_APP_GANACHE_WITHDRAW_CONTRACT_ADDRESS, // Include your Ganache-deployed DaoRegistry smart contract address in your `.env` file.
 };
+
 // If developing locally, include your Multicall contract address in your `.env` file.
 export const MULTICALL_CONTRACT_ADDRESS = REACT_APP_MULTICALL_CONTRACT_ADDRESS;
 

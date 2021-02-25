@@ -102,16 +102,16 @@ export type AddAdapterFunction =
   | 'submitKickProposal'
   | 'ragequit';
 
-// type AclFlag =  // @todo typify its deps
-//   | 'ADD_ADAPTER'
-//   | 'ADD_EXTENSION'
-//   | 'JAIL_MEMBER'
-//   | 'PROCESS_PROPOSAL'
-//   | 'SUBMIT_PROPOSAL'
-//   | 'SPONSOR_PROPOSAL'
-//   | 'SET_CONFIGURATION'
-//   | 'REMOVE_ADAPTER'
-//   | 'REMOVE_EXTENSION'
-//   | 'NEW_MEMBER'
-//   | 'UNJAIL_MEMBER'
-//   | 'UPDATE_DELEGATE_KEY';
+export type AclFlag =  // @todo typify its deps
+  | 'ADD_ADAPTER'
+  | 'ADD_EXTENSION'
+  | 'JAIL_MEMBER'
+  | 'PROCESS_PROPOSAL'
+  | 'SUBMIT_PROPOSAL'
+  | 'SPONSOR_PROPOSAL'
+  | 'SET_CONFIGURATION'
+  | 'REMOVE_ADAPTER'
+  | 'REMOVE_EXTENSION'
+  | 'NEW_MEMBER'
+  | 'UNJAIL_MEMBER'
+  | 'UPDATE_DELEGATE_KEY';

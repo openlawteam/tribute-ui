@@ -7,7 +7,10 @@ import {useSelector} from 'react-redux';
 
 import {GET_ADAPTERS_AND_EXTENSIONS} from '../../../gql';
 
-import {defaultAdaptersAndExtensions} from '../config';
+import {
+  defaultAdaptersAndExtensions,
+  AdaptersAndExtensionsType,
+} from '../config';
 import {Adapters, Extensions} from '../types';
 import {DaoConstants} from '../enums';
 import {GQL_QUERY_POLLING_INTERVAL} from '../../../config';
@@ -157,17 +160,20 @@ export function useAdapters(): UseAdaptersReturn {
 
     // add registered adapters
     daoAdapters.forEach((a: AdapterType) => {
-      const adapter: Adapters | undefined = defaultAdaptersAndExtensions.find(
-        (aa: Adapters) =>
-          aa.adapterId?.toLowerCase() === a.adapterId?.toLowerCase() && aa.name
+      const adapter:
+        | AdaptersAndExtensionsType
+        | undefined = defaultAdaptersAndExtensions.find(
+        (adt: AdaptersAndExtensionsType) =>
+          adt.adapterId?.toLowerCase() === a.adapterId?.toLowerCase() &&
+          adt.name
       );
 
       if (adapter) {
         registeredAdapters.push({
           ...a,
-          name: adapter.name,
+          name: adapter.name as DaoConstants,
           description: adapter.description,
-        });
+        } as any);
       }
     });
 
@@ -203,19 +209,19 @@ export function useAdapters(): UseAdaptersReturn {
     // add registered extensions
     daoExtensions.forEach((e: ExtensionType) => {
       const extension:
-        | Extensions
+        | AdaptersAndExtensionsType
         | undefined = defaultAdaptersAndExtensions.find(
-        (ee: Extensions) =>
-          ee.extensionId?.toLowerCase() === e.extensionId?.toLowerCase() &&
-          ee.name
+        (ext: AdaptersAndExtensionsType) =>
+          ext.extensionId?.toLowerCase() === e.extensionId?.toLowerCase() &&
+          ext.name
       );
 
       if (extension) {
         registeredExtensions.push({
           ...e,
-          name: extension.name,
+          name: extension.name as DaoConstants,
           description: extension.description,
-        });
+        } as any);
       }
     });
 

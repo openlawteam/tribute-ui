@@ -1,6 +1,7 @@
 import Web3 from 'web3';
 
 import {DaoConstants} from './enums';
+// import {AclFlag} from './types';
 
 export function getAdapterOrExtensionId(adapterName: DaoConstants): string {
   return sha3(adapterName) as string;

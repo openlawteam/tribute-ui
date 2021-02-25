@@ -14,7 +14,10 @@ import {
 import {ContractsStateEntry, StoreState} from '../types';
 import {getAdapterAddress, multicall} from '../../components/web3/helpers';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
-import {DaoConstants, VotingAdapterName} from '../../components/adapters/enums';
+import {
+  DaoConstants,
+  VotingAdapterName,
+} from '../../components/adapters-extensions/enums';
 
 type ContractAction =
   | typeof CONTRACT_DAO_FACTORY

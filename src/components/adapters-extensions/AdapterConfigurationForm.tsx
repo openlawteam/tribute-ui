@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
 
 import {DaoConstants} from './enums';
-import {AdapterFormArguments, Adapters} from './types';
+import {/*AdapterFormArguments,*/ Adapters} from './types';
 import {StoreState} from '../../store/types';
 import {MetaMaskRPCError} from '../../util/types';
 import {Web3TxStatus} from '../web3/types';

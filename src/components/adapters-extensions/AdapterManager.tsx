@@ -7,7 +7,10 @@ import {AddAdapterArguments, Adapters} from './types';
 
 import {DaoConstants} from './enums';
 
-import {defaultAdaptersAndExtensions} from './config';
+import {
+  defaultAdaptersAndExtensions,
+  AdaptersAndExtensionsType,
+} from './config';
 
 import {
   getAdapterOrExtensionId,
@@ -22,9 +25,10 @@ import {useDao, useMemberActionDisabled} from '../../hooks';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 
 import AdapterConfiguratorModal from './AdapterConfiguratorModal';
-import Checkbox, {CheckboxSize} from '../../components/common/Checkbox';
-import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
-import Loader from '../../components/feedback/Loader';
+import AdapterExtensionSelectTarget from './AdapterExtensionSelectTarget';
+import Checkbox, {CheckboxSize} from '../common/Checkbox';
+import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
+import Loader from '../feedback/Loader';
 
 enum WhyDisableModalTitles {
   FINALIZED_REASON = 'Why is finalizing disabled?',
@@ -110,6 +114,8 @@ export default function AdapterManager() {
     registeredAdapters === undefined &&
     unRegisteredAdapters === undefined;
   const isLoadingAdapters = adapterStatus === AsyncStatus.PENDING;
+  // @todo track the prior selection of a dropdown target
+  // let priorSelectedTargetOption: DaoConstants | null = null;
 
   const checkDaoStateCached = useCallback(checkDaoState, [
     DaoRegistryContract,
@@ -125,13 +131,19 @@ export default function AdapterManager() {
   // Sets the initial checkbox selections for non-registered adapters to `false`
   // and sets the `Select All` checkbox to disabled if no adapters are available
   useEffect(() => {
+    // Set the select all check to false by default
+    setSelectAll(false);
+
     if (!unRegisteredAdapters) return;
+
     unRegisteredAdapters &&
       unRegisteredAdapters?.forEach((adapter: Record<string, any>) => {
-        setSelections((prevState: Record<string, boolean> | undefined) => ({
-          ...prevState,
-          [adapter.adapterName]: false,
-        }));
+        // only add a selection if it doesn't have nested `options`
+        !adapter?.options &&
+          setSelections((prevState: Record<string, boolean> | undefined) => ({
+            ...prevState,
+            [adapter.name]: false,
+          }));
       });
   }, [isDisabled, unRegisteredAdapters]);
 
@@ -168,20 +180,18 @@ export default function AdapterManager() {
    * @param adapter
    */
   function handleAddAdapter(adapter: Record<string, any>) {
+    console.log('handleAddAdapter: adapter', adapter);
     const adapterOrExtensionAddress = new Promise<any>((resolve, reject) => {
       try {
-        // Get adapters contract address
+        // Get contract address
         const {contractAddress} = getAdapterFromRedux(
           adapter.name as DaoConstants
         );
 
         resolve(contractAddress);
       } catch (error) {
-        const defaultAdapterorEExtension = defaultAdaptersAndExtensions.filter(
-          (ae: any) => ae.name === adapter.name
-        )[0];
-        // try and get the default contract address
-        const contractAddress = defaultAdapterorEExtension.contractAddress;
+        // try and get the default contract address from the arg `adapter`
+        const contractAddress = adapter.contractAddress;
 
         if (contractAddress) {
           resolve(contractAddress);
@@ -219,7 +229,6 @@ export default function AdapterManager() {
     contractAddress: string,
     adapterName: DaoConstants
   ) {
-    //Record<string, any>
     setSubmitError(undefined);
 
     if (!DaoRegistryContract) return;
@@ -229,9 +238,6 @@ export default function AdapterManager() {
         ...prevState,
         [adapterName]: true,
       }));
-
-      // Get adapters contract address
-      // const {contractAddress} = getAdapter(adapter.adapterName as DaoConstants);
 
       if (!contractAddress) {
         throw new Error('adapterAddress must not be empty');
@@ -304,8 +310,10 @@ export default function AdapterManager() {
         if (selections[adapterName]) {
           // @todo check for extension
           // Get adapterOrExtensionId from `defaultAdaptersAndExtensions`
-          const {adapterId} = defaultAdaptersAndExtensions.filter(
-            (a: Adapters) => a.name === adapterName
+          const {
+            adapterId,
+          }: AdaptersAndExtensionsType = defaultAdaptersAndExtensions.filter(
+            (a: AdaptersAndExtensionsType) => a.name === adapterName
           )[0];
 
           // Get adapter contract address
@@ -317,7 +325,9 @@ export default function AdapterManager() {
           // these are the functions the adapter will have access to
           const {acl} = getAccessControlLayer(adapterName);
 
-          adaptersArguments.push([adapterId, contractAddress, acl]);
+          // @todo skip if adapterId undefined
+          adapterId &&
+            adaptersArguments.push([adapterId, contractAddress, acl]);
 
           setIsInProcess((prevState) => ({
             ...prevState,
@@ -473,6 +483,18 @@ export default function AdapterManager() {
     }
   }
 
+  function handleSelectTargetChange({event, selectedTargetOption}: any) {
+    // update the prior selected target to track the change
+    // so we can remove the old target from checkbox `selections`
+
+    // @todo Remove previously selected target
+
+    setSelections((s) => ({
+      ...s,
+      [selectedTargetOption]: event.target.checked,
+    }));
+  }
+
   return (
     <div className="adaptermanager">
       <h1>Adapter Manager</h1>
@@ -486,7 +508,7 @@ export default function AdapterManager() {
       <div className="adaptermanager__selection">
         <div>
           <Checkbox
-            id="select-all"
+            id="selectAll"
             label={`${selectionCount} selected`}
             checked={selectAll === true}
             disabled={
@@ -498,7 +520,7 @@ export default function AdapterManager() {
               - disable when there are no more unused adapters to select
               */
             }
-            name="select-all"
+            name="selectAll"
             size={CheckboxSize.LARGE}
             onChange={handleOnChange}
           />
@@ -520,60 +542,138 @@ export default function AdapterManager() {
       {isDAOExisting &&
         unRegisteredAdapters &&
         unRegisteredAdapters?.length &&
-        unRegisteredAdapters.map((adapter: Record<string, any>) => (
-          <div
-            className="adaptermanager__grid unregistered-adapters"
-            key={adapter.id}>
-            <div className="adaptermanager__checkbox">
-              <Checkbox
-                id={adapter.name}
-                label={''}
-                checked={
-                  (selections && selections[adapter.name] === true) || false
-                }
-                disabled={isDisabled}
-                name={adapter.name}
-                size={CheckboxSize.LARGE}
-                onChange={(event) => {
-                  setSelections((s) => ({
-                    ...s,
-                    [adapter.name]: event.target.checked,
-                  }));
-                }}
-              />
-            </div>
+        unRegisteredAdapters.map(
+          (adapter: Record<string, any>, idx: number) => (
+            <div
+              className="adaptermanager__grid unregistered-adapters"
+              key={idx}>
+              {/** RENDER ADAPTER/EXTENSION DROPDOWN */}
+              {adapter?.options ? (
+                <AdapterExtensionSelectTarget
+                  adapterOrExtension={adapter}
+                  renderCheckboxAction={({selectedTargetOption}) => {
+                    return (
+                      <>
+                        <div className="adaptermanager__checkbox">
+                          <Checkbox
+                            id={selectedTargetOption || 'empty'}
+                            label={''}
+                            checked={
+                              (selectedTargetOption &&
+                                selections &&
+                                selections[selectedTargetOption] === true) ||
+                              false
+                            }
+                            disabled={
+                              isDisabled || selectedTargetOption === null
+                            }
+                            name={selectedTargetOption || ''}
+                            size={CheckboxSize.LARGE}
+                            onChange={(event) => {
+                              selectedTargetOption &&
+                                handleSelectTargetChange({
+                                  event,
+                                  selectedTargetOption,
+                                });
+                            }}
+                          />
+                        </div>
+                      </>
+                    );
+                  }}
+                  renderActions={({
+                    selectedTargetOption,
+                    selectedTargetOptionProps,
+                  }) => {
+                    return (
+                      <>
+                        <div className="adaptermanager__add">
+                          <button
+                            className="button--secondary"
+                            disabled={
+                              selectedTargetOption === null ||
+                              (isInProcess &&
+                                isInProcess[selectedTargetOptionProps.name]) ||
+                              isDisabled
+                            }
+                            onClick={() =>
+                              selectedTargetOptionProps?.isExtension
+                                ? handleAddExtension(selectedTargetOptionProps)
+                                : handleAddAdapter(selectedTargetOptionProps)
+                            }>
+                            {isInProcess &&
+                            isInProcess[selectedTargetOptionProps.name] ? (
+                              <Loader />
+                            ) : isDone &&
+                              isDone[selectedTargetOptionProps.name] ? (
+                              'Done'
+                            ) : (
+                              'Add'
+                            )}
+                          </button>
+                        </div>
+                      </>
+                    );
+                  }}
+                />
+              ) : (
+                <>
+                  {/** RENDER ADAPTER/EXTENSION */}
+                  <div className="adaptermanager__checkbox">
+                    <Checkbox
+                      id={adapter.name}
+                      label={''}
+                      checked={
+                        (selections && selections[adapter.name] === true) ||
+                        false
+                      }
+                      disabled={isDisabled}
+                      name={adapter.name}
+                      size={CheckboxSize.LARGE}
+                      onChange={(event) => {
+                        setSelections((s) => ({
+                          ...s,
+                          [adapter.name]: event.target.checked,
+                        }));
+                      }}
+                    />
+                  </div>
 
-            <div className="adaptermanager__info">
-              <span className="adaptermanager__name">
-                {adapter.name} {adapter?.isExtension && '(EXTENSION)'}
-              </span>
-              <span className="adaptermanager__desc">
-                {adapter.description}
-              </span>
-            </div>
+                  <div className="adaptermanager__info">
+                    <span className="adaptermanager__name">
+                      {adapter.name} {adapter?.isExtension && '(EXTENSION)'}
+                    </span>
+                    <span className="adaptermanager__desc">
+                      {adapter.description}
+                    </span>
+                  </div>
 
-            <div className="adaptermanager__add">
-              <button
-                className="button--secondary"
-                disabled={
-                  (isInProcess && isInProcess[adapter.name]) || isDisabled
-                }
-                onClick={() =>
-                  adapter?.isExtension
-                    ? handleAddExtension(adapter)
-                    : handleAddAdapter(adapter)
-                }>
-                {isInProcess && isInProcess[adapter.adapterName] ? (
-                  <Loader />
-                ) : isDone && isDone[adapter.adapterName] ? (
-                  'Done'
-                ) : (
-                  'Add'
-                )}
-              </button>
+                  <div className="adaptermanager__add">
+                    <button
+                      className="button--secondary"
+                      disabled={
+                        (isInProcess && isInProcess[adapter.name]) || isDisabled
+                      }
+                      onClick={() =>
+                        adapter?.isExtension
+                          ? handleAddExtension(adapter)
+                          : handleAddAdapter(adapter)
+                      }>
+                      {isInProcess && isInProcess[adapter.name] ? (
+                        <Loader />
+                      ) : isDone && isDone[adapter.name] ? (
+                        'Done'
+                      ) : (
+                        'Add'
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
-          </div>
-        ))}
+          )
+        )}
+
       {/** CURRENTLY USED ADAPTERS AND EXTENSIONS TO CONFIGURE OR REMOVE */}
       {isDAOExisting &&
         registeredAdapters &&
@@ -644,6 +744,7 @@ export default function AdapterManager() {
               className="button--help"
               onClick={() => {
                 openWhyDisabledModal();
+
                 setWhyDisabledReason(WhyDisableModalTitles.FINALIZED_REASON);
               }}>
               {WhyDisableModalTitles.FINALIZED_REASON}

@@ -16,26 +16,28 @@ import {
   OFFCHAINVOTING_CONTRACT_ADDRESS,
 } from '../../config';
 
-// type AdapterProps = {
-//   adapterId?: string;
-//   extensionId?: string;
-//   contractAddress: string;
-//   description: string;
-// };
+type AdapterProps = {
+  adapterId?: string;
+  extensionId?: string;
+  name: string;
+  contractAddress: string;
+  description: string;
+};
 
-// type AdaptersAndExtensions = {
-//   isExtension?: boolean;
-//   listOptions?: Omit<
-//     AdapterProps,
-//     'adapterId' | 'extensionId' | 'description' | 'contractAddress'
-//   >;
-// } & Partial<AdapterProps>;
+export type AdaptersAndExtensionsType = {
+  isExtension?: boolean;
+  options?: Omit<
+    AdapterProps,
+    'adapterId' | 'extensionId' | 'name' | 'description' | 'contractAddress'
+  >;
+  optionDefaultTarget?: DaoConstants;
+} & Partial<AdapterProps>;
 
 // Partial<
 //   Record<DaoConstants, AdaptersAndExtensions>
 // >
 
-export const defaultAdaptersAndExtensions: any = [
+export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
   {
     isExtension: true,
     name: DaoConstants.BANK,
@@ -97,7 +99,7 @@ export const defaultAdaptersAndExtensions: any = [
     options: [
       {
         name: DaoConstants.OFFCHAINVOTING,
-        adapterId: getAdapterOrExtensionId(DaoConstants.VOTING), // @todo check this
+        adapterId: getAdapterOrExtensionId(DaoConstants.VOTING),
         contractAddress: OFFCHAINVOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
         description:
           'Adds the offchain voting governance process to the DAO to support gasless voting.',
@@ -110,6 +112,7 @@ export const defaultAdaptersAndExtensions: any = [
           'Adds the simple on chain voting governance process to the DAO.',
       },
     ],
+    optionDefaultTarget: DaoConstants.VOTING,
   },
   {
     name: DaoConstants.WITHDRAW,
