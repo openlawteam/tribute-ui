@@ -31,18 +31,13 @@ describe('VotingStatus unit tests', () => {
       screen.getByLabelText(/counting down until voting ends/i)
     ).toBeInTheDocument();
 
-    // Assert countdown
+    /**
+     * Assert countdown
+     * @note The timing can be flakey so we keep the matching generic (we know it will be between 0-2secs)
+     */
     await waitFor(() => {
       expect(screen.getByText(/ends:/i)).toBeInTheDocument();
-      expect(screen.getByText(/2 secs/i)).toBeInTheDocument();
-    });
-    await waitFor(() => {
-      expect(screen.getByText(/ends:/i)).toBeInTheDocument();
-      expect(screen.getByText(/1 sec/i)).toBeInTheDocument();
-    });
-    await waitFor(() => {
-      // @note This label probably wouldn't show as we'd render `null` the timer after the vote period was over.
-      expect(screen.getByText(/ended/i)).toBeInTheDocument();
+      expect(screen.getByText(/^[012] secs?/i)).toBeInTheDocument();
     });
 
     // Grace period
