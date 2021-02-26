@@ -2,7 +2,7 @@ import {Store} from 'redux';
 import {MemoryRouter} from 'react-router-dom';
 import {provider as Web3Provider} from 'web3-core/types';
 import {Provider} from 'react-redux';
-import React, {useEffect, useLayoutEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import Web3 from 'web3';
 
 import * as useWeb3ModalToMock from '../components/web3/hooks/useWeb3Modal';
