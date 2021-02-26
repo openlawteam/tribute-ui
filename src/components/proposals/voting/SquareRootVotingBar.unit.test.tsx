@@ -36,4 +36,20 @@ describe('SquareRootVotingBar unit tests', () => {
     expect(screen.getByLabelText('4% yes votes')).toBeInTheDocument();
     expect(screen.getByLabelText('2% no votes')).toBeInTheDocument();
   });
+
+  test('no results should display if shares values are not provided yet (i.e. async values)', () => {
+    render(
+      <SquareRootVotingBar
+        yesShares={undefined}
+        noShares={undefined}
+        totalShares={undefined}
+        votingExpired={false}
+        showPercentages={true}
+      />
+    );
+
+    expect(screen.getAllByText('0%')).toHaveLength(2);
+    expect(screen.getByLabelText('0% yes votes')).toBeInTheDocument();
+    expect(screen.getByLabelText('0% no votes')).toBeInTheDocument();
+  });
 });
