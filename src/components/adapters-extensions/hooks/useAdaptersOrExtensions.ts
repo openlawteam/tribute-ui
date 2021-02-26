@@ -32,12 +32,12 @@ export type ExtensionType = {
 };
 
 type UseAdaptersOrExtensionsReturn = {
-  adapterStatus: AsyncStatus;
+  adapterExtensionStatus: AsyncStatus;
   getAdapterOrExtensionFromRedux: (
     adapterName: DaoConstants
   ) => Record<string, any>;
-  registeredAdapters: AdapterType[] | undefined;
-  unRegisteredAdapters: Adapters[] | undefined;
+  registeredAdaptersOrExtensions: AdapterType[] | undefined;
+  unRegisteredAdaptersOrExtensions: Adapters[] | undefined;
 };
 
 export type AdaptersType = AdapterType & Adapters;
@@ -73,15 +73,18 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
   /**
    * State
    */
-  const [registeredAdapters, setRegisteredAdapters] = useState<
-    AdapterType[] | undefined
-  >();
-  const [unRegisteredAdapters, setUnRegisteredAdapters] = useState<
-    Adapters[] | undefined
-  >();
-  const [adapterStatus, setAdapterStatus] = useState<AsyncStatus>(
-    AsyncStatus.STANDBY
-  );
+  const [
+    registeredAdaptersOrExtensions,
+    setRegisteredAdaptersOrExtensions,
+  ] = useState<AdapterType[] | undefined>();
+  const [
+    unRegisteredAdaptersOrExtensions,
+    setUnRegisteredAdaptersOrExtensions,
+  ] = useState<Adapters[] | undefined>();
+  const [
+    adapterExtensionStatus,
+    setAdapterExtensionStatus,
+  ] = useState<AsyncStatus>(AsyncStatus.STANDBY);
 
   const getAdaptersAndExtensionsCached = useCallback(
     getAdaptersAndExtensions,
@@ -99,7 +102,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
     if (!DaoRegistryContract?.contractAddress) return;
 
     try {
-      setAdapterStatus(AsyncStatus.PENDING);
+      setAdapterExtensionStatus(AsyncStatus.PENDING);
 
       if (data) {
         // extract adapters and extensions from gql data
@@ -111,21 +114,21 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
           unRegisteredList,
         } = getAdaptersAndExtensionsCached(adapters, extensions);
 
-        setRegisteredAdapters(registeredList);
-        setUnRegisteredAdapters(unRegisteredList);
+        setRegisteredAdaptersOrExtensions(registeredList);
+        setUnRegisteredAdaptersOrExtensions(unRegisteredList);
 
         // done; lets set status to fulfilled
-        setAdapterStatus(AsyncStatus.FULFILLED);
+        setAdapterExtensionStatus(AsyncStatus.FULFILLED);
       } else {
         if (error) {
           throw new Error(error.message);
         }
       }
     } catch (error) {
-      setRegisteredAdapters(undefined);
-      setUnRegisteredAdapters(undefined);
+      setRegisteredAdaptersOrExtensions(undefined);
+      setUnRegisteredAdaptersOrExtensions(undefined);
 
-      setAdapterStatus(AsyncStatus.REJECTED);
+      setAdapterExtensionStatus(AsyncStatus.REJECTED);
     }
   }, [
     DaoRegistryContract,
@@ -182,6 +185,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
           if (gqlExtension) {
             registeredList.push({
               ...gqlExtension,
+              ...adapterOrExtension,
               name: adapterOrExtension.name as DaoConstants,
               description: adapterOrExtension.description,
             } as AdaptersAndExtensionsType);
@@ -206,6 +210,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
               if (gqlExtension) {
                 registeredList.push({
                   ...gqlExtension,
+                  ...option,
                   name: option.name as DaoConstants,
                   description: option.description,
                 } as AdaptersAndExtensionsType);
@@ -224,6 +229,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
               if (gqlAdapter) {
                 registeredList.push({
                   ...gqlAdapter,
+                  ...option,
                   name: option.name as DaoConstants,
                   description: option.description,
                 } as AdaptersAndExtensionsType);
@@ -246,6 +252,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
           if (gqlAdapter) {
             registeredList.push({
               ...gqlAdapter,
+              ...adapterOrExtension,
               name: adapterOrExtension.name as DaoConstants,
               description: adapterOrExtension.description,
             } as AdaptersAndExtensionsType);
@@ -274,7 +281,6 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
   function getAdapterOrExtensionFromRedux(
     adapterOrExtensionName: DaoConstants
   ): Record<string, any> {
-    console.log('adapterExtensionContracts', adapterExtensionContracts);
     return Object.keys(adapterExtensionContracts)
       .map((ae) => adapterExtensionContracts[ae])
       .filter((ae) => ae) // filter out any `null` objects
@@ -282,9 +288,9 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
   }
 
   return {
-    adapterStatus,
+    adapterExtensionStatus,
     getAdapterOrExtensionFromRedux,
-    registeredAdapters,
-    unRegisteredAdapters,
+    registeredAdaptersOrExtensions,
+    unRegisteredAdaptersOrExtensions,
   };
 }

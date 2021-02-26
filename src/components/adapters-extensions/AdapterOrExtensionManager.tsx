@@ -3,7 +3,13 @@ import {useSelector} from 'react-redux';
 
 import {StoreState} from '../../store/types';
 import {AsyncStatus} from '../../util/types';
-import {AddAdapterArguments, Adapters, AddExtensionArguments} from './types';
+import {
+  AddAdapterArguments,
+  Adapters,
+  AddExtensionArguments,
+  // Extensions,
+  AdaptersOrExtensions,
+} from './types';
 
 import {DaoConstants} from './enums';
 
@@ -82,10 +88,10 @@ export default function AdapterManager() {
    */
   const {account} = useWeb3Modal();
   const {
-    adapterStatus,
+    adapterExtensionStatus,
     getAdapterOrExtensionFromRedux,
-    registeredAdapters,
-    unRegisteredAdapters,
+    registeredAdaptersOrExtensions,
+    unRegisteredAdaptersOrExtensions,
   } = useAdaptersOrExtensions();
   const {dao, gqlError} = useDao();
 
@@ -110,10 +116,10 @@ export default function AdapterManager() {
   const isDAOExisting = dao;
   // grammatically naming is incorrect :)
   const isAdaptersUnavailable =
-    adapterStatus === AsyncStatus.REJECTED &&
-    registeredAdapters === undefined &&
-    unRegisteredAdapters === undefined;
-  const isLoadingAdapters = adapterStatus === AsyncStatus.PENDING;
+    adapterExtensionStatus === AsyncStatus.REJECTED &&
+    registeredAdaptersOrExtensions === undefined &&
+    unRegisteredAdaptersOrExtensions === undefined;
+  const isLoadingAdapters = adapterExtensionStatus === AsyncStatus.PENDING;
   // @todo track the prior selection of a dropdown target
   // let priorSelectedTargetOption: DaoConstants | null = null;
 
@@ -134,18 +140,20 @@ export default function AdapterManager() {
     // Set the select all check to false by default
     setSelectAll(false);
 
-    if (!unRegisteredAdapters) return;
+    if (!unRegisteredAdaptersOrExtensions) return;
 
-    unRegisteredAdapters &&
-      unRegisteredAdapters?.forEach((adapter: Record<string, any>) => {
-        // only add a selection if it doesn't have nested `options`
-        !adapter?.options &&
-          setSelections((prevState: Record<string, boolean> | undefined) => ({
-            ...prevState,
-            [adapter.name]: false,
-          }));
-      });
-  }, [isDisabled, unRegisteredAdapters]);
+    unRegisteredAdaptersOrExtensions &&
+      unRegisteredAdaptersOrExtensions?.forEach(
+        (adapter: Record<string, any>) => {
+          // only add a selection if it doesn't have nested `options`
+          !adapter?.options &&
+            setSelections((prevState: Record<string, boolean> | undefined) => ({
+              ...prevState,
+              [adapter.name]: false,
+            }));
+        }
+      );
+  }, [isDisabled, unRegisteredAdaptersOrExtensions]);
 
   // Updates checkbox selection counter when user selects a checkbox
   useEffect(() => {
@@ -212,15 +220,13 @@ export default function AdapterManager() {
   }
 
   function handleAddExtension(extension: any): void {
-    console.log('add extension', extension);
-
     const adapterOrExtensionAddress = new Promise<any>((resolve, reject) => {
       try {
         // Get contract address
         const {contractAddress} = getAdapterOrExtensionFromRedux(
           extension.name as DaoConstants
         );
-        console.log('1....', contractAddress);
+
         resolve(contractAddress);
       } catch (error) {
         // try and get the default contract address
@@ -291,17 +297,6 @@ export default function AdapterManager() {
 
       const txSendMethod =
         adapterOrExtensionType === 'ADAPTER' ? 'addAdapter' : 'addExtension';
-
-      console.log('txSendMethod', txSendMethod);
-      console.log(
-        'DaoRegistryContract.instance.methods',
-        DaoRegistryContract.instance.methods
-      );
-      console.log(
-        'addAdapterOrExtensionArguments',
-        addAdapterOrExtensionArguments
-      );
-      console.log('txArguments', txArguments);
 
       // Execute contract call for `addAdapter` or `addExtension`
       await txSend(
@@ -428,31 +423,32 @@ export default function AdapterManager() {
    *
    * @param adapter
    */
-  async function handleConfigureAdapter(adapter: Adapters): Promise<void> {
+  async function handleConfigure(
+    adapterOrExtension: AdaptersOrExtensions
+  ): Promise<void> {
     setSubmitError(undefined);
-    console.log('adapter', adapter);
+
     try {
       // Get ABI function name
-      const adapterABIFunctionName: string = getConfigurationABIFunction()[
-        adapter.name
+      const abiFunctionName: string = getConfigurationABIFunction()[
+        adapterOrExtension.name
       ];
-      // Get adapters ABI
-      const {abi} = getAdapterOrExtensionFromRedux(adapter.name);
-      // Get adapters configure function input parameters
+      // Get adapters/extension ABI
+      const {abi} = getAdapterOrExtensionFromRedux(adapterOrExtension.name);
+      // Get adapters/extension configure function input parameters
       const {inputs} = abi.filter(
-        (p: Record<string, any>) => p.name === adapterABIFunctionName
+        (p: Record<string, any>) => p.name === abiFunctionName
       )[0];
 
-      setABIMethodName(adapterABIFunctionName);
-      setConfigureAdapter(adapter);
+      setABIMethodName(abiFunctionName);
+      setConfigureAdapter(adapterOrExtension);
       setInputParameters(inputs);
       setOpenModal(true);
     } catch (error) {
-      console.log('error', error);
       const errorMessage = new Error(
         error && error?.code === 4001
           ? error.message
-          : `${adapter.name} contract not found`
+          : `${adapterOrExtension.name} contract not found`
       );
       setSubmitError(errorMessage);
     }
@@ -568,7 +564,7 @@ export default function AdapterManager() {
             disabled={
               isAdaptersUnavailable ||
               isDisabled || // connected user is not an active member
-              unRegisteredAdapters?.length === 0 || // nothing left to register
+              unRegisteredAdaptersOrExtensions?.length === 0 || // nothing left to register
               !isDAOExisting /* 
               @todo 
               - disable when selection is processing 
@@ -595,9 +591,9 @@ export default function AdapterManager() {
 
       {/** UNUSED ADAPTERS AND EXTENSIONS TO ADD */}
       {isDAOExisting &&
-        unRegisteredAdapters &&
-        unRegisteredAdapters?.length > 0 &&
-        unRegisteredAdapters.map(
+        unRegisteredAdaptersOrExtensions &&
+        unRegisteredAdaptersOrExtensions?.length > 0 &&
+        unRegisteredAdaptersOrExtensions.map(
           (adapter: Record<string, any>, idx: number) => (
             <div
               className="adaptermanager__grid unregistered-adapters"
@@ -620,7 +616,9 @@ export default function AdapterManager() {
                               false
                             }
                             disabled={
-                              isDisabled || selectedTargetOption === null
+                              isDisabled ||
+                              selectedTargetOption === null ||
+                              adapter?.isExtension
                             }
                             name={selectedTargetOption || ''}
                             size={CheckboxSize.LARGE}
@@ -731,31 +729,36 @@ export default function AdapterManager() {
 
       {/** CURRENTLY USED ADAPTERS AND EXTENSIONS TO CONFIGURE OR REMOVE */}
       {isDAOExisting &&
-        registeredAdapters &&
-        registeredAdapters?.length > 0 &&
-        registeredAdapters.map((adapter: Record<string, any>, idx: number) => (
-          <div
-            className="adaptermanager__grid registered-adapters"
-            key={`${adapter.id}-${idx}`}>
-            <div className="adaptermanager__info">
-              <span className="adaptermanager__name">
-                {adapter.name} {adapter?.isExtension && '(EXTENSION)'}
-              </span>
-              <span className="adaptermanager__desc">
-                {adapter.description}
-              </span>
-            </div>
+        registeredAdaptersOrExtensions &&
+        registeredAdaptersOrExtensions?.length > 0 &&
+        registeredAdaptersOrExtensions.map(
+          (adapterOrExtension: Record<string, any>, idx: number) => (
+            <div
+              className="adaptermanager__grid registered-adapters"
+              key={`${adapterOrExtension.id}-${idx}`}>
+              <div className="adaptermanager__info">
+                <span className="adaptermanager__name">
+                  {adapterOrExtension.name}{' '}
+                  {adapterOrExtension?.isExtension && '(EXTENSION)'}
+                </span>
+                <span className="adaptermanager__desc">
+                  {adapterOrExtension.description}
+                </span>
+              </div>
 
-            <div className="adaptermanager__configure">
-              <button
-                className="button--secondary"
-                disabled={isDisabled}
-                onClick={() => handleConfigureAdapter(adapter as Adapters)}>
-                Configure
-              </button>
+              <div className="adaptermanager__configure">
+                <button
+                  className="button--secondary"
+                  disabled={isDisabled || adapterOrExtension?.isExtension}
+                  onClick={() =>
+                    handleConfigure(adapterOrExtension as AdaptersOrExtensions)
+                  }>
+                  Configure
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        )}
 
       {isDisabled && (
         <div>

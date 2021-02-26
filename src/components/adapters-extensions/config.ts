@@ -14,6 +14,7 @@ import {
   VOTING_CONTRACT_ADDRESS,
   WITHDRAW_CONTRACT_ADDRESS,
   OFFCHAINVOTING_CONTRACT_ADDRESS,
+  DISTRIBUTE_CONTRACT_ADDRESS,
 } from '../../config';
 
 type AdapterProps = {
@@ -33,10 +34,18 @@ export type AdaptersAndExtensionsType = {
   optionDefaultTarget?: DaoConstants;
 } & Partial<AdapterProps>;
 
-// Partial<
-//   Record<DaoConstants, AdaptersAndExtensions>
-// >
-
+/**
+ * @note README [IMPORTANT]
+ *
+ *    HOW TO ADD A NEW DEFAULT ADAPTER OR EXTENSION
+ *
+ * 1. Add the new contract address to the `./src/config.ts`
+ *    list ie: <NAME-OF-NEW-CONTRACT>_CONTRACT_ADDRESS
+ *
+ * 2. Create a new object in the following variable `defaultAdaptersAndExtensions`
+ *    - Extensions: must have the key/value pair set `isExtension: true`
+ *    - Choosing an adapter/extension from a group: must be defined within a nested `options` key
+ */
 export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
   {
     isExtension: true,
@@ -52,6 +61,13 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
     contractAddress: CONFIGURATION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     description:
       'Manages storing and retrieving per-DAO settings required by shared adapters.',
+  },
+  {
+    name: DaoConstants.DISTRIBUTE,
+    adapterId: getAdapterOrExtensionId(DaoConstants.DISTRIBUTE),
+    contractAddress: DISTRIBUTE_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    description:
+      'Allows the members to distribute funds to one or all members of the DAO.',
   },
   {
     name: DaoConstants.FINANCING,
