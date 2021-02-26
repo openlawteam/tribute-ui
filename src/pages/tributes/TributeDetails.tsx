@@ -106,7 +106,7 @@ export default function TributeDetails() {
       const balanceReadable = afterDecimal.eq(toBN(0))
         ? beforeDecimal.toString()
         : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
-      const isTributeAmountInt = !balanceReadable.includes('.');
+      const isTributeAmountInt = Number.isInteger(Number(balanceReadable));
       tributeAmount = isTributeAmountInt
         ? balanceReadable
         : formatDecimal(Number(balanceReadable));

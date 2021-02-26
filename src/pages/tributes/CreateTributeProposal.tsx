@@ -502,7 +502,7 @@ export default function CreateTributeProposal() {
       return '---';
     }
 
-    const isBalanceInt = !userERC20Balance.includes('.');
+    const isBalanceInt = Number.isInteger(Number(userERC20Balance));
     return isBalanceInt
       ? userERC20Balance
       : formatDecimal(Number(userERC20Balance));

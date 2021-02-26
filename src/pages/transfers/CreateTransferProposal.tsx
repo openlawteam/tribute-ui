@@ -3,7 +3,7 @@ import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
 import {useHistory} from 'react-router-dom';
-import {toBN, AbiItem, fromUtf8} from 'web3-utils';
+import {toBN, AbiItem, fromUtf8, toWei} from 'web3-utils';
 
 import {ETH_TOKEN_ADDRESS, GUILD_ADDRESS, SHARES_ADDRESS} from '../../config';
 import {
@@ -314,10 +314,16 @@ export default function CreateTransferProposal() {
       const {selectedToken, memberAddress, amount, notes} = values;
       const selectedTokenObj = JSON.parse(selectedToken);
       const {symbol, decimals, address} = selectedTokenObj;
-      const multiplier = toBN(10).pow(toBN(decimals));
-      const amountWithDecimals = toBN(stripFormatNumber(amount)).mul(
-        multiplier
-      );
+      let amountArg;
+      if (address === ETH_TOKEN_ADDRESS) {
+        amountArg = toWei(stripFormatNumber(amount), 'ether');
+      } else {
+        const multiplier = toBN(10).pow(toBN(decimals));
+        const amountWithDecimals = toBN(stripFormatNumber(amount)).mul(
+          multiplier
+        );
+        amountArg = amountWithDecimals.toString();
+      }
 
       // Maybe set proposal ID from previous attempt
       let proposalId: string = proposalData?.uniqueId || '';
@@ -356,7 +362,7 @@ export default function CreateTransferProposal() {
         proposalId,
         memberAddressArg,
         address,
-        amountWithDecimals.toString(),
+        amountArg,
         fromUtf8(bodyIntro),
       ];
 
@@ -426,7 +432,7 @@ export default function CreateTransferProposal() {
       return '---';
     }
 
-    const isBalanceInt = !selectedTokenBalance.includes('.');
+    const isBalanceInt = Number.isInteger(Number(selectedTokenBalance));
     return isBalanceInt
       ? selectedTokenBalance
       : formatDecimal(Number(selectedTokenBalance));
@@ -580,6 +586,10 @@ export default function CreateTransferProposal() {
                 ref={register({
                   validate: (amount: string): string | boolean => {
                     const amountToNumber = Number(stripFormatNumber(amount));
+                    const selectedTokenObj =
+                      selectedTokenValue && JSON.parse(selectedTokenValue);
+                    const isSelectedTokenEth =
+                      selectedTokenObj?.address === ETH_TOKEN_ADDRESS;
 
                     return amount === ''
                       ? FormFieldErrors.REQUIRED
@@ -589,6 +599,10 @@ export default function CreateTransferProposal() {
                       ? 'The value must be greater than 0.'
                       : amountToNumber > Number(selectedTokenBalance)
                       ? 'Insufficient funds.'
+                      : isSelectedTokenEth
+                      ? true
+                      : !Number.isInteger(amountToNumber)
+                      ? 'The value must be an integer for an ERC20 token.'
                       : true;
                   },
                 })}

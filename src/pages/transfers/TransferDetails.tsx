@@ -106,7 +106,7 @@ export default function TransferDetails() {
       const balanceReadable = afterDecimal.eq(toBN(0))
         ? beforeDecimal.toString()
         : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
-      const isTransferAmountInt = !balanceReadable.includes('.');
+      const isTransferAmountInt = Number.isInteger(Number(balanceReadable));
       transferAmount = isTransferAmountInt
         ? balanceReadable
         : formatDecimal(Number(balanceReadable));
