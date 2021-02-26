@@ -2,7 +2,7 @@ import React, {useState, useCallback, useEffect} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
-import {Link} from 'react-router-dom';
+import {Link, useHistory} from 'react-router-dom';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
 import {toBN, AbiItem} from 'web3-utils';
 
@@ -25,7 +25,6 @@ import {truncateEthAddress} from '../../util/helpers';
 import {SHARES_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
-import {useHistory} from 'react-router-dom';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import CycleMessage from '../../components/feedback/CycleMessage';
