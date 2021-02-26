@@ -11,7 +11,6 @@ type AdapterExtensionSelectTargetRenderActionsArgs = {
 
 type AdapterExtensionSelectTargetProps = {
   defaultTarget?: AdapterExtensionTarget;
-  // showPropsalTargetSelector: boolean;
   adapterOrExtension: Record<string, any>;
   renderActions: (
     a: AdapterExtensionSelectTargetRenderActionsArgs
@@ -37,7 +36,6 @@ export default function AdapterExtensionSelectTarget(
   const {
     adapterOrExtension,
     defaultTarget,
-    // showPropsalTargetSelector,
     renderActions,
     renderCheckboxAction,
   } = props;

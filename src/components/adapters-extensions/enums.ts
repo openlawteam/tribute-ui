@@ -6,6 +6,7 @@
 export enum DaoConstants {
   BANK = 'bank',
   CONFIGURATION = 'configuration',
+  DISTRIBUTE = 'distribute',
   FINANCING = 'financing',
   GUILDKICK = 'guildkick',
   ONBOARDING = 'onboarding',

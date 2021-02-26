@@ -33,7 +33,9 @@ export type ExtensionType = {
 
 type UseAdaptersOrExtensionsReturn = {
   adapterStatus: AsyncStatus;
-  getAdapterFromRedux: (adapterName: DaoConstants) => Record<string, any>;
+  getAdapterOrExtensionFromRedux: (
+    adapterName: DaoConstants
+  ) => Record<string, any>;
   registeredAdapters: AdapterType[] | undefined;
   unRegisteredAdapters: Adapters[] | undefined;
 };
@@ -53,7 +55,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
   /**
    * Selectors
    */
-  const {DaoRegistryContract, ...adapterContracts} = useSelector(
+  const {DaoRegistryContract, ...adapterExtensionContracts} = useSelector(
     (s: StoreState) => s.contracts
   );
 
@@ -135,14 +137,16 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
   ]);
 
   /**
-   * getAdapters
+   * getAdaptersAndExtensions
    *
-   * Find all registered and un-registered adapters
-   * @param daoAdapters
+   * Find all registered and un-registered adapters and extensions
+   *
+   * @param registeredDaoAdapters
+   * @param registeredDaoExtensions
    */
   function getAdaptersAndExtensions(
-    daoAdapters: any,
-    daoExtensions: any
+    registeredDaoAdapters: any,
+    registeredDaoExtensions: any
   ): Record<string, any> {
     //@todo types
 
@@ -150,17 +154,21 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
     let unRegisteredList: AdaptersAndExtensionsType[] = [];
 
     const getAdapterFromGql = (adapterId: string) => {
-      return daoAdapters.find((adapter: AdaptersAndExtensionsType) => {
-        return adapter.adapterId?.toLowerCase() === adapterId?.toLowerCase();
-      });
+      return registeredDaoAdapters.find(
+        (adapter: AdaptersAndExtensionsType) => {
+          return adapter.adapterId?.toLowerCase() === adapterId?.toLowerCase();
+        }
+      );
     };
 
     const getExtensionFromGql = (extensionId: string) => {
-      return daoExtensions.find((extension: AdaptersAndExtensionsType) => {
-        return (
-          extension.extensionId?.toLowerCase() === extensionId?.toLowerCase()
-        );
-      });
+      return registeredDaoExtensions.find(
+        (extension: AdaptersAndExtensionsType) => {
+          return (
+            extension.extensionId?.toLowerCase() === extensionId?.toLowerCase()
+          );
+        }
+      );
     };
 
     defaultAdaptersAndExtensions.forEach(
@@ -196,8 +204,6 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
             if (option?.isExtension) {
               const gqlExtension = getExtensionFromGql(option.extensionId);
               if (gqlExtension) {
-                // @todo for now we are adding all found options that match the register
-                // need to check which adapter contract type was added to de-dupe
                 registeredList.push({
                   ...gqlExtension,
                   name: option.name as DaoConstants,
@@ -216,8 +222,6 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
             } else {
               const gqlAdapter = getAdapterFromGql(option.adapterId);
               if (gqlAdapter) {
-                // @todo for now we are adding all found options that match the register
-                // need to check which adapter contract type was added to de-dupe
                 registeredList.push({
                   ...gqlAdapter,
                   name: option.name as DaoConstants,
@@ -263,20 +267,22 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
   }
 
   /**
-   * getAdapterFromRedux
+   * getAdapterOrExtensionFromRedux
    *
-   * @param adapterName DaoConstants
+   * @param adapterOrExtensionName DaoConstants
    */
-  function getAdapterFromRedux(adapterName: DaoConstants): Record<string, any> {
-    return Object.keys(adapterContracts)
-      .map((a) => adapterContracts[a])
-      .filter((a) => a) // filter out any `null` adapter objects
-      .filter((a) => a.adapterName === adapterName)[0];
+  function getAdapterOrExtensionFromRedux(
+    adapterOrExtensionName: DaoConstants
+  ): Record<string, any> {
+    return Object.keys(adapterExtensionContracts)
+      .map((ae) => adapterExtensionContracts[ae])
+      .filter((ae) => ae) // filter out any `null` objects
+      .filter((ae) => ae.adapterOrExtensionName === adapterOrExtensionName)[0];
   }
 
   return {
     adapterStatus,
-    getAdapterFromRedux,
+    getAdapterOrExtensionFromRedux,
     registeredAdapters,
     unRegisteredAdapters,
   };

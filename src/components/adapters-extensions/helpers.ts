@@ -14,8 +14,9 @@ export function getAdapterOrExtensionId(adapterName: DaoConstants): string {
  */
 export function getConfigurationABIFunction(): Record<DaoConstants, string> {
   return {
-    [DaoConstants.BANK]: '', //@todo
+    [DaoConstants.BANK]: 'configureExtension', //@todo `configureExtension` comes from the DaoFactory
     [DaoConstants.CONFIGURATION]: 'submitConfigurationProposal',
+    [DaoConstants.DISTRIBUTE]: '', //@todo
     [DaoConstants.FINANCING]: 'createFinancingRequest',
     [DaoConstants.GUILDKICK]: 'submitKickProposal',
     [DaoConstants.MANAGING]: 'createAdapterChangeRequest',
@@ -44,7 +45,20 @@ export function getAccessControlLayer(
       SPONSOR_PROPOSAL: true,
       SET_CONFIGURATION: true,
     },
-    [DaoConstants.TRIBUTE]: {}, // @todo
+    [DaoConstants.DISTRIBUTE]: {
+      SUBMIT_PROPOSAL: true,
+      SPONSOR_PROPOSAL: true,
+      PROCESS_PROPOSAL: true,
+      INTERNAL_TRANSFER: true,
+    },
+    [DaoConstants.TRIBUTE]: {
+      SUBMIT_PROPOSAL: true,
+      SPONSOR_PROPOSAL: true,
+      PROCESS_PROPOSAL: true,
+      NEW_MEMBER: true,
+      ADD_TO_BALANCE: true,
+      REGISTER_NEW_TOKEN: true,
+    },
     [DaoConstants.FINANCING]: {
       SUBMIT_PROPOSAL: true,
       SPONSOR_PROPOSAL: true,

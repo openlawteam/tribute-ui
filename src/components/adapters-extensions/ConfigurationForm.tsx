@@ -75,7 +75,7 @@ export default function AdapterConfigurationForm({
     getFormFieldError,
     formatInputByType,
   } = useValidation();
-  const {getAdapterFromRedux} = useAdaptersOrExtensions();
+  const {getAdapterOrExtensionFromRedux} = useAdaptersOrExtensions();
 
   /**
    * Their hooks
@@ -179,7 +179,7 @@ export default function AdapterConfigurationForm({
       const {
         contractAddress,
         instance: {methods},
-      } = getAdapterFromRedux(adapter?.name as DaoConstants);
+      } = getAdapterOrExtensionFromRedux(adapter?.name as DaoConstants);
 
       if (!isConnected) {
         throw new Error(
