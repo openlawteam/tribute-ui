@@ -21,6 +21,7 @@ type OffchainVotingResult = {
 };
 
 /**
+ * @todo Polling
  * @todo Attempt to use subgraph data first.
  */
 export function useOffchainVotingResults(
@@ -108,8 +109,9 @@ export function useOffchainVotingResults(
 
   async function getSharesPerChoiceFromContract() {
     try {
-      if (!bankAddress || !getPriorAmountABI || !voterAddressesAndChoices)
+      if (!bankAddress || !getPriorAmountABI || !voterAddressesAndChoices) {
         return;
+      }
 
       if (!snapshot) {
         throw new Error('No snapshot was found.');
