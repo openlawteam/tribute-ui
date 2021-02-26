@@ -313,9 +313,9 @@ export default function CreateTransferProposal() {
 
       const {selectedToken, memberAddress, amount, notes} = values;
       const selectedTokenObj = JSON.parse(selectedToken);
-      const {symbol, decimals, address} = selectedTokenObj;
+      const {symbol, decimals, address: tokenAddress} = selectedTokenObj;
       let amountArg;
-      if (address === ETH_TOKEN_ADDRESS) {
+      if (tokenAddress === ETH_TOKEN_ADDRESS) {
         amountArg = toWei(stripFormatNumber(amount), 'ether');
       } else {
         const multiplier = toBN(10).pow(toBN(decimals));
@@ -361,7 +361,7 @@ export default function CreateTransferProposal() {
         DaoRegistryContract.contractAddress,
         proposalId,
         memberAddressArg,
-        address,
+        tokenAddress,
         amountArg,
         fromUtf8(bodyIntro),
       ];
