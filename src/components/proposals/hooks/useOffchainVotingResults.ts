@@ -159,6 +159,7 @@ export function useOffchainVotingResults(
         web3Instance,
       });
 
+      // Set shares values for choices
       sharesResults.forEach((shares, i) => {
         const isYes =
           VoteChoicesIndex[voterAddressesAndChoices[i][1]] ===
