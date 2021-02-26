@@ -2,12 +2,15 @@ import React, {useState, useCallback, useEffect} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
-import {toBN, fromUtf8} from 'web3-utils';
+import {useHistory} from 'react-router-dom';
+import {toBN, AbiItem, fromUtf8} from 'web3-utils';
 
+import {ETH_TOKEN_ADDRESS, GUILD_ADDRESS, SHARES_ADDRESS} from '../../config';
 import {
   getValidationError,
   stripFormatNumber,
   formatNumber,
+  formatDecimal,
 } from '../../util/helpers';
 import {
   useContractSend,
@@ -20,7 +23,6 @@ import {isEthAddressValid} from '../../util/validation';
 import {MetaMaskRPCError} from '../../util/types';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
-import {useHistory} from 'react-router-dom';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import CycleMessage from '../../components/feedback/CycleMessage';
@@ -30,10 +32,11 @@ import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
 import Wrap from '../../components/common/Wrap';
 import EtherscanURL from '../../components/web3/EtherscanURL';
+import {default as ERC20ABI} from '../../truffle-contracts/ERC20.json';
 
 enum Fields {
   type = 'type',
-  tokenAddress = 'tokenAddress',
+  selectedToken = 'selectedToken',
   memberAddress = 'memberAddress',
   amount = 'amount',
   notes = 'notes',
@@ -41,7 +44,7 @@ enum Fields {
 
 type FormInputs = {
   type: string;
-  tokenAddress: string;
+  selectedToken: string;
   memberAddress: string;
   amount: string;
   notes: string;
@@ -60,10 +63,9 @@ type TokenDetails = {
   name: string;
   symbol: string;
   address: string;
+  decimals: number;
   daoBalance: string;
 };
-
-type BN = ReturnType<typeof toBN>;
 
 export default function CreateTransferProposal() {
   /**
@@ -79,13 +81,16 @@ export default function CreateTransferProposal() {
   const BankExtensionContract = useSelector(
     (state: StoreState) => state.contracts?.BankExtensionContract
   );
+  const isActiveMember = useSelector(
+    (s: StoreState) => s.connectedMember?.isActiveMember
+  );
 
   /**
    * Hooks
    */
 
   const {defaultChainError} = useIsDefaultChain();
-  const {connected, account} = useWeb3Modal();
+  const {connected, account, web3Instance} = useWeb3Modal();
   const gasPrices = useETHGasPrice();
   const {
     txError,
@@ -99,7 +104,7 @@ export default function CreateTransferProposal() {
     proposalData,
     proposalSignAndSendStatus,
     signAndSendProposal,
-  } = useSignAndSubmitProposal<SnapshotType.draft>();
+  } = useSignAndSubmitProposal<SnapshotType.proposal>();
 
   /**
    * Their hooks
@@ -117,6 +122,7 @@ export default function CreateTransferProposal() {
 
   const [submitError, setSubmitError] = useState<Error>();
   const [daoTokens, setDaoTokens] = useState<TokenDetails[]>();
+  const [selectedTokenBalance, setSelectedTokenBalance] = useState<string>();
 
   /**
    * Variables
@@ -133,9 +139,11 @@ export default function CreateTransferProposal() {
   } = form;
   const typeValue = watch('type');
   const isTypeSingleMember = typeValue === 'single member';
+  const selectedTokenValue = watch('selectedToken');
 
-  const createTributeError = submitError || txError;
+  const createTransferError = submitError || txError;
   const isConnected = connected && account;
+  const erc20Contract: AbiItem[] = ERC20ABI as any;
 
   /**
    * @note From the docs: "Read the formState before render to subscribe the form state through Proxy"
@@ -162,6 +170,13 @@ export default function CreateTransferProposal() {
   const getDaoTokensCached = useCallback(getDaoTokens, [
     BankExtensionContract,
     account,
+    erc20Contract,
+    web3Instance,
+  ]);
+
+  const getSelectedTokenBalanceCached = useCallback(getSelectedTokenBalance, [
+    account,
+    selectedTokenValue,
   ]);
 
   /**
@@ -171,6 +186,10 @@ export default function CreateTransferProposal() {
   useEffect(() => {
     getDaoTokensCached();
   }, [getDaoTokensCached]);
+
+  useEffect(() => {
+    getSelectedTokenBalanceCached();
+  }, [getSelectedTokenBalanceCached]);
 
   /**
    * Functions
@@ -182,10 +201,94 @@ export default function CreateTransferProposal() {
       return;
     }
 
-    const fetchedTokens = await BankExtensionContract.instance.methods
-      .getTokens()
-      .call();
-    console.log({fetchedTokens});
+    try {
+      const bankMethods = BankExtensionContract.instance.methods;
+      // @todo replace this with multicall
+      const fetchedTokens = await bankMethods.getTokens().call();
+      const parsedTokens: TokenDetails[] = await Promise.all(
+        fetchedTokens.map(async (token: string) => {
+          try {
+            const daoBalance = await bankMethods
+              .balanceOf(GUILD_ADDRESS, token)
+              .call();
+
+            // Don't need to fetch token info if the balance is 0.
+            if (toBN(daoBalance).lte(toBN(0))) return;
+
+            if (token === ETH_TOKEN_ADDRESS) {
+              return {
+                name: 'Ether',
+                symbol: 'ETH',
+                address: ETH_TOKEN_ADDRESS,
+                decimals: 18,
+                daoBalance,
+              };
+            } else {
+              if (!web3Instance) return;
+
+              const erc20Instance = new web3Instance.eth.Contract(
+                erc20Contract,
+                token
+              );
+
+              const name = await erc20Instance.methods.name().call();
+              const symbol = await erc20Instance.methods.symbol().call();
+              const decimals = await erc20Instance.methods.decimals().call();
+
+              return {
+                name,
+                symbol,
+                address: token,
+                decimals,
+                daoBalance,
+              };
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        })
+      );
+
+      let sortedTokens = parsedTokens
+        .filter(Boolean)
+        .sort((a, b) => a.name.localeCompare(b.name));
+      // If token list includes Ether, move it to the front.
+      sortedTokens.some(
+        (token, idx) =>
+          token.address === ETH_TOKEN_ADDRESS &&
+          sortedTokens.unshift(sortedTokens.splice(idx, 1)[0])
+      );
+
+      setDaoTokens(sortedTokens);
+    } catch (error) {
+      console.error(error);
+      setDaoTokens(undefined);
+    }
+  }
+
+  async function getSelectedTokenBalance() {
+    if (!account || !selectedTokenValue) {
+      setSelectedTokenBalance(undefined);
+      return;
+    }
+
+    try {
+      const selectedTokenObj = JSON.parse(selectedTokenValue);
+      const balance = selectedTokenObj.daoBalance;
+      const balanceBN = toBN(balance);
+      const decimals = selectedTokenObj.decimals;
+      const divisor = toBN(10).pow(toBN(decimals));
+      const beforeDecimal = balanceBN.div(divisor);
+      const afterDecimal = balanceBN.mod(divisor);
+      const balanceReadable = afterDecimal.eq(toBN(0))
+        ? beforeDecimal.toString()
+        : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
+
+      setSelectedTokenBalance(balanceReadable);
+    } catch (error) {
+      console.error(error);
+      setSelectedTokenBalance(undefined);
+    }
   }
 
   async function handleSubmit(values: FormInputs) {
@@ -197,7 +300,7 @@ export default function CreateTransferProposal() {
       }
 
       if (!DistributeContract) {
-        throw new Error('No TributeContract found.');
+        throw new Error('No DistributeContract found.');
       }
 
       if (!DaoRegistryContract) {
@@ -208,31 +311,38 @@ export default function CreateTransferProposal() {
         throw new Error('No account found.');
       }
 
-      const {tokenAddress, memberAddress, amount, notes} = values;
+      const {selectedToken, memberAddress, amount, notes} = values;
+      const selectedTokenObj = JSON.parse(selectedToken);
+      const {symbol, decimals, address} = selectedTokenObj;
+      const multiplier = toBN(10).pow(toBN(decimals));
+      const amountWithDecimals = toBN(stripFormatNumber(amount)).mul(
+        multiplier
+      );
 
       // Maybe set proposal ID from previous attempt
       let proposalId: string = proposalData?.uniqueId || '';
 
       const bodyIntro = isTypeSingleMember
         ? `Transfer to ${memberAddress}.`
-        : 'Transfer to all members.';
+        : 'Transfer to all members pro rata.';
 
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
         const body = notes ? `${bodyIntro}\n${notes}` : bodyIntro;
         const name = isTypeSingleMember ? memberAddress : 'All members.';
 
-        // Sign and submit draft for snapshot-hub
+        // Sign and submit proposal for snapshot-hub
         const {uniqueId} = await signAndSendProposal({
           partialProposalData: {
             name,
             body,
             metadata: {
-              // @todo
+              amountUnit: symbol,
+              tokenDecimals: decimals,
             },
           },
           adapterName: ContractAdapterNames.distribute,
-          type: SnapshotType.draft,
+          type: SnapshotType.proposal,
         });
 
         proposalId = uniqueId;
@@ -245,8 +355,8 @@ export default function CreateTransferProposal() {
         DaoRegistryContract.contractAddress,
         proposalId,
         memberAddressArg,
-        tokenAddress,
-        amount,
+        address,
+        amountWithDecimals.toString(),
         fromUtf8(bodyIntro),
       ];
 
@@ -311,27 +421,58 @@ export default function CreateTransferProposal() {
     }
   }
 
+  function renderSelectedTokenBalance() {
+    if (!selectedTokenBalance) {
+      return '---';
+    }
+
+    const isBalanceInt = !selectedTokenBalance.includes('.');
+    return isBalanceInt
+      ? selectedTokenBalance
+      : formatDecimal(Number(selectedTokenBalance));
+  }
+
+  function getUnauthorizedMessage() {
+    // user is not connected
+    if (!isConnected) {
+      return 'Connect your wallet to submit a transfer proposal.';
+    }
+
+    // user is on wrong network
+    if (defaultChainError) {
+      return defaultChainError.message;
+    }
+
+    // user is not an active member
+    if (!isActiveMember) {
+      return 'Either you are not a member, or your membership is not active.';
+    }
+  }
+
+  async function isActiveMemberWithShares(address: string) {
+    if (!BankExtensionContract) {
+      console.error('No BankExtensionContract found.');
+      return false;
+    }
+
+    const sharesBalance = await BankExtensionContract.instance.methods
+      .balanceOf(address, SHARES_ADDRESS)
+      .call();
+
+    return toBN(sharesBalance).gt(toBN(0));
+  }
+
   /**
    * Render
    */
 
-  // Render wallet auth message if user is not connected
-  if (!isConnected) {
-    return (
-      <RenderWrapper>
-        <div className="form__description--unauthorized">
-          <p>Connect your wallet to submit a transfer proposal.</p>
-        </div>
-      </RenderWrapper>
-    );
-  }
+  // Render unauthorized message
 
-  // Render wrong network message if user is on wrong network
-  if (defaultChainError) {
+  if (!isConnected || defaultChainError || !isActiveMember) {
     return (
       <RenderWrapper>
         <div className="form__description--unauthorized">
-          <p>{defaultChainError.message}</p>
+          <p>{getUnauthorizedMessage()}</p>
         </div>
       </RenderWrapper>
     );
@@ -364,11 +505,15 @@ export default function CreateTransferProposal() {
                 aria-invalid={errors.memberAddress ? 'true' : 'false'}
                 name={Fields.memberAddress}
                 ref={register({
-                  validate: (memberAddress: string): string | boolean => {
+                  validate: async (
+                    memberAddress: string
+                  ): Promise<string | boolean> => {
                     return !memberAddress
                       ? FormFieldErrors.REQUIRED
                       : !isEthAddressValid(memberAddress)
                       ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
+                      : !(await isActiveMemberWithShares(memberAddress))
+                      ? 'The address is not an active member with SHARES.'
                       : true;
                   },
                 })}
@@ -384,36 +529,37 @@ export default function CreateTransferProposal() {
           </div>
         )}
 
-        {/* TOKEN ADDRESS */}
+        {/* SELECTED TOKEN */}
         <div className="form__input-row">
           <label className="form__input-row-label">Asset</label>
           <div className="form__input-row-fieldwrap">
             <select
-              aria-describedby={`error-${Fields.tokenAddress}`}
-              aria-invalid={errors.tokenAddress ? 'true' : 'false'}
-              name={Fields.tokenAddress}
+              aria-describedby={`error-${Fields.selectedToken}`}
+              aria-invalid={errors.selectedToken ? 'true' : 'false'}
+              name={Fields.selectedToken}
               ref={register({
-                required: FormFieldErrors.REQUIRED,
+                validate: (token: string): string | boolean => {
+                  return !daoTokens || daoTokens.length < 1
+                    ? 'No tokens available for distribution.'
+                    : !token
+                    ? FormFieldErrors.REQUIRED
+                    : true;
+                },
               })}
               disabled={isInProcessOrDone}>
               <option value="">Select from DAO assets</option>
-              <option value="0x0000000000000000000000000000000000000000">
-                ETH
-              </option>
-              <option value="0x8CF54B5422Cc49571D3b7BA67Fe1114436EE7280">
-                OLT
-              </option>
-              <option value="0xc1d55803652F10E33d59bC6D853200Ce54C6BCCB">
-                TT1
-              </option>
-              <option value="0x2bF80a7274e52583654596EdAfD08352Ab0f708C">
-                TT2
-              </option>
+              {daoTokens?.map((token) => (
+                <option
+                  key={token.address}
+                  value={JSON.stringify(
+                    token
+                  )}>{`${token.name} (${token.symbol})`}</option>
+              ))}
             </select>
 
             <InputError
-              error={getValidationError(Fields.tokenAddress, errors)}
-              id={`error-${Fields.tokenAddress}`}
+              error={getValidationError(Fields.selectedToken, errors)}
+              id={`error-${Fields.selectedToken}`}
             />
           </div>
         </div>
@@ -441,10 +587,9 @@ export default function CreateTransferProposal() {
                       ? FormFieldErrors.INVALID_NUMBER
                       : amountToNumber <= 0
                       ? 'The value must be greater than 0.'
-                      : // @todo
-                        // : amountToNumber > Number(userERC20Balance)
-                        // ? 'Insufficient funds.'
-                        true;
+                      : amountToNumber > Number(selectedTokenBalance)
+                      ? 'Insufficient funds.'
+                      : true;
                   },
                 })}
                 type="text"
@@ -452,9 +597,9 @@ export default function CreateTransferProposal() {
               />
 
               <div className="input__suffix-item">
-                {/* {erc20Details?.symbol || '___'} */}
-                {/* @todo */}
-                ___
+                {(selectedTokenValue &&
+                  JSON.parse(selectedTokenValue).symbol) ||
+                  '___'}
               </div>
             </div>
 
@@ -473,9 +618,7 @@ export default function CreateTransferProposal() {
           <div className="form__input-addon">
             available:{' '}
             <span className="text-underline">
-              {/* {renderUserERC20Balance()} */}
-              {/* @todo */}
-              ---
+              {renderSelectedTokenBalance()}
             </span>
           </div>
         </div>
@@ -517,12 +660,12 @@ export default function CreateTransferProposal() {
         </div>
 
         {/* SUBMIT ERROR */}
-        {createTributeError &&
-          (createTributeError as MetaMaskRPCError).code !== 4001 && (
+        {createTransferError &&
+          (createTransferError as MetaMaskRPCError).code !== 4001 && (
             <div className="form__submit-error-container">
               <ErrorMessageWithDetails
                 renderText="Something went wrong while submitting the proposal."
-                error={createTributeError}
+                error={createTransferError}
               />
             </div>
           )}
