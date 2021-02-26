@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useState} from 'react';
-import {useQuery} from '@apollo/react-hooks';
+import {useLazyQuery} from '@apollo/react-hooks';
 
 import {StoreState} from '../store/types';
 import {useSelector} from 'react-redux';
@@ -23,7 +23,7 @@ export function useDao(): UseDaoReturn {
     (s: StoreState) => s.contracts.DaoRegistryContract
   );
 
-  const getDao = useQuery(GET_DAO, {
+  const [getDao, {called, loading, data, error}] = useLazyQuery(GET_DAO, {
     variables: {id: daoRegistryContract?.contractAddress.toLowerCase()},
   });
 
@@ -32,25 +32,29 @@ export function useDao(): UseDaoReturn {
 
   const getDaoRegistryCallback = useCallback(getDaoRegistry, [
     daoRegistryContract?.contractAddress,
-    getDao,
+    data,
+    error,
+    loading,
   ]);
 
   useEffect(() => {
-    if (!getDao.loading && daoRegistryContract?.contractAddress) {
+    if (!called) {
+      getDao();
+    }
+  }, [called, getDao]);
+
+  useEffect(() => {
+    if (!loading && daoRegistryContract?.contractAddress) {
       getDaoRegistryCallback();
     }
-  }, [
-    getDao.loading,
-    daoRegistryContract?.contractAddress,
-    getDaoRegistryCallback,
-  ]);
+  }, [daoRegistryContract?.contractAddress, getDaoRegistryCallback, loading]);
 
   function getDaoRegistry() {
     try {
-      if (!getDao.loading && getDao.data) {
-        setDao(getDao.data.molochv3S[0]);
+      if (!loading && data) {
+        setDao(data.molochv3S[0]);
 
-        if (getDao.data.molochv3S.length === 0) {
+        if (data.molochv3S.length === 0) {
           const error = new Error(
             `"${daoRegistryContract?.contractAddress}" dao address not found.`
           );
@@ -58,7 +62,7 @@ export function useDao(): UseDaoReturn {
           throw error;
         }
       } else {
-        if (getDao.error) {
+        if (error) {
           const error = new Error(
             `"${daoRegistryContract?.contractAddress}" is not a valid dao address.`
           );

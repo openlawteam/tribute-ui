@@ -82,7 +82,7 @@ export default function AdapterExtensionSelectTarget(
             selectedOption.displayName === selectedTargetOption
         ).description || '';
 
-      return <span className="adaptermanager__desc">{description}</span>;
+      return <span className="adapter-extension__desc">{description}</span>;
     } catch (error) {
       console.warn(error);
     }
@@ -93,9 +93,9 @@ export default function AdapterExtensionSelectTarget(
       {/* CHECKBOX ACTIONS */}
       {renderCheckboxAction({selectedTargetOption})}
 
-      <div className="adaptermanager__info">
+      <div className="adapter-extension__info">
         {/* ADAPTER/EXTENSION TARGET DEFAULT NAME */}
-        <span className="adaptermanager__name">
+        <span className="adapter-extension__name">
           {adapterOrExtension?.optionDefaultTarget}
           {adapterOrExtension?.isExtension && '(EXTENSION)'}
         </span>

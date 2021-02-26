@@ -5,9 +5,7 @@ import {StoreState} from '../../store/types';
 import {AsyncStatus} from '../../util/types';
 import {
   AddAdapterArguments,
-  Adapters,
   AddExtensionArguments,
-  // Extensions,
   AdaptersOrExtensions,
 } from './types';
 
@@ -38,7 +36,7 @@ import Loader from '../feedback/Loader';
 
 enum WhyDisableModalTitles {
   FINALIZED_REASON = 'Why is finalizing disabled?',
-  ADAPTERS_REASON = 'Why are configurations disabled?',
+  CONFIGURATION_REASON = 'Why are configurations disabled?',
 }
 /**
  * AdapterManager()
@@ -74,7 +72,7 @@ export default function AdapterManager() {
     Record<string, boolean> | undefined
   >();
   const [configureAdapter, setConfigureAdapter] = useState<
-    Adapters | undefined
+    AdaptersOrExtensions | undefined
   >();
   const [isInProcess, setIsInProcess] = useState<
     Record<string, boolean> | undefined
@@ -555,7 +553,7 @@ export default function AdapterManager() {
         consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut lacus
         dictum fermentum vel tincidunt neque. Sed sed lacinia...
       </p>
-      <div className="adaptermanager__selection">
+      <div className="adapter-extension__selection">
         <div>
           <Checkbox
             id="selectAll"
@@ -586,7 +584,7 @@ export default function AdapterManager() {
         </div>
       </div>
 
-      {isLoadingAdapters && <Loader />}
+      {isLoadingAdapters && <Loader text="Loading data from subgraph..." />}
       {isAdaptersUnavailable && <p>No adapters available</p>}
 
       {/** UNUSED ADAPTERS AND EXTENSIONS TO ADD */}
@@ -596,7 +594,7 @@ export default function AdapterManager() {
         unRegisteredAdaptersOrExtensions.map(
           (adapter: Record<string, any>, idx: number) => (
             <div
-              className="adaptermanager__grid unregistered-adapters"
+              className="adapter-extension__grid unregistered-adapters"
               key={idx}>
               {/** RENDER ADAPTER/EXTENSION DROPDOWN */}
               {adapter?.options ? (
@@ -605,7 +603,7 @@ export default function AdapterManager() {
                   renderCheckboxAction={({selectedTargetOption}) => {
                     return (
                       <>
-                        <div className="adaptermanager__checkbox">
+                        <div className="adapter-extension__checkbox">
                           <Checkbox
                             id={selectedTargetOption || 'empty'}
                             label={''}
@@ -640,7 +638,7 @@ export default function AdapterManager() {
                   }) => {
                     return (
                       <>
-                        <div className="adaptermanager__add">
+                        <div className="adapter-extension__add">
                           <button
                             className="button--secondary"
                             disabled={
@@ -672,7 +670,7 @@ export default function AdapterManager() {
               ) : (
                 <>
                   {/** RENDER ADAPTER/EXTENSION */}
-                  <div className="adaptermanager__checkbox">
+                  <div className="adapter-extension__checkbox">
                     <Checkbox
                       id={adapter.name}
                       label={''}
@@ -692,16 +690,16 @@ export default function AdapterManager() {
                     />
                   </div>
 
-                  <div className="adaptermanager__info">
-                    <span className="adaptermanager__name">
+                  <div className="adapter-extension__info">
+                    <span className="adapter-extension__name">
                       {adapter.name} {adapter?.isExtension && '(EXTENSION)'}
                     </span>
-                    <span className="adaptermanager__desc">
+                    <span className="adapter-extension__desc">
                       {adapter.description}
                     </span>
                   </div>
 
-                  <div className="adaptermanager__add">
+                  <div className="adapter-extension__add">
                     <button
                       className="button--secondary"
                       disabled={
@@ -734,19 +732,19 @@ export default function AdapterManager() {
         registeredAdaptersOrExtensions.map(
           (adapterOrExtension: Record<string, any>, idx: number) => (
             <div
-              className="adaptermanager__grid registered-adapters"
+              className="adapter-extension__grid registered-adapters"
               key={`${adapterOrExtension.id}-${idx}`}>
-              <div className="adaptermanager__info">
-                <span className="adaptermanager__name">
+              <div className="adapter-extension__info">
+                <span className="adapter-extension__name">
                   {adapterOrExtension.name}{' '}
                   {adapterOrExtension?.isExtension && '(EXTENSION)'}
                 </span>
-                <span className="adaptermanager__desc">
+                <span className="adapter-extension__desc">
                   {adapterOrExtension.description}
                 </span>
               </div>
 
-              <div className="adaptermanager__configure">
+              <div className="adapter-extension__configure">
                 <button
                   className="button--secondary"
                   disabled={isDisabled || adapterOrExtension?.isExtension}
@@ -766,14 +764,14 @@ export default function AdapterManager() {
             className="button--help"
             onClick={() => {
               openWhyDisabledModal();
-              setWhyDisabledReason(WhyDisableModalTitles.ADAPTERS_REASON);
+              setWhyDisabledReason(WhyDisableModalTitles.CONFIGURATION_REASON);
             }}>
-            {WhyDisableModalTitles.ADAPTERS_REASON}
+            {WhyDisableModalTitles.CONFIGURATION_REASON}
           </button>
         </div>
       )}
 
-      <div className="adaptermanager_finalize">
+      <div className="adapter-adapter-extension__finalize">
         <p>
           If you're happy with your setup, you can finalize your DAO. After your
           DAO is finalized you will need to submit a proposal to make changes.

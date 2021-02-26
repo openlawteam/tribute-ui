@@ -2,7 +2,7 @@
 @use "./mixins" as *; /* load without namespace for convenience */
 @use "./button";
 
-.adapter-configurator-modal {
+.adapter-extension-configure-modal {
   max-width: 48.5rem;
 
   h1 {
@@ -16,13 +16,9 @@
       text-align: left;
     }
   }
-
-  // .form__submit-status-container {
-  //   margin: 1rem auto auto;
-  // }
 }
 
-.adaptermanager__grid {
+.adapter-extension__grid {
   display: flex;
   flex-direction: row;
   margin-bottom: 2rem;
@@ -32,7 +28,7 @@
   }
 }
 
-.adaptermanager__selection {
+.adapter-extension__selection {
   border-bottom: 2px solid #e4e4e4;
   display: flex;
   flex-direction: row;
@@ -51,48 +47,45 @@
 }
 
 .registered-adapters {
-  // .adaptermanager__info {
-  //   padding-left: 10%;
-  // }
-  .adaptermanager__info {
+  .adapter-extension__info {
     flex: 70%;
   }
-  .adaptermanager__configure {
+  .adapter-extension__configure {
     flex: 30%;
   }
 }
 
 // includes room for the checkbox
 .unregistered-adapters {
-  .adaptermanager__checkbox {
+  .adapter-extension__checkbox {
     flex: 10%;
   }
-  .adaptermanager__info {
+  .adapter-extension__info {
     flex: 60%;
   }
-  .adaptermanager__add {
+  .adapter-extension__add {
     flex: 30%;
   }
 }
 
-.adaptermanager__info {
-  .adaptermanager__name,
-  .adaptermanager__desc {
+.adapter-extension__info {
+  .adapter-extension__name,
+  .adapter-extension__desc {
     display: flex;
     flex: 100%;
   }
 
-  .adaptermanager__desc {
+  .adapter-extension__desc {
     line-height: 2;
   }
 }
 
-.adaptermanager__add,
-.adaptermanager__configure {
+.adapter-extension__add,
+.adapter-extension__configure {
   align-self: center;
   text-align: center;
 }
-.adaptermanager__remove {
+.adapter-extension__remove {
   border-top: 2px solid #eaeaea;
   margin-bottom: 2rem;
   margin-top: 2rem;
@@ -109,11 +102,11 @@
   }
 }
 
-.adaptermanager__name {
+.adapter-extension__name {
   text-transform: uppercase;
 }
 
-.adaptermanager_finalize {
+.adapter-adapter-extension__finalize {
   border-top: 2px solid #e4e4e4;
   display: flex;
   flex-direction: column;

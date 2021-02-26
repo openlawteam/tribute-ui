@@ -309,7 +309,7 @@ export default function AdapterConfigurationForm({
         )}
 
       {/** REMOVE ADAPTER BUTTON - only show if DAO isn't finalized */}
-      <div className="adaptermanager__remove">
+      <div className="adapter-extension__remove">
         <p>
           Delete this adapter. Once you delete this adapter, it can be re-added
           if the DAO isn't finalized.

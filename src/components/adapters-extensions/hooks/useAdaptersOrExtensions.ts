@@ -64,7 +64,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
    */
   const [
     getRegisteredAdaptersAndExtensions,
-    {called, loading, data, error},
+    {called, data, error},
   ] = useLazyQuery(GET_ADAPTERS_AND_EXTENSIONS, {
     pollInterval: GQL_QUERY_POLLING_INTERVAL,
     variables: {daoAddress: DaoRegistryContract?.contractAddress.toLowerCase()},
@@ -130,14 +130,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
 
       setAdapterExtensionStatus(AsyncStatus.REJECTED);
     }
-  }, [
-    DaoRegistryContract,
-    called,
-    data,
-    error,
-    getAdaptersAndExtensionsCached,
-    loading,
-  ]);
+  }, [DaoRegistryContract, data, error, getAdaptersAndExtensionsCached]);
 
   /**
    * getAdaptersAndExtensions

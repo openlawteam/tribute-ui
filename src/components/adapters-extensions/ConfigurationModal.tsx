@@ -24,7 +24,7 @@ export default function AdapterConfiguratorModal({
   return (
     <Modal
       keyProp="adapter-configurator"
-      modalClassNames="adapter-configurator-modal"
+      modalClassNames="adapter-extension-configure-modal"
       isOpen={isOpen}
       isOpenHandler={() => {
         closeHandler();
