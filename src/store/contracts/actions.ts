@@ -196,24 +196,31 @@ export function initRegisteredVotingAdapter(
             (item) => item.name === 'getVotingAdapterName'
           );
 
-          const [addressResult, votingAdapterNameResult] = await multicall({
-            calls: [
-              [
-                daoRegistryContract.contractAddress,
-                getAdapterAddressABIItem,
-                [Web3.utils.sha3(ContractAdapterNames.voting) || ''],
+          // Handle potential multicall error
+          try {
+            const [addressResult, votingAdapterNameResult] = await multicall({
+              calls: [
+                [
+                  daoRegistryContract.contractAddress,
+                  getAdapterAddressABIItem,
+                  [Web3.utils.sha3(ContractAdapterNames.voting) || ''],
+                ],
+                [
+                  managingContract.contractAddress,
+                  getVotingAdapterNameABIItem,
+                  [daoRegistryContract.contractAddress],
+                ],
               ],
-              [
-                managingContract.contractAddress,
-                getVotingAdapterNameABIItem,
-                [daoRegistryContract.contractAddress],
-              ],
-            ],
-            web3Instance,
-          });
+              web3Instance,
+            });
 
-          address = addressResult;
-          votingAdapterName = votingAdapterNameResult;
+            address = addressResult;
+            votingAdapterName = votingAdapterNameResult;
+          } catch (error) {
+            throw new Error(
+              `The voting contract could not be found in the DAO. Are you sure you meant to add this contract's ABI?`
+            );
+          }
         }
 
         /**
@@ -236,7 +243,7 @@ export function initRegisteredVotingAdapter(
         }
       }
     } catch (error) {
-      throw error;
+      console.warn(error);
     }
   };
 }
