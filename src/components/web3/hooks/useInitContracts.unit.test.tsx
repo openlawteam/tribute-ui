@@ -62,9 +62,9 @@ describe('useInitContracts unit tests', () => {
         reduxStore.getState().contracts.VotingContract?.contractAddress
       ).toBeTruthy();
 
-      expect(reduxStore.getState().contracts.VotingContract?.adapterName).toBe(
-        VotingAdapterName.OffchainVotingContract
-      );
+      expect(
+        reduxStore.getState().contracts.VotingContract?.adapterOrExtensionName
+      ).toBe(VotingAdapterName.OffchainVotingContract);
 
       expect(
         reduxStore.getState().contracts.VotingContract?.instance

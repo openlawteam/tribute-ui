@@ -399,9 +399,9 @@ export function initContractThunkFactory({
   actionType: ContractAction;
   adapterOrExtensionName: ContractAdapterNames | ContractExtensionNames;
   /**
-   * The name to be shown in Redux state as `adapterName`.
+   * The name to be shown in Redux state as `adapterOrExtensionName`.
    */
-  adapterNameForRedux?: ContractsStateEntry['adapterName'];
+  adapterNameForRedux?: ContractsStateEntry['adapterOrExtensionName'];
   contractAddress?: string;
   /**
    * If set to `true` an Extenion address will be searched for instead of an Adapter.
@@ -439,7 +439,7 @@ export function initContractThunkFactory({
           type: actionType,
           abi: contractABI,
           contractAddress: address,
-          adapterName: adapterNameForRedux,
+          adapterOrExtensionName: adapterNameForRedux,
           instance: new web3Instance.eth.Contract(contractABI, address),
         })
       );

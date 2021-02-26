@@ -448,6 +448,7 @@ export default function AdapterManager() {
       setInputParameters(inputs);
       setOpenModal(true);
     } catch (error) {
+      console.log('error', error);
       const errorMessage = new Error(
         error && error?.code === 4001
           ? error.message
@@ -492,6 +493,18 @@ export default function AdapterManager() {
     }
   }
 
+  function handleSelectTargetChange({event, selectedTargetOption}: any): void {
+    // update the prior selected target to track the change
+    // so we can remove the old target from checkbox `selections`
+
+    // @todo Remove previously selected target
+
+    setSelections((s) => ({
+      ...s,
+      [selectedTargetOption]: event.target.checked,
+    }));
+  }
+
   function renderDaoName() {
     if (!dao && gqlError) {
       window.scrollTo({
@@ -534,18 +547,6 @@ export default function AdapterManager() {
     } else {
       return <></>;
     }
-  }
-
-  function handleSelectTargetChange({event, selectedTargetOption}: any): void {
-    // update the prior selected target to track the change
-    // so we can remove the old target from checkbox `selections`
-
-    // @todo Remove previously selected target
-
-    setSelections((s) => ({
-      ...s,
-      [selectedTargetOption]: event.target.checked,
-    }));
   }
 
   return (

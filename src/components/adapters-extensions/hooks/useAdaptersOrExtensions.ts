@@ -274,6 +274,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
   function getAdapterOrExtensionFromRedux(
     adapterOrExtensionName: DaoConstants
   ): Record<string, any> {
+    console.log('adapterExtensionContracts', adapterExtensionContracts);
     return Object.keys(adapterExtensionContracts)
       .map((ae) => adapterExtensionContracts[ae])
       .filter((ae) => ae) // filter out any `null` objects

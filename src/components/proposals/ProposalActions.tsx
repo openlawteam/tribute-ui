@@ -33,7 +33,7 @@ export default function ProposalActions(
   const {adapterName, proposal} = props;
 
   const votingAdapterName = useSelector(
-    (s: StoreState) => s.contracts.VotingContract?.adapterName
+    (s: StoreState) => s.contracts.VotingContract?.adapterOrExtensionName
   );
 
   function renderActions() {

@@ -46,9 +46,9 @@ export type ContractsStateEntry = {
    */
   abi: AbiItem[];
   /**
-   * (Optional) Adapter name, used for the Adapter Management
+   * (Optional) Adapter/extension name, used for the Adapter/Extension Management
    */
-  adapterName?: DaoConstants | VotingAdapterName;
+  adapterOrExtensionName?: DaoConstants | VotingAdapterName;
   /**
    * Address of the instantiated contract
    */
