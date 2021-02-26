@@ -88,10 +88,9 @@ export function OffchainVotingStatus({
 
   const votingStartSeconds = snapshotProposal?.msg.payload.start || 0;
   const votingEndSeconds = snapshotProposal?.msg.payload.end || 0;
-  // @todo Add function to calculate member voting power by shares
-  const yesShares = 0;
-  const noShares = 0;
-  const totalShares = 10000000;
+  const yesShares = votingResults?.Yes.shares || 0;
+  const noShares = votingResults?.No.shares || 0;
+  const totalShares = votingResults?.totalShares;
 
   /**
    * Effects
@@ -101,7 +100,7 @@ export function OffchainVotingStatus({
     if (!hasOffchainVotingEnded) return;
 
     setDidVotePass(yesShares > noShares);
-  }, [hasOffchainVotingEnded]);
+  }, [hasOffchainVotingEnded, noShares, yesShares]);
 
   // Determine grace period end
   useEffect(() => {
