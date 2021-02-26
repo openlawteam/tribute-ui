@@ -39,17 +39,17 @@ enum WhyDisableModalTitles {
   CONFIGURATION_REASON = 'Why are configurations disabled?',
 }
 /**
- * AdapterManager()
+ * AdapterOrExtensionManager()
  *
- * This components lists all the registered and unregistered adapters
- * from the list of available adapters in the `daoConstants` in `./config.ts`
+ * This components lists all the registered and unregistered adapters/extensions
+ * from the list of available adapters in the `defaultAdaptersAndExtensions` in `./config.ts`
  *
- * It allows for adding unregisted adapters, configurating registered adapters
- * and finalizing the DAO.
+ * It allows for adding unreigsterd adapters and extensions, configurating
+ * registered adapters and extensions, and finalizing the DAO.
  *
- * @note it is not possible to manage the adapters if the DAO is finalized.
+ * @note it is not possible to manage the adapters/extensions if the DAO is finalized.
  */
-export default function AdapterManager() {
+export default function AdapterOrExtensionManager() {
   /**
    * Selectors
    */
@@ -453,7 +453,7 @@ export default function AdapterManager() {
   }
 
   /**
-   * finalizeDao
+   * confirmFinalizePrompt
    */
   function confirmFinalizePrompt(): void {
     if (window.confirm('Do you really want to finalize this DAO?')) {
@@ -491,7 +491,7 @@ export default function AdapterManager() {
     // update the prior selected target to track the change
     // so we can remove the old target from checkbox `selections`
 
-    // @todo Remove previously selected target
+    // @todo Remove previously selected target if its from an `options` list
 
     setSelections((s) => ({
       ...s,
@@ -563,8 +563,8 @@ export default function AdapterManager() {
               isAdaptersUnavailable ||
               isDisabled || // connected user is not an active member
               unRegisteredAdaptersOrExtensions?.length === 0 || // nothing left to register
-              !isDAOExisting /* 
-              @todo 
+              !isDAOExisting
+              /* @todo 
               - disable when selection is processing 
               - disable when there are no more unused adapters to select
               */
@@ -593,9 +593,7 @@ export default function AdapterManager() {
         unRegisteredAdaptersOrExtensions?.length > 0 &&
         unRegisteredAdaptersOrExtensions.map(
           (adapter: Record<string, any>, idx: number) => (
-            <div
-              className="adapter-extension__grid unregistered-adapters"
-              key={idx}>
+            <div className="adapter-extension__grid unregistered" key={idx}>
               {/** RENDER ADAPTER/EXTENSION DROPDOWN */}
               {adapter?.options ? (
                 <AdapterExtensionSelectTarget
@@ -725,14 +723,14 @@ export default function AdapterManager() {
           )
         )}
 
-      {/** CURRENTLY USED ADAPTERS AND EXTENSIONS TO CONFIGURE OR REMOVE */}
+      {/** CURRENTLY USED ADAPTERS/EXTENSIONS TO CONFIGURE OR REMOVE */}
       {isDAOExisting &&
         registeredAdaptersOrExtensions &&
         registeredAdaptersOrExtensions?.length > 0 &&
         registeredAdaptersOrExtensions.map(
           (adapterOrExtension: Record<string, any>, idx: number) => (
             <div
-              className="adapter-extension__grid registered-adapters"
+              className="adapter-extension__grid registered"
               key={`${adapterOrExtension.id}-${idx}`}>
               <div className="adapter-extension__info">
                 <span className="adapter-extension__name">
@@ -782,9 +780,8 @@ export default function AdapterManager() {
             disabled={
               isAdaptersUnavailable ||
               !isDAOExisting ||
-              daoState ===
-                DaoState.READY /* 
-              @todo 
+              daoState === DaoState.READY
+              /* @todo 
               - also disable when selection is processing 
               - when there are no more unused adapters to select
               */

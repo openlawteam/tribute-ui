@@ -1,12 +1,6 @@
 @import "./variables";
 @import "./mixins";
 
-// %button-highlight {
-//   border-color: $color-babyblue;
-//   color: $color-babyblue;
-//   transition: border 0.25s ease, color 0.25s ease;
-// }
-
 .checkbox-input {
   @include assistive-hidden;
 
@@ -22,8 +16,6 @@
   }
 
   &:checked + .checkbox-label-words {
-    // @extend %button-highlight;
-
     font-weight: 500;
   }
 

@@ -4,7 +4,7 @@ import {useHistory, useParams} from 'react-router-dom';
 import {truncateEthAddress} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
-import AdapterManager from '../../components/adapters-extensions/AdapterOrExtensionManager';
+import AdapterOrExtensionManager from '../../components/adapters-extensions/AdapterOrExtensionManager';
 import {fakeMembers, FakeMember} from './_mockData';
 
 export default function MemberProfile() {
@@ -56,7 +56,7 @@ export default function MemberProfile() {
               </h3>
               {/* @todo only show if dao `state` is CREATION = 0 and connected 
               address is a member */}
-              <AdapterManager />
+              <AdapterOrExtensionManager />
             </div>
 
             {/* RIGHT COLUMN */}

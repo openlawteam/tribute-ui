@@ -23,6 +23,10 @@
   flex-direction: row;
   margin-bottom: 2rem;
 
+  // @media only screen and (min-width: em($bp-md)) {
+  //   flex-direction: row;
+  // }
+
   .button--secondary {
     font-family: $font-mono;
   }
@@ -46,7 +50,7 @@
   }
 }
 
-.registered-adapters {
+.registered {
   .adapter-extension__info {
     flex: 70%;
   }
@@ -56,7 +60,7 @@
 }
 
 // includes room for the checkbox
-.unregistered-adapters {
+.unregistered {
   .adapter-extension__checkbox {
     flex: 10%;
   }
