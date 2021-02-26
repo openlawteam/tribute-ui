@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
 
 import {DaoConstants} from './enums';
-import {/*AdapterFormArguments,*/ Adapters} from './types';
+import {AdaptersOrExtensions} from './types';
 import {StoreState} from '../../store/types';
 import {MetaMaskRPCError} from '../../util/types';
 import {Web3TxStatus} from '../web3/types';
@@ -14,31 +14,27 @@ import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useAdaptersOrExtensions, useValidation} from './hooks';
 import {ParamInputType, ParamType} from './hooks/useValidation';
 
-// import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
-// import CycleMessage from '../../components/feedback/CycleMessage';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
-// import EtherscanURL from '../../components/web3/EtherscanURL';
-// import FadeIn from '../../components/common/FadeIn';
 import InputError from '../common/InputError';
 import Loader from '../feedback/Loader';
 
-type AdapterConfigurationFormProps = {
+type ConfigurationFormProps = {
   abiConfigurationInputs: Record<string, any> | undefined;
   abiMethodName: string;
-  adapter: Adapters | undefined;
+  adapterOrExtension: Pick<AdaptersOrExtensions, any> | undefined;
   closeHandler?: () => void;
 };
 
-type RemoveAdapterArguments = [
-  string // `adapterId`
+type RemoveArgument = [
+  string // `adapterId` | `extensionId`
 ];
 
-export default function AdapterConfigurationForm({
+export default function ConfigurationForm({
   abiConfigurationInputs,
   abiMethodName,
-  adapter,
+  adapterOrExtension,
   closeHandler,
-}: AdapterConfigurationFormProps) {
+}: ConfigurationFormProps) {
   /**
    * Selectors
    */
@@ -54,7 +50,7 @@ export default function AdapterConfigurationForm({
     configureAdapterStatus,
     setConfigureAdapterStatus,
   ] = useState<Web3TxStatus>(Web3TxStatus.STANDBY);
-  const [removeAdapterStatus, setRemoveAdapterStatus] = useState<Web3TxStatus>(
+  const [removeStatus, setRemoveStatus] = useState<Web3TxStatus>(
     Web3TxStatus.STANDBY
   );
 
@@ -113,15 +109,15 @@ export default function AdapterConfigurationForm({
   const isRemoveInProcess =
     (txStatus === Web3TxStatus.AWAITING_CONFIRM ||
       txStatus === Web3TxStatus.PENDING) &&
-    (removeAdapterStatus === Web3TxStatus.AWAITING_CONFIRM ||
-      removeAdapterStatus === Web3TxStatus.PENDING);
+    (removeStatus === Web3TxStatus.AWAITING_CONFIRM ||
+      removeStatus === Web3TxStatus.PENDING);
 
   const isConfigureDone =
     txStatus === Web3TxStatus.FULFILLED &&
     configureAdapterStatus === Web3TxStatus.FULFILLED;
   const isRemoveDone =
     txStatus === Web3TxStatus.FULFILLED &&
-    removeAdapterStatus === Web3TxStatus.FULFILLED;
+    removeStatus === Web3TxStatus.FULFILLED;
 
   const isConfigureInProcessOrDone =
     (isConfigureInProcess || isConfigureDone) && txIsPromptOpen;
@@ -129,32 +125,34 @@ export default function AdapterConfigurationForm({
     (isRemoveInProcess || isRemoveDone) && txIsPromptOpen;
 
   /**
-   * handleRemoveAdapter()
+   * handleRemove()
    */
-  async function handleRemoveAdapter(): Promise<void> {
+  async function handleRemove(): Promise<void> {
     if (!DaoRegistryContract) return;
 
     try {
-      setRemoveAdapterStatus(Web3TxStatus.AWAITING_CONFIRM);
+      setRemoveStatus(Web3TxStatus.AWAITING_CONFIRM);
 
-      const removeAdapterArguments: RemoveAdapterArguments = [
-        adapter?.adapterId || '', // [0]bytes32 adapterId
-      ];
+      const removeArguments: RemoveArgument = [
+        adapterOrExtension?.isExtension
+          ? adapterOrExtension?.extensionId
+          : adapterOrExtension?.adapterId,
+      ] as any;
       const txArguments = {
         from: account || '',
         // Set a fast gas price
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      // Execute contract call for `removeAdapter`
+      // Execute contract call for `removeAdapter` | `removeExtension`
       await txSend(
-        'removeAdapter',
+        adapterOrExtension?.isExtension ? 'removeExtension' : 'removeAdapter',
         DaoRegistryContract.instance.methods,
-        removeAdapterArguments,
+        removeArguments,
         txArguments
       );
 
-      setRemoveAdapterStatus(Web3TxStatus.FULFILLED);
+      setRemoveStatus(Web3TxStatus.FULFILLED);
 
       // Close modal
       closeHandler &&
@@ -164,7 +162,7 @@ export default function AdapterConfigurationForm({
         }, 3000);
     } catch (error) {
       setSubmitError(error);
-      setRemoveAdapterStatus(Web3TxStatus.REJECTED);
+      setRemoveStatus(Web3TxStatus.REJECTED);
     }
   }
 
@@ -179,7 +177,9 @@ export default function AdapterConfigurationForm({
       const {
         contractAddress,
         instance: {methods},
-      } = getAdapterOrExtensionFromRedux(adapter?.name as DaoConstants);
+      } = getAdapterOrExtensionFromRedux(
+        adapterOrExtension?.name as DaoConstants
+      );
 
       if (!isConnected) {
         throw new Error(
@@ -188,7 +188,7 @@ export default function AdapterConfigurationForm({
       }
 
       if (!contractAddress) {
-        throw new Error(`No ${adapter?.name} contract found.`);
+        throw new Error(`No ${adapterOrExtension?.name} contract found.`);
       }
 
       if (!account) {
@@ -317,7 +317,7 @@ export default function AdapterConfigurationForm({
         <button
           className="button--secondary"
           disabled={isRemoveInProcessOrDone || isConfigureInProcessOrDone}
-          onClick={handleRemoveAdapter}>
+          onClick={handleRemove}>
           {isRemoveInProcess ? <Loader /> : isRemoveDone ? 'Done' : 'Remove'}
         </button>
 

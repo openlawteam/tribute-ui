@@ -1,29 +1,29 @@
 import React from 'react';
 
-import {Adapters} from './types';
-import AdapterConfigurationForm from './ConfigurationForm';
+import {AdaptersOrExtensions} from './types';
+import ConfigurationForm from './ConfigurationForm';
 import Modal from '../common/Modal';
 
 import TimesSVG from '../../assets/svg/TimesSVG';
 
-type AdapterConfiguratorModalProps = {
+type ConfiguratorModalProps = {
   abiMethodName: string;
-  adapter: Adapters | undefined;
+  adapterOrExtension: AdaptersOrExtensions | undefined;
   configurationInputs: Record<string, any> | undefined;
   isOpen: boolean;
   closeHandler: () => void;
 };
 
-export default function AdapterConfiguratorModal({
+export default function ConfiguratorModal({
   abiMethodName,
-  adapter,
+  adapterOrExtension,
   configurationInputs,
   isOpen,
   closeHandler,
-}: AdapterConfiguratorModalProps) {
+}: ConfiguratorModalProps) {
   return (
     <Modal
-      keyProp="adapter-configurator"
+      keyProp="adapter-extension-configuration"
       modalClassNames="adapter-extension-configure-modal"
       isOpen={isOpen}
       isOpenHandler={() => {
@@ -39,13 +39,13 @@ export default function AdapterConfiguratorModal({
           <TimesSVG />
         </span>
 
-        <h1>{adapter?.name.toUpperCase()}</h1>
-        <p>{adapter?.description}</p>
+        <h1>{adapterOrExtension?.name.toUpperCase()}</h1>
+        <p>{adapterOrExtension?.description}</p>
 
-        <AdapterConfigurationForm
+        <ConfigurationForm
           abiConfigurationInputs={configurationInputs}
           abiMethodName={abiMethodName}
-          adapter={adapter}
+          adapterOrExtension={adapterOrExtension as AdaptersOrExtensions}
           closeHandler={closeHandler}
         />
       </>

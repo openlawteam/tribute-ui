@@ -54,8 +54,7 @@ export default function MemberProfile() {
               <h3>
                 {truncateEthAddress((activeMember as FakeMember).address, 7)}
               </h3>
-              {/* @todo only show if dao `state` is CREATION = 0 and connected 
-              address is a member */}
+
               <AdapterOrExtensionManager />
             </div>
 

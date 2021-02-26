@@ -171,6 +171,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
       (adapterOrExtension: AdaptersAndExtensionsType | any) => {
         if (adapterOrExtension?.isExtension) {
           // Add an extenaion
+
           const gqlExtension = getExtensionFromGql(
             adapterOrExtension.extensionId
           );
@@ -190,54 +191,78 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
             } as AdaptersAndExtensionsType);
           }
         } else if (adapterOrExtension?.options) {
-          let shouldSkip = false;
-
           // Check options for adapters and extensions
-          adapterOrExtension?.options?.forEach((option: any) => {
-            if (shouldSkip) {
-              return;
+
+          // dry-run check to see if any of the options have already been registered
+          const maybeSomeAdapters = adapterOrExtension?.options.some(
+            (s: any) => {
+              return !s.isExtension && getAdapterFromGql(s.adapterId);
             }
+          );
 
-            if (option?.isExtension) {
-              const gqlExtension = getExtensionFromGql(option.extensionId);
-              if (gqlExtension) {
-                registeredList.push({
-                  ...gqlExtension,
-                  ...option,
-                  name: option.name as DaoConstants,
-                  description: option.description,
-                } as AdaptersAndExtensionsType);
-
-                shouldSkip = true;
-                return;
-              } else {
-                unRegisteredList.push({
-                  ...option,
-                  name: option.name as DaoConstants,
-                  description: option.description,
-                } as AdaptersAndExtensionsType);
-              }
-            } else {
-              const gqlAdapter = getAdapterFromGql(option.adapterId);
-              if (gqlAdapter) {
-                registeredList.push({
-                  ...gqlAdapter,
-                  ...option,
-                  name: option.name as DaoConstants,
-                  description: option.description,
-                } as AdaptersAndExtensionsType);
-
-                shouldSkip = true;
-                return;
-              } else {
-                unRegisteredList.push({
-                  ...option,
-                  name: option.name as DaoConstants,
-                  description: option.description,
-                } as AdaptersAndExtensionsType);
-              }
+          // dry-run check to see if any of the options have already been registered
+          const maybeSomeExtensions = adapterOrExtension?.options.some(
+            (s: any) => {
+              return s.isExtension && getExtensionFromGql(s.extensionId);
             }
-          });
+          );
+
+          // this means an adapter or extension has already been
+          // added from the options
+          if (maybeSomeAdapters || maybeSomeExtensions) {
+            let shouldSkip = false;
+
+            adapterOrExtension?.options?.forEach((option: any) => {
+              if (shouldSkip) {
+                return;
+              }
+
+              if (option?.isExtension) {
+                const gqlExtension = getExtensionFromGql(option.extensionId);
+
+                if (gqlExtension) {
+                  registeredList.push({
+                    ...gqlExtension,
+                    ...option,
+                    name: option.name as DaoConstants,
+                    description: option.description,
+                  } as AdaptersAndExtensionsType);
+
+                  shouldSkip = true;
+                  return;
+                } else {
+                  unRegisteredList.push({
+                    ...option,
+                    name: option.name as DaoConstants,
+                    description: option.description,
+                  } as AdaptersAndExtensionsType);
+                }
+              } else {
+                const gqlAdapter = getAdapterFromGql(option.adapterId);
+                if (gqlAdapter) {
+                  registeredList.push({
+                    ...gqlAdapter,
+                    ...option,
+                    name: option.name as DaoConstants,
+                    description: option.description,
+                  } as AdaptersAndExtensionsType);
+
+                  shouldSkip = true;
+                  return;
+                } else {
+                  unRegisteredList.push({
+                    ...option,
+                    name: option.name as DaoConstants,
+                    description: option.description,
+                  } as AdaptersAndExtensionsType);
+                }
+              }
+            });
+          } else {
+            // just add the options as a nested object;
+            // this will trigger the dropdown to display the options
+            unRegisteredList.push(adapterOrExtension);
+          }
         } else {
           // Add an adapter
           const gqlAdapter = getAdapterFromGql(adapterOrExtension.adapterId);

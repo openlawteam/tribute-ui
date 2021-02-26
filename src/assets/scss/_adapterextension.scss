@@ -23,9 +23,9 @@
   flex-direction: row;
   margin-bottom: 2rem;
 
-  // @media only screen and (min-width: em($bp-md)) {
-  //   flex-direction: row;
-  // }
+  @media only screen and (max-width: em($bp-sm)) {
+    flex-direction: column;
+  }
 
   .button--secondary {
     font-family: $font-mono;

@@ -28,7 +28,7 @@ import {useAdaptersOrExtensions} from './hooks/useAdaptersOrExtensions';
 import {useDao, useMemberActionDisabled} from '../../hooks';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 
-import AdapterConfiguratorModal from './ConfigurationModal';
+import ConfiguratorModal from './ConfigurationModal';
 import AdapterExtensionSelectTarget from './AdapterOrExtensionSelectTarget';
 import Checkbox, {CheckboxSize} from '../common/Checkbox';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
@@ -71,9 +71,10 @@ export default function AdapterOrExtensionManager() {
   const [selections, setSelections] = useState<
     Record<string, boolean> | undefined
   >();
-  const [configureAdapter, setConfigureAdapter] = useState<
-    AdaptersOrExtensions | undefined
-  >();
+  const [
+    configureAdapterOrExtension,
+    setConfigureAdapterOrExtension,
+  ] = useState<AdaptersOrExtensions | undefined>();
   const [isInProcess, setIsInProcess] = useState<
     Record<string, boolean> | undefined
   >();
@@ -111,13 +112,16 @@ export default function AdapterOrExtensionManager() {
   /**
    * Variables
    */
-  const isDAOExisting = dao;
+  const isDAOExisting: Record<string, any> | undefined = dao;
+  const isDAOReady: boolean = daoState === DaoState.READY;
   // grammatically naming is incorrect :)
-  const isAdaptersUnavailable =
+  const isAdaptersUnavailable: boolean =
     adapterExtensionStatus === AsyncStatus.REJECTED &&
     registeredAdaptersOrExtensions === undefined &&
     unRegisteredAdaptersOrExtensions === undefined;
-  const isLoadingAdapters = adapterExtensionStatus === AsyncStatus.PENDING;
+  const isLoadingAdapters: boolean =
+    adapterExtensionStatus === AsyncStatus.PENDING;
+
   // @todo track the prior selection of a dropdown target
   // let priorSelectedTargetOption: DaoConstants | null = null;
 
@@ -142,12 +146,12 @@ export default function AdapterOrExtensionManager() {
 
     unRegisteredAdaptersOrExtensions &&
       unRegisteredAdaptersOrExtensions?.forEach(
-        (adapter: Record<string, any>) => {
+        (adapterOrExtension: Record<string, any>) => {
           // only add a selection if it doesn't have nested `options`
-          !adapter?.options &&
+          !adapterOrExtension?.options &&
             setSelections((prevState: Record<string, boolean> | undefined) => ({
               ...prevState,
-              [adapter.name]: false,
+              [adapterOrExtension.name]: false,
             }));
         }
       );
@@ -183,6 +187,8 @@ export default function AdapterOrExtensionManager() {
   /**
    * handleAddAdapter
    *
+   * Handles adding `adapter`
+   *
    * @param adapter
    */
   function handleAddAdapter(adapter: Record<string, any>): void {
@@ -217,6 +223,12 @@ export default function AdapterOrExtensionManager() {
       });
   }
 
+  /**
+   * handleAddExtension
+   *
+   * Handle adding an `extension`
+   * @param extension
+   */
   function handleAddExtension(extension: any): void {
     const adapterOrExtensionAddress = new Promise<any>((resolve, reject) => {
       try {
@@ -439,7 +451,7 @@ export default function AdapterOrExtensionManager() {
       )[0];
 
       setABIMethodName(abiFunctionName);
-      setConfigureAdapter(adapterOrExtension);
+      setConfigureAdapterOrExtension(adapterOrExtension);
       setInputParameters(inputs);
       setOpenModal(true);
     } catch (error) {
@@ -517,9 +529,9 @@ export default function AdapterOrExtensionManager() {
 
     if (dao) {
       return (
-        <h2>
+        <h3>
           {dao.name} <small>{truncateEthAddress(dao.daoAddress, 7)}</small>
-        </h2>
+        </h3>
       );
     }
   }
@@ -545,7 +557,7 @@ export default function AdapterOrExtensionManager() {
 
   return (
     <div className="adaptermanager">
-      <h1>Adapter/Extension Manager</h1>
+      <h2>Adapter/Extension Manager</h2>
       {renderDaoName()}
       {renderErrorMessage()}
       <p>
@@ -778,9 +790,7 @@ export default function AdapterOrExtensionManager() {
           <button
             className="button--secondary finalize"
             disabled={
-              isAdaptersUnavailable ||
-              !isDAOExisting ||
-              daoState === DaoState.READY
+              isAdaptersUnavailable || !isDAOExisting || isDAOReady
               /* @todo 
               - also disable when selection is processing 
               - when there are no more unused adapters to select
@@ -809,9 +819,9 @@ export default function AdapterOrExtensionManager() {
       </div>
 
       {openModal && (
-        <AdapterConfiguratorModal
+        <ConfiguratorModal
           abiMethodName={abiMethodName}
-          adapter={configureAdapter}
+          adapterOrExtension={configureAdapterOrExtension}
           configurationInputs={inputParameters}
           isOpen={openModal}
           closeHandler={() => {

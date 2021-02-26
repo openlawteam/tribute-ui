@@ -10,6 +10,7 @@ export type Extensions = {
   extensionId?: string;
   name: DaoConstants;
   description: string;
+  isExtension: boolean;
 };
 
 export type AdaptersOrExtensions = Adapters | Extensions;
