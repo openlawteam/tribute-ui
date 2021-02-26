@@ -150,6 +150,11 @@ export function useProposalWithOffchainVoteStatus(
     if (atProcessedInDAO && pollingIntervalIdRef.current) {
       clearInterval(pollingIntervalIdRef.current);
     }
+
+    return () => {
+      pollingIntervalIdRef.current &&
+        clearInterval(pollingIntervalIdRef.current);
+    };
   }, [atProcessedInDAO]);
 
   /**

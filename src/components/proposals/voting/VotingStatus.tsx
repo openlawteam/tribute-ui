@@ -6,7 +6,6 @@ import StopwatchSVG from '../../../assets/svg/StopwatchSVG';
 
 type VotingStatusProps = {
   hasVotingEnded: boolean;
-  noShares: number;
   /**
    * A render prop to display status to before / after the clock timer is shown.
    */
@@ -25,8 +24,9 @@ type VotingStatusProps = {
    * Defaults to `true`.
    */
   showPercentages?: boolean;
-  totalShares: number;
-  yesShares: number;
+  noShares: Parameters<typeof SquareRootVotingBar>[0]['noShares'];
+  totalShares: Parameters<typeof SquareRootVotingBar>[0]['totalShares'];
+  yesShares: Parameters<typeof SquareRootVotingBar>[0]['yesShares'];
 };
 
 export function VotingStatus(props: VotingStatusProps) {

@@ -1,3 +1,4 @@
+export * from './useOffchainVotingResults';
 export * from './useOffchainVotingStartEnd';
 export * from './useProposalOrDraft';
 export * from './useProposalWithOffchainVoteStatus';

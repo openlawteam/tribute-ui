@@ -1,12 +1,25 @@
 import CheckSVG from '../../../assets/svg/CheckSVG';
 
 type SquareRootVotingBarProps = {
-  yesShares: number;
-  noShares: number;
-  totalShares: number;
+  /**
+   * Allow values to not be set as they may not be ready
+   */
+  yesShares: number | undefined;
+  /**
+   * Allow values to not be set as they may not be ready
+   */
+  noShares: number | undefined;
+  /**
+   * Allow values to not be set as they may not be ready
+   */
+  totalShares: number | undefined;
   votingExpired: boolean;
   showPercentages: boolean;
 };
+
+function getSharesPercent(shares: number, totalShares: number) {
+  return ((shares / totalShares) * 100).toFixed(0);
+}
 
 export function SquareRootVotingBar({
   yesShares = 0,
@@ -19,8 +32,10 @@ export function SquareRootVotingBar({
    * Variables
    */
 
-  const percentYes = ((yesShares / totalShares) * 100).toFixed(0) || '0';
-  const percentNo = ((noShares / totalShares) * 100).toFixed(0) || '0';
+  const percentYes = totalShares
+    ? getSharesPercent(yesShares, totalShares)
+    : '0';
+  const percentNo = totalShares ? getSharesPercent(noShares, totalShares) : '0';
 
   /**
    * Render

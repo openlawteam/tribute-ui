@@ -5,7 +5,7 @@ import {CycleEllipsis} from '../../feedback';
 import {getDAOConfigEntry} from '../../web3/helpers';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
-import {useOffchainVotingStartEnd} from '../hooks';
+import {useOffchainVotingResults, useOffchainVotingStartEnd} from '../hooks';
 import {useSelector} from 'react-redux';
 import {VotingStatus} from './VotingStatus';
 
@@ -71,17 +71,6 @@ export function OffchainVotingStatus({
   const [gracePeriodEndMs, setGracePeriodEndMs] = useState<number>(0);
 
   /**
-   * Variables
-   */
-
-  const votingStartSeconds = snapshotProposal?.msg.payload.start || 0;
-  const votingEndSeconds = snapshotProposal?.msg.payload.end || 0;
-  // @todo Add function to calculate member voting power by shares
-  const yesShares = 0;
-  const noShares = 0;
-  const totalShares = 10000000;
-
-  /**
    * Our hooks
    */
 
@@ -91,6 +80,18 @@ export function OffchainVotingStatus({
     offchainVotingStartEndInitReady,
   } = useOffchainVotingStartEnd(proposal);
 
+  const votingResults = useOffchainVotingResults(proposal);
+
+  /**
+   * Variables
+   */
+
+  const votingStartSeconds = snapshotProposal?.msg.payload.start || 0;
+  const votingEndSeconds = snapshotProposal?.msg.payload.end || 0;
+  const yesShares = votingResults?.Yes.shares || 0;
+  const noShares = votingResults?.No.shares || 0;
+  const totalShares = votingResults?.totalShares;
+
   /**
    * Effects
    */
@@ -99,7 +100,7 @@ export function OffchainVotingStatus({
     if (!hasOffchainVotingEnded) return;
 
     setDidVotePass(yesShares > noShares);
-  }, [hasOffchainVotingEnded]);
+  }, [hasOffchainVotingEnded, noShares, yesShares]);
 
   // Determine grace period end
   useEffect(() => {
