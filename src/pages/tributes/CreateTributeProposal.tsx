@@ -622,6 +622,8 @@ export default function CreateTributeProposal() {
                       ? 'The value must be greater than 0.'
                       : amount > Number(userERC20Balance)
                       ? 'Insufficient funds.'
+                      : !Number.isInteger(amount)
+                      ? 'The value must be an integer for an ERC20 token.'
                       : true;
                   },
                 })}
