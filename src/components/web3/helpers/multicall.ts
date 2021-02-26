@@ -46,9 +46,26 @@ export async function multicall({
       )
       .call({}, blockNumber);
 
-    return returnData.map((hexString: string, i: number) =>
-      web3Instance.eth.abi.decodeParameter(calls[i][1].outputs?.[0], hexString)
-    );
+    return returnData.map((hexString: string, i: number) => {
+      const outputsABIItem = calls[i][1].outputs || [];
+      const decodedOutputs = web3Instance.eth.abi.decodeParameters(
+        outputsABIItem,
+        hexString
+      );
+
+      // Output as single result
+      if (
+        decodedOutputs.__length__ === 1 &&
+        decodedOutputs['0'] !== undefined
+      ) {
+        return decodedOutputs['0'];
+      }
+
+      return web3Instance.eth.abi.decodeParameters(
+        outputsABIItem || [],
+        hexString
+      );
+    });
   } catch (error) {
     throw error;
   }

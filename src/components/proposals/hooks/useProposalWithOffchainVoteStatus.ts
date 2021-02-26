@@ -1,16 +1,14 @@
 import {useSelector} from 'react-redux';
-import {useEffect} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
+import {multicall, MulticallTuple} from '../../web3/helpers';
 import {ProposalFlowStatus, ProposalData, ProposalFlag} from '../types';
 import {StoreState} from '../../../store/types';
-import {useContractPoll} from '../../web3/hooks/useContractPoll';
 import {useOffchainVotingStartEnd} from '.';
+import {useWeb3Modal} from '../../web3/hooks';
 import {VotingState} from '../voting/types';
 
-// @todo Stop polling votes once result submitted
-// @todo Stop polling proposal once processed
-// @todo Stop polling vote result once result submitted
-// @todo Be able to fall back to on-chain polling this if subgraph is not available
+// @todo Logic to fall back to on-chain polling this if subgraph is not available
 
 type UseProposalWithOffchainVoteStatusReturn = {
   status: ProposalFlowStatus | undefined;
@@ -48,15 +46,39 @@ export function useProposalWithOffchainVoteStatus(
    * Selectors
    */
 
+  const {web3Instance} = useWeb3Modal();
   const daoRegistryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
   );
-  const daoRegistryMethods = useSelector(
-    (s: StoreState) => s.contracts.DaoRegistryContract?.instance.methods
+  const daoRegistryABI = useSelector(
+    (s: StoreState) => s.contracts.DaoRegistryContract?.abi
   );
-  const offchainVotingMethods = useSelector(
-    (s: StoreState) => s.contracts.VotingContract?.instance.methods
+  const offchainVotingAddress = useSelector(
+    (s: StoreState) => s.contracts.VotingContract?.contractAddress
   );
+  const offchainVotingABI = useSelector(
+    (s: StoreState) => s.contracts.VotingContract?.abi
+  );
+
+  /**
+   * State
+   */
+
+  const [daoProposal, setDAOProposal] = useState<
+    UseProposalWithOffchainVoteStatusReturn['daoProposal']
+  >();
+  const [daoProposalVotes, setDAOProposalVotes] = useState<
+    UseProposalWithOffchainVoteStatusReturn['daoProposalVotes']
+  >();
+  const [daoProposalVoteResult, setDAOProposalVoteResult] = useState<
+    UseProposalWithOffchainVoteStatusReturn['daoProposalVoteResult']
+  >();
+
+  /**
+   * Refs
+   */
+
+  const pollingIntervalIdRef = useRef<NodeJS.Timeout>();
 
   /**
    * Our hooks
@@ -68,33 +90,18 @@ export function useProposalWithOffchainVoteStatus(
     offchainVotingStartEndInitReady,
   } = useOffchainVotingStartEnd(proposal);
 
-  const {
-    pollContract: pollProposal,
-    pollContractData: daoProposal,
-    stopPollingContract: stopPollProposal,
-  } = useContractPoll<UseProposalWithOffchainVoteStatusReturn['daoProposal']>({
-    pollInterval: 5000,
-  });
+  /**
+   * Cached callbacks
+   */
 
-  const {
-    pollContract: pollProposalVoteResult,
-    pollContractData: daoProposalVoteResult,
-    stopPollingContract: stopPollProposalVoteResult,
-  } = useContractPoll<
-    UseProposalWithOffchainVoteStatusReturn['daoProposalVoteResult']
-  >({
-    pollInterval: 5000,
-  });
-
-  const {
-    pollContract: pollProposalVotes,
-    pollContractData: daoProposalVotes,
-    stopPollingContract: stopPollProposalVotes,
-  } = useContractPoll<
-    UseProposalWithOffchainVoteStatusReturn['daoProposalVotes']
-  >({
-    pollInterval: 5000,
-  });
+  const pollStatusFromContractCached = useCallback(pollStatusFromContract, [
+    daoRegistryABI,
+    daoRegistryAddress,
+    offchainVotingABI,
+    offchainVotingAddress,
+    proposalId,
+    web3Instance,
+  ]);
 
   /**
    * Variables
@@ -129,58 +136,26 @@ export function useProposalWithOffchainVoteStatus(
       VotingState[VotingState.GRACE_PERIOD];
 
   useEffect(() => {
-    if (!daoRegistryMethods) return;
+    // Call as soon as possible.
+    pollStatusFromContractCached();
 
-    pollProposal({
-      methodName: 'proposals',
-      methodArguments: [proposalId],
-      contractInstanceMethods: daoRegistryMethods,
-    });
-  }, [daoRegistryMethods, pollProposal, proposalId]);
+    // Then, poll every `x` Ms
+    const intervalId = setInterval(pollStatusFromContractCached, 5000);
 
+    pollingIntervalIdRef.current = intervalId;
+  }, [pollStatusFromContractCached]);
+
+  // Stop polling if propsal is processed
   useEffect(() => {
-    if (!offchainVotingMethods || !daoRegistryAddress) return;
-
-    pollProposalVoteResult({
-      methodName: 'voteResult',
-      methodArguments: [daoRegistryAddress, proposalId],
-      contractInstanceMethods: offchainVotingMethods,
-    });
-  }, [
-    daoRegistryAddress,
-    offchainVotingMethods,
-    pollProposalVoteResult,
-    proposalId,
-  ]);
-
-  useEffect(() => {
-    if (!offchainVotingMethods || !daoRegistryAddress) return;
-
-    pollProposalVotes({
-      methodName: 'votes',
-      methodArguments: [daoRegistryAddress, proposalId],
-      contractInstanceMethods: offchainVotingMethods,
-    });
-  }, [
-    daoRegistryAddress,
-    offchainVotingMethods,
-    pollProposalVotes,
-    proposalId,
-  ]);
-
-  // Stop polling if processed
-  useEffect(() => {
-    if (atProcessedInDAO) {
-      stopPollProposal();
-      stopPollProposalVoteResult();
-      stopPollProposalVotes();
+    if (atProcessedInDAO && pollingIntervalIdRef.current) {
+      clearInterval(pollingIntervalIdRef.current);
     }
-  }, [
-    atProcessedInDAO,
-    stopPollProposal,
-    stopPollProposalVoteResult,
-    stopPollProposalVotes,
-  ]);
+
+    return () => {
+      pollingIntervalIdRef.current &&
+        clearInterval(pollingIntervalIdRef.current);
+    };
+  }, [atProcessedInDAO]);
 
   /**
    * Functions
@@ -197,6 +172,52 @@ export function useProposalWithOffchainVoteStatus(
       daoProposalVoteResult,
       daoProposalVotes,
     };
+  }
+
+  async function pollStatusFromContract() {
+    try {
+      if (
+        !daoRegistryABI ||
+        !daoRegistryAddress ||
+        !offchainVotingABI ||
+        !offchainVotingAddress ||
+        !proposalId
+      ) {
+        return;
+      }
+
+      const proposalsABI = daoRegistryABI.filter(
+        (item) => item.name === 'proposals'
+      )[0];
+      const voteResultABI = offchainVotingABI.filter(
+        (item) => item.name === 'voteResult'
+      )[0];
+      const votesABI = offchainVotingABI.filter(
+        (item) => item.name === 'votes'
+      )[0];
+
+      const calls: MulticallTuple[] = [
+        // DAO proposals call
+        [daoRegistryAddress, proposalsABI, [proposalId]],
+        // Votes call
+        [offchainVotingAddress, votesABI, [daoRegistryAddress, proposalId]],
+        // Vote result call
+        [
+          offchainVotingAddress,
+          voteResultABI,
+          [daoRegistryAddress, proposalId],
+        ],
+      ];
+
+      const [proposal, votes, voteResult] = await multicall({
+        calls,
+        web3Instance,
+      });
+
+      setDAOProposal(proposal);
+      setDAOProposalVotes(votes);
+      setDAOProposalVoteResult(voteResult);
+    } catch (error) {}
   }
 
   // Status: Sponsor
