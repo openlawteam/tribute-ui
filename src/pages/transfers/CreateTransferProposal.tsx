@@ -144,7 +144,7 @@ export default function CreateTransferProposal() {
 
   const createTransferError = submitError || txError;
   const isConnected = connected && account;
-  const erc20Contract: AbiItem[] = ERC20ABI as any;
+  const erc20ABI: AbiItem[] = ERC20ABI as any;
 
   /**
    * @note From the docs: "Read the formState before render to subscribe the form state through Proxy"
@@ -171,7 +171,7 @@ export default function CreateTransferProposal() {
   const getDaoTokensCached = useCallback(getDaoTokens, [
     BankExtensionContract,
     account,
-    erc20Contract,
+    erc20ABI,
     web3Instance,
   ]);
 
@@ -209,11 +209,10 @@ export default function CreateTransferProposal() {
         instance: {methods: bankMethods},
       } = BankExtensionContract;
 
+      // Build calls to get DAO token list with details
       const nbTokens = await bankMethods.nbTokens().call();
-      const getTokenABI = bankABI.find((item) => item.name === 'getToken');
-      const balanceOfABI = bankABI.find((item) => item.name === 'balanceOf');
 
-      // Build calls to Bank contract
+      const getTokenABI = bankABI.find((item) => item.name === 'getToken');
       const getTokenCalls = [...Array(Number(nbTokens)).keys()].map(
         (index): MulticallTuple => [
           bankAddress,
@@ -225,6 +224,8 @@ export default function CreateTransferProposal() {
         calls: getTokenCalls,
         web3Instance,
       });
+
+      const balanceOfABI = bankABI.find((item) => item.name === 'balanceOf');
       const getDaoTokenBalanceCalls = fetchedTokens.map(
         (token): MulticallTuple => [
           bankAddress,
@@ -242,53 +243,78 @@ export default function CreateTransferProposal() {
           address: token,
           daoBalance: daoTokenBalances[index],
         }))
-        // Don't need to include tokens that have 0 balance.
+        // Don't need to include tokens that have 0 balance
         .filter((tokenObj) => toBN(tokenObj.daoBalance).gt(toBN(0)));
 
-      const parsedTokens = await Promise.all(
-        tokensArray.map(async (token: Partial<TokenDetails>) => {
-          try {
-            if (token.address === ETH_TOKEN_ADDRESS) {
-              return {
-                ...token,
-                name: 'Ether',
-                symbol: 'ETH',
-                decimals: 18,
-              };
-            } else {
-              const erc20Instance = new web3Instance.eth.Contract(
-                erc20Contract,
-                token.address
-              );
-
-              const name = await erc20Instance.methods.name().call();
-              const symbol = await erc20Instance.methods.symbol().call();
-              const decimals = await erc20Instance.methods.decimals().call();
-
-              return {
-                ...token,
-                name,
-                symbol,
-                decimals,
-              };
-            }
-          } catch (error) {
-            console.error(error);
-          }
-        })
+      let ethToken = tokensArray.find(
+        (token) => token.address === ETH_TOKEN_ADDRESS
+      );
+      // Filter out Ether to handle ERC20 tokens
+      const erc20Tokens = tokensArray.filter(
+        (token) => token.address !== ETH_TOKEN_ADDRESS
       );
 
-      let sortedTokens = (parsedTokens.filter(
-        Boolean
-      ) as TokenDetails[]).sort((a, b) => a.name.localeCompare(b.name));
-      // If token list includes Ether, move it to the front.
-      sortedTokens.some(
-        (token, idx) =>
-          token.address === ETH_TOKEN_ADDRESS &&
-          sortedTokens.unshift(sortedTokens.splice(idx, 1)[0])
+      const nameABI = erc20ABI.find((item) => item.name === 'name');
+      const nameCalls = erc20Tokens.map(
+        (token): MulticallTuple => [
+          token.address as string,
+          nameABI as AbiItem,
+          [],
+        ]
       );
+      const symbolABI = erc20ABI.find((item) => item.name === 'symbol');
+      const symbolCalls = erc20Tokens.map(
+        (token): MulticallTuple => [
+          token.address as string,
+          symbolABI as AbiItem,
+          [],
+        ]
+      );
+      const decimalsABI = erc20ABI.find((item) => item.name === 'decimals');
+      const decimalsCalls = erc20Tokens.map(
+        (token): MulticallTuple => [
+          token.address as string,
+          decimalsABI as AbiItem,
+          [],
+        ]
+      );
+      const erc20DetailsCalls = [
+        ...nameCalls,
+        ...symbolCalls,
+        ...decimalsCalls,
+      ];
+      let results = await multicall({
+        calls: erc20DetailsCalls,
+        web3Instance,
+      });
+      let chunkedResults = [];
+      while (results.length) {
+        chunkedResults.push(results.splice(0, erc20Tokens.length));
+      }
+      const [names, symbols, decimals] = chunkedResults;
 
-      setDaoTokens(sortedTokens);
+      let parsedAndSortedTokens = erc20Tokens
+        .map((token, index) => ({
+          ...token,
+          name: names[index],
+          symbol: symbols[index],
+          decimals: decimals[index],
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      // Add back Ether to token list
+      if (ethToken) {
+        ethToken = {
+          ...ethToken,
+          name: 'Ether',
+          symbol: 'ETH',
+          decimals: 18,
+        };
+
+        parsedAndSortedTokens.unshift(ethToken as TokenDetails);
+      }
+
+      setDaoTokens(parsedAndSortedTokens as TokenDetails[]);
     } catch (error) {
       console.error(error);
       setDaoTokens(undefined);
