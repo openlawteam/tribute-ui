@@ -23,6 +23,7 @@ import {isEthAddressValid} from '../../util/validation';
 import {MetaMaskRPCError} from '../../util/types';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
+import {multicall, MulticallTuple} from '../../components/web3/helpers';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import CycleMessage from '../../components/feedback/CycleMessage';
@@ -196,39 +197,68 @@ export default function CreateTransferProposal() {
    */
 
   async function getDaoTokens() {
-    if (!account || !BankExtensionContract) {
+    if (!account || !BankExtensionContract || !web3Instance) {
       setDaoTokens(undefined);
       return;
     }
 
     try {
-      const bankMethods = BankExtensionContract.instance.methods;
-      // @todo replace this with multicall
-      const fetchedTokens = await bankMethods.getTokens().call();
-      const parsedTokens: TokenDetails[] = await Promise.all(
-        fetchedTokens.map(async (token: string) => {
+      const {
+        abi: bankABI,
+        contractAddress: bankAddress,
+        instance: {methods: bankMethods},
+      } = BankExtensionContract;
+
+      const nbTokens = await bankMethods.nbTokens().call();
+      const getTokenABI = bankABI.find((item) => item.name === 'getToken');
+      const balanceOfABI = bankABI.find((item) => item.name === 'balanceOf');
+
+      // Build calls to Bank contract
+      const getTokenCalls = [...Array(Number(nbTokens)).keys()].map(
+        (index): MulticallTuple => [
+          bankAddress,
+          getTokenABI as AbiItem,
+          [index.toString()],
+        ]
+      );
+      const fetchedTokens: string[] = await multicall({
+        calls: getTokenCalls,
+        web3Instance,
+      });
+      const getDaoTokenBalanceCalls = fetchedTokens.map(
+        (token): MulticallTuple => [
+          bankAddress,
+          balanceOfABI as AbiItem,
+          [GUILD_ADDRESS, token],
+        ]
+      );
+      const daoTokenBalances: string[] = await multicall({
+        calls: getDaoTokenBalanceCalls,
+        web3Instance,
+      });
+
+      const tokensArray: Partial<TokenDetails>[] = fetchedTokens
+        .map((token, index) => ({
+          address: token,
+          daoBalance: daoTokenBalances[index],
+        }))
+        // Don't need to include tokens that have 0 balance.
+        .filter((tokenObj) => toBN(tokenObj.daoBalance).gt(toBN(0)));
+
+      const parsedTokens = await Promise.all(
+        tokensArray.map(async (token: Partial<TokenDetails>) => {
           try {
-            const daoBalance = await bankMethods
-              .balanceOf(GUILD_ADDRESS, token)
-              .call();
-
-            // Don't need to fetch token info if the balance is 0.
-            if (toBN(daoBalance).lte(toBN(0))) return;
-
-            if (token === ETH_TOKEN_ADDRESS) {
+            if (token.address === ETH_TOKEN_ADDRESS) {
               return {
+                ...token,
                 name: 'Ether',
                 symbol: 'ETH',
-                address: ETH_TOKEN_ADDRESS,
                 decimals: 18,
-                daoBalance,
               };
             } else {
-              if (!web3Instance) return;
-
               const erc20Instance = new web3Instance.eth.Contract(
                 erc20Contract,
-                token
+                token.address
               );
 
               const name = await erc20Instance.methods.name().call();
@@ -236,11 +266,10 @@ export default function CreateTransferProposal() {
               const decimals = await erc20Instance.methods.decimals().call();
 
               return {
+                ...token,
                 name,
                 symbol,
-                address: token,
                 decimals,
-                daoBalance,
               };
             }
           } catch (error) {
@@ -249,9 +278,9 @@ export default function CreateTransferProposal() {
         })
       );
 
-      let sortedTokens = parsedTokens
-        .filter(Boolean)
-        .sort((a, b) => a.name.localeCompare(b.name));
+      let sortedTokens = (parsedTokens.filter(
+        Boolean
+      ) as TokenDetails[]).sort((a, b) => a.name.localeCompare(b.name));
       // If token list includes Ether, move it to the front.
       sortedTokens.some(
         (token, idx) =>
