@@ -60,12 +60,15 @@ type TransferArguments = [
   string // `data`
 ];
 
-type TokenDetails = {
+type InitialTokenDetails = {
+  address: string;
+  daoBalance: string;
+};
+
+type TokenDetails = InitialTokenDetails & {
   name: string;
   symbol: string;
-  address: string;
   decimals: number;
-  daoBalance: string;
 };
 
 export default function CreateTransferProposal() {
@@ -209,112 +212,122 @@ export default function CreateTransferProposal() {
         instance: {methods: bankMethods},
       } = BankExtensionContract;
 
-      // Build calls to get DAO token list with details
       const nbTokens = await bankMethods.nbTokens().call();
 
-      const getTokenABI = bankABI.find((item) => item.name === 'getToken');
-      const getTokenCalls = [...Array(Number(nbTokens)).keys()].map(
-        (index): MulticallTuple => [
-          bankAddress,
-          getTokenABI as AbiItem,
-          [index.toString()],
-        ]
-      );
-      const fetchedTokens: string[] = await multicall({
-        calls: getTokenCalls,
-        web3Instance,
-      });
+      if (Number(nbTokens) < 1) {
+        setDaoTokens([]);
+      } else {
+        let parsedAndSortedTokens: TokenDetails[] = [];
 
-      const balanceOfABI = bankABI.find((item) => item.name === 'balanceOf');
-      const getDaoTokenBalanceCalls = fetchedTokens.map(
-        (token): MulticallTuple => [
-          bankAddress,
-          balanceOfABI as AbiItem,
-          [GUILD_ADDRESS, token],
-        ]
-      );
-      const daoTokenBalances: string[] = await multicall({
-        calls: getDaoTokenBalanceCalls,
-        web3Instance,
-      });
+        // Build calls to get DAO token list with details
+        const getTokenABI = bankABI.find((item) => item.name === 'getToken');
+        const getTokenCalls = [...Array(Number(nbTokens)).keys()].map(
+          (index): MulticallTuple => [
+            bankAddress,
+            getTokenABI as AbiItem,
+            [index.toString()],
+          ]
+        );
+        const fetchedTokens: string[] = await multicall({
+          calls: getTokenCalls,
+          web3Instance,
+        });
 
-      const tokensArray: Partial<TokenDetails>[] = fetchedTokens
-        .map((token, index) => ({
-          address: token,
-          daoBalance: daoTokenBalances[index],
-        }))
-        // Don't need to include tokens that have 0 balance
-        .filter((tokenObj) => toBN(tokenObj.daoBalance).gt(toBN(0)));
+        const balanceOfABI = bankABI.find((item) => item.name === 'balanceOf');
+        const getDaoTokenBalanceCalls = fetchedTokens.map(
+          (token): MulticallTuple => [
+            bankAddress,
+            balanceOfABI as AbiItem,
+            [GUILD_ADDRESS, token],
+          ]
+        );
+        const daoTokenBalances: string[] = await multicall({
+          calls: getDaoTokenBalanceCalls,
+          web3Instance,
+        });
 
-      let ethToken = tokensArray.find(
-        (token) => token.address === ETH_TOKEN_ADDRESS
-      );
-      // Filter out Ether to handle ERC20 tokens
-      const erc20Tokens = tokensArray.filter(
-        (token) => token.address !== ETH_TOKEN_ADDRESS
-      );
+        const tokensArray: InitialTokenDetails[] = fetchedTokens
+          .map((token, index) => ({
+            address: token,
+            daoBalance: daoTokenBalances[index],
+          }))
+          // Don't need to include tokens that have 0 balance
+          .filter((tokenObj) => toBN(tokenObj.daoBalance).gt(toBN(0)));
 
-      const nameABI = erc20ABI.find((item) => item.name === 'name');
-      const nameCalls = erc20Tokens.map(
-        (token): MulticallTuple => [
-          token.address as string,
-          nameABI as AbiItem,
-          [],
-        ]
-      );
-      const symbolABI = erc20ABI.find((item) => item.name === 'symbol');
-      const symbolCalls = erc20Tokens.map(
-        (token): MulticallTuple => [
-          token.address as string,
-          symbolABI as AbiItem,
-          [],
-        ]
-      );
-      const decimalsABI = erc20ABI.find((item) => item.name === 'decimals');
-      const decimalsCalls = erc20Tokens.map(
-        (token): MulticallTuple => [
-          token.address as string,
-          decimalsABI as AbiItem,
-          [],
-        ]
-      );
-      const erc20DetailsCalls = [
-        ...nameCalls,
-        ...symbolCalls,
-        ...decimalsCalls,
-      ];
-      let results = await multicall({
-        calls: erc20DetailsCalls,
-        web3Instance,
-      });
-      let chunkedResults = [];
-      while (results.length) {
-        chunkedResults.push(results.splice(0, erc20Tokens.length));
+        const ethToken = tokensArray.find(
+          (token) => token.address === ETH_TOKEN_ADDRESS
+        );
+        if (ethToken) {
+          parsedAndSortedTokens.push({
+            ...ethToken,
+            name: 'Ether',
+            symbol: 'ETH',
+            decimals: 18,
+          });
+        }
+
+        // Filter out Ether to handle ERC20 tokens
+        const erc20Tokens = tokensArray.filter(
+          (token) => token.address !== ETH_TOKEN_ADDRESS
+        );
+
+        if (erc20Tokens.length > 0) {
+          const nameABI = erc20ABI.find((item) => item.name === 'name');
+          const nameCalls = erc20Tokens.map(
+            (token): MulticallTuple => [
+              token.address as string,
+              nameABI as AbiItem,
+              [],
+            ]
+          );
+          const symbolABI = erc20ABI.find((item) => item.name === 'symbol');
+          const symbolCalls = erc20Tokens.map(
+            (token): MulticallTuple => [
+              token.address as string,
+              symbolABI as AbiItem,
+              [],
+            ]
+          );
+          const decimalsABI = erc20ABI.find((item) => item.name === 'decimals');
+          const decimalsCalls = erc20Tokens.map(
+            (token): MulticallTuple => [
+              token.address as string,
+              decimalsABI as AbiItem,
+              [],
+            ]
+          );
+          const erc20DetailsCalls = [
+            ...nameCalls,
+            ...symbolCalls,
+            ...decimalsCalls,
+          ];
+          let results = await multicall({
+            calls: erc20DetailsCalls,
+            web3Instance,
+          });
+          let chunkedResults = [];
+          while (results.length) {
+            chunkedResults.push(results.splice(0, erc20Tokens.length));
+          }
+          const [names, symbols, decimals] = chunkedResults;
+
+          const parsedAndSortedERC20Tokens = erc20Tokens
+            .map((token, index) => ({
+              ...token,
+              name: names[index],
+              symbol: symbols[index],
+              decimals: decimals[index],
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+
+          parsedAndSortedTokens = [
+            ...parsedAndSortedTokens,
+            ...parsedAndSortedERC20Tokens,
+          ];
+        }
+
+        setDaoTokens(parsedAndSortedTokens);
       }
-      const [names, symbols, decimals] = chunkedResults;
-
-      let parsedAndSortedTokens = erc20Tokens
-        .map((token, index) => ({
-          ...token,
-          name: names[index],
-          symbol: symbols[index],
-          decimals: decimals[index],
-        }))
-        .sort((a, b) => a.name.localeCompare(b.name));
-
-      // Add back Ether to token list
-      if (ethToken) {
-        ethToken = {
-          ...ethToken,
-          name: 'Ether',
-          symbol: 'ETH',
-          decimals: 18,
-        };
-
-        parsedAndSortedTokens.unshift(ethToken as TokenDetails);
-      }
-
-      setDaoTokens(parsedAndSortedTokens as TokenDetails[]);
     } catch (error) {
       console.error(error);
       setDaoTokens(undefined);
