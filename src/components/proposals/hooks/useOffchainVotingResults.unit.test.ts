@@ -98,24 +98,6 @@ describe('useOffchainVotingResults unit tests', () => {
           wrapper: Wrapper,
           initialProps: {
             getProps: ({mockWeb3Provider, web3Instance}) => {
-              /**
-               * @note We need to replace one of the mocked RPC responses in <Wrapper /> as there's a timing issue
-               *   with when `useOffchainVotingResults` runs and tries to use the aforementioned RPC mock response.
-               */
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [
-                    0,
-                    [
-                      web3Instance.utils.padLeft(DEFAULT_ETH_ADDRESS, 64),
-                      '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000164f6666636861696e566f74696e67436f6e747261637400000000000000000000',
-                    ],
-                  ]
-                ),
-                {abi: MulticallABI, abiMethodName: 'aggregate'}
-              );
-
               // Inject mocked result
               mockWeb3Provider.injectResult(
                 web3Instance.eth.abi.encodeParameters(
