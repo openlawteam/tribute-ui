@@ -1,9 +1,13 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {SnapshotType} from '@openlaw/snapshot-js-erc712';
+import {
+  SnapshotType,
+  SnapshotProposalData,
+  prepareVoteProposalData,
+} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
 import {useHistory} from 'react-router-dom';
-import {toBN, AbiItem, fromUtf8, toWei} from 'web3-utils';
+import {toBN, AbiItem, toWei} from 'web3-utils';
 
 import {ETH_TOKEN_ADDRESS, GUILD_ADDRESS, SHARES_ADDRESS} from '../../config';
 import {
@@ -379,6 +383,10 @@ export default function CreateTransferProposal() {
         throw new Error('No account found.');
       }
 
+      if (!web3Instance) {
+        throw new Error('No Web3 instance was found.');
+      }
+
       const {selectedToken, memberAddress, amount, notes} = values;
       const selectedTokenObj = JSON.parse(selectedToken);
       const {symbol, decimals, address: tokenAddress} = selectedTokenObj;
@@ -393,8 +401,10 @@ export default function CreateTransferProposal() {
         amountArg = amountWithDecimals.toString();
       }
 
-      // Maybe set proposal ID from previous attempt
+      // Maybe set proposal info from previous attempt
       let proposalId: string = proposalData?.uniqueId || '';
+      let data: SnapshotProposalData | undefined = proposalData?.data;
+      let signature: string = proposalData?.signature || '';
 
       const bodyIntro = isTypeSingleMember
         ? `Transfer to ${memberAddress}.`
@@ -404,9 +414,14 @@ export default function CreateTransferProposal() {
       if (!proposalId) {
         const body = notes ? `${bodyIntro}\n${notes}` : bodyIntro;
         const name = isTypeSingleMember ? memberAddress : 'All members.';
+        const now = Math.floor(Date.now() / 1000);
 
         // Sign and submit proposal for snapshot-hub
-        const {uniqueId} = await signAndSendProposal({
+        const {
+          uniqueId,
+          data: returnData,
+          signature: returnSignature,
+        } = await signAndSendProposal({
           partialProposalData: {
             name,
             body,
@@ -414,24 +429,52 @@ export default function CreateTransferProposal() {
               amountUnit: symbol,
               tokenDecimals: decimals,
             },
+            timestamp: now.toString(),
           },
           adapterName: ContractAdapterNames.distribute,
           type: SnapshotType.proposal,
         });
 
         proposalId = uniqueId;
+        data = returnData;
+        signature = returnSignature;
       }
 
       const memberAddressArg = isTypeSingleMember
         ? memberAddress
         : '0x0000000000000000000000000000000000000000'; //indicates distribution to all active members
+      /**
+       * Prepare `data` argument for submission to DAO
+       *
+       * For information about which data the smart contract needs for signature verification (e.g. `hashMessage`):
+       * @link https://github.com/openlawteam/laoland/blob/master/contracts/adapters/voting/OffchainVoting.sol
+       */
+      const preparedVoteVerificationBytes = data
+        ? prepareVoteProposalData(
+            {
+              payload: {
+                name: data.payload.name,
+                body: data.payload.body,
+                choices: data.payload.choices,
+                snapshot: data.payload.snapshot.toString(),
+                start: data.payload.start,
+                end: data.payload.end,
+              },
+              sig: signature,
+              space: data.space,
+              timestamp: parseInt(data.timestamp),
+            },
+            web3Instance
+          )
+        : '';
+
       const transferArguments: TransferArguments = [
         DaoRegistryContract.contractAddress,
         proposalId,
         memberAddressArg,
         tokenAddress,
         amountArg,
-        fromUtf8(bodyIntro),
+        preparedVoteVerificationBytes,
       ];
 
       const txArguments = {
