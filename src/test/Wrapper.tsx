@@ -20,7 +20,7 @@ import {
 import {CHAINS as mockChains} from '../config';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider, getNewStore} from './helpers';
 import Init, {InitError} from '../Init';
-import MulticallABI from '../truffle-contracts/Multicall.json';
+import IVotingABI from '../truffle-contracts/IVoting.json';
 
 export type WrapperReturnProps = {
   mockWeb3Provider: FakeHttpProvider;
@@ -146,28 +146,28 @@ export default function Wrapper(
     };
   }, [getExtensionAddressMock]);
 
+  useEffect(() => {}, [
+    mockWeb3Provider,
+    useInit,
+    web3Instance.eth.abi,
+    web3Instance.utils,
+  ]);
+
   useEffect(() => {
     /**
-     * Mock rpc response for voting contract multicall inside init
+     * Mock rpc response for voting contract name inside init
      * @note This should come first
      */
     if (useInit) {
       mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              web3Instance.utils.padLeft(DEFAULT_ETH_ADDRESS, 64),
-              '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000164f6666636861696e566f74696e67436f6e747261637400000000000000000000',
-            ],
-          ]
+        web3Instance.eth.abi.encodeParameter(
+          'string',
+          'OffchainVotingContract'
         ),
-        {abi: MulticallABI, abiMethodName: 'aggregate'}
+        {abi: IVotingABI, abiMethodName: 'getAdapterName'}
       );
     }
 
-    // Inject initial results for calls made via getConnectedMember
     if (useWallet) {
       mockWeb3Provider.injectResult(
         ...memberAddressesByDelegatedKey({web3Instance})
