@@ -1,7 +1,7 @@
 import {render, waitFor} from '@testing-library/react';
 
 import {StoreState} from '../../../store/types';
-import {VotingAdapterName} from '../../adpaters/enums';
+import {VotingAdapterName} from '../../adapters-extensions/enums';
 import Wrapper from '../../../test/Wrapper';
 
 describe('useInitContracts unit tests', () => {
