@@ -31,7 +31,7 @@ export default function ProposalDetails(props: ProposalDetailsProps) {
     <>
       <div className="proposaldetails__header">Proposal Details</div>
       <div className="proposaldetails">
-        {/* PROPOSAL NAME (address) AND BODY */}
+        {/* PROPOSAL NAME (an address in most cases) AND BODY */}
         <div className="proposaldetails__content">
           <h3>{truncateEthAddress(commonData.msg.payload.name || '', 7)}</h3>
 
