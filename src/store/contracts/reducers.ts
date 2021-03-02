@@ -1,21 +1,33 @@
 import {
+  CONTRACT_DAO_FACTORY,
   CONTRACT_BANK_EXTENSION,
   CONTRACT_DAO_REGISTRY,
+  CONTRACT_CONFIGURATION,
+  CONTRACT_FINANCING,
+  CONTRACT_GUILDKICK,
+  CONTRACT_RAGEQUIT,
   CONTRACT_MANAGING,
   CONTRACT_ONBOARDING,
   CONTRACT_TRIBUTE,
   CONTRACT_VOTING,
   CONTRACT_VOTING_OP_ROLLUP,
+  CONTRACT_WITHDRAW,
 } from '../actions';
 import {ContractsState} from '../types';
 
 const initialState = {
   BankExtensionContract: null,
+  ConfigurationContract: null,
+  DaoFactoryContract: null,
   DaoRegistryContract: null,
+  FinancingContract: null,
+  GuildBankContract: null,
   ManagingContract: null,
   OnboardingContract: null,
+  RagequitContract: null,
   TributeContract: null,
   VotingContract: null,
+  WithdrawContract: null,
 };
 
 export default function reducer(
@@ -25,10 +37,22 @@ export default function reducer(
   const {type, ...payload} = action;
 
   switch (type) {
-    case CONTRACT_BANK_EXTENSION:
-      return contractBankExtension(state, payload);
+    case CONTRACT_DAO_FACTORY:
+      return contractDAOFactory(state, payload);
     case CONTRACT_DAO_REGISTRY:
       return contractDAORegistry(state, payload);
+    case CONTRACT_BANK_EXTENSION:
+      return contractBankExtension(state, payload);
+    case CONTRACT_CONFIGURATION:
+      return contractConfiguration(state, payload);
+    case CONTRACT_FINANCING:
+      return contractFinancing(state, payload);
+    case CONTRACT_GUILDKICK:
+      return contractGuildBank(state, payload);
+    case CONTRACT_MANAGING:
+      return contractManaging(state, payload);
+    case CONTRACT_RAGEQUIT:
+      return contractRagequit(state, payload);
     case CONTRACT_ONBOARDING:
       return contractOnboarding(state, payload);
     case CONTRACT_TRIBUTE:
@@ -37,11 +61,19 @@ export default function reducer(
       return contractVoting(state, payload);
     case CONTRACT_VOTING_OP_ROLLUP:
       return contractVoting(state, payload);
-    case CONTRACT_MANAGING:
-      return contractManaging(state, payload);
+    case CONTRACT_WITHDRAW:
+      return contractWithdraw(state, payload);
     default:
       return state;
   }
+}
+
+function contractDAOFactory(state: ContractsState, payload: any) {
+  return {...state, DaoFactoryContract: {...payload}};
+}
+
+function contractDAORegistry(state: ContractsState, payload: any) {
+  return {...state, DaoRegistryContract: {...payload}};
 }
 
 function contractBankExtension(
@@ -51,18 +83,24 @@ function contractBankExtension(
   return {...state, BankExtensionContract: {...payload}};
 }
 
-function contractDAORegistry(
-  state: ContractsState,
-  payload: any
-): ContractsState {
-  return {...state, DaoRegistryContract: {...payload}};
+function contractConfiguration(state: ContractsState, payload: any) {
+  return {...state, ConfigurationContract: {...payload}};
 }
 
-function contractOnboarding(
-  state: ContractsState,
-  payload: any
-): ContractsState {
+function contractFinancing(state: ContractsState, payload: any) {
+  return {...state, FinancingContract: {...payload}};
+}
+
+function contractGuildBank(state: ContractsState, payload: any) {
+  return {...state, GuildBankContract: {...payload}};
+}
+
+function contractOnboarding(state: ContractsState, payload: any) {
   return {...state, OnboardingContract: {...payload}};
+}
+
+function contractRagequit(state: ContractsState, payload: any) {
+  return {...state, RagequitContract: {...payload}};
 }
 
 function contractTribute(state: ContractsState, payload: any): ContractsState {
@@ -75,4 +113,8 @@ function contractVoting(state: ContractsState, payload: any): ContractsState {
 
 function contractManaging(state: ContractsState, payload: any): ContractsState {
   return {...state, ManagingContract: {...payload}};
+}
+
+function contractWithdraw(state: ContractsState, payload: any): ContractsState {
+  return {...state, WithdrawContract: {...payload}};
 }

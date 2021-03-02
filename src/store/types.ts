@@ -3,15 +3,24 @@ import {ThunkDispatch} from 'redux-thunk';
 import {AbiItem} from 'web3-utils/types';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
 
-import {DaoConstants, VotingAdapterName} from '../components/adpaters/enums';
+import {
+  DaoConstants,
+  VotingAdapterName,
+} from '../components/adapters-extensions/enums';
 
 export type ContractsState = {
   BankExtensionContract: ContractsStateEntry | null;
+  ConfigurationContract: ContractsStateEntry | null;
+  DaoFactoryContract: ContractsStateEntry | null;
   DaoRegistryContract: ContractsStateEntry | null;
+  FinancingContract: ContractsStateEntry | null;
+  GuildBankContract: ContractsStateEntry | null;
   ManagingContract: ContractsStateEntry | null;
   OnboardingContract: ContractsStateEntry | null;
+  RagequitContract: ContractsStateEntry | null;
   TributeContract: ContractsStateEntry | null;
   VotingContract: ContractsStateEntry | null;
+  WithdrawContract: ContractsStateEntry | null;
 };
 
 export type ConnectedMemberState = {
@@ -35,9 +44,9 @@ export type ContractsStateEntry = {
    */
   abi: AbiItem[];
   /**
-   * (Optional) Adapter name, used for the Adapter Management
+   * (Optional) Adapter/extension name, used for the Adapter/Extension Management
    */
-  adapterName?: DaoConstants | VotingAdapterName;
+  adapterOrExtensionName?: DaoConstants | VotingAdapterName;
   /**
    * Address of the instantiated contract
    */

@@ -6,10 +6,11 @@
 export enum DaoConstants {
   BANK = 'bank',
   CONFIGURATION = 'configuration',
+  DISTRIBUTE = 'distribute',
   FINANCING = 'financing',
   GUILDKICK = 'guildkick',
   ONBOARDING = 'onboarding',
-  OFFCHAIN_VOTING = 'offchain-voting',
+  OFFCHAINVOTING = 'offchainvoting',
   MANAGING = 'managing',
   RAGEQUIT = 'ragequit',
   TRIBUTE = 'tribute',

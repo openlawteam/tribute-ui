@@ -6,28 +6,77 @@ import {
   ContractAdapterNames,
   ContractExtensionNames,
 } from '../../components/web3/types';
+import {
+  DEFAULT_CHAIN,
+  DAO_FACTORY_CONTRACT_ADDRESS,
+  DAO_REGISTRY_CONTRACT_ADDRESS,
+} from '../../config';
 import {ContractsStateEntry, StoreState} from '../types';
-import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../config';
-import {DaoConstants, VotingAdapterName} from '../../components/adpaters/enums';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
+import {
+  DaoConstants,
+  VotingAdapterName,
+} from '../../components/adapters-extensions/enums';
 
 type ContractAction =
-  | typeof CONTRACT_BANK_EXTENSION
+  | typeof CONTRACT_DAO_FACTORY
   | typeof CONTRACT_DAO_REGISTRY
+  | typeof CONTRACT_CONFIGURATION
+  | typeof CONTRACT_FINANCING
+  | typeof CONTRACT_GUILDKICK
   | typeof CONTRACT_MANAGING
-  | typeof CONTRACT_ONBOARDING
-  | typeof CONTRACT_TRIBUTE
+  | typeof CONTRACT_RAGEQUIT
   | typeof CONTRACT_VOTING
+  | typeof CONTRACT_VOTING_OP_ROLLUP
+  | typeof CONTRACT_ONBOARDING
+  | typeof CONTRACT_BANK_EXTENSION
+  | typeof CONTRACT_WITHDRAW
+  | typeof CONTRACT_TRIBUTE
   | typeof CONTRACT_VOTING_OP_ROLLUP;
 
 export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
-export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
-export const CONTRACT_MANAGING = 'CONTRACT_MANAGING';
-export const CONTRACT_ONBOARDING = 'CONTRACT_ONBOARDING';
-export const CONTRACT_TRIBUTE = 'CONTRACT_TRIBUTE';
-export const CONTRACT_VOTING = 'CONTRACT_VOTING';
 export const CONTRACT_VOTING_OP_ROLLUP = 'CONTRACT_VOTING_OP_ROLLUP';
+export const CONTRACT_DAO_FACTORY = 'CONTRACT_DAO_FACTORY';
+export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
+export const CONTRACT_CONFIGURATION = 'CONTRACT_CONFIGURATION';
+export const CONTRACT_FINANCING = 'CONTRACT_FINANCING';
+export const CONTRACT_GUILDKICK = 'CONTRACT_GUILDKICK';
+export const CONTRACT_MANAGING = 'CONTRACT_MANAGING';
+export const CONTRACT_RAGEQUIT = 'CONTRACT_RAGEQUIT';
+export const CONTRACT_VOTING = 'CONTRACT_VOTING';
+export const CONTRACT_ONBOARDING = 'CONTRACT_ONBOARDING';
+export const CONTRACT_WITHDRAW = 'CONTRACT_WITHDRAW';
+export const CONTRACT_TRIBUTE = 'CONTRACT_TRIBUTE';
+
+export function initContractDaoFactory(web3Instance: Web3) {
+  return async function (dispatch: Dispatch<any>) {
+    try {
+      if (web3Instance) {
+        const {default: lazyDaoFactoryABI} = await import(
+          '../../truffle-contracts/DaoFactory.json'
+        );
+        const daoFactoryContract: AbiItem[] = lazyDaoFactoryABI as any;
+        const contractAddress = DAO_FACTORY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+        const instance = new web3Instance.eth.Contract(
+          daoFactoryContract,
+          contractAddress
+        );
+
+        dispatch(
+          createContractAction({
+            type: CONTRACT_DAO_FACTORY,
+            abi: daoFactoryContract,
+            contractAddress,
+            instance,
+          })
+        );
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+}
 
 export function initContractDaoRegistry(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
@@ -107,10 +156,13 @@ export function initContractOnboarding(
   });
 }
 
-export function initContractBankExtension(
-  web3Instance: Web3,
-  contractAddress?: string
-) {
+export function initContractBankExtension(web3Instance: Web3) {
+  const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS;
+
+  if (!contractAddress) {
+    throw new Error('No DAO Registry contract address was found.');
+  }
+
   return initContractThunkFactory({
     actionType: CONTRACT_BANK_EXTENSION,
     adapterNameForRedux: DaoConstants.BANK,
@@ -146,6 +198,77 @@ export function initContractManaging(
     adapterOrExtensionName: ContractAdapterNames.managing,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/ManagingContract.json'),
+    web3Instance,
+  });
+}
+
+export function initContractWithdraw(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_WITHDRAW,
+    adapterNameForRedux: DaoConstants.WITHDRAW,
+    adapterOrExtensionName: ContractAdapterNames.withdraw,
+    contractAddress,
+    lazyImport: () => import('../../truffle-contracts/WithdrawContract.json'),
+    web3Instance,
+  });
+}
+
+export function initContractRagequit(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_RAGEQUIT,
+    adapterNameForRedux: DaoConstants.RAGEQUIT,
+    adapterOrExtensionName: ContractAdapterNames.ragequit,
+    contractAddress,
+    lazyImport: () => import('../../truffle-contracts/RagequitContract.json'),
+    web3Instance,
+  });
+}
+
+export function initContractGuildKick(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_GUILDKICK,
+    adapterNameForRedux: DaoConstants.GUILDKICK,
+    adapterOrExtensionName: ContractAdapterNames.guildkick,
+    contractAddress,
+    lazyImport: () => import('../../truffle-contracts/GuildKickContract.json'),
+    web3Instance,
+  });
+}
+
+export function initContractFinancing(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_FINANCING,
+    adapterNameForRedux: DaoConstants.FINANCING,
+    adapterOrExtensionName: ContractAdapterNames.financing,
+    contractAddress,
+    lazyImport: () => import('../../truffle-contracts/FinancingContract.json'),
+    web3Instance,
+  });
+}
+
+export function initContractConfiguration(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_CONFIGURATION,
+    adapterNameForRedux: DaoConstants.CONFIGURATION,
+    adapterOrExtensionName: ContractAdapterNames.configuration,
+    contractAddress,
+    lazyImport: () =>
+      import('../../truffle-contracts/ConfigurationContract.json'),
     web3Instance,
   });
 }
@@ -249,9 +372,9 @@ export function initContractThunkFactory({
   actionType: ContractAction;
   adapterOrExtensionName: ContractAdapterNames | ContractExtensionNames;
   /**
-   * The name to be shown in Redux state as `adapterName`.
+   * The name to be shown in Redux state as `adapterOrExtensionName`.
    */
-  adapterNameForRedux?: ContractsStateEntry['adapterName'];
+  adapterNameForRedux?: ContractsStateEntry['adapterOrExtensionName'];
   contractAddress?: string;
   /**
    * If set to `true` an Extenion address will be searched for instead of an Adapter.
@@ -289,7 +412,7 @@ export function initContractThunkFactory({
           type: actionType,
           abi: contractABI,
           contractAddress: address,
-          adapterName: adapterNameForRedux,
+          adapterOrExtensionName: adapterNameForRedux,
           instance: new web3Instance.eth.Contract(contractABI, address),
         })
       );

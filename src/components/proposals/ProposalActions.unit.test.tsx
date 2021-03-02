@@ -80,7 +80,7 @@ describe('ProposalActions component unit tests', () => {
             createContractAction({
               type: CONTRACT_VOTING_OP_ROLLUP,
               abi: [],
-              adapterName: 'CrappyVotingAdapterName' as any,
+              adapterOrExtensionName: 'CrappyVotingAdapterName' as any,
               contractAddress: '',
               instance: {} as any,
             })

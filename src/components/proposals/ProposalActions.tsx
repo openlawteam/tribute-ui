@@ -5,7 +5,7 @@ import {ContractAdapterNames} from '../web3/types';
 import {CycleEllipsis} from '../feedback';
 import {ProposalData} from './types';
 import {StoreState} from '../../store/types';
-import {VotingAdapterName} from '../adpaters/enums';
+import {VotingAdapterName} from '../adapters-extensions/enums';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 
 type ProposalActionsProps = {
@@ -33,7 +33,7 @@ export default function ProposalActions(
   const {adapterName, proposal} = props;
 
   const votingAdapterName = useSelector(
-    (s: StoreState) => s.contracts.VotingContract?.adapterName
+    (s: StoreState) => s.contracts.VotingContract?.adapterOrExtensionName
   );
 
   function renderActions() {

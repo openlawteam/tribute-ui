@@ -19,7 +19,10 @@
 @use "./membercard"; /* member card styles */
 @use "./memberprofile"; /* member profile styles */
 @use "./landing"; /* landing styles */
+@use "./adapterextension"; /* adapter/extension manager styles */
+@use "./checkbox"; /* checkbox styles */
 @use "./cube"; /* Moloch v3 cube styles */
+@use "./radiolist"; /* radiolist styles */
 
 html {
   height: 100%;

@@ -8,6 +8,7 @@ type ModalProps = {
   isOpen: boolean;
   isOpenHandler: (isOpen: boolean) => void;
   keyProp: string;
+  modalClassNames?: string;
   styleProps?: Record<string, string>;
 };
 
@@ -16,13 +17,14 @@ export default function Modal({
   keyProp,
   isOpen,
   styleProps,
+  modalClassNames,
   isOpenHandler,
 }: ModalProps) {
   return (
     <ReactModal
       key={keyProp}
       ariaHideApp={false}
-      className="modal-container"
+      className={`modal-container ${modalClassNames}`}
       isOpen={isOpen}
       onRequestClose={() => {
         isOpenHandler(isOpen);

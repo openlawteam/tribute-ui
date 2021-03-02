@@ -1,0 +1,37 @@
+@use "./variables" as *; /* load without namespace for convenience */
+
+.radiolist-label {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: 1.125rem;
+  margin-top: 1rem;
+}
+
+.radiolist-input[type="radio"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: black;
+  border-radius: 1.25rem;
+  border: none;
+  box-shadow: $color-litesmoke 0px 0px 0px 2px inset;
+  cursor: pointer;
+  display: inline-block;
+  height: 1.25rem;
+  margin: 0 0.5rem 0 0;
+  outline: none;
+  padding: 0;
+  width: 1.25rem;
+
+  &:hover {
+    box-shadow: white 0px 0px 0px 2px inset;
+    transition: box-shadow 0.25s ease;
+  }
+
+  &:checked {
+    box-shadow: $color-babyblue 0px 0px 0px 7px inset;
+    border: none;
+    transition: box-shadow 0.25s ease;
+  }
+}

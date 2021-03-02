@@ -2,12 +2,18 @@ import {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
 
 import {
+  initContractDaoFactory,
   initContractBankExtension,
   initContractDaoRegistry,
   initContractManaging,
   initContractOnboarding,
+  initContractConfiguration,
+  initContractFinancing,
+  initContractGuildKick,
+  initContractRagequit,
   initContractTribute,
   initRegisteredVotingAdapter,
+  initContractWithdraw,
 } from '../../../store/actions';
 import {ReduxDispatch} from '../../../store/types';
 import {useIsDefaultChain} from './useIsDefaultChain';
@@ -45,10 +51,6 @@ export function useInitContracts(): () => Promise<void> {
   ]);
 
   /**
-   * Functions
-   */
-
-  /**
    * Init contracts
    */
   async function initContracts() {
@@ -58,6 +60,14 @@ export function useInitContracts(): () => Promise<void> {
       // Must init registry first
       await dispatch(initContractDaoRegistry(web3Instance));
 
+      // Init more contracts
+      await dispatch(initContractDaoFactory(web3Instance));
+      await dispatch(initContractConfiguration(web3Instance));
+      await dispatch(initContractFinancing(web3Instance));
+      await dispatch(initContractGuildKick(web3Instance));
+      await dispatch(initContractManaging(web3Instance));
+      await dispatch(initContractRagequit(web3Instance));
+      await dispatch(initContractWithdraw(web3Instance));
       // Init other contracts
       await dispatch(initContractBankExtension(web3Instance));
       await dispatch(initContractManaging(web3Instance));
