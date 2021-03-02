@@ -113,7 +113,7 @@ export default function CreateMembershipProposal() {
    * Variables
    */
 
-  const {errors, getValues, setValue, register, triggerValidation} = form;
+  const {errors, getValues, setValue, register, trigger} = form;
 
   const createMemberError = submitError || txError;
   const isConnected = connected && account;
@@ -407,7 +407,7 @@ export default function CreateMembershipProposal() {
           onClick={async () => {
             if (isInProcessOrDone) return;
 
-            if (!(await triggerValidation())) {
+            if (!(await trigger())) {
               return;
             }
 
