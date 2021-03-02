@@ -21,8 +21,6 @@ describe('getAdapterAddressFromContracts unit tests', () => {
     // Wait for contracts to load
     await waitFor(() => {
       Object.keys(store.getState().contracts).forEach((c) => {
-        console.log('c', store.getState().contracts[c] === null && c);
-
         expect(store.getState().contracts[c]).not.toBeUndefined();
         expect(store.getState().contracts[c]).not.toBeNull();
       });
