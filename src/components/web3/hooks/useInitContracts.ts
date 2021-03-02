@@ -59,8 +59,6 @@ export function useInitContracts(): () => Promise<void> {
 
       // Must init registry first
       await dispatch(initContractDaoRegistry(web3Instance));
-      // Must be init before voting
-      await dispatch(initContractManaging(web3Instance));
 
       // Init more contracts
       await dispatch(initContractDaoFactory(web3Instance));
@@ -71,10 +69,11 @@ export function useInitContracts(): () => Promise<void> {
       await dispatch(initContractRagequit(web3Instance));
       await dispatch(initContractWithdraw(web3Instance));
       // Init other contracts
-      await dispatch(initRegisteredVotingAdapter(web3Instance));
-      await dispatch(initContractOnboarding(web3Instance));
       await dispatch(initContractBankExtension(web3Instance));
+      await dispatch(initContractManaging(web3Instance));
+      await dispatch(initContractOnboarding(web3Instance));
       await dispatch(initContractTribute(web3Instance));
+      await dispatch(initRegisteredVotingAdapter(web3Instance));
     } catch (error) {
       throw error;
     }

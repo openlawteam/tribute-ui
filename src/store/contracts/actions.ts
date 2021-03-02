@@ -12,7 +12,7 @@ import {
   DAO_REGISTRY_CONTRACT_ADDRESS,
 } from '../../config';
 import {ContractsStateEntry, StoreState} from '../types';
-import {getAdapterAddress, multicall} from '../../components/web3/helpers';
+import {getAdapterAddress} from '../../components/web3/helpers';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
 import {
   DaoConstants,
@@ -290,7 +290,9 @@ export function initRegisteredVotingAdapter(
     try {
       if (web3Instance) {
         const daoRegistryContract = getState().contracts.DaoRegistryContract;
-        const managingContract = getState().contracts.ManagingContract;
+        const {default: lazyIVotingABI} = await import(
+          '../../truffle-contracts/IVoting.json'
+        );
 
         if (!daoRegistryContract) {
           console.warn(
@@ -299,55 +301,28 @@ export function initRegisteredVotingAdapter(
           return;
         }
 
-        if (!managingContract) {
-          console.warn(
-            'Please init the Managing contract before the voting contract.'
-          );
-          return;
-        }
-
         let votingAdapterName: string = '';
         let address: string = contractAddress || '';
 
-        if (address) {
-          votingAdapterName = await managingContract.instance.methods
-            .getVotingAdapterName(daoRegistryContract.contractAddress)
+        const getVotingAdapterName = async (a: string) =>
+          await new web3Instance.eth.Contract(
+            lazyIVotingABI as AbiItem[],
+            a
+          ).methods
+            .getAdapterName()
             .call();
+
+        if (address) {
+          votingAdapterName = await getVotingAdapterName(address);
         }
 
         if (!address && !votingAdapterName) {
-          const [getAdapterAddressABIItem] = daoRegistryContract.abi.filter(
-            (item) => item.name === 'getAdapterAddress'
-          );
-          const [getVotingAdapterNameABIItem] = managingContract.abi.filter(
-            (item) => item.name === 'getVotingAdapterName'
+          address = await getAdapterAddress(
+            ContractAdapterNames.voting,
+            getState().contracts.DaoRegistryContract?.instance
           );
 
-          // Handle potential multicall error
-          try {
-            const [addressResult, votingAdapterNameResult] = await multicall({
-              calls: [
-                [
-                  daoRegistryContract.contractAddress,
-                  getAdapterAddressABIItem,
-                  [Web3.utils.sha3(ContractAdapterNames.voting) || ''],
-                ],
-                [
-                  managingContract.contractAddress,
-                  getVotingAdapterNameABIItem,
-                  [daoRegistryContract.contractAddress],
-                ],
-              ],
-              web3Instance,
-            });
-
-            address = addressResult;
-            votingAdapterName = votingAdapterNameResult;
-          } catch (error) {
-            throw new Error(
-              `The voting contract could not be found in the DAO. Are you sure you meant to add this contract's ABI?`
-            );
-          }
+          votingAdapterName = await getVotingAdapterName(address);
         }
 
         /**
@@ -370,7 +345,9 @@ export function initRegisteredVotingAdapter(
         }
       }
     } catch (error) {
-      console.warn(error);
+      console.warn(
+        `The voting contract could not be found in the DAO. Are you sure you meant to add this contract's ABI?`
+      );
     }
   };
 }
