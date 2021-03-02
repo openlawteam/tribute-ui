@@ -14,7 +14,6 @@ export type ContractsState = {
   ConfigurationContract: ContractsStateEntry | null;
   FinancingContract: ContractsStateEntry | null;
   GuildBankContract: ContractsStateEntry | null;
-  OffchainVotingContract: ContractsStateEntry | null;
   NonVotingOnboadingContract: ContractsStateEntry | null;
   ManagingContract: ContractsStateEntry | null;
   RagequitContract: ContractsStateEntry | null;
