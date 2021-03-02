@@ -10,3 +10,5 @@ export const DEFAULT_DRAFT_HASH: string =
 export const DEFAULT_SIG: string =
   '0x042bfdd90cddaf67978fe3e3294f1c1aad017a06dde072c02ad1549914b8bf8e316c1addbad510247d2e5175006c272632a3b79120898482cf5e0187a1283b811b';
 export const DEFAULT_DAO_NAME: string = 'test-dao';
+export const DEFAULT_ADAPTER_OR_EXTENSION_ID: string =
+  '0x86e4d415f8203aaabba34505e3ceb7b05f5255120bc6ae19dd5f4823ce4e1fb9';
