@@ -156,13 +156,10 @@ export function initContractOnboarding(
   });
 }
 
-export function initContractBankExtension(web3Instance: Web3) {
-  const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS;
-
-  if (!contractAddress) {
-    throw new Error('No DAO Registry contract address was found.');
-  }
-
+export function initContractBankExtension(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
   return initContractThunkFactory({
     actionType: CONTRACT_BANK_EXTENSION,
     adapterNameForRedux: DaoConstants.BANK,
