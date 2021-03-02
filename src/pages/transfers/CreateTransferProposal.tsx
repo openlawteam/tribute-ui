@@ -138,7 +138,6 @@ export default function CreateTransferProposal() {
 
   const {
     errors,
-    formState,
     getValues,
     setValue,
     register,
@@ -152,12 +151,6 @@ export default function CreateTransferProposal() {
   const createTransferError = submitError || txError;
   const isConnected = connected && account;
   const erc20ABI: AbiItem[] = ERC20ABI as any;
-
-  /**
-   * @note From the docs: "Read the formState before render to subscribe the form state through Proxy"
-   * @see https://react-hook-form.com/api#formState
-   */
-  const {isValid} = formState;
 
   const isInProcess =
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
@@ -765,11 +758,10 @@ export default function CreateTransferProposal() {
         <button
           className="button"
           disabled={isInProcessOrDone}
-          onClick={() => {
+          onClick={async () => {
             if (isInProcessOrDone) return;
 
-            if (!isValid) {
-              triggerValidation();
+            if (!(await triggerValidation())) {
               return;
             }
 
