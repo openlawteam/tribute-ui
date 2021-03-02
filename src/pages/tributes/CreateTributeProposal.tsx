@@ -136,14 +136,7 @@ export default function CreateTributeProposal() {
    * Variables
    */
 
-  const {
-    errors,
-    getValues,
-    setValue,
-    register,
-    triggerValidation,
-    watch,
-  } = form;
+  const {errors, getValues, setValue, register, trigger, watch} = form;
   const erc20AddressValue = watch('erc20Address');
 
   const createTributeError = submitError || txError || txErrorTokenApprove;
@@ -715,7 +708,7 @@ export default function CreateTributeProposal() {
           onClick={async () => {
             if (isInProcessOrDone) return;
 
-            if (!(await triggerValidation())) {
+            if (!(await trigger())) {
               return;
             }
 
