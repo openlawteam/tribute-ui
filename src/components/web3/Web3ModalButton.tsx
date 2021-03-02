@@ -144,8 +144,7 @@ function ConnectWallet({
           {account && (
             <button
               className="walletconnect__connected-address-button"
-              onClick={handleNavigate}
-              disabled={isChainGanache}>
+              onClick={handleNavigate}>
               {isMobile ? truncateEthAddress(account) : account}
             </button>
           )}
