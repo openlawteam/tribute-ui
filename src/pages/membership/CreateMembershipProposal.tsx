@@ -27,11 +27,11 @@ import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import CycleMessage from '../../components/feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
+import EtherscanURL from '../../components/web3/EtherscanURL';
 import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
 import Wrap from '../../components/common/Wrap';
-import EtherscanURL from '../../components/web3/EtherscanURL';
 
 enum Fields {
   ethAddress = 'ethAddress',
@@ -320,12 +320,15 @@ export default function CreateMembershipProposal() {
       <form className="form" onSubmit={(e) => e.preventDefault()}>
         {/* ETH ADDRESS */}
         <div className="form__input-row">
-          <label className="form__input-row-label">Applicant Address</label>
+          <label className="form__input-row-label" htmlFor={Fields.ethAddress}>
+            Applicant Address
+          </label>
           <div className="form__input-row-fieldwrap">
             {/* @note We don't need the default value as it's handled in the useEffect above. */}
             <input
               aria-describedby={`error-${Fields.ethAddress}`}
               aria-invalid={errors.ethAddress ? 'true' : 'false'}
+              id={Fields.ethAddress}
               name={Fields.ethAddress}
               ref={register({
                 validate: (ethAddress: string): string | boolean => {
@@ -349,13 +352,16 @@ export default function CreateMembershipProposal() {
 
         {/* ETH AMOUNT */}
         <div className="form__input-row">
-          <label className="form__input-row-label">Amount</label>
+          <label className="form__input-row-label" htmlFor={Fields.ethAmount}>
+            Amount
+          </label>
           <div className="form__input-row-fieldwrap--narrow">
             <div className="input__suffix-wrap">
               <input
                 className="input__suffix"
                 aria-describedby={`error-${Fields.ethAmount}`}
                 aria-invalid={errors.ethAmount ? 'true' : 'false'}
+                id={Fields.ethAmount}
                 name={Fields.ethAmount}
                 onChange={() =>
                   setValue(
