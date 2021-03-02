@@ -9,16 +9,15 @@ import {
 } from '../components/adapters-extensions/enums';
 
 export type ContractsState = {
+  BankExtensionContract: ContractsStateEntry | null;
+  ConfigurationContract: ContractsStateEntry | null;
   DaoFactoryContract: ContractsStateEntry | null;
   DaoRegistryContract: ContractsStateEntry | null;
-  ConfigurationContract: ContractsStateEntry | null;
   FinancingContract: ContractsStateEntry | null;
   GuildBankContract: ContractsStateEntry | null;
-  NonVotingOnboadingContract: ContractsStateEntry | null;
   ManagingContract: ContractsStateEntry | null;
-  RagequitContract: ContractsStateEntry | null;
-  BankExtensionContract: ContractsStateEntry | null;
   OnboardingContract: ContractsStateEntry | null;
+  RagequitContract: ContractsStateEntry | null;
   TributeContract: ContractsStateEntry | null;
   VotingContract: ContractsStateEntry | null;
   WithdrawContract: ContractsStateEntry | null;

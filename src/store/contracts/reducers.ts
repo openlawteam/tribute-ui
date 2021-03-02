@@ -5,7 +5,6 @@ import {
   CONTRACT_CONFIGURATION,
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
-  CONTRACT_NONVOTING_ONBOARDING,
   CONTRACT_RAGEQUIT,
   CONTRACT_MANAGING,
   CONTRACT_ONBOARDING,
@@ -17,15 +16,14 @@ import {
 import {ContractsState} from '../types';
 
 const initialState = {
+  BankExtensionContract: null,
+  ConfigurationContract: null,
   DaoFactoryContract: null,
   DaoRegistryContract: null,
-  ConfigurationContract: null,
   FinancingContract: null,
   GuildBankContract: null,
-  BankExtensionContract: null,
-  OnboardingContract: null,
-  NonVotingOnboadingContract: null,
   ManagingContract: null,
+  OnboardingContract: null,
   RagequitContract: null,
   TributeContract: null,
   VotingContract: null,
@@ -51,8 +49,6 @@ export default function reducer(
       return contractFinancing(state, payload);
     case CONTRACT_GUILDKICK:
       return contractGuildBank(state, payload);
-    case CONTRACT_NONVOTING_ONBOARDING:
-      return contractNonVotingOnboarding(state, payload);
     case CONTRACT_MANAGING:
       return contractManaging(state, payload);
     case CONTRACT_RAGEQUIT:
@@ -101,10 +97,6 @@ function contractGuildBank(state: ContractsState, payload: any) {
 
 function contractOnboarding(state: ContractsState, payload: any) {
   return {...state, OnboardingContract: {...payload}};
-}
-
-function contractNonVotingOnboarding(state: ContractsState, payload: any) {
-  return {...state, NonVotingOnboadingContract: {...payload}};
 }
 
 function contractRagequit(state: ContractsState, payload: any) {

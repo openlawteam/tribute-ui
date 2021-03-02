@@ -22,6 +22,8 @@ describe('getContractByAddress unit tests', () => {
       Object.keys(store.getState().contracts).forEach((c) => {
         const contract = store.getState().contracts[c];
 
+        console.log('contract', contract === null && c);
+
         expect(contract).not.toBeUndefined();
         expect(contract).not.toBeNull();
       });
