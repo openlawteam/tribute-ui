@@ -145,7 +145,7 @@ export default function CreateTransferProposal() {
     watch,
   } = form;
   const typeValue = watch('type');
-  const isTypeSingleMember = typeValue === 'single member';
+  const isTypeAllMembers = typeValue === 'all members';
   const selectedTokenValue = watch('selectedToken');
 
   const createTransferError = submitError || txError;
@@ -399,14 +399,14 @@ export default function CreateTransferProposal() {
       let data: SnapshotProposalData | undefined = proposalData?.data;
       let signature: string = proposalData?.signature || '';
 
-      const bodyIntro = isTypeSingleMember
-        ? `Transfer to ${memberAddress}.`
-        : 'Transfer to all members pro rata.';
+      const bodyIntro = isTypeAllMembers
+        ? 'Transfer to all members pro rata.'
+        : `Transfer to ${memberAddress}.`;
 
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
         const body = notes ? `${bodyIntro}\n${notes}` : bodyIntro;
-        const name = isTypeSingleMember ? memberAddress : 'All members.';
+        const name = isTypeAllMembers ? 'All members' : memberAddress;
         const now = Math.floor(Date.now() / 1000);
 
         // Sign and submit proposal for snapshot-hub
@@ -421,6 +421,7 @@ export default function CreateTransferProposal() {
             metadata: {
               amountUnit: symbol,
               tokenDecimals: decimals,
+              isTypeAllMembers,
             },
             timestamp: now.toString(),
           },
@@ -433,9 +434,9 @@ export default function CreateTransferProposal() {
         signature = returnSignature;
       }
 
-      const memberAddressArg = isTypeSingleMember
-        ? memberAddress
-        : '0x0000000000000000000000000000000000000000'; //indicates distribution to all active members
+      const memberAddressArg = isTypeAllMembers
+        ? '0x0000000000000000000000000000000000000000' //indicates distribution to all active members
+        : memberAddress;
       /**
        * Prepare `data` argument for submission to DAO
        *
@@ -606,7 +607,7 @@ export default function CreateTransferProposal() {
         </div>
 
         {/* MEMBER ADDRESS */}
-        {isTypeSingleMember && (
+        {!isTypeAllMembers && (
           <div className="form__input-row">
             <label className="form__input-row-label">Member Address</label>
             <div className="form__input-row-fieldwrap">
@@ -727,9 +728,9 @@ export default function CreateTransferProposal() {
             />
 
             <div className="form__input-description">
-              {isTypeSingleMember
-                ? "If the proposal passes, this amount will be distributed to the member's internal account."
-                : "If the proposal passes, this total amount will be distributed pro rata to all members' internal accounts, based on the current number of shares held by each member."}
+              {isTypeAllMembers
+                ? "If the proposal passes, this total amount will be distributed pro rata to all members' internal accounts, based on the current number of shares held by each member."
+                : "If the proposal passes, this amount will be distributed to the member's internal account."}
             </div>
           </div>
 
