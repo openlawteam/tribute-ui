@@ -41,6 +41,7 @@ export function useProposalWithOffchainVoteStatus(
 ): UseProposalWithOffchainVoteStatusReturn {
   const {snapshotDraft, snapshotProposal} = proposal;
   const proposalId = snapshotDraft?.idInDAO || snapshotProposal?.idInDAO;
+  console.log({proposalId});
 
   /**
    * Selectors
@@ -213,6 +214,7 @@ export function useProposalWithOffchainVoteStatus(
         calls,
         web3Instance,
       });
+      console.log({proposal, votes, voteResult});
 
       setDAOProposal(proposal);
       setDAOProposalVotes(votes);
