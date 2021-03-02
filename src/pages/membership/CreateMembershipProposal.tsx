@@ -113,23 +113,10 @@ export default function CreateMembershipProposal() {
    * Variables
    */
 
-  const {
-    errors,
-    formState,
-    getValues,
-    setValue,
-    register,
-    triggerValidation,
-  } = form;
+  const {errors, getValues, setValue, register, triggerValidation} = form;
 
   const createMemberError = submitError || txError;
   const isConnected = connected && account;
-
-  /**
-   * @note From the docs: "Read the formState before render to subscribe the form state through Proxy"
-   * @see https://react-hook-form.com/api#formState
-   */
-  const {isValid} = formState;
 
   const isInProcess =
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
@@ -420,11 +407,10 @@ export default function CreateMembershipProposal() {
         <button
           className="button"
           disabled={isInProcessOrDone}
-          onClick={() => {
+          onClick={async () => {
             if (isInProcessOrDone) return;
 
-            if (!isValid) {
-              triggerValidation();
+            if (!(await triggerValidation())) {
               return;
             }
 
