@@ -1,12 +1,12 @@
 import {renderHook, act} from '@testing-library/react-hooks';
+import {waitFor} from '@testing-library/react';
+import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {DEFAULT_ETH_ADDRESS} from '../../../test/helpers';
-import {useSignAndSendVote} from '.';
-import {VoteChoices} from '@openlaw/snapshot-js-erc712';
-import Wrapper from '../../../test/Wrapper';
-import {waitFor} from '@testing-library/react';
 import {signTypedDataV4} from '../../../test/web3Responses';
+import {useSignAndSendVote} from '.';
+import Wrapper from '../../../test/Wrapper';
 
 describe('useSignAndSendVote unit tests', () => {
   test('should return correct data when calling signAndSendVote', async () => {
