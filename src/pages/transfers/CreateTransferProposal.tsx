@@ -136,14 +136,7 @@ export default function CreateTransferProposal() {
    * Variables
    */
 
-  const {
-    errors,
-    getValues,
-    setValue,
-    register,
-    triggerValidation,
-    watch,
-  } = form;
+  const {errors, getValues, setValue, register, trigger, watch} = form;
   const typeValue = watch('type');
   const isTypeAllMembers = typeValue === 'all members';
   const selectedTokenValue = watch('selectedToken');
@@ -762,7 +755,7 @@ export default function CreateTransferProposal() {
           onClick={async () => {
             if (isInProcessOrDone) return;
 
-            if (!(await triggerValidation())) {
+            if (!(await trigger())) {
               return;
             }
 
