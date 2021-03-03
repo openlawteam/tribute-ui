@@ -408,6 +408,7 @@ export default function CreateMembershipProposal() {
 
         {/* SUBMIT */}
         <button
+          aria-label={isInProcess ? 'Submitting your proposal.' : ''}
           className="button"
           disabled={isInProcessOrDone}
           onClick={async () => {
