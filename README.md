@@ -43,22 +43,21 @@ Clone the https://github.com/openlawteam/molochv3-contracts repo and from the ro
 ### Running ganache-cli
 
 In a new terminal tab, `ganache-cli --port 7545 --networkId 1337 --blockTime 10`.
-Then deploying the contracts to local ganache instance `truffle deploy --network=ganache`
+Then deploy the contracts to the local ganache instance `truffle deploy --network=ganache`
 
 ### Running IPFS (version 0.4.18)
 
-If you already have a version of IPFS on your machine, check the version `ipfs version`. It needs to be version 0.4.18 to work with the graph-node. If you have an old or newer version you’ll need to migrate your IPFS repo to version 7.
+If you already have a version of IPFS on your machine, check the version `ipfs version`. As per the recommendation from The Graph guys, you need version 0.4.18 of IPFS and version 7 of the IPFS repo to work with the local graph-node. If you have an old or newer version you’ll need to migrate your IPFS repo to version 7.
 
-#### Installing version 0.4.18
+#### Installing version 0.4.18 (IPFS)
 
-As per the recommendation from The Graph guys, you need version 0.4.18.
 Get it from https://dist.ipfs.io/#go-ipfs or alternatively use this download link: https://dist.ipfs.io/go-ipfs/v0.4.18/go-ipfs_v0.4.18_darwin-amd64.tar.gz
 
 Unzip it… `tar -xvzf go-ipfs_v0.4.18_darwin-amd64.tar.gz`
 
 Then follow these instructions for your OS https://docs.ipfs.io/install/command-line/#official-distributions from step 3.
 
-#### Down/upgrading to version 0.4.18
+#### Down/upgrading to version 7 (IPFS repo)
 
 You will need to migrate the IPFS repo version 7… do that by downloading the migration-repo from here https://dist.ipfs.io/#fs-repo-migrations and then unzipping…
 Alternately, download from this direct link https://dist.ipfs.io/fs-repo-migrations/v1.7.1/fs-repo-migrations_v1.7.1_darwin-amd64.tar.gz
@@ -68,12 +67,17 @@ tar -xvzf fs-repo-migrations_v1.7.1_darwin-amd64.tar.gz
 cd fs-repo-migrations
 ./fs-repo-migrations -to 7 --revert-ok
 ```
+### Start IPFS
 
-Downgrade to repo migration 7!! Useful https://github.com/ipfs/fs-repo-migrations/issues/120
+After re/installing IPFS and its repo, start the service by running `ipfs init` followed by `ipfs daemon`
+
+### Start the PostgreSQL database
+
+Install PostgreSQL and run `initdb -D .postgres` followed by `pg_ctl -D .postgres -l logfile start` and `createdb graph-node`
 
 ### Start the graph-node
 
-Make sure you have cargo installed, if not following the instructions here to install it https://doc.rust-lang.org/cargo/getting-started/installation.html
+Make sure you have cargo installed, if not follow the instructions here to install it https://doc.rust-lang.org/cargo/getting-started/installation.html
 
 Then:
 
@@ -85,14 +89,13 @@ Then:
 
 ```
 
-Deploy subgraph to the local graph-node:
+Deploy the subgraph to the local graph-node:
 
 - Don’t forget to update the `BankFactory` and `DaoFactory` contract addresses in `subgraph.yaml` before deploying
 
   `graph create-local`
   `graph deploy-local`
 
-✔ Upload subgraph to IPFS
 
 ### Troubleshooting
 
