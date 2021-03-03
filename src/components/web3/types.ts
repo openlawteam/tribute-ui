@@ -9,12 +9,13 @@
  */
 
 /**
- * Should match laoland constants
+ * Should match molochv3-contracts constants
  *
  * @todo Add other extensions as needs arise
  */
 export enum ContractAdapterNames {
   configuration = 'configuration',
+  distribute = 'distribute',
   financing = 'financing',
   guildkick = 'guildkick',
   managing = 'managing',
@@ -26,7 +27,7 @@ export enum ContractAdapterNames {
 }
 
 /**
- * Should match laoland constants
+ * Should match molochv3-contracts constants
  *
  * @todo Add other extensions as needs arise
  */
@@ -35,7 +36,7 @@ export enum ContractExtensionNames {
 }
 
 /**
- * Should match laoland constants
+ * Should match molochv3-contracts constants
  *
  * @todo Add other extensions as needs arise
  */

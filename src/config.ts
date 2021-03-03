@@ -73,7 +73,7 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
 
 /**
  * CORE CONTRACTS
- * @note as per https://github.com/openlawteam/laoland#architecture
+ * @note as per https://github.com/openlawteam/molochv3-contracts#architecture
  *
  * - DAO Registry (@note uses dao address for the contract address)
  * - DAO Factory
@@ -103,7 +103,7 @@ export const BANK_EXTENSION_CONTRACT_ADDRESS = {
 
 /**
  * ADAPTER CONTRACTS
- * @note as per https://github.com/openlawteam/laoland#architecture
+ * @note as per https://github.com/openlawteam/molochv3-contracts#architecture
  *
  * - Configuration
  * - CouponOnboardingContract @todo add to initContracts
@@ -244,7 +244,7 @@ export const DEFAULT_CHAIN =
  *
  * @todo Remove and get from the chain/subgraph?
  *
- * @see https://github.com/openlawteam/laoland/blob/9e0e03616a00e41e666351e146ee109b9fe37fb2/utils/DaoFactory.js
+ * @see https://github.com/openlawteam/molochv3-contracts/blob/9e0e03616a00e41e666351e146ee109b9fe37fb2/utils/DaoFactory.js
  */
 export const GUILD_ADDRESS: string =
   '0x000000000000000000000000000000000000dead';

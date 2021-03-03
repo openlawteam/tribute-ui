@@ -1,5 +1,5 @@
 /**
- * @see `IVoting.sol` in laoland
+ * @see `IVoting.sol` in molochv3-contracts
  */
 export enum VotingState {
   NOT_STARTED,

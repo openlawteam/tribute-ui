@@ -5,6 +5,7 @@ import {
   initContractDaoFactory,
   initContractBankExtension,
   initContractDaoRegistry,
+  initContractDistribute,
   initContractManaging,
   initContractOnboarding,
   initContractConfiguration,
@@ -73,6 +74,7 @@ export function useInitContracts(): () => Promise<void> {
       await dispatch(initContractManaging(web3Instance));
       await dispatch(initContractOnboarding(web3Instance));
       await dispatch(initContractTribute(web3Instance));
+      await dispatch(initContractDistribute(web3Instance));
       await dispatch(initRegisteredVotingAdapter(web3Instance));
     } catch (error) {
       throw error;

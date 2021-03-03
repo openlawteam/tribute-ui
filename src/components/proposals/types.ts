@@ -18,9 +18,9 @@ import {
  *
  * @note Order matters
  *
- * @see `ProposalFlag` in laoland `DaoRegistry.sol`
- * @see `getFlag` in laoland `DaoConstants.sol`
- * @see `setFlag` in laoland `DaoConstants.sol`
+ * @see `ProposalFlag` in molochv3-contracts `DaoRegistry.sol`
+ * @see `getFlag` in molochv3-contracts `DaoConstants.sol`
+ * @see `setFlag` in molochv3-contracts `DaoConstants.sol`
  */
 export enum ProposalFlag {
   EXISTS = 1,
@@ -37,6 +37,16 @@ export enum ProposalFlowStatus {
   OnchainVoting = 'OnchainVoting',
   Process = 'Process',
   Completed = 'Completed',
+}
+
+/**
+ * @see `Distribute.sol` in molochv3-contracts
+ */
+export enum DistributionStatus {
+  NOT_STARTED,
+  IN_PROGRESS,
+  DONE,
+  FAILED,
 }
 
 /**

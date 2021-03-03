@@ -5,11 +5,13 @@ import {
   OffchainVotingAction,
   OffchainOpRollupVotingSubmitResultAction,
 } from './voting';
+import {VotingState} from './voting/types';
 import {ContractAdapterNames} from '../web3/types';
 import {ProposalData, ProposalFlowStatus} from './types';
 import {useProposalWithOffchainVoteStatus} from './hooks';
 import SponsorAction from './SponsorAction';
 import ProcessAction from './ProcessAction';
+import PostProcessAction from './PostProcessAction';
 
 type ProposalWithOffchainActionsProps = {
   adapterName: ContractAdapterNames;
@@ -25,9 +27,11 @@ export default function ProposalWithOffchainVoteActions(
    * Our hooks
    */
 
-  const {daoProposalVotes, status} = useProposalWithOffchainVoteStatus(
-    proposal
-  );
+  const {
+    daoProposalVotes,
+    status,
+    daoProposalVoteResult,
+  } = useProposalWithOffchainVoteStatus(proposal);
 
   /**
    * Variables
@@ -38,6 +42,13 @@ export default function ProposalWithOffchainVoteActions(
     daoProposalVotes && status === ProposalFlowStatus.OffchainVotingGracePeriod
       ? Number(daoProposalVotes.gracePeriodStartingTime) * 1000
       : 0;
+  //  Currently, only Distribute adapter has an action that occurs after the
+  //  proposal is processed.
+  const showPostProcessAction =
+    adapterName === ContractAdapterNames.distribute &&
+    status === ProposalFlowStatus.Completed &&
+    daoProposalVoteResult &&
+    VotingState[daoProposalVoteResult] === VotingState[VotingState.PASS];
 
   /**
    * Render
@@ -83,6 +94,10 @@ export default function ProposalWithOffchainVoteActions(
             disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
             proposal={proposal}
           />
+        )}
+
+        {showPostProcessAction && (
+          <PostProcessAction adapterName={adapterName} proposal={proposal} />
         )}
       </div>
     </>

@@ -42,6 +42,13 @@ describe('getAdapterAddressFromContracts unit tests', () => {
 
     expect(
       getAdapterAddressFromContracts(
+        ContractAdapterNames.distribute,
+        store.getState().contracts
+      )
+    ).toBe(DEFAULT_ETH_ADDRESS);
+
+    expect(
+      getAdapterAddressFromContracts(
         ContractAdapterNames.managing,
         store.getState().contracts
       )

@@ -2,7 +2,7 @@ import React, {useState, useCallback, useEffect} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
-import {Link} from 'react-router-dom';
+import {Link, useHistory} from 'react-router-dom';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
 import {toBN, AbiItem} from 'web3-utils';
 
@@ -25,7 +25,6 @@ import {truncateEthAddress} from '../../util/helpers';
 import {SHARES_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
-import {useHistory} from 'react-router-dom';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import CycleMessage from '../../components/feedback/CycleMessage';
@@ -139,22 +138,16 @@ export default function CreateTributeProposal() {
 
   const {
     errors,
-    formState,
     getValues,
     setValue,
     register,
     triggerValidation,
+    watch,
   } = form;
-  const erc20AddressValue = getValues().erc20Address;
+  const erc20AddressValue = watch('erc20Address');
 
   const createTributeError = submitError || txError || txErrorTokenApprove;
   const isConnected = connected && account;
-
-  /**
-   * @note From the docs: "Read the formState before render to subscribe the form state through Proxy"
-   * @see https://react-hook-form.com/api#formState
-   */
-  const {isValid} = formState;
 
   const isInProcess =
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
@@ -502,7 +495,7 @@ export default function CreateTributeProposal() {
       return '---';
     }
 
-    const isBalanceInt = !userERC20Balance.includes('.');
+    const isBalanceInt = Number.isInteger(Number(userERC20Balance));
     return isBalanceInt
       ? userERC20Balance
       : formatDecimal(Number(userERC20Balance));
@@ -622,6 +615,8 @@ export default function CreateTributeProposal() {
                       ? 'The value must be greater than 0.'
                       : amount > Number(userERC20Balance)
                       ? 'Insufficient funds.'
+                      : !Number.isInteger(amount)
+                      ? 'The value must be an integer for an ERC20 token.'
                       : true;
                   },
                 })}
@@ -641,8 +636,8 @@ export default function CreateTributeProposal() {
 
             <div className="form__input-description">
               This amount will be held in escrow pending a member vote. If the
-              proposal is accepted, the funds will automatically be sent to the
-              DAO. If the proposal fails, the funds will be refunded to you.
+              proposal passes, the funds will automatically be sent to the DAO.
+              If the proposal fails, the funds will be refunded to you.
             </div>
           </div>
 
@@ -705,10 +700,10 @@ export default function CreateTributeProposal() {
           <label className="form__input-row-label">Description</label>
           <div className="form__input-row-fieldwrap">
             <textarea
-              aria-describedby={`error-${Fields.description}`}
               name={Fields.description}
               placeholder="Say something about your tribute..."
               ref={register}
+              disabled={isInProcessOrDone}
             />
           </div>
         </div>
@@ -717,11 +712,10 @@ export default function CreateTributeProposal() {
         <button
           className="button"
           disabled={isInProcessOrDone}
-          onClick={() => {
+          onClick={async () => {
             if (isInProcessOrDone) return;
 
-            if (!isValid) {
-              triggerValidation();
+            if (!(await triggerValidation())) {
               return;
             }
 
