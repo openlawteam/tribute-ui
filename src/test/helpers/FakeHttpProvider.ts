@@ -85,7 +85,10 @@ export class FakeHttpProvider {
     this.validation = [];
   }
 
-  send(
+  /**
+   * @note Use `request`
+   */
+  /* send(
     payload: Record<string, any>,
     callback: (e: ErrorStub, r: Record<string, any>) => void
   ) {
@@ -108,6 +111,24 @@ export class FakeHttpProvider {
     setTimeout(function () {
       callback(error, response);
     }, 1);
+  } */
+
+  /**
+   * Use this instead of `send`.
+   *
+   * @link https://eips.ethereum.org/EIPS/eip-1193#request-1
+   * @link https://docs.metamask.io/guide/ethereum-provider.html#ethereum-request-args
+   */
+  async request(payload: {
+    method: string;
+    params?: any[] | Record<string, any>;
+  }): Promise<any> {
+    const response = this.getResponseOrError(
+      'response',
+      payload
+    ) as ResponseStub;
+
+    return response.result;
   }
 
   getResponseOrError(type: 'response' | 'error', payload: Record<string, any>) {
