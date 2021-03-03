@@ -317,7 +317,7 @@ export default function ConfigurationForm({
         <button
           className="button--secondary"
           disabled={isRemoveInProcessOrDone || isConfigureInProcessOrDone}
-          onClick={handleRemove}>
+          onClick={() => (isRemoveDone ? {} : handleRemove())}>
           {isRemoveInProcess ? <Loader /> : isRemoveDone ? 'Done' : 'Remove'}
         </button>
 

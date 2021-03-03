@@ -16,15 +16,14 @@ import {
   AdaptersAndExtensionsType,
 } from './config';
 
-import {
-  getAdapterOrExtensionId,
-  getAccessControlLayer,
-  getConfigurationABIFunction,
-} from './helpers';
+import {getAdapterOrExtensionId, getAccessControlLayer} from './helpers';
 import {getDaoState, DaoState} from '../web3/helpers';
 import {truncateEthAddress} from '../../util/helpers';
 
-import {useAdaptersOrExtensions} from './hooks/useAdaptersOrExtensions';
+import {
+  useAdaptersOrExtensions,
+  useInitAdapterExtensionContracts,
+} from './hooks';
 import {useDao, useMemberActionDisabled} from '../../hooks';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 
@@ -92,6 +91,7 @@ export default function AdapterOrExtensionManager() {
     registeredAdaptersOrExtensions,
     unRegisteredAdaptersOrExtensions,
   } = useAdaptersOrExtensions();
+  const {initAdapterExtensionContract} = useInitAdapterExtensionContracts();
   const {dao, gqlError} = useDao();
 
   const {
@@ -325,7 +325,8 @@ export default function AdapterOrExtensionManager() {
         [adapterOrExtensionName]: true,
       }));
 
-      // @todo re-initContracts
+      // init adapter/extension contracts
+      initAdapterExtensionContract(adapterOrExtensionName);
     } catch (error) {
       setIsInProcess((prevState) => ({
         ...prevState,
@@ -439,12 +440,14 @@ export default function AdapterOrExtensionManager() {
     setSubmitError(undefined);
 
     try {
-      // Get ABI function name
-      const abiFunctionName: string = getConfigurationABIFunction()[
-        adapterOrExtension.name
-      ];
+      const {abiFunctionName, name} = adapterOrExtension;
+
+      if (!abiFunctionName) {
+        throw new Error(`ABI function not found for ${name}`);
+      }
+
       // Get adapters/extension ABI
-      const {abi} = getAdapterOrExtensionFromRedux(adapterOrExtension.name);
+      const {abi} = getAdapterOrExtensionFromRedux(name);
       // Get adapters/extension configure function input parameters
       const {inputs} = abi.filter(
         (p: Record<string, any>) => p.name === abiFunctionName

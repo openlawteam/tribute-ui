@@ -8,28 +8,6 @@ export function getAdapterOrExtensionId(adapterName: DaoConstants): string {
 }
 
 /**
- * getConfigurationABIFunction()
- *
- * Returns the ABI functions used to configure adapters
- */
-export function getConfigurationABIFunction(): Record<DaoConstants, string> {
-  return {
-    [DaoConstants.BANK]: 'configureExtension', //@todo `configureExtension` comes from the DaoFactory
-    [DaoConstants.CONFIGURATION]: 'submitConfigurationProposal',
-    [DaoConstants.DISTRIBUTE]: '', //@todo
-    [DaoConstants.FINANCING]: 'createFinancingRequest',
-    [DaoConstants.GUILDKICK]: 'submitKickProposal',
-    [DaoConstants.MANAGING]: 'createAdapterChangeRequest',
-    [DaoConstants.OFFCHAINVOTING]: 'configureDao',
-    [DaoConstants.ONBOARDING]: 'configureDao',
-    [DaoConstants.RAGEQUIT]: 'ragequit',
-    [DaoConstants.TRIBUTE]: 'configureDao',
-    [DaoConstants.VOTING]: 'configureDao',
-    [DaoConstants.WITHDRAW]: 'withdraw',
-  };
-}
-
-/**
  * getAccessControlLayer
  *
  * @param adapterName
