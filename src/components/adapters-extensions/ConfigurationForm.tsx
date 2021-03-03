@@ -84,14 +84,7 @@ export default function ConfigurationForm({
   /**
    * Variables
    */
-  const {
-    errors,
-    formState,
-    getValues,
-    setValue,
-    register,
-    triggerValidation,
-  } = form;
+  const {errors, formState, getValues, setValue, register, trigger} = form;
   const configureAdapterError = submitError || txError;
   const isConnected = connected && account;
 
@@ -276,7 +269,7 @@ export default function ConfigurationForm({
           if (isConfigureInProcessOrDone) return;
 
           if (!isValid) {
-            triggerValidation();
+            trigger();
             return;
           }
 
