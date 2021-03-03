@@ -40,6 +40,16 @@ export enum ProposalFlowStatus {
 }
 
 /**
+ * @see `Distribute.sol` in molochv3-contracts
+ */
+export enum DistributionStatus {
+  NOT_STARTED,
+  IN_PROGRESS,
+  DONE,
+  FAILED,
+}
+
+/**
  * TYPES
  */
 

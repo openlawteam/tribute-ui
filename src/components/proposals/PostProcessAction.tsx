@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {useSelector} from 'react-redux';
 
 import {CycleEllipsis} from '../feedback';
 import {getContractByAddress} from '../web3/helpers';
-import {ProposalData} from './types';
+import {ProposalData, DistributionStatus} from './types';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
@@ -25,6 +25,10 @@ type SubmitConfigs = {
   functionArguments: any[];
 };
 
+type ActionDisabledReasons = {
+  alreadyCompletedMessage: string;
+};
+
 /**
  * @note Attempt to keep this component general to handle any adapters that may
  * have post-process actions
@@ -40,6 +44,14 @@ export default function PostProcessAction(props: ProcessActionProps) {
    */
 
   const [submitError, setSubmitError] = useState<Error>();
+
+  /**
+   * Refs
+   */
+
+  const actionDisabledReasonsRef = useRef<ActionDisabledReasons>({
+    alreadyCompletedMessage: '',
+  });
 
   /**
    * Selectors
@@ -62,6 +74,7 @@ export default function PostProcessAction(props: ProcessActionProps) {
     isDisabled,
     openWhyDisabledModal,
     WhyDisabledModal,
+    setOtherDisabledReasons,
   } = useMemberActionDisabled();
 
   const gasPrices = useETHGasPrice();
@@ -77,6 +90,60 @@ export default function PostProcessAction(props: ProcessActionProps) {
   const isDone = txStatus === Web3TxStatus.FULFILLED;
   const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
   const areSomeDisabled = isDisabled || isInProcessOrDone;
+
+  /**
+   * Effects
+   */
+
+  useEffect(() => {
+    async function getActionDisabledReasons() {
+      // 1. Determine and set reasons why action would be disabled
+
+      // Reason: distribution already completed
+      if (adapterName === ContractAdapterNames.distribute) {
+        if (!snapshotProposal) {
+          throw new Error('No Snapshot proposal was found.');
+        }
+        if (!daoRegistryContract) {
+          throw new Error('No DAO Registry contract was found.');
+        }
+
+        try {
+          const distributeContract = getContractByAddress(
+            snapshotProposal.actionId,
+            contracts
+          );
+          const distributeProposal = await distributeContract.instance.methods
+            .distributions(
+              daoRegistryContract.contractAddress,
+              snapshotProposal.idInDAO
+            )
+            .call();
+
+          actionDisabledReasonsRef.current = {
+            ...actionDisabledReasonsRef.current,
+            alreadyCompletedMessage:
+              distributeProposal.status !== DistributionStatus.IN_PROGRESS
+                ? 'The transfer has already been completed.'
+                : '',
+          };
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      // 2. Set reasons
+      setOtherDisabledReasons(Object.values(actionDisabledReasonsRef.current));
+    }
+
+    getActionDisabledReasons();
+  }, [
+    adapterName,
+    contracts,
+    daoRegistryContract,
+    setOtherDisabledReasons,
+    snapshotProposal,
+  ]);
 
   /**
    * Functions
