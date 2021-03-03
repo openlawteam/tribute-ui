@@ -113,7 +113,7 @@ export default function CreateMembershipProposal() {
    * Variables
    */
 
-  const {errors, getValues, setValue, register, triggerValidation} = form;
+  const {errors, getValues, setValue, register, trigger} = form;
 
   const createMemberError = submitError || txError;
   const isConnected = connected && account;
@@ -315,9 +315,6 @@ export default function CreateMembershipProposal() {
     );
   }
 
-  // @todo Consider adding check to see if user ethereum address is either
-  // already a member or has a pending member proposal.
-
   return (
     <RenderWrapper>
       <form className="form" onSubmit={(e) => e.preventDefault()}>
@@ -410,7 +407,7 @@ export default function CreateMembershipProposal() {
           onClick={async () => {
             if (isInProcessOrDone) return;
 
-            if (!(await triggerValidation())) {
+            if (!(await trigger())) {
               return;
             }
 

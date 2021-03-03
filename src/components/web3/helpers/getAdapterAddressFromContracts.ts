@@ -33,6 +33,8 @@ export function getAdapterAddressFromContracts(
     switch (name) {
       case ContractAdapterNames.configuration:
         return '';
+      case ContractAdapterNames.distribute:
+        return getContractAddressOrThrow(contracts.DistributeContract);
       case ContractAdapterNames.financing:
         return '';
       case ContractAdapterNames.guildkick:

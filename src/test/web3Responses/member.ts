@@ -7,7 +7,7 @@ import DAORegistryABI from '../../truffle-contracts/DaoRegistry.json';
  *
  * @param web3Instance
  * @returns {TestWeb3ResponseReturn<string>}
- * @link https://github.com/openlawteam/laoland/blob/master/contracts/core/DaoRegistry.sol
+ * @link https://github.com/openlawteam/molochv3-contracts/blob/master/contracts/core/DaoRegistry.sol
  */
 export const memberAddressesByDelegatedKey = ({
   result,

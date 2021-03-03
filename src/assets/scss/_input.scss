@@ -36,6 +36,10 @@ select {
   box-sizing: border-box;
   padding: 1rem;
   line-height: 1.3;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
 }
 
 input[type="text"]::placeholder,

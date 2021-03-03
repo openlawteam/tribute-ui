@@ -113,5 +113,20 @@ describe('useInitContracts unit tests', () => {
         reduxStore.getState().contracts.TributeContract?.instance
       ).toBeTruthy();
     });
+
+    // Distribute
+    await waitFor(() => {
+      expect(
+        reduxStore.getState().contracts.DistributeContract?.abi
+      ).toBeTruthy();
+
+      expect(
+        reduxStore.getState().contracts.DistributeContract?.contractAddress
+      ).toBeTruthy();
+
+      expect(
+        reduxStore.getState().contracts.DistributeContract?.instance
+      ).toBeTruthy();
+    });
   });
 });
