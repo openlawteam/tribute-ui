@@ -1,62 +1,52 @@
 import {renderHook, act} from '@testing-library/react-hooks';
+import {waitFor} from '@testing-library/react';
+import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
+import {ethBlockNumber, signTypedDataV4} from '../../../test/web3Responses';
 import {rest, server} from '../../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../../config';
 import {snapshotAPISubmitMessage} from '../../../test/restResponses';
-import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useSignAndSubmitProposal} from '.';
 import Wrapper from '../../../test/Wrapper';
 
 describe('useSignAndSubmitProposal unit tests', () => {
   test('hook states should be correct when signing & sending (Draft)', async () => {
     await act(async () => {
-      let provider: any;
-      let web3: any;
-
       const {result, waitForNextUpdate} = renderHook(
         () => useSignAndSubmitProposal(),
         {
           initialProps: {
             useInit: true,
             useWallet: true,
-            mockMetaMaskRequest: true,
             getProps: ({mockWeb3Provider, web3Instance}) => {
-              provider = mockWeb3Provider;
-              web3 = web3Instance;
+              // Mock signature
+              mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
             },
           },
           wrapper: Wrapper,
         }
       );
 
-      await new Promise((r) => {
-        setTimeout(r, 1000);
+      await waitFor(() => {
+        // assert initial state
+        expect(result.current.signAndSendProposal).toBeInstanceOf(Function);
+        expect(result.current.proposalData).toBe(undefined);
+        expect(result.current.proposalSignAndSendError).toBe(undefined);
+        expect(result.current.proposalSignAndSendStatus).toBe(
+          Web3TxStatus.STANDBY
+        );
       });
 
-      // assert initial state
-      expect(result.current.signAndSendProposal).toBeInstanceOf(Function);
-      expect(result.current.proposalData).toBe(undefined);
-      expect(result.current.proposalSignAndSendError).toBe(undefined);
-      expect(result.current.proposalSignAndSendStatus).toBe(
-        Web3TxStatus.STANDBY
-      );
-
       // Call signAndSendProposal
-      act(() => {
-        // @note For signing ERC712 with MetaMask's API provider.request
-        provider.request = async () =>
-          web3.eth.abi.encodeParameter('uint256', 123);
-
-        result.current.signAndSendProposal({
-          partialProposalData: {
-            name: 'Test Name',
-            body: 'Test Body',
-            metadata: {},
-          },
-          adapterName: ContractAdapterNames.onboarding,
-          type: SnapshotType.draft,
-        });
+      result.current.signAndSendProposal({
+        partialProposalData: {
+          name: 'Test Name',
+          body: 'Test Body',
+          metadata: {},
+        },
+        adapterName: ContractAdapterNames.onboarding,
+        type: SnapshotType.draft,
       });
 
       // assert awaiting confirmation state
@@ -103,8 +93,13 @@ describe('useSignAndSubmitProposal unit tests', () => {
           version: '0.1.2',
         },
         signature:
-          '0x000000000000000000000000000000000000000000000000000000000000007b',
-        uniqueId: 'abc123def456',
+          '0x6772656174207369676e61747572650000000000000000000000000000000000',
+        /**
+         * @note This actually matches a proposal ID (set in our mock server)
+         *   This was done to make the mocked HTTP calls easier.
+         */
+        uniqueId:
+          '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
         uniqueIdDraft: '',
       });
       expect(result.current.proposalSignAndSendError).toBe(undefined);
@@ -128,53 +123,46 @@ describe('useSignAndSubmitProposal unit tests', () => {
     );
 
     await act(async () => {
-      let provider: any;
-      let web3: any;
-
       const {result, waitForNextUpdate} = renderHook(
         () => useSignAndSubmitProposal(),
         {
           initialProps: {
             useInit: true,
             useWallet: true,
-            mockMetaMaskRequest: true,
             getProps: ({mockWeb3Provider, web3Instance}) => {
-              provider = mockWeb3Provider;
-              web3 = web3Instance;
+              // Mock the RPC calls from `buildProposalMessageHelper`
+              mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
+              mockWeb3Provider.injectResult(
+                web3Instance.eth.abi.encodeParameter('uint256', 123)
+              );
+              // Mock signature
+              mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
             },
           },
           wrapper: Wrapper,
         }
       );
 
-      await new Promise((r) => {
-        setTimeout(r, 1000);
+      await waitFor(() => {
+        // assert initial state
+        expect(result.current.signAndSendProposal).toBeInstanceOf(Function);
+        expect(result.current.proposalData).toBe(undefined);
+        expect(result.current.proposalSignAndSendError).toBe(undefined);
+        expect(result.current.proposalSignAndSendStatus).toBe(
+          Web3TxStatus.STANDBY
+        );
       });
 
-      // assert initial state
-      expect(result.current.signAndSendProposal).toBeInstanceOf(Function);
-      expect(result.current.proposalData).toBe(undefined);
-      expect(result.current.proposalSignAndSendError).toBe(undefined);
-      expect(result.current.proposalSignAndSendStatus).toBe(
-        Web3TxStatus.STANDBY
-      );
-
       // Call signAndSendProposal
-      act(() => {
-        // @note For signing ERC712 with MetaMask's API provider.request
-        provider.request = async () =>
-          web3.eth.abi.encodeParameter('uint256', 123);
-
-        result.current.signAndSendProposal({
-          partialProposalData: {
-            name: 'Test Name',
-            body: 'Test Body',
-            metadata: {},
-            timestamp: '1610981167',
-          },
-          adapterName: ContractAdapterNames.onboarding,
-          type: SnapshotType.proposal,
-        });
+      result.current.signAndSendProposal({
+        partialProposalData: {
+          name: 'Test Name',
+          body: 'Test Body',
+          metadata: {},
+          timestamp: '1610981167',
+        },
+        adapterName: ContractAdapterNames.onboarding,
+        type: SnapshotType.proposal,
       });
 
       // assert awaiting confirmation state
@@ -223,7 +211,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
             name: 'Test Name',
             end: now + 180,
             start: now + 60,
-            snapshot: 123,
+            snapshot: 100,
           },
           space: 'thelao',
           timestamp: now.toString(),
@@ -234,7 +222,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
         uniqueId: '1234567jkl',
         uniqueIdDraft: snapshotAPISubmitMessage.uniqueId,
         signature:
-          '0x000000000000000000000000000000000000000000000000000000000000007b',
+          '0x6772656174207369676e61747572650000000000000000000000000000000000',
       });
       expect(result.current.proposalSignAndSendError).toBe(undefined);
       expect(result.current.proposalSignAndSendStatus).toBe(
@@ -252,7 +240,6 @@ describe('useSignAndSubmitProposal unit tests', () => {
         initialProps: {
           useInit: true,
           useWallet: true,
-          mockMetaMaskRequest: true,
           getProps: ({mockWeb3Provider, web3Instance}) => {
             provider = mockWeb3Provider;
             web3 = web3Instance;
@@ -265,9 +252,8 @@ describe('useSignAndSubmitProposal unit tests', () => {
         setTimeout(r, 1000);
       });
 
-      // @note For signing ERC712 with MetaMask's API provider.request
-      provider.request = async () =>
-        web3.eth.abi.encodeParameter('uint256', 123);
+      // Mock signature
+      provider.injectResult(...signTypedDataV4({web3Instance: web3}));
 
       // Call signAndSendProposal
       const {
@@ -305,7 +291,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
         version: '0.1.2',
       });
       expect(signature).toBe(
-        '0x000000000000000000000000000000000000000000000000000000000000007b'
+        '0x6772656174207369676e61747572650000000000000000000000000000000000'
       );
       expect(uniqueId).toBe(snapshotAPISubmitMessage.uniqueId);
     });
@@ -325,36 +311,39 @@ describe('useSignAndSubmitProposal unit tests', () => {
     );
 
     await act(async () => {
-      let provider: any;
-      let web3: any;
-
-      const {result} = renderHook(() => useSignAndSubmitProposal(), {
+      const {result} = await renderHook(() => useSignAndSubmitProposal(), {
         initialProps: {
           useInit: true,
           useWallet: true,
-          mockMetaMaskRequest: true,
           getProps: ({mockWeb3Provider, web3Instance}) => {
-            provider = mockWeb3Provider;
-            web3 = web3Instance;
+            // Mock the RPC calls from `buildProposalMessageHelper`
+            mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
+            mockWeb3Provider.injectResult(
+              web3Instance.eth.abi.encodeParameter('uint256', 123)
+            );
+            // Mock signature
+            mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
           },
         },
         wrapper: Wrapper,
       });
 
-      await new Promise((r) => {
-        setTimeout(r, 1000);
+      await waitFor(() => {
+        // assert initial state
+        expect(result.current.signAndSendProposal).toBeInstanceOf(Function);
+        expect(result.current.proposalData).toBe(undefined);
+        expect(result.current.proposalSignAndSendError).toBe(undefined);
+        expect(result.current.proposalSignAndSendStatus).toBe(
+          Web3TxStatus.STANDBY
+        );
       });
-
-      // @note For signing ERC712 with MetaMask's API provider.request
-      provider.request = async () =>
-        web3.eth.abi.encodeParameter('uint256', 123);
 
       // Call signAndSendProposal
       const {
         data,
+        signature,
         uniqueId,
         uniqueIdDraft,
-        signature,
       } = await result.current.signAndSendProposal({
         partialProposalData: {
           name: 'Test Name',
@@ -386,7 +375,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
           name: 'Test Name',
           end: now + 180,
           start: now + 60,
-          snapshot: 123,
+          snapshot: 100,
         },
         space: 'thelao',
         timestamp: now.toString(),
@@ -395,7 +384,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
         version: '0.1.2',
       });
       expect(signature).toBe(
-        '0x000000000000000000000000000000000000000000000000000000000000007b'
+        '0x6772656174207369676e61747572650000000000000000000000000000000000'
       );
       expect(uniqueId).toBe('1234567jkl');
       expect(uniqueIdDraft).toBe(snapshotAPISubmitMessage.uniqueId);
