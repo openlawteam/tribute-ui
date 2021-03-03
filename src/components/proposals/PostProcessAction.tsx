@@ -123,7 +123,8 @@ export default function PostProcessAction(props: ProcessActionProps) {
           actionDisabledReasonsRef.current = {
             ...actionDisabledReasonsRef.current,
             alreadyCompletedMessage:
-              distributeProposal.status !== DistributionStatus.IN_PROGRESS
+              DistributionStatus[distributeProposal.status] !==
+              DistributionStatus[DistributionStatus.IN_PROGRESS]
                 ? 'The transfer has already been completed.'
                 : '',
           };
