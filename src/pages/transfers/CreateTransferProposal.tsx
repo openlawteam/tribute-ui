@@ -441,7 +441,7 @@ export default function CreateTransferProposal() {
        * Prepare `data` argument for submission to DAO
        *
        * For information about which data the smart contract needs for signature verification (e.g. `hashMessage`):
-       * @link https://github.com/openlawteam/laoland/blob/master/contracts/adapters/voting/OffchainVoting.sol
+       * @link https://github.com/openlawteam/molochv3-contracts/blob/master/contracts/adapters/voting/OffchainVoting.sol
        */
       const preparedVoteVerificationBytes = data
         ? prepareVoteProposalData(
