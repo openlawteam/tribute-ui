@@ -1,4 +1,6 @@
 import React from 'react';
+
+import {MetaMaskRPCError} from '../../util/types';
 import {normalizeString} from '../../util/helpers';
 
 import FadeIn from './FadeIn';
@@ -16,7 +18,7 @@ export default function ErrorMessageWithDetails(
 
   // @link https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md#provider-errors
   const isWalletRejectedRequest =
-    (error as any)?.code === 4001 ||
+    (error as MetaMaskRPCError)?.code === 4001 ||
     /^(the )?user rejected (the )?request$/g.test(
       normalizeString(error?.message || '')
     );

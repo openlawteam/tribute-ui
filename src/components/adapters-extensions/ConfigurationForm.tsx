@@ -6,7 +6,6 @@ import {AbiItem} from 'web3-utils/types';
 import {DaoConstants} from './enums';
 import {AdaptersOrExtensions} from './types';
 import {StoreState} from '../../store/types';
-import {MetaMaskRPCError} from '../../util/types';
 import {Web3TxStatus} from '../web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {getValidationError} from '../../util/helpers';
@@ -291,15 +290,14 @@ export default function ConfigurationForm({
     </div> */}
 
       {/* SUBMIT ERROR */}
-      {configureAdapterError &&
-        (configureAdapterError as MetaMaskRPCError).code !== 4001 && (
-          <div className="form__submit-error-container">
-            <ErrorMessageWithDetails
-              renderText="Something went wrong while submitting the adapter configuration."
-              error={configureAdapterError}
-            />
-          </div>
-        )}
+      {configureAdapterError && (
+        <div className="form__submit-error-container">
+          <ErrorMessageWithDetails
+            renderText="Something went wrong while submitting the adapter configuration."
+            error={configureAdapterError}
+          />
+        </div>
+      )}
 
       {/** REMOVE ADAPTER BUTTON - only show if DAO isn't finalized */}
       <div className="adapter-extension__remove">
