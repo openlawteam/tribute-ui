@@ -18,7 +18,6 @@ import {
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
-import {MetaMaskRPCError} from '../../util/types';
 import {SHARES_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
@@ -432,15 +431,14 @@ export default function CreateMembershipProposal() {
         )}
 
         {/* SUBMIT ERROR */}
-        {createMemberError &&
-          (createMemberError as MetaMaskRPCError).code !== 4001 && (
-            <div className="form__submit-error-container">
-              <ErrorMessageWithDetails
-                renderText="Something went wrong while submitting the proposal."
-                error={createMemberError}
-              />
-            </div>
-          )}
+        {createMemberError && (
+          <div className="form__submit-error-container">
+            <ErrorMessageWithDetails
+              renderText="Something went wrong while submitting the proposal."
+              error={createMemberError}
+            />
+          </div>
+        )}
       </form>
     </RenderWrapper>
   );
