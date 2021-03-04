@@ -425,9 +425,11 @@ export default function CreateMembershipProposal() {
         </button>
 
         {/* SUBMIT STATUS */}
-        <div className="form__submit-status-container">
-          {isInProcessOrDone && renderSubmitStatus()}
-        </div>
+        {isInProcessOrDone && (
+          <div className="form__submit-status-container">
+            {renderSubmitStatus()}
+          </div>
+        )}
 
         {/* SUBMIT ERROR */}
         {createMemberError &&
