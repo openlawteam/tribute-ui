@@ -1,4 +1,5 @@
 import {render, screen, waitFor} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import {SET_CONNECTED_MEMBER} from '../../store/actions';
@@ -63,6 +64,28 @@ describe('CreateGovernanceProposal unit tests', () => {
       expect(screen.getByText(/^governance proposal$/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/title/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
+    });
+  });
+
+  test('should render form errors for blank fields', async () => {
+    render(
+      <Wrapper useWallet useInit>
+        <CreateGovernanceProposal />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/^governance proposal$/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/title/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByLabelText(/title/i));
+    userEvent.click(screen.getByLabelText(/description/i));
+    userEvent.click(screen.getByLabelText(/title/i));
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/this field is required\.$/i).length).toBe(2);
     });
   });
 });
