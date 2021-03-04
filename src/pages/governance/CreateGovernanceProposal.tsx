@@ -118,6 +118,8 @@ export default function CreateGovernanceProposal() {
           </label>
           <div className="form__input-row-fieldwrap">
             <textarea
+              aria-describedby={`error-${Fields.description}`}
+              aria-invalid={errors.description ? 'true' : 'false'}
               id={Fields.description}
               name={Fields.description}
               placeholder="Say something about your governance proposal..."
@@ -125,6 +127,11 @@ export default function CreateGovernanceProposal() {
                 required: FormFieldErrors.REQUIRED,
               })}
               // disabled={isInProcessOrDone}
+            />
+
+            <InputError
+              error={getValidationError(Fields.description, errors)}
+              id={`error-${Fields.description}`}
             />
           </div>
         </div>
