@@ -2,39 +2,39 @@ import React from 'react';
 import {useHistory} from 'react-router-dom';
 
 import {ProposalHeaderNames} from '../../util/enums';
-import {truncateEthAddress} from '../../util/helpers';
+// import {truncateEthAddress} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
-import ProposalCard from '../../components/proposals/ProposalCard';
-import {
-  fakeMembershipProposalsVoting,
-  fakeMembershipProposalsRequest,
-  fakeMembershipProposalsPassed,
-  fakeMembershipProposalsFailed,
-  FakeProposal,
-} from '../../components/proposals/_mockData';
+// import ProposalCard from '../../components/proposals/ProposalCard';
+// import {
+//   fakeMembershipProposalsVoting,
+//   fakeMembershipProposalsRequest,
+//   fakeMembershipProposalsPassed,
+//   fakeMembershipProposalsFailed,
+//   FakeProposal,
+// } from '../../components/proposals/_mockData';
 
 export default function Membership() {
   /**
    * Their hooks
    */
 
-  const history = useHistory();
+  // const history = useHistory();
 
   /**
    * Variables
    */
 
-  const votingProposals = renderProposalCards(fakeMembershipProposalsVoting);
-  const requestProposals = renderProposalCards(fakeMembershipProposalsRequest);
-  const passedProposals = renderProposalCards(fakeMembershipProposalsPassed);
-  const failedProposals = renderProposalCards(fakeMembershipProposalsFailed);
+  const votingProposals = /* renderProposalCards(fakeMembershipProposalsVoting) */ [] as any;
+  const requestProposals = /* renderProposalCards(fakeMembershipProposalsRequest) */ [] as any;
+  const passedProposals = /* renderProposalCards(fakeMembershipProposalsPassed) */ [] as any;
+  const failedProposals = /* renderProposalCards(fakeMembershipProposalsFailed) */ [] as any;
 
   /**
    * Functions
    */
 
-  function renderProposalCards(proposals: FakeProposal[]) {
+  /* function renderProposalCards(proposals: FakeProposal[]) {
     return proposals.map((proposal) => {
       return (
         <ProposalCard
@@ -45,15 +45,15 @@ export default function Membership() {
         />
       );
     });
-  }
+  } */
 
-  function handleClickProposalDetails(proposalHash: string) {
+  /* function handleClickProposalDetails(proposalHash: string) {
     return () => {
       if (!proposalHash) return;
 
       history.push(`/membership/${proposalHash}`);
     };
-  }
+  } */
 
   /**
    * Render
@@ -128,6 +128,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
           </button>
         </div>
         {/* RENDER CHILDREN */}
+        @TODO
         {props.children}
       </FadeIn>
     </Wrap>
