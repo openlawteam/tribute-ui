@@ -766,9 +766,11 @@ export default function CreateTransferProposal() {
         </button>
 
         {/* SUBMIT STATUS */}
-        <div className="form__submit-status-container">
-          {isInProcessOrDone && renderSubmitStatus()}
-        </div>
+        {isInProcessOrDone && (
+          <div className="form__submit-status-container">
+            {renderSubmitStatus()}
+          </div>
+        )}
 
         {/* SUBMIT ERROR */}
         {createTransferError &&
