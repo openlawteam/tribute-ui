@@ -97,7 +97,7 @@ export default function Wrapper(
         providerOptions: {},
         onConnectTo: () => {},
         onDisconnect: () => {},
-        networkId: mockChains['GANACHE'],
+        networkId: mockChains.GANACHE,
         provider: mockWeb3Provider,
         web3Instance: mockWeb3,
         web3Modal: null,

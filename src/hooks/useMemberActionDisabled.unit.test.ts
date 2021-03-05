@@ -1,10 +1,9 @@
 import {renderHook, act} from '@testing-library/react-hooks';
 
-import {isActiveMember} from '../test/web3Responses';
-import {useMemberActionDisabled} from '.';
-import Wrapper from '../test/Wrapper';
 import {SET_CONNECTED_MEMBER} from '../store/actions';
+import {useMemberActionDisabled} from '.';
 import {waitFor} from '@testing-library/react';
+import Wrapper from '../test/Wrapper';
 
 describe('useMemberActionDisabled unit tests', () => {
   test('should return correct data when wallet is disconnected', async () => {
@@ -31,7 +30,7 @@ describe('useMemberActionDisabled unit tests', () => {
 
       const {result} = await renderHook(() => useMemberActionDisabled(), {
         initialProps: {
-          getProps: ({mockWeb3Provider, web3Instance, store}) => {
+          getProps: ({store}) => {
             reduxStore = store;
           },
           useInit: true,

@@ -1,22 +1,23 @@
-import React from 'react';
 import {Route, Switch} from 'react-router-dom';
 
-import GetStarted from './pages/start/GetStarted';
+import CreateGovernanceProposal from './pages/governance/CreateGovernanceProposal';
 import CreateMembershipProposal from './pages/membership/CreateMembershipProposal';
+import CreateTransferProposal from './pages/transfers/CreateTransferProposal';
+import CreateTributeProposal from './pages/tributes/CreateTributeProposal';
+import GetStarted from './pages/start/GetStarted';
+import GovernanceProposalDetails from './pages/governance/GovernanceProposalDetails';
+import GovernanceProposals from './pages/governance/GovernanceProposals';
+import MemberProfile from './pages/members/MemberProfile';
+import Members from './pages/members/Members';
 import Membership from './pages/membership/Membership';
 import MembershipDetails from './pages/membership/MembershipDetails';
-import CreateTransferProposal from './pages/transfers/CreateTransferProposal';
-import Transfers from './pages/transfers/Transfers';
-import TransferDetails from './pages/transfers/TransferDetails';
-import CreateTributeProposal from './pages/tributes/CreateTributeProposal';
-import Tributes from './pages/tributes/Tributes';
-import TributeDetails from './pages/tributes/TributeDetails';
-import CreateGovernanceProposal from './pages/governance/CreateGovernanceProposal';
-import GovernanceProposals from './pages/governance/GovernanceProposals';
-import GovernanceProposalDetails from './pages/governance/GovernanceProposalDetails';
-import Members from './pages/members/Members';
-import MemberProfile from './pages/members/MemberProfile';
 import NotFound from './pages/subpages/NotFound';
+import TransferDetails from './pages/transfers/TransferDetails';
+import Transfers from './pages/transfers/Transfers';
+import TributeDetails from './pages/tributes/TributeDetails';
+import Tributes from './pages/tributes/Tributes';
+
+const proposalIdParameter: string = ':proposalId';
 
 export default function Routes() {
   return (
@@ -38,7 +39,7 @@ export default function Routes() {
         <Route
           key="membership-details"
           exact
-          path="/membership/:proposalId"
+          path={`/membership/${proposalIdParameter}`}
           render={() => <MembershipDetails />}
         />,
         <Route
@@ -56,7 +57,7 @@ export default function Routes() {
         <Route
           key="transfer-details"
           exact
-          path="/transfers/:proposalId"
+          path={`/transfers/${proposalIdParameter}`}
           render={() => <TransferDetails />}
         />,
         <Route
@@ -74,7 +75,7 @@ export default function Routes() {
         <Route
           key="tribute-details"
           exact
-          path="/tributes/:proposalId"
+          path={`/tributes/${proposalIdParameter}`}
           render={() => <TributeDetails />}
         />,
         <Route
@@ -92,7 +93,7 @@ export default function Routes() {
         <Route
           key="governance-proposal-details"
           exact
-          path="/governance-proposals/:proposalId"
+          path={`/governance-proposals/${proposalIdParameter}`}
           render={() => <GovernanceProposalDetails />}
         />,
         <Route

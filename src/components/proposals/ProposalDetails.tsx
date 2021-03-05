@@ -1,6 +1,7 @@
 import {ProposalData} from './types';
 
 import {truncateEthAddress} from '../../util/helpers';
+import Markdown from 'markdown-to-jsx';
 
 type ProposalDetailsProps = {
   proposal: ProposalData;
@@ -35,7 +36,7 @@ export default function ProposalDetails(props: ProposalDetailsProps) {
         <div className="proposaldetails__content">
           <h3>{truncateEthAddress(commonData.msg.payload.name || '', 7)}</h3>
 
-          <p>{commonData.msg.payload.body}</p>
+          <Markdown>{commonData.msg.payload.body}</Markdown>
         </div>
 
         {/* SIDEBAR */}
