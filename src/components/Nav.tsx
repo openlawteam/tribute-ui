@@ -171,7 +171,6 @@ export default function Nav() {
 
                 <div className="nav-modal__walletconnect-button-container">
                   <Web3ModalButton showWalletETHBadge />
-                  {/* @todo Display Join button only if user is not a member */}
                   <button
                     className="button"
                     onClick={() => {

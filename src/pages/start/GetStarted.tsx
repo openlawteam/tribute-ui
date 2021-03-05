@@ -60,7 +60,6 @@ export default function GetStarted() {
           </div>
 
           <div className="landing__button">
-            {/* @todo Display Join button only if user is not a member */}
             <button
               className="button"
               onClick={() => {
