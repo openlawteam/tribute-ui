@@ -15,6 +15,7 @@ import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDet
 import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
+import PreviewInputMarkdown from '../../components/common/PreviewInputMarkdown';
 import Wrap from '../../components/common/Wrap';
 
 enum Fields {
@@ -66,7 +67,7 @@ export default function CreateGovernanceProposal() {
    * Variables
    */
 
-  const {errors, getValues, register, trigger} = form;
+  const {errors, getValues, register, trigger, watch} = form;
   const isConnected = connected && account;
   const isInProcess =
     proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM ||
@@ -200,6 +201,8 @@ export default function CreateGovernanceProposal() {
               error={getValidationError(Fields.description, errors)}
               id={`error-${Fields.description}`}
             />
+
+            <PreviewInputMarkdown value={watch(Fields.description)} />
           </div>
         </div>
 
