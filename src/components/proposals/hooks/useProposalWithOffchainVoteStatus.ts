@@ -7,6 +7,8 @@ import {StoreState} from '../../../store/types';
 import {useOffchainVotingStartEnd} from '.';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VotingState} from '../voting/types';
+import {BURN_ADDRESS} from '../../../util/constants';
+import {normalizeString} from '../../../util/helpers';
 
 // @todo Logic to fall back to on-chain polling this if subgraph is not available
 
@@ -126,9 +128,9 @@ export function useProposalWithOffchainVoteStatus(
   const offchainResultSubmitted =
     daoProposalVotes &&
     daoProposalVotes.reporter &&
-    !daoProposalVotes.reporter.startsWith('0x00000000000') &&
+    normalizeString(daoProposalVotes.reporter) !== BURN_ADDRESS &&
     daoProposalVotes.resultRoot &&
-    !daoProposalVotes.resultRoot.startsWith('0x00000000000');
+    normalizeString(daoProposalVotes.resultRoot) !== BURN_ADDRESS;
 
   const isInVotingGracePeriod =
     daoProposalVoteResult &&

@@ -3,7 +3,7 @@ import {AbiItem} from 'web3-utils/types';
 import {ContractAdapterNames} from '../types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
 import {getAdapterAddress} from '.';
-import {getWeb3Instance} from '../../../test/helpers';
+import {DEFAULT_ETH_ADDRESS, getWeb3Instance} from '../../../test/helpers';
 import DaoRegistryABI from '../../../truffle-contracts/DaoRegistry.json';
 
 describe('getAdapterAddress unit tests', () => {
@@ -16,10 +16,7 @@ describe('getAdapterAddress unit tests', () => {
     );
 
     const result: [string] = [
-      web3.eth.abi.encodeParameter(
-        'bytes32',
-        '0x000000000000000000000000000000000000000'
-      ),
+      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
     ];
 
     // Inject Web3 result for `getAdapterAddress.call()`
@@ -30,7 +27,7 @@ describe('getAdapterAddress unit tests', () => {
       instance
     );
 
-    expect(address).toBe('0x0000000000000000000000000000000000000000');
+    expect(address).toBe(DEFAULT_ETH_ADDRESS);
   });
 
   test('should throw if no contract instance provided', async () => {
