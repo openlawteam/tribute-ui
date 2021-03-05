@@ -1,12 +1,12 @@
 import {render, screen, waitFor} from '@testing-library/react';
 
-import GovernanceProposalDetails from './GovernanceProposalDetails';
-import Wrapper from '../../test/Wrapper';
 import {rest, server} from '../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../config';
+import GovernanceProposalDetails from './GovernanceProposalDetails';
+import Wrapper from '../../test/Wrapper';
 
 describe('GovernanceProposalDetails unit tests', () => {
-  test('should render page', async () => {
+  test('should render proposal', async () => {
     render(
       <Wrapper>
         <GovernanceProposalDetails />
@@ -14,6 +14,7 @@ describe('GovernanceProposalDetails unit tests', () => {
     );
 
     expect(screen.getByText(/governance/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /view all/i})).toBeInTheDocument();
 
     await waitFor(() => {
       expect(
@@ -26,6 +27,33 @@ describe('GovernanceProposalDetails unit tests', () => {
       expect(
         screen.getByText(/test snapshot proposal body content\./i)
       ).toBeInTheDocument();
+    });
+
+    /**
+     * Vote actions
+     *
+     * @note is an ended vote as per default mocked repsonse in our test suite.
+     */
+
+    await waitFor(() => {
+      expect(
+        screen.getByLabelText(/counting down until voting ends/i)
+      ).toBeInTheDocument();
+      expect(screen.getAllByText(/0%/i).length).toBe(2);
+      expect(screen.getByLabelText(/0% yes votes/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/0% no votes/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByLabelText(/counting down until voting ends/i)
+      ).toBeInTheDocument();
+      expect(screen.getAllByText(/0%/i).length).toBe(2);
+      expect(screen.getByLabelText(/0% yes votes/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/0% no votes/i)).toBeInTheDocument();
+
+      // Wait for status
+      expect(screen.getByLabelText(/failed/i)).toBeInTheDocument();
     });
   });
 

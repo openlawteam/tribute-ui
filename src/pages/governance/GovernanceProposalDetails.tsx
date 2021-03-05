@@ -3,6 +3,7 @@ import React from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
 import {AsyncStatus} from '../../util/types';
+import {GovernanceActions} from '../../components/governance';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
@@ -72,7 +73,10 @@ export default function GovernanceProposalDetails() {
   if (proposalData) {
     return (
       <RenderWrapper>
-        <ProposalDetails proposal={proposalData} renderActions={() => <></>} />
+        <ProposalDetails
+          proposal={proposalData}
+          renderActions={() => <GovernanceActions proposal={proposalData} />}
+        />
       </RenderWrapper>
     );
   }
