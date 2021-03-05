@@ -1,14 +1,21 @@
-import React from 'react';
-import {useSelector} from 'react-redux';
-
-import {StoreState} from '../../store/types';
-import {useWeb3Modal} from '../../components/web3/hooks';
-import FadeIn from '../../components/common/FadeIn';
-import Wrap from '../../components/common/Wrap';
+import React, {useState} from 'react';
 import {useForm} from 'react-hook-form';
+import {useHistory} from 'react-router';
+import {useSelector} from 'react-redux';
+import {SnapshotType} from '@openlaw/snapshot-js-erc712';
+
+import {CycleEllipsis} from '../../components/feedback';
 import {FormFieldErrors} from '../../util/enums';
 import {getValidationError} from '../../util/helpers';
+import {StoreState} from '../../store/types';
+import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
+import {useWeb3Modal} from '../../components/web3/hooks';
+import {Web3TxStatus} from '../../components/web3/types';
+import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
+import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
+import Loader from '../../components/feedback/Loader';
+import Wrap from '../../components/common/Wrap';
 
 enum Fields {
   title = 'title',
@@ -30,10 +37,20 @@ export default function CreateGovernanceProposal() {
   );
 
   /**
+   * State
+   */
+
+  const [submitError, setSubmitError] = useState<Error>();
+
+  /**
    * Our hooks
    */
 
   const {connected, account} = useWeb3Modal();
+  const {
+    proposalSignAndSendStatus,
+    signAndSendProposal,
+  } = useSignAndSubmitProposal<SnapshotType.proposal>();
 
   /**
    * Their hooks
@@ -43,13 +60,20 @@ export default function CreateGovernanceProposal() {
     mode: 'onBlur',
     reValidateMode: 'onChange',
   });
+  const history = useHistory();
 
   /**
    * Variables
    */
 
-  const {errors, getValues, setValue, register, trigger, watch} = form;
+  const {errors, getValues, register, trigger} = form;
   const isConnected = connected && account;
+  const isInProcess =
+    proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM ||
+    proposalSignAndSendStatus === Web3TxStatus.PENDING;
+
+  const isDone = proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
+  const isInProcessOrDone = isInProcess || isDone;
 
   /**
    * Functions
@@ -64,6 +88,50 @@ export default function CreateGovernanceProposal() {
     // user is not an active member
     if (!isActiveMember) {
       return 'Either you are not a member, or your membership is not active.';
+    }
+  }
+
+  async function handleSubmit(values: FormInputs) {
+    try {
+      // Sign and submit proposal for Snapshot Hub
+      const {uniqueId} = await signAndSendProposal({
+        partialProposalData: {
+          name: values.title,
+          body: values.description,
+          metadata: {},
+        },
+        type: SnapshotType.proposal,
+      });
+
+      // Go to newly creatd governance proposal's page
+      history.push(`/governance-proposals/${uniqueId}`);
+    } catch (error) {
+      console.log('error', error);
+
+      setSubmitError(error);
+    }
+  }
+
+  function renderSubmitStatus(): React.ReactNode {
+    switch (proposalSignAndSendStatus) {
+      case Web3TxStatus.AWAITING_CONFIRM:
+        return (
+          <>
+            Awaiting your confirmation
+            <CycleEllipsis intervalMs={500} />
+          </>
+        );
+      case Web3TxStatus.PENDING:
+        return (
+          <>
+            Submitting
+            <CycleEllipsis intervalMs={500} />
+          </>
+        );
+      case Web3TxStatus.FULFILLED:
+        return 'Done!';
+      default:
+        return '';
     }
   }
 
@@ -91,7 +159,6 @@ export default function CreateGovernanceProposal() {
             Title
           </label>
           <div className="form__input-row-fieldwrap">
-            {/* @note We don't need the default value as it's handled in the useEffect above. */}
             <input
               aria-describedby={`error-${Fields.title}`}
               aria-invalid={errors.title ? 'true' : 'false'}
@@ -101,7 +168,7 @@ export default function CreateGovernanceProposal() {
                 required: FormFieldErrors.REQUIRED,
               })}
               type="text"
-              // disabled={isInProcessOrDone}
+              disabled={isInProcessOrDone}
             />
 
             <InputError
@@ -126,7 +193,7 @@ export default function CreateGovernanceProposal() {
               ref={register({
                 required: FormFieldErrors.REQUIRED,
               })}
-              // disabled={isInProcessOrDone}
+              disabled={isInProcessOrDone}
             />
 
             <InputError
@@ -135,6 +202,41 @@ export default function CreateGovernanceProposal() {
             />
           </div>
         </div>
+
+        {/* SUBMIT */}
+        <button
+          aria-label={isInProcess ? 'Submitting your proposal...' : ''}
+          className="button"
+          disabled={isInProcessOrDone}
+          onClick={async () => {
+            if (isInProcessOrDone) return;
+
+            if (!(await trigger())) {
+              return;
+            }
+
+            handleSubmit(getValues());
+          }}
+          type="submit">
+          {isInProcess ? <Loader /> : isDone ? 'Done' : 'Submit'}
+        </button>
+
+        {/* SUBMIT STATUS */}
+        {isInProcessOrDone && (
+          <div className="form__submit-status-container">
+            {renderSubmitStatus()}
+          </div>
+        )}
+
+        {/* SUBMIT ERROR */}
+        {submitError && (
+          <div className="form__submit-error-container">
+            <ErrorMessageWithDetails
+              renderText="Something went wrong while submitting the proposal."
+              error={submitError}
+            />
+          </div>
+        )}
       </form>
     </RenderWrapper>
   );
