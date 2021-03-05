@@ -34,6 +34,7 @@ import {
 } from '../types';
 import {StoreState} from '../../../store/types';
 import {useWeb3Modal} from '../../web3/hooks/useWeb3Modal';
+import {BURN_ADDRESS} from '../../../util/constants';
 
 type SignAndSendData<T extends ProposalOrDraftSnapshotType> = {
   partialProposalData: PrepareAndSignProposalDataParam;
@@ -191,7 +192,7 @@ export function useSignAndSubmitProposal<
         ? adapterAddress
         : adapterName
         ? getAdapterAddressFromContracts(adapterName, contracts)
-        : '';
+        : BURN_ADDRESS;
 
       const {body, name, metadata, timestamp} = partialProposalData;
 
