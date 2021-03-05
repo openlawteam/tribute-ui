@@ -1,4 +1,10 @@
-# Moloch v3
+# Moloch v3 DApp
+
+Related supporting repositories:
+
+- [openlawteam/molochv3-contracts](https://github.com/openlawteam/molochv3-contracts)
+- [openlawteam/snapshot-hub (erc-712 branch)](https://github.com/openlawteam/snapshot-hub/tree/erc-712)
+- [openlawteam/snapshot-js-erc712](https://github.com/openlawteam/snapshot-js-erc712)
 
 ## Developer Setup
 
@@ -67,6 +73,7 @@ tar -xvzf fs-repo-migrations_v1.7.1_darwin-amd64.tar.gz
 cd fs-repo-migrations
 ./fs-repo-migrations -to 7 --revert-ok
 ```
+
 ### Start IPFS
 
 After re/installing IPFS and its repo, start the service by running `ipfs init` followed by `ipfs daemon`
@@ -95,7 +102,6 @@ Deploy the subgraph to the local graph-node:
 
   `graph create-local`
   `graph deploy-local`
-
 
 ### Troubleshooting
 
