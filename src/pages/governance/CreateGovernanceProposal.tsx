@@ -7,6 +7,7 @@ import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {CycleEllipsis} from '../../components/feedback';
 import {FormFieldErrors} from '../../util/enums';
 import {getValidationError} from '../../util/helpers';
+import {SnapshotMetadataType} from '../../components/proposals/types';
 import {StoreState} from '../../store/types';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
@@ -99,7 +100,9 @@ export default function CreateGovernanceProposal() {
         partialProposalData: {
           name: values.title,
           body: values.description,
-          metadata: {},
+          metadata: {
+            type: SnapshotMetadataType.Governance,
+          },
         },
         type: SnapshotType.proposal,
       });
@@ -107,8 +110,6 @@ export default function CreateGovernanceProposal() {
       // Go to newly creatd governance proposal's page
       history.push(`/governance-proposals/${uniqueId}`);
     } catch (error) {
-      console.log('error', error);
-
       setSubmitError(error);
     }
   }
