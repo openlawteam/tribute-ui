@@ -41,14 +41,14 @@ export const snapshotAPISpaceResponse = {
 };
 
 export const snapshotAPISubmitMessage: SnapshotSubmitBaseReturn = {
-  uniqueId: 'abc123def456',
+  uniqueId: DEFAULT_PROPOSAL_HASH,
 };
 
 export const snapshotAPIDraftResponse: SnapshotDraftResponse = {
   [DEFAULT_DRAFT_HASH]: {
     address: DEFAULT_ETH_ADDRESS,
     data: {
-      authorIpfsHash: DEFAULT_PROPOSAL_HASH,
+      authorIpfsHash: DEFAULT_DRAFT_HASH,
       sponsored: false,
     },
     msg: {
@@ -65,7 +65,7 @@ export const snapshotAPIDraftResponse: SnapshotDraftResponse = {
     },
     actionId: DEFAULT_ETH_ADDRESS,
     sig: DEFAULT_SIG,
-    authorIpfsHash: DEFAULT_PROPOSAL_HASH,
+    authorIpfsHash: DEFAULT_DRAFT_HASH,
     relayerIpfsHash: 'QmPdW2zQm9yAqUSihD1TJHoSiQTsJHuWrn8n98qpeBGjzE',
   },
 };
@@ -74,7 +74,7 @@ export const snapshotAPIProposalResponse: SnapshotProposalResponse = {
   [DEFAULT_PROPOSAL_HASH]: {
     address: DEFAULT_ETH_ADDRESS,
     data: {
-      authorIpfsHash: 'abc123def456',
+      authorIpfsHash: DEFAULT_PROPOSAL_HASH,
       /**
        * The hash of a proposal's draft.
        * This property will not be present if the proposal does not have a draft.

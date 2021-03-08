@@ -1,8 +1,11 @@
 import {useSelector} from 'react-redux';
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import {BURN_ADDRESS} from '../../../util/constants';
 import {multicall, MulticallTuple} from '../../web3/helpers';
+import {normalizeString} from '../../../util/helpers';
 import {ProposalFlowStatus, ProposalData, ProposalFlag} from '../types';
+import {proposalHasFlag} from '../helpers';
 import {StoreState} from '../../../store/types';
 import {useOffchainVotingStartEnd} from '.';
 import {useWeb3Modal} from '../../web3/hooks';
@@ -108,13 +111,13 @@ export function useProposalWithOffchainVoteStatus(
    */
 
   const atExistsInDAO = daoProposal
-    ? ProposalFlag[daoProposal.flags] === ProposalFlag[ProposalFlag.EXISTS]
+    ? proposalHasFlag(ProposalFlag.EXISTS, daoProposal.flags)
     : false;
   const atSponsoredInDAO = daoProposal
-    ? ProposalFlag[daoProposal.flags] === ProposalFlag[ProposalFlag.SPONSORED]
+    ? proposalHasFlag(ProposalFlag.SPONSORED, daoProposal.flags)
     : false;
   const atProcessedInDAO = daoProposal
-    ? ProposalFlag[daoProposal.flags] === ProposalFlag[ProposalFlag.PROCESSED]
+    ? proposalHasFlag(ProposalFlag.PROCESSED, daoProposal.flags)
     : false;
 
   /**
@@ -126,9 +129,9 @@ export function useProposalWithOffchainVoteStatus(
   const offchainResultSubmitted =
     daoProposalVotes &&
     daoProposalVotes.reporter &&
-    !daoProposalVotes.reporter.startsWith('0x00000000000') &&
+    normalizeString(daoProposalVotes.reporter) !== BURN_ADDRESS &&
     daoProposalVotes.resultRoot &&
-    !daoProposalVotes.resultRoot.startsWith('0x00000000000');
+    normalizeString(daoProposalVotes.resultRoot) !== BURN_ADDRESS;
 
   const isInVotingGracePeriod =
     daoProposalVoteResult &&

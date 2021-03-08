@@ -2,6 +2,7 @@ import {waitFor} from '@testing-library/react';
 
 import {DEFAULT_ETH_ADDRESS, setupHook} from '../../../test/helpers';
 import {getContractByAddress} from '.';
+import {GUILD_ADDRESS} from '../../../config';
 
 describe('getContractByAddress unit tests', () => {
   test('should return contract data', async () => {
@@ -60,10 +61,7 @@ describe('getContractByAddress unit tests', () => {
 
     // Should throw if not found
     expect(() =>
-      getContractByAddress(
-        '0x000000000000000000000000000000000000dead',
-        store.getState().contracts
-      )
+      getContractByAddress(GUILD_ADDRESS, store.getState().contracts)
     ).toThrow();
   });
 });

@@ -1,6 +1,8 @@
 import {Dispatch} from 'redux';
 
+import {BURN_ADDRESS} from '../../util/constants';
 import {ConnectedMemberState, ContractsStateEntry} from '../types';
+import {normalizeString} from '../../util/helpers';
 
 export const SET_CONNECTED_MEMBER = 'SET_CONNECTED_MEMBER';
 export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
@@ -42,7 +44,7 @@ export function getConnectedMember(
 
       const isActiveMemberChecks: boolean =
         isActiveMember &&
-        !memberAddressByDelegateKey.startsWith('0x0000000000');
+        normalizeString(memberAddressByDelegateKey) !== BURN_ADDRESS;
 
       dispatch(
         setConnectedMember({

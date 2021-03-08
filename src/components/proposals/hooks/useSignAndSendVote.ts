@@ -15,6 +15,7 @@ import {
   VoteChoicesIndex,
 } from '@openlaw/snapshot-js-erc712';
 
+import {BURN_ADDRESS} from '../../../util/constants';
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {DEFAULT_CHAIN, SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
 import {getAdapterAddressFromContracts} from '../../web3/helpers';
@@ -34,7 +35,8 @@ type SignAndSendVoteDataParam = {
 type UseSignAndSendVoteReturn = {
   signAndSendVote: (data: {
     partialVoteData: SignAndSendVoteDataParam;
-    adapterName: ContractAdapterNames;
+    // e.g. Governance does not have an adpater name
+    adapterName?: ContractAdapterNames;
     proposalIdInDAO: SnapshotVoteData['payload']['proposalHash'];
     proposalIdInSnapshot: string;
   }) => Promise<SignAndSendVoteReturn>;
@@ -105,7 +107,8 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
     proposalIdInSnapshot,
   }: {
     partialVoteData: SignAndSendVoteDataParam;
-    adapterName: ContractAdapterNames;
+    // e.g. Governance does not have an adpater name
+    adapterName?: ContractAdapterNames;
     /**
      * This is the hash of the content as submitted to the DAO.
      * The hash should be the same as the Snapshot draft's, or
@@ -139,10 +142,10 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
 
       setVoteDataStatus(Web3TxStatus.AWAITING_CONFIRM);
 
-      const adapterAddress = getAdapterAddressFromContracts(
-        adapterName,
-        contracts
-      );
+      const adapterAddress = adapterName
+        ? getAdapterAddressFromContracts(adapterName, contracts)
+        : BURN_ADDRESS;
+
       const {choice, delegateAddress, metadata = {}} = partialVoteData;
 
       const {data: snapshotSpace} = await getSpace(SNAPSHOT_HUB_API_URL, SPACE);

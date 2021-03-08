@@ -1,4 +1,10 @@
-# Moloch v3
+# Moloch v3 DApp
+
+Related supporting repositories:
+
+- [openlawteam/molochv3-contracts](https://github.com/openlawteam/molochv3-contracts)
+- [openlawteam/snapshot-hub (erc-712 branch)](https://github.com/openlawteam/snapshot-hub/tree/erc-712)
+- [openlawteam/snapshot-js-erc712](https://github.com/openlawteam/snapshot-js-erc712)
 
 ## Developer Setup
 
@@ -35,6 +41,94 @@ Alternatively (and for now the more stable method), you can run the network with
 - `ganache-cli --port 7545 --networkId 1337`
 
 **Remember**: After you deploy the `DaoRegistry` smart contract on your local Ganache network you must include the deployed contract's address in your local root `.env` file.
+
+## Running the local graph-node
+
+Clone the https://github.com/openlawteam/molochv3-contracts repo and from the root open up a terminal, `npm ci`.
+
+### Running ganache-cli
+
+In a new terminal tab, `ganache-cli --port 7545 --networkId 1337 --blockTime 10`.
+Then deploy the contracts to the local ganache instance `truffle deploy --network=ganache`
+
+### Running IPFS (version 0.4.18)
+
+If you already have a version of IPFS on your machine, check the version `ipfs version`. As per the recommendation from The Graph guys, you need version 0.4.18 of IPFS and version 7 of the IPFS repo to work with the local graph-node. If you have an old or newer version you’ll need to migrate your IPFS repo to version 7.
+
+#### Installing version 0.4.18 (IPFS)
+
+Get it from https://dist.ipfs.io/#go-ipfs or alternatively use this download link: https://dist.ipfs.io/go-ipfs/v0.4.18/go-ipfs_v0.4.18_darwin-amd64.tar.gz
+
+Unzip it… `tar -xvzf go-ipfs_v0.4.18_darwin-amd64.tar.gz`
+
+Then follow these instructions for your OS https://docs.ipfs.io/install/command-line/#official-distributions from step 3.
+
+#### Down/upgrading to version 7 (IPFS repo)
+
+You will need to migrate the IPFS repo version 7… do that by downloading the migration-repo from here https://dist.ipfs.io/#fs-repo-migrations and then unzipping…
+Alternately, download from this direct link https://dist.ipfs.io/fs-repo-migrations/v1.7.1/fs-repo-migrations_v1.7.1_darwin-amd64.tar.gz
+
+```
+tar -xvzf fs-repo-migrations_v1.7.1_darwin-amd64.tar.gz
+cd fs-repo-migrations
+./fs-repo-migrations -to 7 --revert-ok
+```
+
+### Start IPFS
+
+After re/installing IPFS and its repo, start the service by running `ipfs init` followed by `ipfs daemon`
+
+### Start the PostgreSQL database
+
+Install PostgreSQL and run `initdb -D .postgres` followed by `pg_ctl -D .postgres -l logfile start` and `createdb graph-node`
+
+### Start the graph-node
+
+Make sure you have cargo installed, if not follow the instructions here to install it https://doc.rust-lang.org/cargo/getting-started/installation.html
+
+Then:
+
+```
+➜ cargo run -p graph-node --release -- \
+  --postgres-url postgresql://USERNAME[:PASSWORD]@localhost:5432/graph-node \
+  --ethereum-rpc mainnet:http://localhost:7545 \
+  --ipfs 127.0.0.1:5001
+
+```
+
+Deploy the subgraph to the local graph-node:
+
+- Don’t forget to update the `BankFactory` and `DaoFactory` contract addresses in `subgraph.yaml` before deploying
+
+  `graph create-local`
+  `graph deploy-local`
+
+### Troubleshooting
+
+Error: thread 'tokio-runtime-worker' panicked at 'genesis block cannot be reverted
+
+thread 'tokio-runtime-worker' panicked at 'genesis block cannot be reverted', /path/graph-node/core/src/subgraph/instance_manager.rs:526:34
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+Panic in tokio task, aborting!
+[1] 16415 abort cargo run -p graph-node --release -- --postgres-url --ethereum-rpc --ipfs
+
+Solution: `dropdb graph-node`… then create a fresh db `createdb graph-node`
+
+Error: **_ Deployment Failed _** when running `truffle deploy --network=ganache`
+
+"Migrations" hit an invalid opcode while deploying. Try:
+
+- Verifying that your constructor params satisfy all assert conditions.
+- Verifying your constructor code doesn't access an array out of bounds.
+- Adding reason strings to your assert statements.
+
+Solution: If you have Ganache CLI v6.1.0 … upgrade to the latest version
+
+Useful links:
+https://github.com/rust-lang/cargo/
+https://doc.rust-lang.org/cargo/getting-started/installation.html
+https://github.com/graphprotocol/graph-node
+https://dist.ipfs.io/#go-ipfs
 
 ## GitHub Pages Deployments
 

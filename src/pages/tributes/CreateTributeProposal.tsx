@@ -20,7 +20,6 @@ import {
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
-import {MetaMaskRPCError} from '../../util/types';
 import {truncateEthAddress} from '../../util/helpers';
 import {SHARES_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
@@ -719,20 +718,21 @@ export default function CreateTributeProposal() {
         </button>
 
         {/* SUBMIT STATUS */}
-        <div className="form__submit-status-container">
-          {isInProcessOrDone && renderSubmitStatus()}
-        </div>
+        {isInProcessOrDone && (
+          <div className="form__submit-status-container">
+            {renderSubmitStatus()}
+          </div>
+        )}
 
         {/* SUBMIT ERROR */}
-        {createTributeError &&
-          (createTributeError as MetaMaskRPCError).code !== 4001 && (
-            <div className="form__submit-error-container">
-              <ErrorMessageWithDetails
-                renderText="Something went wrong while submitting the proposal."
-                error={createTributeError}
-              />
-            </div>
-          )}
+        {createTributeError && (
+          <div className="form__submit-error-container">
+            <ErrorMessageWithDetails
+              renderText="Something went wrong while submitting the proposal."
+              error={createTributeError}
+            />
+          </div>
+        )}
       </form>
     </RenderWrapper>
   );

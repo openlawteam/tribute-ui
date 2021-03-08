@@ -1,62 +1,56 @@
 import {renderHook, act} from '@testing-library/react-hooks';
+import {waitFor} from '@testing-library/react';
+import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {DEFAULT_ETH_ADDRESS} from '../../../test/helpers';
+import {signTypedDataV4} from '../../../test/web3Responses';
 import {useSignAndSendVote} from '.';
-import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 import Wrapper from '../../../test/Wrapper';
 
 describe('useSignAndSendVote unit tests', () => {
   test('should return correct data when calling signAndSendVote', async () => {
     await act(async () => {
-      let provider: any;
-      let web3: any;
-
       const {result, waitForNextUpdate} = renderHook(
         () => useSignAndSendVote(),
         {
           initialProps: {
             useInit: true,
             useWallet: true,
-            mockMetaMaskRequest: true,
             getProps: ({mockWeb3Provider, web3Instance}) => {
-              provider = mockWeb3Provider;
-              web3 = web3Instance;
+              // Mock signature
+              mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
             },
           },
           wrapper: Wrapper,
         }
       );
 
-      await new Promise((r) => {
-        setTimeout(r, 1000);
+      await waitFor(() => {
+        // assert initial state
+        expect(result.current.signAndSendVote).toBeInstanceOf(Function);
+        expect(result.current.voteData).toBe(undefined);
+        expect(result.current.voteDataError).toBe(undefined);
+        expect(result.current.voteDataStatus).toBe(Web3TxStatus.STANDBY);
       });
-
-      // assert initial state
-      expect(result.current.signAndSendVote).toBeInstanceOf(Function);
-      expect(result.current.voteData).toBe(undefined);
-      expect(result.current.voteDataError).toBe(undefined);
-      expect(result.current.voteDataStatus).toBe(Web3TxStatus.STANDBY);
 
       // Call signAndSendVote
-      act(() => {
-        // @note For signing ERC712 with MetaMask's API provider.request
-        provider.request = async () =>
-          web3.eth.abi.encodeParameter('uint256', 123);
-
-        result.current.signAndSendVote({
-          partialVoteData: {choice: VoteChoices.Yes},
-          adapterName: ContractAdapterNames.onboarding,
-          proposalIdInDAO: 'abc123',
-          proposalIdInSnapshot: 'abc123',
-        });
+      result.current.signAndSendVote({
+        partialVoteData: {choice: VoteChoices.Yes},
+        adapterName: ContractAdapterNames.onboarding,
+        proposalIdInDAO: 'abc123',
+        proposalIdInSnapshot: 'abc123',
       });
 
-      // assert awaiting confirmation state
-      expect(result.current.signAndSendVote).toBeInstanceOf(Function);
-      expect(result.current.voteData).toBe(undefined);
-      expect(result.current.voteDataError).toBe(undefined);
-      expect(result.current.voteDataStatus).toBe(Web3TxStatus.AWAITING_CONFIRM);
+      await waitFor(() => {
+        // assert awaiting confirmation state
+        expect(result.current.signAndSendVote).toBeInstanceOf(Function);
+        expect(result.current.voteData).toBe(undefined);
+        expect(result.current.voteDataError).toBe(undefined);
+        expect(result.current.voteDataStatus).toBe(
+          Web3TxStatus.AWAITING_CONFIRM
+        );
+      });
 
       await waitForNextUpdate();
       await waitForNextUpdate();
@@ -89,8 +83,9 @@ describe('useSignAndSendVote unit tests', () => {
           version: '0.1.2',
         },
         signature:
-          '0x000000000000000000000000000000000000000000000000000000000000007b',
-        uniqueId: 'abc123def456',
+          '0x6772656174207369676e61747572650000000000000000000000000000000000',
+        uniqueId:
+          '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
       });
       expect(result.current.voteDataError).toBe(undefined);
       expect(result.current.voteDataStatus).toBe(Web3TxStatus.FULFILLED);
@@ -99,53 +94,41 @@ describe('useSignAndSendVote unit tests', () => {
 
   test('should return correct data when calling signAndSendVote with delegate address', async () => {
     await act(async () => {
-      let provider: any;
-      let web3: any;
-
       const {result, waitForNextUpdate} = renderHook(
         () => useSignAndSendVote(),
         {
           initialProps: {
             useInit: true,
             useWallet: true,
-            mockMetaMaskRequest: true,
             getProps: ({mockWeb3Provider, web3Instance}) => {
-              provider = mockWeb3Provider;
-              web3 = web3Instance;
+              // Mock signature
+              mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
             },
           },
           wrapper: Wrapper,
         }
       );
 
-      await new Promise((r) => {
-        setTimeout(r, 1000);
+      await waitFor(() => {
+        // assert initial state
+        expect(result.current.signAndSendVote).toBeInstanceOf(Function);
+        expect(result.current.voteData).toBe(undefined);
+        expect(result.current.voteDataError).toBe(undefined);
+        expect(result.current.voteDataStatus).toBe(Web3TxStatus.STANDBY);
       });
 
-      // assert initial state
-      expect(result.current.signAndSendVote).toBeInstanceOf(Function);
-      expect(result.current.voteData).toBe(undefined);
-      expect(result.current.voteDataError).toBe(undefined);
-      expect(result.current.voteDataStatus).toBe(Web3TxStatus.STANDBY);
-
       // Call signAndSendVote
-      act(() => {
-        // @note For signing ERC712 with MetaMask's API provider.request
-        provider.request = async () =>
-          web3.eth.abi.encodeParameter('uint256', 123);
-
-        result.current.signAndSendVote({
-          partialVoteData: {
-            choice: VoteChoices.Yes,
-            delegateAddress: '0xF297430B340fEEdfe18da3747e1392B5A04b5c99',
-            metadata: {
-              someData: 'Some data',
-            },
+      result.current.signAndSendVote({
+        partialVoteData: {
+          choice: VoteChoices.Yes,
+          delegateAddress: '0xF297430B340fEEdfe18da3747e1392B5A04b5c99',
+          metadata: {
+            someData: 'Some data',
           },
-          adapterName: ContractAdapterNames.onboarding,
-          proposalIdInDAO: 'abc123',
-          proposalIdInSnapshot: 'abc123',
-        });
+        },
+        adapterName: ContractAdapterNames.onboarding,
+        proposalIdInDAO: 'abc123',
+        proposalIdInSnapshot: 'abc123',
       });
 
       // assert awaiting confirmation state
@@ -186,8 +169,9 @@ describe('useSignAndSendVote unit tests', () => {
           version: '0.1.2',
         },
         signature:
-          '0x000000000000000000000000000000000000000000000000000000000000007b',
-        uniqueId: 'abc123def456',
+          '0x6772656174207369676e61747572650000000000000000000000000000000000',
+        uniqueId:
+          '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
       });
       expect(result.current.voteDataError).toBe(undefined);
       expect(result.current.voteDataStatus).toBe(Web3TxStatus.FULFILLED);

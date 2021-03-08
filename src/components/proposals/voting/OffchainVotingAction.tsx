@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {getVoteChosen} from '../helpers';
@@ -13,7 +13,7 @@ import {VotingActionButtons} from '.';
 import ErrorMessageWithDetails from '../../common/ErrorMessageWithDetails';
 
 type OffchainVotingActionProps = {
-  adapterName: ContractAdapterNames;
+  adapterName?: ContractAdapterNames;
   proposal: ProposalData;
 };
 
@@ -152,8 +152,8 @@ export function OffchainVotingAction(
       setVoteChoiceClicked(VoteChoices[choice]);
 
       await signAndSendVote({
+        ...(adapterName ? {adapterName} : undefined),
         partialVoteData: {choice},
-        adapterName,
         proposalIdInDAO: proposalHash,
         proposalIdInSnapshot: snapshotProposalId,
       });

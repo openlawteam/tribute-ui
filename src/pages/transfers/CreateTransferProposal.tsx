@@ -24,7 +24,6 @@ import {
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
-import {MetaMaskRPCError} from '../../util/types';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 import {multicall, MulticallTuple} from '../../components/web3/helpers';
@@ -766,20 +765,21 @@ export default function CreateTransferProposal() {
         </button>
 
         {/* SUBMIT STATUS */}
-        <div className="form__submit-status-container">
-          {isInProcessOrDone && renderSubmitStatus()}
-        </div>
+        {isInProcessOrDone && (
+          <div className="form__submit-status-container">
+            {renderSubmitStatus()}
+          </div>
+        )}
 
         {/* SUBMIT ERROR */}
-        {createTransferError &&
-          (createTransferError as MetaMaskRPCError).code !== 4001 && (
-            <div className="form__submit-error-container">
-              <ErrorMessageWithDetails
-                renderText="Something went wrong while submitting the proposal."
-                error={createTransferError}
-              />
-            </div>
-          )}
+        {createTransferError && (
+          <div className="form__submit-error-container">
+            <ErrorMessageWithDetails
+              renderText="Something went wrong while submitting the proposal."
+              error={createTransferError}
+            />
+          </div>
+        )}
       </form>
     </RenderWrapper>
   );
