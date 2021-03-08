@@ -47,6 +47,17 @@ export enum DistributionStatus {
 }
 
 /**
+ * This is an internal type we use inside Snapshot Hub
+ * `metadata: {}` to indicate the proposal is only meant for xyz.
+ *
+ * @note Only set the `metadata.type` in the case where the proposal's usage
+ * cannot be determined by the `actionId` (adapter address) alone.
+ */
+export enum SnapshotMetadataType {
+  Governance = 'Governance',
+}
+
+/**
  * TYPES
  */
 
