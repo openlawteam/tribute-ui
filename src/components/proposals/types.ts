@@ -47,7 +47,7 @@ export enum DistributionStatus {
 }
 
 /**
- * This is an internal type we use inside Snapshot Hub
+ * This is an internal type we use for sending to Snapshot Hub via
  * `metadata: {}` to indicate the proposal is only meant for xyz.
  *
  * @note Only set the `metadata.type` in the case where the proposal's usage
