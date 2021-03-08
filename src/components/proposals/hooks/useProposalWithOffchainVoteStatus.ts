@@ -1,14 +1,15 @@
 import {useSelector} from 'react-redux';
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import {BURN_ADDRESS} from '../../../util/constants';
 import {multicall, MulticallTuple} from '../../web3/helpers';
+import {normalizeString} from '../../../util/helpers';
 import {ProposalFlowStatus, ProposalData, ProposalFlag} from '../types';
+import {proposalHasFlag} from '../helpers';
 import {StoreState} from '../../../store/types';
 import {useOffchainVotingStartEnd} from '.';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VotingState} from '../voting/types';
-import {BURN_ADDRESS} from '../../../util/constants';
-import {normalizeString} from '../../../util/helpers';
 
 // @todo Logic to fall back to on-chain polling this if subgraph is not available
 
@@ -110,13 +111,13 @@ export function useProposalWithOffchainVoteStatus(
    */
 
   const atExistsInDAO = daoProposal
-    ? ProposalFlag[daoProposal.flags] === ProposalFlag[ProposalFlag.EXISTS]
+    ? proposalHasFlag(ProposalFlag.EXISTS, daoProposal.flags)
     : false;
   const atSponsoredInDAO = daoProposal
-    ? ProposalFlag[daoProposal.flags] === ProposalFlag[ProposalFlag.SPONSORED]
+    ? proposalHasFlag(ProposalFlag.SPONSORED, daoProposal.flags)
     : false;
   const atProcessedInDAO = daoProposal
-    ? ProposalFlag[daoProposal.flags] === ProposalFlag[ProposalFlag.PROCESSED]
+    ? proposalHasFlag(ProposalFlag.PROCESSED, daoProposal.flags)
     : false;
 
   /**
