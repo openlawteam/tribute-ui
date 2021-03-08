@@ -11,21 +11,18 @@ import {
  */
 
 /**
- * Reverse mapping of DaoRegistry proposal flags.
- * The formula used to create the `flags` entry is:
- *   `prevFlags + 2**nextFlagIndex`
- *    i.e. to get the flag after `flags: 1` the formula is: `1 + 2**1 = 3`
+ * Mapping of DaoRegistry proposal flags.
+ * This should match the enum (including order) in the `DaoRegistry`. If it does not match,
+ * the results of checking the proposal's state via flag will be wrong.
  *
- * @note Order matters
- *
- * @see `ProposalFlag` in molochv3-contracts `DaoRegistry.sol`
- * @see `getFlag` in molochv3-contracts `DaoConstants.sol`
- * @see `setFlag` in molochv3-contracts `DaoConstants.sol`
+ * @see `ProposalFlag` `DaoRegistry.sol`
+ * @see `getFlag` `DaoConstants.sol`
+ * @see `setFlag` `DaoConstants.sol`
  */
 export enum ProposalFlag {
-  EXISTS = 1,
-  SPONSORED = 3,
-  PROCESSED = 7,
+  EXISTS,
+  SPONSORED,
+  PROCESSED,
 }
 
 // @todo Need more information about the vote challenge flow.
