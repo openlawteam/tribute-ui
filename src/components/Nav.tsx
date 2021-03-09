@@ -71,12 +71,6 @@ export function NavHamburger() {
   );
 
   /**
-   * Their hooks
-   */
-
-  const history = useHistory();
-
-  /**
    * Our hooks
    */
 
