@@ -1,4 +1,5 @@
 @use "./variables" as *; /* load without namespace for convenience */
+@use "./functions" as *; /* load without namespace for convenience */
 
 // Reset button to sensible defaults
 %button-base {
@@ -54,4 +55,12 @@
   font-family: $font-accent;
   font-size: 1rem;
   text-transform: lowercase;
+  display: block;
+  margin: 0 auto;
+}
+
+@media only screen and (max-width: em($bp-sm)) {
+  .button--help {
+    font-size: 0.85rem;
+  }
 }

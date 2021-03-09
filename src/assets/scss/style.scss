@@ -78,7 +78,7 @@ h6 {
 
 p {
   font-size: rem(18);
-  line-height: 2;
+  line-height: 1.75;
 
   @media only screen and (max-width: em($bp-sm)) {
     line-height: 1.5;
@@ -169,7 +169,7 @@ main {
 
 .error-message {
   color: $color-brightsalmon;
-  // the text needs to wrap as the JSON erros can be long
+  // the text needs to wrap as the JSON errors can be long
   word-break: break-word;
 }
 
