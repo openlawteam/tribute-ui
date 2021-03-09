@@ -67,8 +67,6 @@ export default function GetStarted() {
               Join
             </button>
           </div>
-
-          
         </div>
       </FadeIn>
     </Wrap>
