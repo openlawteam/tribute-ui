@@ -3,7 +3,9 @@ import {Transition} from 'react-transition-group';
 import ReactModal from 'react-modal';
 import Media from 'react-media';
 import {NavLink} from 'react-router-dom';
+import {useSelector} from 'react-redux';
 
+import {StoreState} from '../store/types';
 import Web3ModalButton from './web3/Web3ModalButton';
 import {useWeb3Modal} from './web3/hooks';
 import {ModalLogo} from './logo';
@@ -61,6 +63,14 @@ export function NavLinks() {
 }
 
 export function NavHamburger() {
+  /**
+   * Selectors
+   */
+
+  const isActiveMember = useSelector(
+    (s: StoreState) => s.connectedMember?.isActiveMember
+  );
+
   /**
    * State
    */
@@ -178,10 +188,8 @@ export function NavHamburger() {
                       <span>Tribute</span>
                     </NavLink>
                   </li>
-                  {/* @todo Display Profile link only if user is an active member */}
-                  {account && (
+                  {account && isActiveMember && (
                     <li
-                      className="link-separated"
                       onClick={() => {
                         handleMenuModalClose(false);
                       }}>
