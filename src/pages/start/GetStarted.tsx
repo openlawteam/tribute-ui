@@ -51,7 +51,7 @@ export default function GetStarted() {
 
         <div className="landing">
           <div className="landing__subtitle">
-            <p>A proposed evolution of the Moloch DAO framework</p>
+            A proposed evolution of the Moloch DAO framework
           </div>
 
           <div className="landing__img">

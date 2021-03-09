@@ -5,24 +5,20 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  font-family: $font-mono;
-  padding: 1rem;
-  margin: 0 2rem 0;
-
-  @include size-medium-down {
-    padding-top: 0;
-  }
+  font-family: $font-body;
+  margin: 0 2rem;
 }
 
 .landing__subtitle {
-  > p {
-    font-size: 1.2rem;
-    text-align: center;
+  font-size: 1.2rem;
+  text-align: center;
+  letter-spacing: 2px;
+  line-height: 1.5;
+  margin-top: 0.5rem;
 
-    @include size-medium-down {
-      font-size: 1.15rem;
-      margin-top: 0;
-    }
+  @include size-medium-down {
+    font-size: 1.15rem;
+    margin-top: 0;
   }
 }
 
