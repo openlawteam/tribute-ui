@@ -150,14 +150,6 @@ export function NavHamburger() {
 
                 <div className="nav-modal__walletconnect-button-container">
                   <Web3ModalButton showWalletETHBadge />
-                  <button
-                    className="button"
-                    onClick={() => {
-                      handleMenuModalClose(false);
-                      history.push('/join');
-                    }}>
-                    Join
-                  </button>
                 </div>
                 <ul className="nav__list">
                   <li
