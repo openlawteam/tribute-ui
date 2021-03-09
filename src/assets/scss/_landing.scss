@@ -14,11 +14,9 @@
   text-align: center;
   letter-spacing: 2px;
   line-height: 1.5;
-  margin-top: 0.5rem;
 
   @include size-medium-down {
     font-size: 1.15rem;
-    margin-top: 0;
   }
 }
 
