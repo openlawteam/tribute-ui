@@ -1,7 +1,7 @@
 @use "./mixins" as *; /* load without namespace for convenience */
 
-$cubeHeight: 396px;
-$cubeWidth: 348px;
+$cubeHeight: 298px;
+$cubeWidth: 262px;
 $faceSize: $cubeWidth / 2;
 
 %cube-background {
@@ -46,8 +46,8 @@ $faceSize: $cubeWidth / 2;
 }
 
 .cube__segment--top {
-  $left: 87px;
-  $top: 14px;
+  $left: 65px;
+  $top: 11px;
 
   -webkit-transform: skew(60deg, -30deg) scale(1, -0.575);
   -moz-transform: skew(60deg, -30deg) scale(1, -0.575);
@@ -65,9 +65,10 @@ $faceSize: $cubeWidth / 2;
 }
 
 .cube__segment--left {
-  $top: 152px;
-  $width: 174px;
-  $height: 195px;
+  $left: 0;
+  $top: 115px;
+  $width: 130px;
+  $height: 146px;
 
   -webkit-transform: skew(0deg, 30deg);
   -moz-transform: skew(0deg, 30deg);
@@ -75,10 +76,10 @@ $faceSize: $cubeWidth / 2;
   -ms-transform: skew(0deg, 30deg);
   transform: skew(0deg, 30deg);
 
-  left: 0px;
-  top: 152px;
-  width: 174px;
-  height: 195px;
+  left: $left;
+  top: $top;
+  width: $width;
+  height: $height;
 
   @include size-medium-down {
     top: $top / 2;
@@ -88,10 +89,10 @@ $faceSize: $cubeWidth / 2;
 }
 
 .cube__segment--right {
-  $left: 175px;
-  $top: 151px;
-  $width: 174px;
-  $height: 195px;
+  $left: 131px;
+  $top: 115px;
+  $width: 130px;
+  $height: 146px;
 
   -webkit-transform: skew(0deg, -30deg);
   -moz-transform: skew(0deg, -30deg);
