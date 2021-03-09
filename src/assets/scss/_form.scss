@@ -4,7 +4,7 @@
 %row {
   display: flex;
   justify-content: flex-start;
-  margin: 2rem 0;
+  margin: 1rem 0;
 
   @media only screen and (min-width: em($bp-md)) {
     align-items: baseline;
@@ -12,7 +12,7 @@
 }
 
 .form-wrapper {
-  padding: 2rem 1.5rem;
+  padding: 0 1rem 1.5rem;
   margin: 0 auto 2rem;
   max-width: 70rem;
   box-sizing: border-box;
@@ -42,7 +42,7 @@
   justify-content: space-between;
   max-width: 51rem;
   width: 100%;
-  margin-top: 2rem;
+  margin-top: 0.5rem;
 }
 
 .form .error-message {
@@ -68,7 +68,7 @@
 .form__input-row-label {
   flex: 0 0 26%;
   text-align: left;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   line-height: 1.3;
 
   @media only screen and (min-width: em($bp-md)) {
@@ -90,7 +90,7 @@
 
 .form button[type="submit"] {
   min-width: 7.1rem;
-  margin: 2.5rem auto 1.125rem;
+  margin: 2rem auto 1.125rem;
 }
 
 .form__submit-error-container {
@@ -118,14 +118,17 @@
 /* @MEDIA QUERIES */
 
 @media only screen and (max-width: em($bp-md)) {
+  .form {
+    margin-top: 0;
+  }
+
   .form__input-row,
   .form__textarea-row {
     flex-direction: column;
-    margin: 1rem 0;
   }
 
   .form__input-row-label {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
 
   .form__textarea-row .form__input-row-label {
@@ -144,11 +147,7 @@
 
 @media only screen and (max-width: em($bp-sm)) {
   .form-wrapper {
-    padding: 1.5rem 1rem;
-  }
-
-  .form {
-    margin-top: 1rem;
+    padding: 0 0.5rem 1rem;
   }
 
   .form__description p,
