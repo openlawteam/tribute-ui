@@ -111,7 +111,7 @@
 
   li {
     display: flex;
-    margin: 2rem 0 0 3rem;
+    margin: 1rem 0 0 3rem;
 
     a {
       font-size: 1.125rem;
@@ -127,10 +127,6 @@
 
     span {
       transition: color 0.25s ease-in-out;
-    }
-
-    &.link-separated {
-      margin-top: 3rem;
     }
   }
 }
