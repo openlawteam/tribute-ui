@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {Transition} from 'react-transition-group';
 import ReactModal from 'react-modal';
 import Media from 'react-media';
-import {NavLink, useHistory} from 'react-router-dom';
+import {NavLink} from 'react-router-dom';
 
 import Web3ModalButton from './web3/Web3ModalButton';
 import {useWeb3Modal} from './web3/hooks';
