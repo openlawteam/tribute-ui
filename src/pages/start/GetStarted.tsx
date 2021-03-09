@@ -4,7 +4,6 @@ import AOS from 'aos';
 import '../../../node_modules/aos/dist/aos.css';
 
 import {CenterLogo} from '../../components/logo';
-import {NavLinks} from '../../components/Nav';
 import FadeIn from '../../components/common/FadeIn';
 import Wrap from '../../components/common/Wrap';
 
@@ -69,9 +68,7 @@ export default function GetStarted() {
             </button>
           </div>
 
-          <div className="landing__navlinks">
-            <NavLinks />
-          </div>
+          
         </div>
       </FadeIn>
     </Wrap>

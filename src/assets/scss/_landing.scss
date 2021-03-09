@@ -37,32 +37,3 @@
     margin: 2.5rem 0 1rem;
   }
 }
-
-.landing__navlinks .nav__list {
-  display: inline-flex;
-  flex-direction: row;
-  font-size: 1.2rem;
-  text-transform: lowercase;
-
-  > li {
-    margin: 1.5rem;
-    text-align: center;
-
-    a {
-      text-decoration: none;
-
-      &.active,
-      &:hover {
-        color: $color-primary-hover;
-      }
-    }
-
-    @include size-medium-down {
-      margin: 1.5rem 0 0;
-    }
-  }
-
-  @include size-medium-down {
-    flex-direction: column;
-  }
-}
