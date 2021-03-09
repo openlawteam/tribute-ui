@@ -396,7 +396,7 @@ export default function CreateMembershipProposal() {
           </div>
           <div className="form__input-addon">
             available:{' '}
-            <span className="text-underline">
+            <span>
               {userAccountBalance
                 ? formatDecimal(Number(userAccountBalance.eth))
                 : '---'}{' '}

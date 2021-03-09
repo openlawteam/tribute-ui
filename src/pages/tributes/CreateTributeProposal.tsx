@@ -634,8 +634,7 @@ export default function CreateTributeProposal() {
           </div>
 
           <div className="form__input-addon">
-            available:{' '}
-            <span className="text-underline">{renderUserERC20Balance()}</span>
+            available: <span>{renderUserERC20Balance()}</span>
           </div>
         </div>
 

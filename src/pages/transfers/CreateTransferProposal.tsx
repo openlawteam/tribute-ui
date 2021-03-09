@@ -727,10 +727,7 @@ export default function CreateTransferProposal() {
           </div>
 
           <div className="form__input-addon">
-            available:{' '}
-            <span className="text-underline">
-              {renderSelectedTokenBalance()}
-            </span>
+            available: <span>{renderSelectedTokenBalance()}</span>
           </div>
         </div>
 
