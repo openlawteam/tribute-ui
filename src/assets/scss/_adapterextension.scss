@@ -1,6 +1,18 @@
 @use "./variables" as *; /* load without namespace for convenience */
 @use "./mixins" as *; /* load without namespace for convenience */
+@use "./functions" as *; /* load without namespace for convenience */
 @use "./button";
+
+.adaptermanager {
+  padding: 0 1rem 1.5rem;
+  margin: 0 auto 2rem;
+  max-width: 51rem;
+  box-sizing: border-box;
+
+  @media only screen and (max-width: em($bp-sm)) {
+    padding: 0 0.5rem 1rem;
+  }
+}
 
 .adapter-extension-configure-modal {
   max-width: 48.5rem;
@@ -126,4 +138,16 @@
   .finalize {
     margin-bottom: 1rem;
   }
+}
+
+.adapter-extension__loader {
+  display: inline-block;
+  margin: 1rem 0;
+}
+
+.adapter-extension__unauthorized-message {
+  max-width: 51rem;
+  text-align: center;
+  color: $color-brightsalmon;
+  margin: 0 auto;
 }

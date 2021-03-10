@@ -1,9 +1,11 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {Transition} from 'react-transition-group';
 import ReactModal from 'react-modal';
 import Media from 'react-media';
-import {NavLink, useLocation, useHistory} from 'react-router-dom';
+import {NavLink} from 'react-router-dom';
+import {useSelector} from 'react-redux';
 
+import {StoreState} from '../store/types';
 import Web3ModalButton from './web3/Web3ModalButton';
 import {useWeb3Modal} from './web3/hooks';
 import {ModalLogo} from './logo';
@@ -31,7 +33,6 @@ const transitionClosingStyles: Record<string, any> = {
   exited: {right: 0, opacity: 1},
 };
 
-// Nav links displayed on the landing page and main pages
 export function NavLinks() {
   return (
     <nav role="navigation" id="navigation">
@@ -61,7 +62,15 @@ export function NavLinks() {
   );
 }
 
-export default function Nav() {
+export function NavHamburger() {
+  /**
+   * Selectors
+   */
+
+  const isActiveMember = useSelector(
+    (s: StoreState) => s.connectedMember?.isActiveMember
+  );
+
   /**
    * State
    */
@@ -72,23 +81,10 @@ export default function Nav() {
   );
 
   /**
-   * Their hooks
-   */
-
-  const location = useLocation();
-  const history = useHistory();
-
-  /**
    * Our hooks
    */
 
   const {account} = useWeb3Modal();
-
-  /**
-   * Variables
-   */
-
-  const isIndexPath = location.pathname === '/';
 
   /**
    * Functions
@@ -112,32 +108,19 @@ export default function Nav() {
 
   return (
     <>
-      <Media query="(max-width: 62em)">
-        {(matches: boolean) => (
-          <div className="nav-header">
-            <div className="nav-header__menu-container">
-              {/* NAV */}
-              {!isIndexPath && <NavLinks />}
+      <div tabIndex={0} className="nav__hamburger-wrapper">
+        <div
+          className="nav__hamburger"
+          aria-label="Menu"
+          aria-controls="navigation"
+          onClick={(event) => {
+            event.preventDefault();
+            handleMenuModalClose(true);
+          }}>
+          <HamburgerSVG />
+        </div>
+      </div>
 
-              <div tabIndex={0} className="nav__hamburger-wrapper">
-                <div
-                  className="nav__hamburger"
-                  aria-label="Menu"
-                  aria-controls="navigation"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    handleMenuModalClose(true);
-                  }}>
-                  <HamburgerSVG />
-                </div>
-              </div>
-              <div className="nav-header__walletconnect-button-container">
-                <Web3ModalButton showWalletETHBadge />
-              </div>
-            </div>
-          </div>
-        )}
-      </Media>
       {/** MODAL MENU */}
       <ReactModal
         ariaHideApp={false}
@@ -171,14 +154,6 @@ export default function Nav() {
 
                 <div className="nav-modal__walletconnect-button-container">
                   <Web3ModalButton showWalletETHBadge />
-                  <button
-                    className="button"
-                    onClick={() => {
-                      handleMenuModalClose(false);
-                      history.push('/join');
-                    }}>
-                    Join
-                  </button>
                 </div>
                 <ul className="nav__list">
                   <li
@@ -213,27 +188,25 @@ export default function Nav() {
                       <span>Tribute</span>
                     </NavLink>
                   </li>
-                  <li
-                    onClick={() => {
-                      handleMenuModalClose(false);
-                    }}>
-                    {/* @todo Add docs link when it's ready */}
-                    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                    <a href="#" rel="noopener noreferrer" target="_blank">
-                      <span>Help</span>
-                    </a>
-                  </li>
-                  {/* @todo Display Profile link only if user is an active member */}
-                  {account && (
-                    <li
-                      className="link-separated"
-                      onClick={() => {
-                        handleMenuModalClose(false);
-                      }}>
-                      <NavLink to={`/members/${account}`}>
-                        <span>Profile</span>
-                      </NavLink>
-                    </li>
+                  {account && isActiveMember && (
+                    <>
+                      <li
+                        onClick={() => {
+                          handleMenuModalClose(false);
+                        }}>
+                        <NavLink to={`/members/${account}`}>
+                          <span>Profile</span>
+                        </NavLink>
+                      </li>
+                      <li
+                        onClick={() => {
+                          handleMenuModalClose(false);
+                        }}>
+                        <NavLink to="/dao-manager">
+                          <span>Manage DAO</span>
+                        </NavLink>
+                      </li>
+                    </>
                   )}
                 </ul>
               </div>
@@ -242,5 +215,28 @@ export default function Nav() {
         </Transition>
       </ReactModal>
     </>
+  );
+}
+
+export default function Nav() {
+  /**
+   * Render
+   */
+
+  return (
+    <Media query="(max-width: 62em)">
+      {(matches: boolean) => (
+        <div className="nav-header">
+          <div className="nav-header__menu-container">
+            {/* NAV */}
+            <NavLinks />
+            <NavHamburger />
+            <div className="nav-header__walletconnect-button-container">
+              <Web3ModalButton showWalletETHBadge />
+            </div>
+          </div>
+        </div>
+      )}
+    </Media>
   );
 }

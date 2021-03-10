@@ -290,7 +290,9 @@ export function OffchainOpRollupVotingSubmitResultAction(
         )}
 
         {isDisabled && (
-          <button className="button--help" onClick={openWhyDisabledModal}>
+          <button
+            className="button--help-centered"
+            onClick={openWhyDisabledModal}>
             Why is submitting disabled?
           </button>
         )}

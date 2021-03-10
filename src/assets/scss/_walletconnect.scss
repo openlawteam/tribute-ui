@@ -59,21 +59,15 @@
   vertical-align: middle;
 }
 
-.walletconnect__connected-address-button {
+.walletconnect__connected-address-text {
+  display: inline-block;
   background-color: rgba(214, 216, 218, 0.2);
-  border: none;
   color: $color-primary;
   font-size: 1rem;
   margin: 1rem 0;
   text-decoration: underline;
   font-family: $font-accent;
   padding: 0.5rem;
-  cursor: pointer;
-  outline: none;
-
-  &:disabled {
-    cursor: initial;
-  }
 }
 
 .walletconnect__disconnect-link-button {

@@ -32,7 +32,7 @@ const Loader = (
   return (!showAfterMs || (showAfterMs && showLoaderAfterMs)) && props.text ? (
     <div className="loader-container">
       <Spinner {...loaderProps} />
-      <span className="loader-text" {...textProps}>
+      <span className="loader__text" {...textProps}>
         {text}
       </span>
     </div>
