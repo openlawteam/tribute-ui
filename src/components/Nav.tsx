@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import {Transition} from 'react-transition-group';
 import ReactModal from 'react-modal';
 import Media from 'react-media';
@@ -87,6 +87,23 @@ export function NavHamburger() {
   const {account} = useWeb3Modal();
 
   /**
+   * Refs
+   */
+
+  const closeMenuRef = useRef<NodeJS.Timeout>();
+
+  /**
+   * Effects
+   */
+
+  useEffect(() => {
+    // Clean up on unmount
+    return () => {
+      closeMenuRef.current && clearTimeout(closeMenuRef.current);
+    };
+  }, []);
+
+  /**
    * Functions
    */
 
@@ -97,8 +114,11 @@ export function NavHamburger() {
       setTransitionStyles(transitionOpeningStyles);
     } else {
       setTransitionStyles(transitionClosingStyles);
-      const closeMenu = setTimeout(() => setShouldShowMenuModal(close), 500);
-      return () => clearTimeout(closeMenu);
+      closeMenuRef.current = setTimeout(
+        () => setShouldShowMenuModal(close),
+        500
+      );
+      return () => closeMenuRef.current && clearTimeout(closeMenuRef.current);
     }
   }
 
