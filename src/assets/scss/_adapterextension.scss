@@ -144,3 +144,10 @@
   display: inline-block;
   margin: 1rem 0;
 }
+
+.adapter-extension__unauthorized-message {
+  max-width: 51rem;
+  text-align: center;
+  color: $color-brightsalmon;
+  margin: 0 auto;
+}

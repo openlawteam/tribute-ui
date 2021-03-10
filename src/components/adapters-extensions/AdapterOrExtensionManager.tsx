@@ -26,7 +26,12 @@ import {truncateEthAddress} from '../../util/helpers';
 
 import {useAdaptersOrExtensions} from './hooks/useAdaptersOrExtensions';
 import {useDao, useMemberActionDisabled} from '../../hooks';
-import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
+import {
+  useContractSend,
+  useETHGasPrice,
+  useWeb3Modal,
+  useIsDefaultChain,
+} from '../web3/hooks';
 
 import ConfiguratorModal from './ConfigurationModal';
 import AdapterExtensionSelectTarget from './AdapterOrExtensionSelectTarget';
@@ -58,6 +63,9 @@ export default function AdapterOrExtensionManager() {
   const {DaoRegistryContract, DaoFactoryContract} = useSelector(
     (state: StoreState) => state.contracts
   );
+  const isActiveMember = useSelector(
+    (s: StoreState) => s.connectedMember?.isActiveMember
+  );
 
   /**
    * States
@@ -87,7 +95,8 @@ export default function AdapterOrExtensionManager() {
   /**
    * Hooks
    */
-  const {account} = useWeb3Modal();
+  const {defaultChainError} = useIsDefaultChain();
+  const {connected, account} = useWeb3Modal();
   const {
     adapterExtensionStatus,
     getAdapterOrExtensionFromRedux,
@@ -114,6 +123,7 @@ export default function AdapterOrExtensionManager() {
   /**
    * Variables
    */
+  const isConnected = connected && account;
   const isDAOExisting: Record<string, any> | undefined = dao;
   const isDAOReady: boolean = daoState === DaoState.READY;
   // grammatically naming is incorrect :)
@@ -127,12 +137,18 @@ export default function AdapterOrExtensionManager() {
   // @todo track the prior selection of a dropdown target
   // let priorSelectedTargetOption: DaoConstants | null = null;
 
+  /**
+   * Cached callbacks
+   */
   const checkDaoStateCached = useCallback(checkDaoState, [
     DaoRegistryContract,
     dao?.name,
     setOtherDisabledReasons,
   ]);
 
+  /**
+   * Effects
+   */
   // Check the Dao state
   useEffect(() => {
     checkDaoStateCached();
@@ -168,6 +184,9 @@ export default function AdapterOrExtensionManager() {
       );
   }, [selections]);
 
+  /**
+   * Functions
+   */
   async function checkDaoState() {
     if (!DaoRegistryContract) {
       return;
@@ -555,6 +574,38 @@ export default function AdapterOrExtensionManager() {
     } else {
       return <></>;
     }
+  }
+
+  function getUnauthorizedMessage() {
+    // user is not connected
+    if (!isConnected) {
+      return 'Connect your wallet to manage the DAO adapters and extensions.';
+    }
+
+    // user is on wrong network
+    if (defaultChainError) {
+      return defaultChainError.message;
+    }
+
+    // user is not an active member
+    if (!isActiveMember) {
+      return 'Either you are not a member, or your membership is not active.';
+    }
+  }
+
+  /**
+   * Render
+   */
+
+  // Render unauthorized message
+  if (!isConnected || !isActiveMember || defaultChainError) {
+    return (
+      <RenderWrapper>
+        <div className="adapter-extension__unauthorized-message">
+          <p>{getUnauthorizedMessage()}</p>
+        </div>
+      </RenderWrapper>
+    );
   }
 
   return (
