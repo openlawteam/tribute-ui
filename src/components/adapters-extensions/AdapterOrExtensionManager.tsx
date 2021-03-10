@@ -32,6 +32,8 @@ import ConfiguratorModal from './ConfigurationModal';
 import AdapterExtensionSelectTarget from './AdapterOrExtensionSelectTarget';
 import Checkbox, {CheckboxSize} from '../common/Checkbox';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
+import Wrap from '../common/Wrap';
+import FadeIn from '../common/FadeIn';
 import Loader from '../feedback/Loader';
 
 enum WhyDisableModalTitles {
@@ -556,250 +558,228 @@ export default function AdapterOrExtensionManager() {
   }
 
   return (
-    <div className="adaptermanager">
-      <h2>Adapter/Extension Manager</h2>
-      {renderDaoName()}
-      {renderErrorMessage()}
-      <p>
-        Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
-        consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut lacus
-        dictum fermentum vel tincidunt neque. Sed sed lacinia...
-      </p>
-      <div className="adapter-extension__selection">
-        <div>
-          <Checkbox
-            id="selectAll"
-            label={`${selectionCount} selected`}
-            checked={selectAll === true}
-            disabled={
-              isAdaptersUnavailable ||
-              isDisabled || // connected user is not an active member
-              unRegisteredAdaptersOrExtensions?.length === 0 || // nothing left to register
-              !isDAOExisting
-              /* @todo 
+    <RenderWrapper>
+      <div className="adaptermanager">
+        {renderDaoName()}
+        {renderErrorMessage()}
+        <p>
+          Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
+          consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut lacus
+          dictum fermentum vel tincidunt neque. Sed sed lacinia...
+        </p>
+        <div className="adapter-extension__selection">
+          <div>
+            <Checkbox
+              id="selectAll"
+              label={`${selectionCount} selected`}
+              checked={selectAll === true}
+              disabled={
+                isAdaptersUnavailable ||
+                isDisabled || // connected user is not an active member
+                unRegisteredAdaptersOrExtensions?.length === 0 || // nothing left to register
+                !isDAOExisting
+                /* @todo 
               - disable when selection is processing 
               - disable when there are no more unused adapters to select
               */
-            }
-            name="selectAll"
-            size={CheckboxSize.LARGE}
-            onChange={handleOnChange}
-          />
+              }
+              name="selectAll"
+              size={CheckboxSize.LARGE}
+              onChange={handleOnChange}
+            />
+          </div>
+          <div>
+            <button
+              className="button--secondary"
+              disabled={selectionCount === 0 || isDisabled}
+              onClick={handleAddSelectedAdapters}>
+              Add selected
+            </button>
+          </div>
         </div>
-        <div>
-          <button
-            className="button--secondary"
-            disabled={selectionCount === 0 || isDisabled}
-            onClick={handleAddSelectedAdapters}>
-            Add selected
-          </button>
-        </div>
-      </div>
 
-      {isLoadingAdapters && <Loader text="Loading data from subgraph..." />}
-      {isAdaptersUnavailable && <p>No adapters available</p>}
-
-      {/** UNUSED ADAPTERS AND EXTENSIONS TO ADD */}
-      {isDAOExisting &&
-        unRegisteredAdaptersOrExtensions &&
-        unRegisteredAdaptersOrExtensions?.length > 0 &&
-        unRegisteredAdaptersOrExtensions.map(
-          (adapter: Record<string, any>, idx: number) => (
-            <div className="adapter-extension__grid unregistered" key={idx}>
-              {/** RENDER ADAPTER/EXTENSION DROPDOWN */}
-              {adapter?.options ? (
-                <AdapterExtensionSelectTarget
-                  adapterOrExtension={adapter}
-                  renderCheckboxAction={({selectedTargetOption}) => {
-                    return (
-                      <>
-                        <div className="adapter-extension__checkbox">
-                          <Checkbox
-                            id={selectedTargetOption || 'empty'}
-                            label={''}
-                            checked={
-                              (selectedTargetOption &&
-                                selections &&
-                                selections[selectedTargetOption] === true) ||
-                              false
-                            }
-                            disabled={
-                              isDisabled ||
-                              selectedTargetOption === null ||
-                              adapter?.isExtension
-                            }
-                            name={selectedTargetOption || ''}
-                            size={CheckboxSize.LARGE}
-                            onChange={(event) => {
-                              selectedTargetOption &&
-                                handleSelectTargetChange({
-                                  event,
-                                  selectedTargetOption,
-                                });
-                            }}
-                          />
-                        </div>
-                      </>
-                    );
-                  }}
-                  renderActions={({
-                    selectedTargetOption,
-                    selectedTargetOptionProps,
-                  }) => {
-                    return (
-                      <>
-                        <div className="adapter-extension__add">
-                          <button
-                            className="button--secondary"
-                            disabled={
-                              selectedTargetOption === null ||
-                              (isInProcess &&
-                                isInProcess[selectedTargetOptionProps.name]) ||
-                              isDisabled
-                            }
-                            onClick={() =>
-                              selectedTargetOptionProps?.isExtension
-                                ? handleAddExtension(selectedTargetOptionProps)
-                                : handleAddAdapter(selectedTargetOptionProps)
-                            }>
-                            {isInProcess &&
-                            isInProcess[selectedTargetOptionProps.name] ? (
-                              <Loader />
-                            ) : isDone &&
-                              isDone[selectedTargetOptionProps.name] ? (
-                              'Done'
-                            ) : (
-                              'Add'
-                            )}
-                          </button>
-                        </div>
-                      </>
-                    );
-                  }}
-                />
-              ) : (
-                <>
-                  {/** RENDER ADAPTER/EXTENSION */}
-                  <div className="adapter-extension__checkbox">
-                    <Checkbox
-                      id={adapter.name}
-                      label={''}
-                      checked={
-                        (selections && selections[adapter.name] === true) ||
-                        false
-                      }
-                      disabled={isDisabled}
-                      name={adapter.name}
-                      size={CheckboxSize.LARGE}
-                      onChange={(event) => {
-                        setSelections((s) => ({
-                          ...s,
-                          [adapter.name]: event.target.checked,
-                        }));
-                      }}
-                    />
-                  </div>
-
-                  <div className="adapter-extension__info">
-                    <span className="adapter-extension__name">
-                      {adapter.name} {adapter?.isExtension && '(EXTENSION)'}
-                    </span>
-                    <span className="adapter-extension__desc">
-                      {adapter.description}
-                    </span>
-                  </div>
-
-                  <div className="adapter-extension__add">
-                    <button
-                      className="button--secondary"
-                      disabled={
-                        (isInProcess && isInProcess[adapter.name]) || isDisabled
-                      }
-                      onClick={() =>
-                        adapter?.isExtension
-                          ? handleAddExtension(adapter)
-                          : handleAddAdapter(adapter)
-                      }>
-                      {isInProcess && isInProcess[adapter.name] ? (
-                        <Loader />
-                      ) : isDone && isDone[adapter.name] ? (
-                        'Done'
-                      ) : (
-                        'Add'
-                      )}
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          )
+        {isLoadingAdapters && (
+          <div className="adapter-extension__loader">
+            <Loader text="Loading data from subgraph..." />
+          </div>
         )}
+        {isAdaptersUnavailable && <p>No adapters available</p>}
 
-      {/** CURRENTLY USED ADAPTERS/EXTENSIONS TO CONFIGURE OR REMOVE */}
-      {isDAOExisting &&
-        registeredAdaptersOrExtensions &&
-        registeredAdaptersOrExtensions?.length > 0 &&
-        registeredAdaptersOrExtensions.map(
-          (adapterOrExtension: Record<string, any>, idx: number) => (
-            <div
-              className="adapter-extension__grid registered"
-              key={`${adapterOrExtension.id}-${idx}`}>
-              <div className="adapter-extension__info">
-                <span className="adapter-extension__name">
-                  {adapterOrExtension.name}{' '}
-                  {adapterOrExtension?.isExtension && '(EXTENSION)'}
-                </span>
-                <span className="adapter-extension__desc">
-                  {adapterOrExtension.description}
-                </span>
+        {/** UNUSED ADAPTERS AND EXTENSIONS TO ADD */}
+        {isDAOExisting &&
+          unRegisteredAdaptersOrExtensions &&
+          unRegisteredAdaptersOrExtensions?.length > 0 &&
+          unRegisteredAdaptersOrExtensions.map(
+            (adapter: Record<string, any>, idx: number) => (
+              <div className="adapter-extension__grid unregistered" key={idx}>
+                {/** RENDER ADAPTER/EXTENSION DROPDOWN */}
+                {adapter?.options ? (
+                  <AdapterExtensionSelectTarget
+                    adapterOrExtension={adapter}
+                    renderCheckboxAction={({selectedTargetOption}) => {
+                      return (
+                        <>
+                          <div className="adapter-extension__checkbox">
+                            <Checkbox
+                              id={selectedTargetOption || 'empty'}
+                              label={''}
+                              checked={
+                                (selectedTargetOption &&
+                                  selections &&
+                                  selections[selectedTargetOption] === true) ||
+                                false
+                              }
+                              disabled={
+                                isDisabled ||
+                                selectedTargetOption === null ||
+                                adapter?.isExtension
+                              }
+                              name={selectedTargetOption || ''}
+                              size={CheckboxSize.LARGE}
+                              onChange={(event) => {
+                                selectedTargetOption &&
+                                  handleSelectTargetChange({
+                                    event,
+                                    selectedTargetOption,
+                                  });
+                              }}
+                            />
+                          </div>
+                        </>
+                      );
+                    }}
+                    renderActions={({
+                      selectedTargetOption,
+                      selectedTargetOptionProps,
+                    }) => {
+                      return (
+                        <>
+                          <div className="adapter-extension__add">
+                            <button
+                              className="button--secondary"
+                              disabled={
+                                selectedTargetOption === null ||
+                                (isInProcess &&
+                                  isInProcess[
+                                    selectedTargetOptionProps.name
+                                  ]) ||
+                                isDisabled
+                              }
+                              onClick={() =>
+                                selectedTargetOptionProps?.isExtension
+                                  ? handleAddExtension(
+                                      selectedTargetOptionProps
+                                    )
+                                  : handleAddAdapter(selectedTargetOptionProps)
+                              }>
+                              {isInProcess &&
+                              isInProcess[selectedTargetOptionProps.name] ? (
+                                <Loader />
+                              ) : isDone &&
+                                isDone[selectedTargetOptionProps.name] ? (
+                                'Done'
+                              ) : (
+                                'Add'
+                              )}
+                            </button>
+                          </div>
+                        </>
+                      );
+                    }}
+                  />
+                ) : (
+                  <>
+                    {/** RENDER ADAPTER/EXTENSION */}
+                    <div className="adapter-extension__checkbox">
+                      <Checkbox
+                        id={adapter.name}
+                        label={''}
+                        checked={
+                          (selections && selections[adapter.name] === true) ||
+                          false
+                        }
+                        disabled={isDisabled}
+                        name={adapter.name}
+                        size={CheckboxSize.LARGE}
+                        onChange={(event) => {
+                          setSelections((s) => ({
+                            ...s,
+                            [adapter.name]: event.target.checked,
+                          }));
+                        }}
+                      />
+                    </div>
+
+                    <div className="adapter-extension__info">
+                      <span className="adapter-extension__name">
+                        {adapter.name} {adapter?.isExtension && '(EXTENSION)'}
+                      </span>
+                      <span className="adapter-extension__desc">
+                        {adapter.description}
+                      </span>
+                    </div>
+
+                    <div className="adapter-extension__add">
+                      <button
+                        className="button--secondary"
+                        disabled={
+                          (isInProcess && isInProcess[adapter.name]) ||
+                          isDisabled
+                        }
+                        onClick={() =>
+                          adapter?.isExtension
+                            ? handleAddExtension(adapter)
+                            : handleAddAdapter(adapter)
+                        }>
+                        {isInProcess && isInProcess[adapter.name] ? (
+                          <Loader />
+                        ) : isDone && isDone[adapter.name] ? (
+                          'Done'
+                        ) : (
+                          'Add'
+                        )}
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
+            )
+          )}
 
-              <div className="adapter-extension__configure">
-                <button
-                  className="button--secondary"
-                  disabled={isDisabled || adapterOrExtension?.isExtension}
-                  onClick={() =>
-                    handleConfigure(adapterOrExtension as AdaptersOrExtensions)
-                  }>
-                  Configure
-                </button>
+        {/** CURRENTLY USED ADAPTERS/EXTENSIONS TO CONFIGURE OR REMOVE */}
+        {isDAOExisting &&
+          registeredAdaptersOrExtensions &&
+          registeredAdaptersOrExtensions?.length > 0 &&
+          registeredAdaptersOrExtensions.map(
+            (adapterOrExtension: Record<string, any>, idx: number) => (
+              <div
+                className="adapter-extension__grid registered"
+                key={`${adapterOrExtension.id}-${idx}`}>
+                <div className="adapter-extension__info">
+                  <span className="adapter-extension__name">
+                    {adapterOrExtension.name}{' '}
+                    {adapterOrExtension?.isExtension && '(EXTENSION)'}
+                  </span>
+                  <span className="adapter-extension__desc">
+                    {adapterOrExtension.description}
+                  </span>
+                </div>
+
+                <div className="adapter-extension__configure">
+                  <button
+                    className="button--secondary"
+                    disabled={isDisabled || adapterOrExtension?.isExtension}
+                    onClick={() =>
+                      handleConfigure(
+                        adapterOrExtension as AdaptersOrExtensions
+                      )
+                    }>
+                    Configure
+                  </button>
+                </div>
               </div>
-            </div>
-          )
-        )}
-
-      {isDisabled && (
-        <div>
-          <button
-            className="button--help"
-            onClick={() => {
-              openWhyDisabledModal();
-              setWhyDisabledReason(WhyDisableModalTitles.CONFIGURATION_REASON);
-            }}>
-            {WhyDisableModalTitles.CONFIGURATION_REASON}
-          </button>
-        </div>
-      )}
-
-      <div className="adapter-adapter-extension__finalize">
-        <p>
-          If you're happy with your setup, you can finalize your DAO. After your
-          DAO is finalized you will need to submit a proposal to make changes.
-        </p>
-        <div>
-          <button
-            className="button--secondary finalize"
-            disabled={
-              isAdaptersUnavailable || !isDAOExisting || isDAOReady
-              /* @todo 
-              - also disable when selection is processing 
-              - when there are no more unused adapters to select
-              */
-            }
-            onClick={confirmFinalizePrompt}>
-            Finalize Dao
-          </button>
-        </div>
+            )
+          )}
 
         {isDisabled && (
           <div>
@@ -807,28 +787,84 @@ export default function AdapterOrExtensionManager() {
               className="button--help"
               onClick={() => {
                 openWhyDisabledModal();
-
-                setWhyDisabledReason(WhyDisableModalTitles.FINALIZED_REASON);
+                setWhyDisabledReason(
+                  WhyDisableModalTitles.CONFIGURATION_REASON
+                );
               }}>
-              {WhyDisableModalTitles.FINALIZED_REASON}
+              {WhyDisableModalTitles.CONFIGURATION_REASON}
             </button>
           </div>
         )}
 
-        <WhyDisabledModal title={whyDisabledReason} />
-      </div>
+        <div className="adapter-adapter-extension__finalize">
+          <p>
+            If you're happy with your setup, you can finalize your DAO. After
+            your DAO is finalized you will need to submit a proposal to make
+            changes.
+          </p>
+          <div>
+            <button
+              className="button--secondary finalize"
+              disabled={
+                isAdaptersUnavailable || !isDAOExisting || isDAOReady
+                /* @todo 
+              - also disable when selection is processing 
+              - when there are no more unused adapters to select
+              */
+              }
+              onClick={confirmFinalizePrompt}>
+              Finalize Dao
+            </button>
+          </div>
 
-      {openModal && (
-        <ConfiguratorModal
-          abiMethodName={abiMethodName}
-          adapterOrExtension={configureAdapterOrExtension}
-          configurationInputs={inputParameters}
-          isOpen={openModal}
-          closeHandler={() => {
-            setOpenModal(false);
-          }}
-        />
-      )}
-    </div>
+          {isDisabled && (
+            <div>
+              <button
+                className="button--help"
+                onClick={() => {
+                  openWhyDisabledModal();
+
+                  setWhyDisabledReason(WhyDisableModalTitles.FINALIZED_REASON);
+                }}>
+                {WhyDisableModalTitles.FINALIZED_REASON}
+              </button>
+            </div>
+          )}
+
+          <WhyDisabledModal title={whyDisabledReason} />
+        </div>
+
+        {openModal && (
+          <ConfiguratorModal
+            abiMethodName={abiMethodName}
+            adapterOrExtension={configureAdapterOrExtension}
+            configurationInputs={inputParameters}
+            isOpen={openModal}
+            closeHandler={() => {
+              setOpenModal(false);
+            }}
+          />
+        )}
+      </div>
+    </RenderWrapper>
+  );
+}
+
+function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
+  /**
+   * Render
+   */
+
+  return (
+    <Wrap className="section-wrapper">
+      <FadeIn>
+        <div className="titlebar">
+          <h2 className="titlebar__title">Adapter/Extension Manager</h2>
+        </div>
+
+        {/* RENDER CHILDREN */}
+        {props.children}
+      </FadeIn>
+    </Wrap>
   );
 }

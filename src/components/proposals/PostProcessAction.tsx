@@ -303,7 +303,9 @@ export default function PostProcessAction(props: ProcessActionProps) {
         )}
 
         {isDisabled && (
-          <button className="button--help" onClick={openWhyDisabledModal}>
+          <button
+            className="button--help-centered"
+            onClick={openWhyDisabledModal}>
             Why is action disabled?
           </button>
         )}

@@ -55,6 +55,11 @@
   font-family: $font-accent;
   font-size: 1rem;
   text-transform: lowercase;
+}
+
+.button--help-centered {
+  @extend .button--help;
+
   display: block;
   margin: 0 auto;
 }

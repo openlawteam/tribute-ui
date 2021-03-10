@@ -189,14 +189,24 @@ export function NavHamburger() {
                     </NavLink>
                   </li>
                   {account && isActiveMember && (
-                    <li
-                      onClick={() => {
-                        handleMenuModalClose(false);
-                      }}>
-                      <NavLink to={`/members/${account}`}>
-                        <span>Profile</span>
-                      </NavLink>
-                    </li>
+                    <>
+                      <li
+                        onClick={() => {
+                          handleMenuModalClose(false);
+                        }}>
+                        <NavLink to={`/members/${account}`}>
+                          <span>Profile</span>
+                        </NavLink>
+                      </li>
+                      <li
+                        onClick={() => {
+                          handleMenuModalClose(false);
+                        }}>
+                        <NavLink to="/dao-manager">
+                          <span>Manage DAO</span>
+                        </NavLink>
+                      </li>
+                    </>
                   )}
                 </ul>
               </div>

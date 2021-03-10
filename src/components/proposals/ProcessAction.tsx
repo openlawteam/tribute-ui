@@ -181,7 +181,9 @@ export default function ProcessAction(props: ProcessActionProps) {
         )}
 
         {isDisabled && (
-          <button className="button--help" onClick={openWhyDisabledModal}>
+          <button
+            className="button--help-centered"
+            onClick={openWhyDisabledModal}>
             Why is processing disabled?
           </button>
         )}

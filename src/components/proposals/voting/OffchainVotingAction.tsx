@@ -183,7 +183,9 @@ export function OffchainVotingAction(
       />
 
       {isDisabled && (
-        <button className="button--help" onClick={openWhyDisabledModal}>
+        <button
+          className="button--help-centered"
+          onClick={openWhyDisabledModal}>
           Why is voting disabled?
         </button>
       )}
