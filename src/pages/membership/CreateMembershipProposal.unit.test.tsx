@@ -56,7 +56,7 @@ describe('CreateMembershipProposal unit tests', () => {
         DEFAULT_ETH_ADDRESS
       );
       expect(screen.getByLabelText(/amount/i)).toBeInTheDocument();
-      expect(screen.getByText(/123\.00 eth/i)).toBeInTheDocument();
+      expect(screen.getByText(/123/i)).toBeInTheDocument();
       expect(screen.getByRole('button', {name: /submit/i})).toBeInTheDocument();
     });
   });
@@ -92,7 +92,7 @@ describe('CreateMembershipProposal unit tests', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/123\.00 eth/i)).toBeInTheDocument();
+      expect(screen.getByText(/123/i)).toBeInTheDocument();
     });
 
     await userEvent.type(screen.getByLabelText(/amount/i), '12', {delay: 100});
