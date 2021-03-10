@@ -111,6 +111,7 @@ export default function TributeDetails() {
         ? balanceReadable
         : formatDecimal(Number(balanceReadable));
     } catch (error) {
+      console.error(error);
       tributeAmount = '\u2026';
     }
 
@@ -118,6 +119,7 @@ export default function TributeDetails() {
     try {
       requestAmount = formatNumber(daoProposal?.requestAmount);
     } catch (error) {
+      console.error(error);
       requestAmount = '\u2026';
     }
 

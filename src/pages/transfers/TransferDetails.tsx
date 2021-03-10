@@ -111,6 +111,7 @@ export default function TransferDetails() {
         ? balanceReadable
         : formatDecimal(Number(balanceReadable));
     } catch (error) {
+      console.error(error);
       transferAmount = '\u2026';
     }
 
