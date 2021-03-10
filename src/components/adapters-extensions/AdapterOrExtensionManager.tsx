@@ -32,13 +32,14 @@ import {
   useIsDefaultChain,
 } from '../web3/hooks';
 
-import ConfiguratorModal from './ConfigurationModal';
 import AdapterExtensionSelectTarget from './AdapterOrExtensionSelectTarget';
+import ConfigurationModal from './ConfigurationModal';
 import Checkbox, {CheckboxSize} from '../common/Checkbox';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
-import Wrap from '../common/Wrap';
 import FadeIn from '../common/FadeIn';
+import FinalizeModal from './FinalizeModal';
 import Loader from '../feedback/Loader';
+import Wrap from '../common/Wrap';
 
 enum WhyDisableModalTitles {
   FINALIZED_REASON = 'Why is finalizing disabled?',
@@ -75,7 +76,7 @@ export default function AdapterOrExtensionManager() {
   const [inputParameters, setInputParameters] = useState<Record<string, any>>();
   const [submitError, setSubmitError] = useState<Error>();
   const [openConfigureModal, setOpenConfigureModal] = useState<boolean>(false);
-  // const [openFinalizeModal, setOpenFinalizeModal] = useState<boolean>(false);
+  const [openFinalizeModal, setOpenFinalizeModal] = useState<boolean>(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [selectionCount, setSelectionCount] = useState<number>(0);
   const [selections, setSelections] = useState<
@@ -290,7 +291,9 @@ export default function AdapterOrExtensionManager() {
   ): Promise<void> {
     setSubmitError(undefined);
 
-    if (!DaoRegistryContract) return;
+    if (!DaoRegistryContract) {
+      throw new Error('No DAO Registry contract was found.');
+    }
 
     try {
       setIsInProcess((prevState) => ({
@@ -485,23 +488,6 @@ export default function AdapterOrExtensionManager() {
       );
       setSubmitError(errorMessage);
     }
-  }
-
-  /**
-   * confirmFinalizePrompt
-   */
-  function confirmFinalizePrompt(): void {
-    if (window.confirm('Do you really want to finalize this DAO?')) {
-      handleFinalizeDao();
-    }
-  }
-
-  async function handleFinalizeDao(): Promise<void> {
-    window.alert(`Sorry, finalizing isn't ready yet!`);
-
-    try {
-      // get getDaoState when done
-    } catch (error) {}
   }
 
   // Handles the select all checkbox event
@@ -779,6 +765,7 @@ export default function AdapterOrExtensionManager() {
                         className="button--secondary"
                         disabled={
                           (isInProcess && isInProcess[adapter.name]) ||
+                          (isDone && isDone[adapter.name]) ||
                           isDisabled
                         }
                         onClick={() =>
@@ -867,7 +854,7 @@ export default function AdapterOrExtensionManager() {
               - when there are no more unused adapters to select
               */
               }
-              onClick={confirmFinalizePrompt}>
+              onClick={() => setOpenFinalizeModal(true)}>
               Finalize Dao
             </button>
           </div>
@@ -890,13 +877,25 @@ export default function AdapterOrExtensionManager() {
         </div>
 
         {openConfigureModal && (
-          <ConfiguratorModal
+          <ConfigurationModal
             abiMethodName={abiMethodName}
             adapterOrExtension={configureAdapterOrExtension}
             configurationInputs={inputParameters}
             isOpen={openConfigureModal}
             closeHandler={() => {
               setOpenConfigureModal(false);
+            }}
+          />
+        )}
+
+        {openFinalizeModal && (
+          <FinalizeModal
+            isOpen={openFinalizeModal}
+            closeHandler={() => {
+              setOpenFinalizeModal(false);
+
+              // check the state of the dao
+              checkDaoStateCached();
             }}
           />
         )}

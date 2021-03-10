@@ -1,12 +1,10 @@
-import React from 'react';
-
 import {AdaptersOrExtensions} from './types';
 import ConfigurationForm from './ConfigurationForm';
 import Modal from '../common/Modal';
 
 import TimesSVG from '../../assets/svg/TimesSVG';
 
-type ConfiguratorModalProps = {
+type ConfigurationModalProps = {
   abiMethodName: string;
   adapterOrExtension: AdaptersOrExtensions | undefined;
   configurationInputs: Record<string, any> | undefined;
@@ -14,13 +12,13 @@ type ConfiguratorModalProps = {
   closeHandler: () => void;
 };
 
-export default function ConfiguratorModal({
+export default function ConfigurationModal({
   abiMethodName,
   adapterOrExtension,
   configurationInputs,
   isOpen,
   closeHandler,
-}: ConfiguratorModalProps) {
+}: ConfigurationModalProps) {
   return (
     <Modal
       keyProp="adapter-extension-configuration"

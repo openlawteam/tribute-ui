@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
