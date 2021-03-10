@@ -6,7 +6,7 @@ import {getConnectedMember} from './store/actions';
 import {ContractsStateEntry, ReduxDispatch, StoreState} from './store/types';
 import {SNAPSHOT_HUB_API_URL} from './config';
 import {useDispatch, useSelector} from 'react-redux';
-import {useInitContracts, useIsDefaultChain} from './components/web3/hooks';
+import {useInitContracts} from './components/web3/hooks';
 import {useIsMounted} from './hooks';
 import {useWeb3Modal} from './components/web3/hooks';
 import ErrorMessageWithDetails from './components/common/ErrorMessageWithDetails';
@@ -78,7 +78,6 @@ export default function Init(props: InitProps) {
 
   const initContracts = useInitContracts();
   const {account, connected, provider, web3Instance} = useWeb3Modal();
-  const {defaultChainError} = useIsDefaultChain();
   const {isMountedRef} = useIsMounted();
 
   /**
@@ -120,10 +119,6 @@ export default function Init(props: InitProps) {
       daoRegistryContract &&
       handleGetMemberCached(account, daoRegistryContract);
   }, [account, connected, daoRegistryContract, handleGetMemberCached]);
-
-  useEffect(() => {
-    setError(defaultChainError);
-  }, [defaultChainError]);
 
   useEffect(() => {
     handleGetSnapshotAPIStatusCached();

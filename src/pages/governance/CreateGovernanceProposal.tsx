@@ -10,7 +10,7 @@ import {getValidationError} from '../../util/helpers';
 import {SnapshotMetadataType} from '../../components/proposals/types';
 import {StoreState} from '../../store/types';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
-import {useWeb3Modal} from '../../components/web3/hooks';
+import {useWeb3Modal, useIsDefaultChain} from '../../components/web3/hooks';
 import {Web3TxStatus} from '../../components/web3/types';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
@@ -53,6 +53,7 @@ export default function CreateGovernanceProposal() {
     proposalSignAndSendStatus,
     signAndSendProposal,
   } = useSignAndSubmitProposal<SnapshotType.proposal>();
+  const {defaultChainError} = useIsDefaultChain();
 
   /**
    * Their hooks
@@ -85,6 +86,11 @@ export default function CreateGovernanceProposal() {
     // user is not connected
     if (!isConnected) {
       return 'Connect your wallet to submit a governance proposal.';
+    }
+
+    // user is on wrong network
+    if (defaultChainError) {
+      return defaultChainError.message;
     }
 
     // user is not an active member
@@ -142,7 +148,7 @@ export default function CreateGovernanceProposal() {
    */
 
   // Render unauthorized message
-  if (!isConnected || !isActiveMember) {
+  if (!isConnected || !isActiveMember || defaultChainError) {
     return (
       <RenderWrapper>
         <div className="form__description--unauthorized">
