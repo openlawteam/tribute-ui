@@ -15,17 +15,17 @@ describe('App unit tests', () => {
 
     await waitFor(() => {
       // Header
+      expect(screen.getByTestId(/header/)).toBeInTheDocument();
+      // Logo
       expect(screen.getByText(/MOLOCH v3/)).toBeInTheDocument();
       // Subtitle
       expect(
-        screen.getByText(/for the ongoing development of moloch v3/i)
+        screen.getByText(/a proposed evolution of the moloch dao framework/i)
       ).toBeInTheDocument();
       // Cube image
       expect(screen.getByTestId('cube')).toBeInTheDocument();
       // Join button
       expect(screen.getByRole('button', {name: /join/i})).toBeInTheDocument();
-      // Navigation
-      expect(screen.getByRole(/navigation/)).toBeInTheDocument();
     });
   });
 

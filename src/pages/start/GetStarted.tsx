@@ -25,7 +25,7 @@ const MolochV3Cube = React.memo(() => {
 
 function GetStartedHeader() {
   return (
-    <div className="landing__header">
+    <div data-testid="header" className="landing__header">
       <SocialMedia />
       <NavHamburger />
     </div>
