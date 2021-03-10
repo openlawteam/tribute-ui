@@ -5,8 +5,9 @@ import MediumSVG from '../../assets/svg/MediumSVG';
 // @todo Add missing URLs when available
 enum SocialMediaLinks {
   DISCORD = '#',
-  GITHUB_CONTRACTS = 'https://github.com/openlawteam/molochv3-contracts',
-  GITHUB_UI = 'https://github.com/openlawteam/molochv3-ui',
+  // query params search sepcifically for openlawteam/molochv3-ui and
+  // openlawteam/molochv3-contracts
+  GITHUB = 'https://github.com/search?q=org%3Aopenlawteam+molochv3-ui+OR+molochv3-contracts+in%3Aname&type=repositories',
   MEDIUM = '#',
 }
 
@@ -26,13 +27,7 @@ export default function SocialMedia() {
         <DiscordSVG />
       </a>
       <a
-        href={SocialMediaLinks.GITHUB_UI}
-        target="_blank"
-        rel="noopener noreferrer">
-        <GitHubSVG />
-      </a>
-      <a
-        href={SocialMediaLinks.GITHUB_CONTRACTS}
+        href={SocialMediaLinks.GITHUB}
         target="_blank"
         rel="noopener noreferrer">
         <GitHubSVG />
