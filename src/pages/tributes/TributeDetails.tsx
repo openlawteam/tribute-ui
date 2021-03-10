@@ -111,14 +111,16 @@ export default function TributeDetails() {
         ? balanceReadable
         : formatDecimal(Number(balanceReadable));
     } catch (error) {
-      // Fallback gracefully to ellipsis
+      console.error(error);
+      tributeAmount = '\u2026';
     }
 
     let requestAmount = '\u2026';
     try {
       requestAmount = formatNumber(daoProposal?.requestAmount);
     } catch (error) {
-      // Fallback gracefully to ellipsis
+      console.error(error);
+      requestAmount = '\u2026';
     }
 
     return (

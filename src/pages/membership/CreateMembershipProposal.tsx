@@ -50,11 +50,6 @@ type OnboardArguments = [
   string // `tokenAmount`
 ];
 
-type UserAccountBalance = {
-  wei: string;
-  eth: string;
-};
-
 export default function CreateMembershipProposal() {
   /**
    * Selectors
@@ -103,10 +98,7 @@ export default function CreateMembershipProposal() {
    */
 
   const [submitError, setSubmitError] = useState<Error>();
-  const [
-    userAccountBalance,
-    setUserAccountBalance,
-  ] = useState<UserAccountBalance>();
+  const [userAccountBalance, setUserAccountBalance] = useState<string>();
 
   /**
    * Variables
@@ -164,10 +156,9 @@ export default function CreateMembershipProposal() {
     try {
       // Ether wallet balance
       const accountBalanceInWei = await web3Instance.eth.getBalance(account);
-      setUserAccountBalance({
-        wei: accountBalanceInWei,
-        eth: web3Instance.utils.fromWei(accountBalanceInWei),
-      });
+      setUserAccountBalance(
+        web3Instance.utils.fromWei(accountBalanceInWei, 'ether')
+      );
     } catch (error) {
       setUserAccountBalance(undefined);
     }
@@ -288,6 +279,17 @@ export default function CreateMembershipProposal() {
     }
   }
 
+  function renderUserAccountBalance() {
+    if (!userAccountBalance) {
+      return '---';
+    }
+
+    const isBalanceInt = Number.isInteger(Number(userAccountBalance));
+    return isBalanceInt
+      ? userAccountBalance
+      : formatDecimal(Number(userAccountBalance));
+  }
+
   function getUnauthorizedMessage() {
     // user is not connected
     if (!isConnected) {
@@ -379,7 +381,7 @@ export default function CreateMembershipProposal() {
                       ? FormFieldErrors.INVALID_NUMBER
                       : amount <= 0
                       ? 'The value must be greater than 0 ETH.'
-                      : amount >= Number(userAccountBalance?.eth)
+                      : amount >= Number(userAccountBalance)
                       ? 'Insufficient funds.'
                       : true;
                   },
@@ -396,13 +398,7 @@ export default function CreateMembershipProposal() {
             />
           </div>
           <div className="form__input-addon">
-            available:{' '}
-            <span>
-              {userAccountBalance
-                ? formatDecimal(Number(userAccountBalance.eth))
-                : '---'}{' '}
-              ETH
-            </span>
+            available: <span>{renderUserAccountBalance()}</span>
           </div>
         </div>
 
