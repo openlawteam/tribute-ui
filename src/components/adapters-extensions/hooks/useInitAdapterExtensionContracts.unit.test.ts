@@ -64,6 +64,18 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
         expect(
           reduxStore.getState().contracts.BankExtensionContract
         ).toBeNull();
+        expect(
+          reduxStore.getState().contracts.ConfigurationContract
+        ).toBeNull();
+        expect(reduxStore.getState().contracts.DistributeContract).toBeNull();
+        expect(reduxStore.getState().contracts.FinancingContract).toBeNull();
+        expect(reduxStore.getState().contracts.GuildBankContract).toBeNull();
+        expect(reduxStore.getState().contracts.ManagingContract).toBeNull();
+        expect(reduxStore.getState().contracts.OnboardingContract).toBeNull();
+        expect(reduxStore.getState().contracts.RagequitContract).toBeNull();
+        expect(reduxStore.getState().contracts.TributeContract).toBeNull();
+        expect(reduxStore.getState().contracts.VotingContract).toBeNull();
+        expect(reduxStore.getState().contracts.WithdrawContract).toBeNull();
       });
 
       reduxStore.dispatch({
