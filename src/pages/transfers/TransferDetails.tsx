@@ -111,7 +111,7 @@ export default function TransferDetails() {
         ? balanceReadable
         : formatDecimal(Number(balanceReadable));
     } catch (error) {
-      // Fallback gracefully to ellipsis
+      transferAmount = '\u2026';
     }
 
     return (
