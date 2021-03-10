@@ -52,7 +52,7 @@
   padding-bottom: 1.5rem;
 
   div:first-child {
-    flex: 70% 1;
+    flex: 1;
   }
 
   > div {
@@ -64,10 +64,10 @@
 
 .registered {
   .adapter-extension__info {
-    flex: 70%;
+    flex: 75%;
   }
   .adapter-extension__configure {
-    flex: 30%;
+    flex: 25%;
   }
 }
 
@@ -77,10 +77,15 @@
     flex: 10%;
   }
   .adapter-extension__info {
-    flex: 60%;
+    flex: 90%;
   }
   .adapter-extension__add {
-    flex: 30%;
+    flex: 25%;
+  }
+  .adapter-extension__inner-wrapper {
+    flex: 75% 1;
+    display: flex;
+    flex-direction: row;
   }
 }
 
@@ -100,6 +105,10 @@
 .adapter-extension__configure {
   align-self: center;
   text-align: center;
+
+  @media only screen and (max-width: em($bp-sm)) {
+    margin-top: 1rem;
+  }
 }
 .adapter-extension__remove {
   border-top: 2px solid #eaeaea;
