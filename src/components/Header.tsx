@@ -25,16 +25,14 @@ export default function Header() {
   }
 
   return (
-    <>
-      <header className="header">
-        <RenderLogo>
-          <LeftLogo />
-        </RenderLogo>
+    <header className="header">
+      <RenderLogo>
+        <LeftLogo />
+      </RenderLogo>
 
-        <div className="header__nav-container">
-          <Nav />
-        </div>
-      </header>
-    </>
+      <div className="header__nav-container">
+        <Nav />
+      </div>
+    </header>
   );
 }

@@ -4,6 +4,7 @@ import AOS from 'aos';
 import '../../../node_modules/aos/dist/aos.css';
 
 import {CenterLogo} from '../../components/logo';
+import {NavHamburger} from '../../components/Nav';
 import FadeIn from '../../components/common/FadeIn';
 import Wrap from '../../components/common/Wrap';
 
@@ -20,6 +21,14 @@ const MolochV3Cube = React.memo(() => {
     </div>
   );
 });
+
+function GetStartedHeader() {
+  return (
+    <div className="landing__header">
+      <NavHamburger />
+    </div>
+  );
+}
 
 export default function GetStarted() {
   /**
@@ -42,33 +51,38 @@ export default function GetStarted() {
     });
   }, []);
 
+  /**
+   * Render
+   */
+
   return (
-    <Wrap className="section-wrapper">
-      <FadeIn>
-        <header className="header">
+    <>
+      <GetStartedHeader />
+      <Wrap className="section-wrapper">
+        <FadeIn>
           <CenterLogo />
-        </header>
 
-        <div className="landing">
-          <div className="landing__subtitle">
-            A proposed evolution of the Moloch DAO framework
-          </div>
+          <div className="landing">
+            <div className="landing__subtitle">
+              A proposed evolution of the Moloch DAO framework
+            </div>
 
-          <div className="landing__img">
-            <MolochV3Cube />
-          </div>
+            <div className="landing__img">
+              <MolochV3Cube />
+            </div>
 
-          <div className="landing__button">
-            <button
-              className="button"
-              onClick={() => {
-                history.push('/join');
-              }}>
-              Join
-            </button>
+            <div className="landing__button">
+              <button
+                className="button"
+                onClick={() => {
+                  history.push('/join');
+                }}>
+                Join
+              </button>
+            </div>
           </div>
-        </div>
-      </FadeIn>
-    </Wrap>
+        </FadeIn>
+      </Wrap>
+    </>
   );
 }

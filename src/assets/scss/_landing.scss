@@ -1,6 +1,15 @@
 @use "./variables" as *; /* load without namespace for convenience */
 @use "./mixins" as *; /* load without namespace for convenience */
 
+.landing__header {
+  z-index: 9;
+  position: relative;
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  padding: 1.5rem 0;
+}
+
 .landing {
   align-items: center;
   display: flex;
@@ -14,6 +23,7 @@
   text-align: center;
   letter-spacing: 2px;
   line-height: 1.5;
+  margin-top: 1.5rem;
 
   @include size-medium-down {
     font-size: 1.15rem;

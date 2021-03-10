@@ -2,13 +2,12 @@
 @use "./mixins" as *; /* load without namespace for convenience */
 
 .logo-container {
-  line-height: 9em;
-  padding: 1em 3em;
+  padding: 1rem 3rem;
   width: 100%;
   z-index: 0;
 
   &--header {
-    padding: 0 3em;
+    padding: 0 2rem;
   }
 
   &--center {
