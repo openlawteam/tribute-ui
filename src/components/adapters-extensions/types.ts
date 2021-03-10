@@ -4,6 +4,7 @@ export type Adapters = {
   adapterId?: string;
   name: DaoConstants;
   description: string;
+  abiFunctionName: string;
 };
 
 export type Extensions = {
@@ -11,6 +12,7 @@ export type Extensions = {
   name: DaoConstants;
   description: string;
   isExtension: boolean;
+  abiFunctionName: string;
 };
 
 export type AdaptersOrExtensions = Adapters | Extensions;

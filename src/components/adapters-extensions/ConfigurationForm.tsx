@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
@@ -308,7 +308,7 @@ export default function ConfigurationForm({
         <button
           className="button--secondary"
           disabled={isRemoveInProcessOrDone || isConfigureInProcessOrDone}
-          onClick={handleRemove}>
+          onClick={() => (isRemoveDone ? {} : handleRemove())}>
           {isRemoveInProcess ? <Loader /> : isRemoveDone ? 'Done' : 'Remove'}
         </button>
 

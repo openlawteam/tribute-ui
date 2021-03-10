@@ -90,33 +90,35 @@ export default function AdapterExtensionSelectTarget(
 
   return (
     <>
-      {/* CHECKBOX ACTIONS */}
-      {renderCheckboxAction({selectedTargetOption})}
+      <div className="adapter-extension__inner-wrapper ">
+        {/* CHECKBOX ACTIONS */}
+        {renderCheckboxAction({selectedTargetOption})}
 
-      <div className="adapter-extension__info">
-        {/* ADAPTER/EXTENSION TARGET DEFAULT NAME */}
-        <span className="adapter-extension__name">
-          {adapterOrExtension?.optionDefaultTarget}
-          {adapterOrExtension?.isExtension && '(EXTENSION)'}
-        </span>
+        <div className="adapter-extension__info">
+          {/* ADAPTER/EXTENSION TARGET DEFAULT NAME */}
+          <span className="adapter-extension__name">
+            {adapterOrExtension?.optionDefaultTarget}
+            {adapterOrExtension?.isExtension && '(EXTENSION)'}
+          </span>
 
-        {/* CHOOSE ADAPTER/EXTENSION TARGET */}
-        <select className="select" onChange={handleSelectTargetChange}>
-          <option
-            key={'adapterOrExtensionSelect'}
-            value=""
-            disabled={selectedTargetOption !== null}>
-            Select a {adapterOrExtension?.optionDefaultTarget} type&hellip;
-          </option>
-
-          {adapterOrExtension?.options.map((option: any) => (
-            <option key={option.displayName} value={option.displayName}>
-              {option.displayName.toUpperCase()}
+          {/* CHOOSE ADAPTER/EXTENSION TARGET */}
+          <select className="select" onChange={handleSelectTargetChange}>
+            <option
+              key={'adapterOrExtensionSelect'}
+              value=""
+              disabled={selectedTargetOption !== null}>
+              Select a {adapterOrExtension?.optionDefaultTarget} type&hellip;
             </option>
-          ))}
-        </select>
 
-        {renderDescription(selectedTargetOption)}
+            {adapterOrExtension?.options.map((option: any) => (
+              <option key={option.displayName} value={option.displayName}>
+                {option.displayName.toUpperCase()}
+              </option>
+            ))}
+          </select>
+
+          {renderDescription(selectedTargetOption)}
+        </div>
       </div>
 
       {/* BUTTON ACTIONS */}

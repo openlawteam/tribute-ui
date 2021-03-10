@@ -1,5 +1,4 @@
-// import {waitFor} from '@testing-library/react';
-import {act, renderHook} from '@testing-library/react-hooks';
+import {renderHook} from '@testing-library/react-hooks';
 
 import {
   DEFAULT_ADAPTER_OR_EXTENSION_ID,
@@ -15,8 +14,11 @@ describe('useValidation unit tests', () => {
     expect(result.current.isParamInputValid).toBeInstanceOf(Function);
     expect(result.current.getFormFieldError).toBeInstanceOf(Function);
     expect(result.current.formatInputByType).toBeInstanceOf(Function);
+  });
 
-    // test all paramInputs are valid
+  test('should valid correct param inputs', async () => {
+    const {result} = await renderHook(() => useValidation());
+
     expect(result.current.isParamInputValid(123, ParamType.UINT256)).toBe(true);
     expect(
       result.current.isParamInputValid([1, 22, 354], ParamType.UINT256_ARRAY)
@@ -36,13 +38,25 @@ describe('useValidation unit tests', () => {
     expect(
       result.current.isParamInputValid(DEFAULT_ETH_ADDRESS, ParamType.ADDRESS)
     ).toBe(true);
+  });
 
-    // test all paramInputs are invalid
-    expect(result.current.isParamInputValid('0x0', ParamType.ADDRESS)).toBe(
+  test('should invalidate incorrect param inputs', async () => {
+    const {result} = await renderHook(() => useValidation());
+
+    expect(result.current.isParamInputValid('x0', ParamType.ADDRESS)).toBe(
       false
     );
-    expect(result.current.isParamInputValid('0x0', ParamType.ADDRESS)).toBe(
+    expect(result.current.isParamInputValid('x0', ParamType.UINT256)).toBe(
       false
     );
+    expect(
+      result.current.isParamInputValid(['test', '123'], ParamType.UINT256_ARRAY)
+    ).toBe(false);
+    expect(result.current.isParamInputValid('x0', ParamType.BYTES32)).toBe(
+      false
+    );
+    expect(
+      result.current.isParamInputValid(['x0', 'x0'], ParamType.BYTES32_ARRAY)
+    ).toBe(false);
   });
 });

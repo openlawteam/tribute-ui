@@ -16,15 +16,14 @@ import {
   AdaptersAndExtensionsType,
 } from './config';
 
-import {
-  getAdapterOrExtensionId,
-  getAccessControlLayer,
-  getConfigurationABIFunction,
-} from './helpers';
+import {getAdapterOrExtensionId, getAccessControlLayer} from './helpers';
 import {getDaoState, DaoState} from '../web3/helpers';
 import {truncateEthAddress} from '../../util/helpers';
 
-import {useAdaptersOrExtensions} from './hooks/useAdaptersOrExtensions';
+import {
+  useAdaptersOrExtensions,
+  useInitAdapterExtensionContracts,
+} from './hooks';
 import {useDao, useMemberActionDisabled} from '../../hooks';
 import {
   useContractSend,
@@ -33,13 +32,14 @@ import {
   useIsDefaultChain,
 } from '../web3/hooks';
 
-import ConfiguratorModal from './ConfigurationModal';
 import AdapterExtensionSelectTarget from './AdapterOrExtensionSelectTarget';
+import ConfigurationModal from './ConfigurationModal';
 import Checkbox, {CheckboxSize} from '../common/Checkbox';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
-import Wrap from '../common/Wrap';
 import FadeIn from '../common/FadeIn';
+import FinalizeModal from './FinalizeModal';
 import Loader from '../feedback/Loader';
+import Wrap from '../common/Wrap';
 
 enum WhyDisableModalTitles {
   FINALIZED_REASON = 'Why is finalizing disabled?',
@@ -75,7 +75,8 @@ export default function AdapterOrExtensionManager() {
   const [isDone, setIsDone] = useState<Record<string, boolean> | undefined>();
   const [inputParameters, setInputParameters] = useState<Record<string, any>>();
   const [submitError, setSubmitError] = useState<Error>();
-  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [openConfigureModal, setOpenConfigureModal] = useState<boolean>(false);
+  const [openFinalizeModal, setOpenFinalizeModal] = useState<boolean>(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [selectionCount, setSelectionCount] = useState<number>(0);
   const [selections, setSelections] = useState<
@@ -103,6 +104,7 @@ export default function AdapterOrExtensionManager() {
     registeredAdaptersOrExtensions,
     unRegisteredAdaptersOrExtensions,
   } = useAdaptersOrExtensions();
+  const {initAdapterExtensionContract} = useInitAdapterExtensionContracts();
   const {dao, gqlError} = useDao();
 
   const {
@@ -126,13 +128,11 @@ export default function AdapterOrExtensionManager() {
   const isConnected = connected && account;
   const isDAOExisting: Record<string, any> | undefined = dao;
   const isDAOReady: boolean = daoState === DaoState.READY;
-  // grammatically naming is incorrect :)
-  const isAdaptersUnavailable: boolean =
+  const isUnavailable: boolean =
     adapterExtensionStatus === AsyncStatus.REJECTED &&
     registeredAdaptersOrExtensions === undefined &&
     unRegisteredAdaptersOrExtensions === undefined;
-  const isLoadingAdapters: boolean =
-    adapterExtensionStatus === AsyncStatus.PENDING;
+  const isLoading: boolean = adapterExtensionStatus === AsyncStatus.PENDING;
 
   // @todo track the prior selection of a dropdown target
   // let priorSelectedTargetOption: DaoConstants | null = null;
@@ -208,7 +208,7 @@ export default function AdapterOrExtensionManager() {
   /**
    * handleAddAdapter
    *
-   * Handles adding `adapter`
+   * Handles adding an `adapter`
    *
    * @param adapter
    */
@@ -291,7 +291,9 @@ export default function AdapterOrExtensionManager() {
   ): Promise<void> {
     setSubmitError(undefined);
 
-    if (!DaoRegistryContract) return;
+    if (!DaoRegistryContract) {
+      throw new Error('No DAO Registry contract was found.');
+    }
 
     try {
       setIsInProcess((prevState) => ({
@@ -346,7 +348,8 @@ export default function AdapterOrExtensionManager() {
         [adapterOrExtensionName]: true,
       }));
 
-      // @todo re-initContracts
+      // init adapter/extension contracts
+      initAdapterExtensionContract(adapterOrExtensionName);
     } catch (error) {
       setIsInProcess((prevState) => ({
         ...prevState,
@@ -460,12 +463,14 @@ export default function AdapterOrExtensionManager() {
     setSubmitError(undefined);
 
     try {
-      // Get ABI function name
-      const abiFunctionName: string = getConfigurationABIFunction()[
-        adapterOrExtension.name
-      ];
+      const {abiFunctionName, name} = adapterOrExtension;
+
+      if (!abiFunctionName) {
+        throw new Error(`ABI function not found for ${name}`);
+      }
+
       // Get adapters/extension ABI
-      const {abi} = getAdapterOrExtensionFromRedux(adapterOrExtension.name);
+      const {abi} = getAdapterOrExtensionFromRedux(name);
       // Get adapters/extension configure function input parameters
       const {inputs} = abi.filter(
         (p: Record<string, any>) => p.name === abiFunctionName
@@ -474,7 +479,7 @@ export default function AdapterOrExtensionManager() {
       setABIMethodName(abiFunctionName);
       setConfigureAdapterOrExtension(adapterOrExtension);
       setInputParameters(inputs);
-      setOpenModal(true);
+      setOpenConfigureModal(true);
     } catch (error) {
       const errorMessage = new Error(
         error && error?.code === 4001
@@ -483,23 +488,6 @@ export default function AdapterOrExtensionManager() {
       );
       setSubmitError(errorMessage);
     }
-  }
-
-  /**
-   * confirmFinalizePrompt
-   */
-  function confirmFinalizePrompt(): void {
-    if (window.confirm('Do you really want to finalize this DAO?')) {
-      handleFinalizeDao();
-    }
-  }
-
-  async function handleFinalizeDao(): Promise<void> {
-    window.alert(`Sorry, finalizing isn't ready yet!`);
-
-    try {
-      // get getDaoState when done
-    } catch (error) {}
   }
 
   // Handles the select all checkbox event
@@ -625,7 +613,7 @@ export default function AdapterOrExtensionManager() {
               label={`${selectionCount} selected`}
               checked={selectAll === true}
               disabled={
-                isAdaptersUnavailable ||
+                isUnavailable ||
                 isDisabled || // connected user is not an active member
                 unRegisteredAdaptersOrExtensions?.length === 0 || // nothing left to register
                 !isDAOExisting
@@ -649,12 +637,12 @@ export default function AdapterOrExtensionManager() {
           </div>
         </div>
 
-        {isLoadingAdapters && (
+        {isLoading && (
           <div className="adapter-extension__loader">
             <Loader text="Loading data from subgraph..." />
           </div>
         )}
-        {isAdaptersUnavailable && <p>No adapters available</p>}
+        {isUnavailable && <p>No adapters/extensions available</p>}
 
         {/** UNUSED ADAPTERS AND EXTENSIONS TO ADD */}
         {isDAOExisting &&
@@ -741,33 +729,35 @@ export default function AdapterOrExtensionManager() {
                 ) : (
                   <>
                     {/** RENDER ADAPTER/EXTENSION */}
-                    <div className="adapter-extension__checkbox">
-                      <Checkbox
-                        id={adapter.name}
-                        label={''}
-                        checked={
-                          (selections && selections[adapter.name] === true) ||
-                          false
-                        }
-                        disabled={isDisabled}
-                        name={adapter.name}
-                        size={CheckboxSize.LARGE}
-                        onChange={(event) => {
-                          setSelections((s) => ({
-                            ...s,
-                            [adapter.name]: event.target.checked,
-                          }));
-                        }}
-                      />
-                    </div>
+                    <div className="adapter-extension__inner-wrapper ">
+                      <div className="adapter-extension__checkbox">
+                        <Checkbox
+                          id={adapter.name}
+                          label={''}
+                          checked={
+                            (selections && selections[adapter.name] === true) ||
+                            false
+                          }
+                          disabled={isDisabled}
+                          name={adapter.name}
+                          size={CheckboxSize.LARGE}
+                          onChange={(event) => {
+                            setSelections((s) => ({
+                              ...s,
+                              [adapter.name]: event.target.checked,
+                            }));
+                          }}
+                        />
+                      </div>
 
-                    <div className="adapter-extension__info">
-                      <span className="adapter-extension__name">
-                        {adapter.name} {adapter?.isExtension && '(EXTENSION)'}
-                      </span>
-                      <span className="adapter-extension__desc">
-                        {adapter.description}
-                      </span>
+                      <div className="adapter-extension__info">
+                        <span className="adapter-extension__name">
+                          {adapter.name} {adapter?.isExtension && '(EXTENSION)'}
+                        </span>
+                        <span className="adapter-extension__desc">
+                          {adapter.description}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="adapter-extension__add">
@@ -775,6 +765,7 @@ export default function AdapterOrExtensionManager() {
                         className="button--secondary"
                         disabled={
                           (isInProcess && isInProcess[adapter.name]) ||
+                          (isDone && isDone[adapter.name]) ||
                           isDisabled
                         }
                         onClick={() =>
@@ -797,7 +788,7 @@ export default function AdapterOrExtensionManager() {
             )
           )}
 
-        {/** CURRENTLY USED ADAPTERS/EXTENSIONS TO CONFIGURE OR REMOVE */}
+        {/** USED ADAPTERS/EXTENSIONS TO CONFIGURE OR REMOVE */}
         {isDAOExisting &&
           registeredAdaptersOrExtensions &&
           registeredAdaptersOrExtensions?.length > 0 &&
@@ -857,13 +848,13 @@ export default function AdapterOrExtensionManager() {
             <button
               className="button--secondary finalize"
               disabled={
-                isAdaptersUnavailable || !isDAOExisting || isDAOReady
+                isUnavailable || !isDAOExisting || isDAOReady
                 /* @todo 
               - also disable when selection is processing 
               - when there are no more unused adapters to select
               */
               }
-              onClick={confirmFinalizePrompt}>
+              onClick={() => setOpenFinalizeModal(true)}>
               Finalize Dao
             </button>
           </div>
@@ -885,14 +876,26 @@ export default function AdapterOrExtensionManager() {
           <WhyDisabledModal title={whyDisabledReason} />
         </div>
 
-        {openModal && (
-          <ConfiguratorModal
+        {openConfigureModal && (
+          <ConfigurationModal
             abiMethodName={abiMethodName}
             adapterOrExtension={configureAdapterOrExtension}
             configurationInputs={inputParameters}
-            isOpen={openModal}
+            isOpen={openConfigureModal}
             closeHandler={() => {
-              setOpenModal(false);
+              setOpenConfigureModal(false);
+            }}
+          />
+        )}
+
+        {openFinalizeModal && (
+          <FinalizeModal
+            isOpen={openFinalizeModal}
+            closeHandler={() => {
+              setOpenFinalizeModal(false);
+
+              // check the state of the dao
+              checkDaoStateCached();
             }}
           />
         )}
