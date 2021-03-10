@@ -24,6 +24,7 @@
 @use "./cube"; /* Moloch v3 cube styles */
 @use "./radiolist"; /* radiolist styles */
 @use "./socialmedia"; /* social media styles */
+@use "./footer"; /* footer styles */
 
 html {
   height: 100%;
@@ -109,15 +110,15 @@ main {
 
 .section-wrapper {
   flex: 1 1;
-  margin: 0 auto 9rem;
+  margin: 0 auto 4rem;
   max-width: 75rem; // 1200px
 
   @media only screen and (max-width: calc(75rem + 4rem)) {
-    margin: 0 2rem 9rem;
+    margin: 0 2rem 4rem;
   }
 
   @media only screen and (max-width: $bp-sm) {
-    margin: 0 1rem 9rem;
+    margin: 0 1rem 4rem;
   }
 }
 

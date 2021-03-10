@@ -2,7 +2,7 @@ import DiscordSVG from '../../assets/svg/DiscordSVG';
 import GitHubSVG from '../../assets/svg/GitHubSVG';
 import MediumSVG from '../../assets/svg/MediumSVG';
 
-// @todo Add missing links when available
+// @todo Add missing URLs when available
 enum SocialMediaLinks {
   DISCORD = '#',
   GITHUB_CONTRACTS = 'https://github.com/openlawteam/molochv3-contracts',
