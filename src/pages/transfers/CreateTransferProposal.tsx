@@ -570,7 +570,6 @@ export default function CreateTransferProposal() {
    */
 
   // Render unauthorized message
-
   if (!isConnected || defaultChainError || !isActiveMember) {
     return (
       <RenderWrapper>

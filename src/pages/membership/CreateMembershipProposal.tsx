@@ -288,27 +288,28 @@ export default function CreateMembershipProposal() {
     }
   }
 
+  function getUnauthorizedMessage() {
+    // user is not connected
+    if (!isConnected) {
+      return 'Connect your wallet to submit a membership proposal.';
+    }
+
+    // user is on wrong network
+    if (defaultChainError) {
+      return defaultChainError.message;
+    }
+  }
+
   /**
    * Render
    */
 
-  // Render wallet auth message if user is not connected
-  if (!isConnected) {
+  // Render unauthorized message
+  if (!isConnected || defaultChainError) {
     return (
       <RenderWrapper>
         <div className="form__description--unauthorized">
-          <p>Connect your wallet to submit a member proposal.</p>
-        </div>
-      </RenderWrapper>
-    );
-  }
-
-  // Render wrong network message if user is on wrong network
-  if (defaultChainError) {
-    return (
-      <RenderWrapper>
-        <div className="form__description--unauthorized">
-          <p>{defaultChainError.message}</p>
+          <p>{getUnauthorizedMessage()}</p>
         </div>
       </RenderWrapper>
     );
