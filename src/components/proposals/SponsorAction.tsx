@@ -237,7 +237,9 @@ export default function SponsorAction(props: SponsorActionProps) {
         )}
 
         {isDisabled && (
-          <button className="button--help" onClick={openWhyDisabledModal}>
+          <button
+            className="button--help-centered"
+            onClick={openWhyDisabledModal}>
             Why is sponsoring disabled?
           </button>
         )}

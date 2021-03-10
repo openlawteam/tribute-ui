@@ -25,7 +25,7 @@ describe('CreateMembershipProposal unit tests', () => {
     expect(() => screen.getByLabelText(/applicant address/i)).toThrow();
     expect(() => screen.getByLabelText(/amount/i)).toThrow();
     expect(
-      screen.getByText(/connect your wallet to submit a member proposal/i)
+      screen.getByText(/connect your wallet to submit a membership proposal/i)
     ).toBeInTheDocument();
   });
 

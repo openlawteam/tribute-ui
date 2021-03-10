@@ -1,28 +1,32 @@
 @use "./variables" as *; /* load without namespace for convenience */
 @use "./mixins" as *; /* load without namespace for convenience */
 
+.landing__header {
+  z-index: 9;
+  position: relative;
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  padding: 1.5rem 0;
+}
+
 .landing {
   align-items: center;
   display: flex;
   flex-direction: column;
-  font-family: $font-mono;
-  padding: 1rem;
-  margin: 0 2rem 0;
-
-  @include size-medium-down {
-    padding-top: 0;
-  }
+  font-family: $font-body;
+  margin: 0 2rem;
 }
 
 .landing__subtitle {
-  > p {
-    font-size: 1.2rem;
-    text-align: center;
+  font-size: 1.2rem;
+  text-align: center;
+  letter-spacing: 2px;
+  line-height: 1.5;
+  margin-top: 1.5rem;
 
-    @include size-medium-down {
-      font-size: 1.15rem;
-      margin-top: 0;
-    }
+  @include size-medium-down {
+    font-size: 1.15rem;
   }
 }
 
@@ -35,34 +39,5 @@
     font-size: 1.5rem;
     padding: 1rem 4rem;
     margin: 2.5rem 0 1rem;
-  }
-}
-
-.landing__navlinks .nav__list {
-  display: inline-flex;
-  flex-direction: row;
-  font-size: 1.2rem;
-  text-transform: lowercase;
-
-  > li {
-    margin: 1.5rem;
-    text-align: center;
-
-    a {
-      text-decoration: none;
-
-      &.active,
-      &:hover {
-        color: $color-primary-hover;
-      }
-    }
-
-    @include size-medium-down {
-      margin: 1.5rem 0 0;
-    }
-  }
-
-  @include size-medium-down {
-    flex-direction: column;
   }
 }

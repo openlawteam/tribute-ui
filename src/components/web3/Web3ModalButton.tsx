@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {isMobile} from 'react-device-detect';
-import {useHistory} from 'react-router-dom';
 
 import {CHAINS} from '../../config';
 import {svgWalletIcon} from './WalletIcons';
@@ -44,12 +43,6 @@ function ConnectWallet({
   const {defaultChain, defaultChainError, isDefaultChain} = useIsDefaultChain();
 
   /**
-   * Their hooks
-   */
-
-  const history = useHistory();
-
-  /**
    * State
    */
 
@@ -81,11 +74,6 @@ function ConnectWallet({
         return customWalletText || '';
       }
     }
-  }
-
-  function handleNavigate(): void {
-    setOpenModal(false);
-    history.push(`/members/${account}`);
   }
 
   function displayProviders(): JSX.Element {
@@ -140,13 +128,11 @@ function ConnectWallet({
             <div className="modal__subtitle">Choose Your Wallet</div>
           )}
 
-          {/* CONNECTED ACCOUNT BUTTON LINK */}
+          {/* CONNECTED ACCOUNT TEXT */}
           {account && (
-            <button
-              className="walletconnect__connected-address-button"
-              onClick={handleNavigate}>
-              {isMobile ? truncateEthAddress(account) : account}
-            </button>
+            <div className="walletconnect__connected-address-text">
+              {truncateEthAddress(account, 7)}
+            </div>
           )}
 
           {/* SHOW; WRONG NETWORK MSG || PROVIDER OPTIONS */}

@@ -4,9 +4,10 @@ import AOS from 'aos';
 import '../../../node_modules/aos/dist/aos.css';
 
 import {CenterLogo} from '../../components/logo';
-import {NavLinks} from '../../components/Nav';
+import {NavHamburger} from '../../components/Nav';
 import FadeIn from '../../components/common/FadeIn';
 import Wrap from '../../components/common/Wrap';
+import SocialMedia from '../../components/common/SocialMedia';
 
 const MolochV3Cube = React.memo(() => {
   return (
@@ -21,6 +22,15 @@ const MolochV3Cube = React.memo(() => {
     </div>
   );
 });
+
+function GetStartedHeader() {
+  return (
+    <div data-testid="header" className="landing__header">
+      <SocialMedia />
+      <NavHamburger />
+    </div>
+  );
+}
 
 export default function GetStarted() {
   /**
@@ -43,37 +53,38 @@ export default function GetStarted() {
     });
   }, []);
 
+  /**
+   * Render
+   */
+
   return (
-    <Wrap className="section-wrapper">
-      <FadeIn>
-        <header className="header">
+    <>
+      <GetStartedHeader />
+      <Wrap className="section-wrapper">
+        <FadeIn>
           <CenterLogo />
-        </header>
 
-        <div className="landing">
-          <div className="landing__subtitle">
-            <p>For the ongoing development of Moloch v3</p>
-          </div>
+          <div className="landing">
+            <div className="landing__subtitle">
+              A proposed evolution of the Moloch DAO framework
+            </div>
 
-          <div className="landing__img">
-            <MolochV3Cube />
-          </div>
+            <div className="landing__img">
+              <MolochV3Cube />
+            </div>
 
-          <div className="landing__button">
-            <button
-              className="button"
-              onClick={() => {
-                history.push('/join');
-              }}>
-              Join
-            </button>
+            <div className="landing__button">
+              <button
+                className="button"
+                onClick={() => {
+                  history.push('/join');
+                }}>
+                Join
+              </button>
+            </div>
           </div>
-
-          <div className="landing__navlinks">
-            <NavLinks />
-          </div>
-        </div>
-      </FadeIn>
-    </Wrap>
+        </FadeIn>
+      </Wrap>
+    </>
   );
 }

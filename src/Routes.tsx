@@ -16,6 +16,7 @@ import TransferDetails from './pages/transfers/TransferDetails';
 import Transfers from './pages/transfers/Transfers';
 import TributeDetails from './pages/tributes/TributeDetails';
 import Tributes from './pages/tributes/Tributes';
+import AdapterOrExtensionManager from './components/adapters-extensions/AdapterOrExtensionManager';
 
 const proposalIdParameter: string = ':proposalId';
 
@@ -107,6 +108,12 @@ export default function Routes() {
           exact
           path="/members/:ethereumAddress"
           render={() => <MemberProfile />}
+        />,
+        <Route
+          key="dao-manager"
+          exact
+          path="/dao-manager"
+          render={() => <AdapterOrExtensionManager />}
         />,
         <Route key="no-match" component={NotFound} />,
       ]}
