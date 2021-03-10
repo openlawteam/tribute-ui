@@ -7,6 +7,7 @@ import {CenterLogo} from '../../components/logo';
 import {NavHamburger} from '../../components/Nav';
 import FadeIn from '../../components/common/FadeIn';
 import Wrap from '../../components/common/Wrap';
+import SocialMedia from '../../components/common/SocialMedia';
 
 const MolochV3Cube = React.memo(() => {
   return (
@@ -25,6 +26,7 @@ const MolochV3Cube = React.memo(() => {
 function GetStartedHeader() {
   return (
     <div className="landing__header">
+      <SocialMedia />
       <NavHamburger />
     </div>
   );
