@@ -61,6 +61,11 @@ export enum SnapshotMetadataType {
  * TYPES
  */
 
+export type Proposal = {
+  adapterAddress: string;
+  flags: string; // unint256 of Proposal's current flag
+};
+
 // @todo Change the type to be precise
 export type SubgraphProposal = Record<string, any>;
 

@@ -1,10 +1,10 @@
-import {FakeProposal} from './_mockData';
 import {OffchainVotingStatus} from './voting';
+import {ProposalData} from './types';
 
 type ProposalCardProps = {
   buttonText?: string;
   onClick: (proposalHash: string) => void;
-  proposal: FakeProposal; // placeholder prop
+  proposal: ProposalData; // placeholder prop
   name: string;
 };
 
@@ -22,9 +22,10 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
    */
 
   function handleClick() {
-    const proposalHash = proposal.snapshotProposal.hash;
+    const proposalHash =
+      proposal.snapshotProposal?.idInDAO || proposal.snapshotDraft?.idInDAO;
 
-    onClick(proposalHash);
+    proposalHash && onClick(proposalHash);
   }
 
   /**

@@ -2,10 +2,12 @@ import React from 'react';
 import {useHistory} from 'react-router-dom';
 
 import {ProposalHeaderNames} from '../../util/enums';
-// import {truncateEthAddress} from '../../util/helpers';
+import {truncateEthAddress} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
-// import ProposalCard from '../../components/proposals/ProposalCard';
+import {useProposals} from '../../components/proposals/hooks/useProposals';
+import {DaoConstants} from '../../components/adapters-extensions/enums';
+import ProposalCard from '../../components/proposals/ProposalCard';
 // import {
 //   fakeMembershipProposalsVoting,
 //   fakeMembershipProposalsRequest,
@@ -19,7 +21,15 @@ export default function Membership() {
    * Their hooks
    */
 
-  // const history = useHistory();
+  const history = useHistory();
+
+  /**
+   * Our hooks
+   */
+
+  const {proposals, proposalsStatus} = useProposals({
+    adapterName: DaoConstants.ONBOARDING,
+  });
 
   /**
    * Variables
@@ -33,6 +43,30 @@ export default function Membership() {
   /**
    * Functions
    */
+
+  // @note TEST
+  return (
+    <RenderWrapper>
+      {proposals.map((proposal) => {
+        return (
+          <ProposalCard
+            key={
+              proposal.snapshotDraft?.idInDAO ||
+              proposal.snapshotProposal?.idInDAO
+            }
+            onClick={(id) => history.push(`membership/${id}`)}
+            proposal={proposal}
+            name={truncateEthAddress(
+              proposal.snapshotProposal?.msg.payload.name ||
+                proposal.snapshotDraft?.msg.payload.name ||
+                '',
+              7
+            )}
+          />
+        );
+      })}
+    </RenderWrapper>
+  );
 
   /* function renderProposalCards(proposals: FakeProposal[]) {
     return proposals.map((proposal) => {
@@ -59,43 +93,43 @@ export default function Membership() {
    * Render
    */
 
-  return (
-    <RenderWrapper>
-      <div className="grid--fluid grid-container">
-        {/* VOTING PROPOSALS */}
-        {votingProposals.length > 0 && (
-          <>
-            <div className="grid__header">{ProposalHeaderNames.VOTING}</div>
-            <div className="grid__cards">{votingProposals}</div>
-          </>
-        )}
+  // return (
+  //   <RenderWrapper>
+  //     <div className="grid--fluid grid-container">
+  //       {/* VOTING PROPOSALS */}
+  //       {votingProposals.length > 0 && (
+  //         <>
+  //           <div className="grid__header">{ProposalHeaderNames.VOTING}</div>
+  //           <div className="grid__cards">{votingProposals}</div>
+  //         </>
+  //       )}
 
-        {/* PENDING PROPOSALS (DRAFTS, NOT SPONSORED) */}
-        {requestProposals.length > 0 && (
-          <>
-            <div className="grid__header">{ProposalHeaderNames.REQUESTS}</div>
-            <div className="grid__cards">{requestProposals}</div>
-          </>
-        )}
+  //       {/* PENDING PROPOSALS (DRAFTS, NOT SPONSORED) */}
+  //       {requestProposals.length > 0 && (
+  //         <>
+  //           <div className="grid__header">{ProposalHeaderNames.REQUESTS}</div>
+  //           <div className="grid__cards">{requestProposals}</div>
+  //         </>
+  //       )}
 
-        {/* PASSED PROPOSALS */}
-        {passedProposals.length > 0 && (
-          <>
-            <div className="grid__header">{ProposalHeaderNames.PASSED}</div>
-            <div className="grid__cards">{passedProposals}</div>
-          </>
-        )}
+  //       {/* PASSED PROPOSALS */}
+  //       {passedProposals.length > 0 && (
+  //         <>
+  //           <div className="grid__header">{ProposalHeaderNames.PASSED}</div>
+  //           <div className="grid__cards">{passedProposals}</div>
+  //         </>
+  //       )}
 
-        {/* FAILED PROPOSALS */}
-        {failedProposals.length > 0 && (
-          <>
-            <div className="grid__header">{ProposalHeaderNames.FAILED}</div>
-            <div className="grid__cards">{failedProposals}</div>
-          </>
-        )}
-      </div>
-    </RenderWrapper>
-  );
+  //       {/* FAILED PROPOSALS */}
+  //       {failedProposals.length > 0 && (
+  //         <>
+  //           <div className="grid__header">{ProposalHeaderNames.FAILED}</div>
+  //           <div className="grid__cards">{failedProposals}</div>
+  //         </>
+  //       )}
+  //     </div>
+  //   </RenderWrapper>
+  // );
 }
 
 function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
