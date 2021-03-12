@@ -37,9 +37,13 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
       {/* TITLE */}
       <h3 className="proposalcard__title">{name}</h3>
 
+      {/**
+       * @todo Should change status component based on voting adapter
+       *   It's currently not possible to get the voting adapter used for a DAO proposal,
+       *   so until then we need to use the currently registered voting adapter for the DAO.
+       */}
       {/* VOTING PROGRESS STATUS AND BAR */}
-      {/* @todo fix */}
-      <OffchainVotingStatus proposal={proposal as any} />
+      <OffchainVotingStatus proposal={proposal} />
 
       {/* BUTTON (no click handler) */}
       <button className="proposalcard__button">{buttonText}</button>
