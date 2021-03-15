@@ -8,6 +8,7 @@ import FadeIn from '../../components/common/FadeIn';
 import {useProposals} from '../../components/proposals/hooks/useProposals';
 import {DaoConstants} from '../../components/adapters-extensions/enums';
 import ProposalCard from '../../components/proposals/ProposalCard';
+import Proposals from '../../components/proposals/Proposals';
 // import {
 //   fakeMembershipProposalsVoting,
 //   fakeMembershipProposalsRequest,
@@ -47,6 +48,8 @@ export default function Membership() {
   // @note TEST
   return (
     <RenderWrapper>
+      <Proposals proposals={proposals} />
+
       {proposals.map((proposal) => {
         return (
           <ProposalCard
