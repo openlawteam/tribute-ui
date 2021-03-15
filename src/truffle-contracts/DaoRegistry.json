@@ -611,29 +611,6 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "adapterId",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "adapterAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "acl",
-        "type": "uint256"
-      }
-    ],
-    "name": "addAdapter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "extensionAddress",
         "type": "address"
@@ -660,9 +637,29 @@
         "internalType": "bytes32",
         "name": "adapterId",
         "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "adapterAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint128",
+        "name": "acl",
+        "type": "uint128"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "keys",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "values",
+        "type": "uint256[]"
       }
     ],
-    "name": "removeAdapter",
+    "name": "replaceAdapter",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

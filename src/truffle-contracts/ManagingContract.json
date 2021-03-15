@@ -128,7 +128,7 @@
         "type": "uint256"
       }
     ],
-    "name": "createAdapterChangeRequest",
+    "name": "submitProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
