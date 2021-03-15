@@ -92,17 +92,17 @@ export default function TransferDetails() {
 
   // Render proposal
   if (proposalData) {
-    const {daoProposal} = proposalData;
     const commonData = proposalData.getCommonSnapshotProposalData();
 
-    // @todo use amounts from proposal.subgraphproposal
     let transferAmount = '\u2026';
+
     try {
       const divisor = toBN(10).pow(
         toBN(commonData?.msg.payload.metadata.tokenDecimals)
       );
-      const beforeDecimal = toBN(daoProposal?.amount).div(divisor);
-      const afterDecimal = toBN(daoProposal?.amount).mod(divisor);
+      // @todo Get amount from adapter's proposal's details: `distributions(...)`
+      const beforeDecimal = toBN(/* amount */ '').div(divisor);
+      const afterDecimal = toBN(/* amount */ '').mod(divisor);
       const balanceReadable = afterDecimal.eq(toBN(0))
         ? beforeDecimal.toString()
         : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;

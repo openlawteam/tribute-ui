@@ -92,17 +92,16 @@ export default function TributeDetails() {
 
   // Render proposal
   if (proposalData) {
-    const {daoProposal} = proposalData;
     const commonData = proposalData.getCommonSnapshotProposalData();
 
-    // @todo use amounts from proposal.subgraphproposal
     let tributeAmount = '\u2026';
     try {
       const divisor = toBN(10).pow(
         toBN(commonData?.msg.payload.metadata.tributeTokenDecimals)
       );
-      const beforeDecimal = toBN(daoProposal?.tributeAmount).div(divisor);
-      const afterDecimal = toBN(daoProposal?.tributeAmount).mod(divisor);
+      // @todo Get amount from adapter's proposal's details: `proposals(...)`
+      const beforeDecimal = toBN(/* tributeAmount */ '').div(divisor);
+      const afterDecimal = toBN(/* tributeAmount */ '').mod(divisor);
       const balanceReadable = afterDecimal.eq(toBN(0))
         ? beforeDecimal.toString()
         : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
@@ -116,7 +115,7 @@ export default function TributeDetails() {
 
     let requestAmount = '\u2026';
     try {
-      requestAmount = formatNumber(daoProposal?.requestAmount);
+      requestAmount = formatNumber(/* requestAmount */ '');
     } catch (error) {
       requestAmount = '\u2026';
     }

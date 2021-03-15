@@ -92,14 +92,13 @@ export default function MembershipDetails() {
 
   // Render proposal
   if (proposalData) {
-    const {daoProposal} = proposalData;
     const commonData = proposalData.getCommonSnapshotProposalData();
 
-    // @todo use amount from proposal.subgraphproposal
     let amount = '\u2026';
     try {
+      // @todo Get amount from adapter's proposal's details: `proposals(...)`
       amount = formatDecimal(
-        Number(Web3.utils.fromWei(daoProposal?.amount, 'ether'))
+        Number(Web3.utils.fromWei(/* amount */ '', 'ether'))
       );
     } catch (error) {
       amount = '\u2026';
