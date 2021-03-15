@@ -1,10 +1,8 @@
 import React from 'react';
 import {useHistory, useParams} from 'react-router-dom';
-import Web3 from 'web3';
 
 import {AsyncStatus} from '../../util/types';
 import {ContractAdapterNames} from '../../components/web3/types';
-import {formatDecimal} from '../../util/helpers';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
@@ -96,10 +94,10 @@ export default function MembershipDetails() {
 
     let amount = '\u2026';
     try {
-      // @todo Get amount from adapter's proposal's details: `proposals(...)`
-      amount = formatDecimal(
-        Number(Web3.utils.fromWei(/* amount */ '', 'ether'))
-      );
+      // @todo Get amount from adapter's proposal's details if subgraph down: `proposals(...)`
+      // amount = formatDecimal(
+      //   Number(Web3.utils.fromWei(/* amount */ '', 'ether'))
+      // );
     } catch (error) {
       amount = '\u2026';
     }

@@ -1,10 +1,8 @@
 import React from 'react';
 import {useHistory, useParams} from 'react-router-dom';
-import {toBN} from 'web3-utils';
 
 import {AsyncStatus} from '../../util/types';
 import {ContractAdapterNames} from '../../components/web3/types';
-import {formatDecimal} from '../../util/helpers';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
@@ -97,19 +95,19 @@ export default function TransferDetails() {
     let transferAmount = '\u2026';
 
     try {
-      const divisor = toBN(10).pow(
-        toBN(commonData?.msg.payload.metadata.tokenDecimals)
-      );
       // @todo Get amount from adapter's proposal's details: `distributions(...)`
-      const beforeDecimal = toBN(/* amount */ '').div(divisor);
-      const afterDecimal = toBN(/* amount */ '').mod(divisor);
-      const balanceReadable = afterDecimal.eq(toBN(0))
-        ? beforeDecimal.toString()
-        : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
-      const isTransferAmountInt = Number.isInteger(Number(balanceReadable));
-      transferAmount = isTransferAmountInt
-        ? balanceReadable
-        : formatDecimal(Number(balanceReadable));
+      // const divisor = toBN(10).pow(
+      //   toBN(commonData?.msg.payload.metadata.tokenDecimals)
+      // );
+      // const beforeDecimal = toBN(/* amount */ '').div(divisor);
+      // const afterDecimal = toBN(/* amount */ '').mod(divisor);
+      // const balanceReadable = afterDecimal.eq(toBN(0))
+      //   ? beforeDecimal.toString()
+      //   : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
+      // const isTransferAmountInt = Number.isInteger(Number(balanceReadable));
+      // transferAmount = isTransferAmountInt
+      //   ? balanceReadable
+      //   : formatDecimal(Number(balanceReadable));
     } catch (error) {
       transferAmount = '\u2026';
     }

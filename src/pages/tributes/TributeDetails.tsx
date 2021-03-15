@@ -1,10 +1,9 @@
 import React from 'react';
 import {useHistory, useParams} from 'react-router-dom';
-import {toBN} from 'web3-utils';
 
 import {AsyncStatus} from '../../util/types';
 import {ContractAdapterNames} from '../../components/web3/types';
-import {formatDecimal, formatNumber} from '../../util/helpers';
+import {formatNumber} from '../../util/helpers';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
@@ -96,19 +95,19 @@ export default function TributeDetails() {
 
     let tributeAmount = '\u2026';
     try {
-      const divisor = toBN(10).pow(
-        toBN(commonData?.msg.payload.metadata.tributeTokenDecimals)
-      );
-      // @todo Get amount from adapter's proposal's details: `proposals(...)`
-      const beforeDecimal = toBN(/* tributeAmount */ '').div(divisor);
-      const afterDecimal = toBN(/* tributeAmount */ '').mod(divisor);
-      const balanceReadable = afterDecimal.eq(toBN(0))
-        ? beforeDecimal.toString()
-        : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
-      const isTributeAmountInt = Number.isInteger(Number(balanceReadable));
-      tributeAmount = isTributeAmountInt
-        ? balanceReadable
-        : formatDecimal(Number(balanceReadable));
+      // @todo Get amount from adapter's proposal's details if subgraph down: `proposals(...)`
+      // const divisor = toBN(10).pow(
+      //   toBN(commonData?.msg.payload.metadata.tributeTokenDecimals)
+      // );
+      // const beforeDecimal = toBN(/* tributeAmount */ '').div(divisor);
+      // const afterDecimal = toBN(/* tributeAmount */ '').mod(divisor);
+      // const balanceReadable = afterDecimal.eq(toBN(0))
+      //   ? beforeDecimal.toString()
+      //   : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
+      // const isTributeAmountInt = Number.isInteger(Number(balanceReadable));
+      // tributeAmount = isTributeAmountInt
+      //   ? balanceReadable
+      //   : formatDecimal(Number(balanceReadable));
     } catch (error) {
       tributeAmount = '\u2026';
     }
