@@ -61,6 +61,8 @@ export default function useMembers() {
       return;
     }
 
+    setMembersStatus(AsyncStatus.PENDING);
+
     try {
       const {
         abi: daoRegistryABI,
@@ -96,11 +98,13 @@ export default function useMembers() {
 
         setMembers(members);
       }
+      setMembersStatus(AsyncStatus.FULFILLED);
     } catch (error) {
       console.error(error);
       setMembers(undefined);
+      setMembersStatus(AsyncStatus.REJECTED);
     }
   }
 
-  return {members};
+  return {members, membersStatus};
 }

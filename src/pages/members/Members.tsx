@@ -6,27 +6,21 @@ import FadeIn from '../../components/common/FadeIn';
 import MemberCard from './MemberCard';
 import useMembers from './hooks/useMembers';
 import {Member} from './types';
+import {AsyncStatus} from '../../util/types';
+import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 
 export default function Members() {
   /**
    * Our hooks
    */
 
-  const {members} = useMembers();
+  const {members, membersStatus} = useMembers();
 
   /**
    * Their hooks
    */
 
   const history = useHistory();
-
-  /**
-   * Cached callbacks
-   */
-
-  /**
-   * Effects
-   */
 
   /**
    * Functions
@@ -53,6 +47,37 @@ export default function Members() {
     };
   }
 
+  function renderContent() {
+    if (
+      membersStatus === AsyncStatus.STANDBY ||
+      membersStatus === AsyncStatus.PENDING
+    ) {
+      return (
+        <div className="loader--emjoi-container">
+          <LoaderWithEmoji />
+        </div>
+      );
+    }
+
+    if (membersStatus === AsyncStatus.REJECTED) {
+      return (
+        <div className="text-center">
+          <p className="error-message">
+            The list of members could not be retrieved.
+          </p>
+        </div>
+      );
+    }
+
+    if (members && membersStatus === AsyncStatus.FULFILLED) {
+      if (members.length > 0) {
+        return <div className="grid__cards">{renderMemberCards(members)}</div>;
+      } else {
+        return <p>No members, yet.</p>;
+      }
+    }
+  }
+
   /**
    * Render
    */
@@ -63,9 +88,7 @@ export default function Members() {
         {/* ACTIVE MEMBERS */}
         <>
           <div className="grid__header">Active Members</div>
-          <div className="grid__cards">
-            {members && renderMemberCards(members)}
-          </div>
+          {renderContent()}
         </>
       </div>
     </RenderWrapper>
