@@ -104,7 +104,7 @@ export type SnapshotProposal = {
 export type SnapshotProposalCommon = SnapshotDraft | SnapshotProposal;
 
 export type ProposalData = {
-  daoProposal: SubgraphProposal | undefined;
+  daoProposal: Proposal | undefined;
   /**
    * Data for either a Draft or Proposal which is shared between the two types.
    */
