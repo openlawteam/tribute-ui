@@ -113,7 +113,7 @@ export const BANK_EXTENSION_CONTRACT_ADDRESS = {
  * - Offchain voting
  * - Financing
  * - Tribute
- * - Distribute @todo add to initContracts
+ * - Distribute
  * - Rage quit
  * - Guild kick
  * - Withdraw
