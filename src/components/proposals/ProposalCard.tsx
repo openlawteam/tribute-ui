@@ -4,7 +4,7 @@ import {ProposalData} from './types';
 type ProposalCardProps = {
   buttonText?: string;
   onClick: (proposalHash: string) => void;
-  proposal: ProposalData; // placeholder prop
+  proposal: ProposalData;
   name: string;
 };
 
