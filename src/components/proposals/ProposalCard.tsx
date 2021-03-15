@@ -1,5 +1,8 @@
 import {OffchainVotingStatus} from './voting';
 import {ProposalData} from './types';
+import {useSelector} from 'react-redux';
+import {StoreState} from '../../store/types';
+import {VotingAdapterName} from '../adapters-extensions/enums';
 
 type ProposalCardProps = {
   buttonText?: string;
@@ -18,6 +21,14 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
   const {buttonText = 'View Proposal', proposal, onClick, name} = props;
 
   /**
+   * Selectors
+   */
+
+  const votingAdapterName = useSelector(
+    (s: StoreState) => s.contracts.VotingContract?.adapterOrExtensionName
+  );
+
+  /**
    * Functions
    */
 
@@ -29,6 +40,24 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
   }
 
   /**
+   * Change status component based on voting adapter.
+   *
+   * @todo It's currently not possible to get the voting adapter used for a DAO proposal,
+   *   so until then we need to use the currently registered voting adapter for the DAO.
+   */
+  function renderStatus(proposal: ProposalData) {
+    switch (votingAdapterName) {
+      case VotingAdapterName.OffchainVotingContract:
+        return <OffchainVotingStatus proposal={proposal} />;
+      // @todo On-chain Voting
+      // case VotingAdapterName.VotingContract:
+      //   return <></>
+      default:
+        return <></>;
+    }
+  }
+
+  /**
    * Render
    */
 
@@ -37,13 +66,8 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
       {/* TITLE */}
       <h3 className="proposalcard__title">{name}</h3>
 
-      {/**
-       * @todo Should change status component based on voting adapter
-       *   It's currently not possible to get the voting adapter used for a DAO proposal,
-       *   so until then we need to use the currently registered voting adapter for the DAO.
-       */}
       {/* VOTING PROGRESS STATUS AND BAR */}
-      <OffchainVotingStatus proposal={proposal} />
+      {renderStatus(proposal)}
 
       {/* BUTTON (no click handler) */}
       <button className="proposalcard__button">{buttonText}</button>
