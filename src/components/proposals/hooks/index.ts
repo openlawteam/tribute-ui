@@ -1,4 +1,4 @@
-export * from './useProposalsVotingResults';
+export * from './useProposalsVotingState';
 export * from './useOffchainVotingResults';
 export * from './useOffchainVotingStartEnd';
 export * from './useProposalOrDraft';
