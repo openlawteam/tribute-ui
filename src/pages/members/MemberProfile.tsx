@@ -4,8 +4,8 @@ import {useHistory, useParams} from 'react-router-dom';
 import {truncateEthAddress} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
-// import AdapterOrExtensionManager from '../../components/adapters-extensions/AdapterOrExtensionManager';
-import {fakeMembers, FakeMember} from './_mockData';
+import {Member} from './types';
+import {fakeMembers} from './_mockData';
 
 export default function MemberProfile() {
   /**
@@ -22,7 +22,7 @@ export default function MemberProfile() {
    */
 
   // @todo replace with actual member fetch and member exists check
-  const activeMember: FakeMember | undefined = fakeMembers.find(
+  const activeMember: Member | undefined = fakeMembers.find(
     (member) => member.address.toLowerCase() === ethereumAddress.toLowerCase()
   );
 
@@ -51,9 +51,7 @@ export default function MemberProfile() {
 
             {/* MEMBER ADDRESS */}
             <div className="memberprofile__left-column">
-              <h3>
-                {truncateEthAddress((activeMember as FakeMember).address, 7)}
-              </h3>
+              <h3>{truncateEthAddress((activeMember as Member).address, 7)}</h3>
               <div>MemberProfile Info @todo</div>
               <div>MemberProfile Actions @todo</div>
             </div>

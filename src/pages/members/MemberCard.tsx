@@ -1,7 +1,7 @@
-import {FakeMember} from './_mockData';
+import {Member} from './types';
 
 type MemberCardProps = {
-  member: FakeMember; // placeholder prop
+  member: Member;
   name: string;
   onClick: (ethereumAddress: string) => void;
 };

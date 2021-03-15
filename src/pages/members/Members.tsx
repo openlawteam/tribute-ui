@@ -4,9 +4,16 @@ import {truncateEthAddress} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
 import MemberCard from './MemberCard';
-import {fakeMembers, FakeMember} from './_mockData';
+import useMembers from './hooks/useMembers';
+import {Member} from './types';
 
 export default function Members() {
+  /**
+   * Our hooks
+   */
+
+  const {members} = useMembers();
+
   /**
    * Their hooks
    */
@@ -14,16 +21,18 @@ export default function Members() {
   const history = useHistory();
 
   /**
-   * Variables
+   * Cached callbacks
    */
 
-  const activeMembers = renderMemberCards(fakeMembers);
+  /**
+   * Effects
+   */
 
   /**
    * Functions
    */
 
-  function renderMemberCards(members: FakeMember[]) {
+  function renderMemberCards(members: Member[]) {
     return members.map((member) => {
       return (
         <MemberCard
@@ -54,7 +63,9 @@ export default function Members() {
         {/* ACTIVE MEMBERS */}
         <>
           <div className="grid__header">Active Members</div>
-          <div className="grid__cards">{activeMembers}</div>
+          <div className="grid__cards">
+            {members && renderMemberCards(members)}
+          </div>
         </>
       </div>
     </RenderWrapper>
