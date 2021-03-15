@@ -58,7 +58,7 @@ export default function MembershipDetails() {
   if (proposalStatus === AsyncStatus.PENDING) {
     return (
       <RenderWrapper>
-        <div style={{width: '3rem', margin: '0 auto'}}>
+        <div className="loader--emjoi-container">
           <LoaderWithEmoji />
         </div>
       </RenderWrapper>
