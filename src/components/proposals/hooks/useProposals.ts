@@ -19,6 +19,7 @@ import {useWeb3Modal} from '../../web3/hooks';
 type UseProposalsReturn = {
   proposals: ProposalData[];
   proposalsStatus: AsyncStatus;
+  proposalsError: Error | undefined;
 };
 
 /**
@@ -42,6 +43,7 @@ export function useProposals({
 
   const [adapterAddress, setAdapterAddress] = useState<string>();
   const [proposals, setProposals] = useState<ProposalData[]>([]);
+  const [proposalsError, setProposalsError] = useState<Error>();
   const [proposalsStatus, setProposalsStatus] = useState<AsyncStatus>(
     AsyncStatus.STANDBY
   );
@@ -267,11 +269,13 @@ export function useProposals({
     } catch (error) {
       setProposalsStatus(AsyncStatus.REJECTED);
       setProposals([]);
+      setProposalsError(error);
     }
   }
 
   return {
     proposals,
+    proposalsError,
     proposalsStatus,
   };
 }

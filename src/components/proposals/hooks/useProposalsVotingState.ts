@@ -14,6 +14,7 @@ type ProposalsVotingStateTuples = [
 
 type UseProposalsVotingStateReturn = {
   proposalsVotingState: ProposalsVotingStateTuples;
+  proposalsVotingStateError: Error | undefined;
   proposalsVotingStateStatus: AsyncStatus;
 };
 
@@ -48,6 +49,11 @@ export function useProposalsVotingState(
     proposalsVotingState,
     setProposaslsVotingState,
   ] = useState<ProposalsVotingStateTuples>([]);
+
+  const [
+    proposalsVotingStateError,
+    setProposalsVotingStateError,
+  ] = useState<Error>();
 
   const [
     proposalsVotingStateStatus,
@@ -117,11 +123,13 @@ export function useProposalsVotingState(
     } catch (error) {
       setProposalsVotingStateStatus(AsyncStatus.REJECTED);
       setProposaslsVotingState([]);
+      setProposalsVotingStateError(error);
     }
   }
 
   return {
     proposalsVotingState,
+    proposalsVotingStateError,
     proposalsVotingStateStatus,
   };
 }
