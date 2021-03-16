@@ -215,6 +215,12 @@ export function useProposals({
         ...snapshotProposalEntries,
       ].map((e) => e[0]);
 
+      if (!proposalIds.length) {
+        setProposalsStatus(AsyncStatus.FULFILLED);
+
+        return;
+      }
+
       // @todo `daoProposals`: swich/case depending on subgraph up/down
       // ...
 
