@@ -14,7 +14,20 @@ import {multicall, MulticallTuple} from '../../../components/web3/helpers';
 import {useWeb3Modal} from '../../../components/web3/hooks';
 import {Member, MemberFlag} from '../types';
 
-export default function useMembers() {
+type UseMembersReturn = {
+  members: Member[];
+  membersStatus: AsyncStatus;
+  membersError: Error | undefined;
+};
+
+/**
+ * useMembers
+ *
+ * @todo Get members from subgraph.
+ * @todo switch/case for retrieval method based on subgraph up/down
+ * @returns `UseMembersReturn` An object with the members, and the current async status.
+ */
+export default function useMembers(): UseMembersReturn {
   /**
    * Selectors
    */
@@ -36,10 +49,11 @@ export default function useMembers() {
    * State
    */
 
-  const [members, setMembers] = useState<Member[]>();
+  const [members, setMembers] = useState<Member[]>([]);
   const [membersStatus, setMembersStatus] = useState<AsyncStatus>(
     AsyncStatus.STANDBY
   );
+  const [membersError, setMembersError] = useState<Error>();
 
   /**
    * Cached callbacks
@@ -71,13 +85,12 @@ export default function useMembers() {
       !account ||
       !web3Instance
     ) {
-      setMembers(undefined);
       return;
     }
 
-    setMembersStatus(AsyncStatus.PENDING);
-
     try {
+      setMembersStatus(AsyncStatus.PENDING);
+
       const {
         abi: daoRegistryABI,
         contractAddress: daoRegistryAddress,
@@ -86,9 +99,7 @@ export default function useMembers() {
 
       const nbMembers = await daoRegistryMethods.getNbMembers().call();
 
-      if (Number(nbMembers) < 1) {
-        setMembers([]);
-      } else {
+      if (Number(nbMembers) > 1) {
         // Build calls to get list of member addresses
         const getMemberAddressABI = daoRegistryABI.find(
           (item) => item.name === 'getMemberAddress'
@@ -204,13 +215,14 @@ export default function useMembers() {
 
         setMembers(filteredMembersWithDetails);
       }
+
       setMembersStatus(AsyncStatus.FULFILLED);
     } catch (error) {
-      console.error(error);
-      setMembers(undefined);
       setMembersStatus(AsyncStatus.REJECTED);
+      setMembers([]);
+      setMembersError(error);
     }
   }
 
-  return {members, membersStatus};
+  return {members, membersError, membersStatus};
 }

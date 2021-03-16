@@ -7,19 +7,30 @@ import MemberCard from './MemberCard';
 import useMembers from './hooks/useMembers';
 import {Member} from './types';
 import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
+import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 
 export default function Members() {
   /**
    * Our hooks
    */
 
-  const {members, membersStatus} = useMembers();
+  const {members, membersError, membersStatus} = useMembers();
 
   /**
    * Their hooks
    */
 
   const history = useHistory();
+
+  /**
+   * Variables
+   */
+
+  const isLoading: boolean =
+    membersStatus === AsyncStatus.STANDBY ||
+    membersStatus === AsyncStatus.PENDING;
+  const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
+  const isError: boolean = membersStatus === AsyncStatus.REJECTED;
 
   /**
    * Functions
@@ -45,46 +56,52 @@ export default function Members() {
     };
   }
 
-  function renderMembersContent() {
-    if (membersStatus === AsyncStatus.PENDING) {
-      return (
-        <div className="loader--emjoi-container">
-          <LoaderWithEmoji showAfterMs={300} />
-        </div>
-      );
-    }
-
-    if (membersStatus === AsyncStatus.REJECTED) {
-      return (
-        <div className="text-center">
-          <p className="error-message">
-            The list of members could not be retrieved.
-          </p>
-        </div>
-      );
-    }
-
-    if (members && membersStatus === AsyncStatus.FULFILLED) {
-      if (members.length > 0) {
-        return <div className="grid__cards">{renderMemberCards(members)}</div>;
-      } else {
-        return <p>No members, yet.</p>;
-      }
-    }
-  }
-
   /**
    * Render
    */
+
+  // Render loading
+  if (isLoading && !isError) {
+    return (
+      <RenderWrapper>
+        <div className="loader--emjoi-container">
+          <LoaderWithEmoji />
+        </div>
+      </RenderWrapper>
+    );
+  }
+
+  // Render error
+  if (isError) {
+    return (
+      <RenderWrapper>
+        <div className="text-center">
+          <ErrorMessageWithDetails
+            error={membersError}
+            renderText="Something went wrong while getting the members."
+          />
+        </div>
+      </RenderWrapper>
+    );
+  }
+
+  // Render no members
+  if (!Object.values(members).length && isLoadingDone) {
+    return (
+      <RenderWrapper>
+        <p className="text-center">No members, yet!</p>
+      </RenderWrapper>
+    );
+  }
 
   return (
     <RenderWrapper>
       <div className="grid--fluid grid-container">
         {/* ACTIVE MEMBERS */}
-        <>
+        <div>
           <div className="grid__header">Active Members</div>
-          {renderMembersContent()}
-        </>
+          <div className="grid__cards">{renderMemberCards(members)}</div>
+        </div>
       </div>
     </RenderWrapper>
   );

@@ -9,13 +9,14 @@ import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 import NotFound from '../subpages/NotFound';
 import useMembers from './hooks/useMembers';
 import {Member} from './types';
+import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 
 export default function MemberProfile() {
   /**
    * Our hooks
    */
 
-  const {members, membersStatus} = useMembers();
+  const {members, membersError, membersStatus} = useMembers();
 
   /**
    * Their hooks
@@ -36,10 +37,7 @@ export default function MemberProfile() {
    */
 
   useEffect(() => {
-    if (!members) {
-      setMemberDetails(undefined);
-      return;
-    }
+    if (membersStatus !== AsyncStatus.FULFILLED) return;
 
     const activeMember = members.find(
       (member) =>
@@ -50,38 +48,49 @@ export default function MemberProfile() {
     if (!activeMember) {
       setMemberNotFound(true);
     }
-  }, [ethereumAddress, members]);
+  }, [ethereumAddress, members, membersStatus]);
+
+  /**
+   * Variables
+   */
+
+  const isLoading: boolean =
+    membersStatus === AsyncStatus.STANDBY ||
+    membersStatus === AsyncStatus.PENDING;
+  const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
+  const isError: boolean = membersStatus === AsyncStatus.REJECTED;
 
   /**
    * Render
    */
 
   // Render loading
-  if (membersStatus === AsyncStatus.PENDING) {
+  if (isLoading && !isError) {
     return (
       <RenderWrapper>
         <div className="loader--emjoi-container">
-          <LoaderWithEmoji showAfterMs={300} />
+          <LoaderWithEmoji />
         </div>
       </RenderWrapper>
     );
   }
 
   // Render error
-  if (membersStatus === AsyncStatus.REJECTED) {
+  if (isError) {
     return (
       <RenderWrapper>
         <div className="text-center">
-          <p className="error-message">
-            The member details could not be retrieved.
-          </p>
+          <ErrorMessageWithDetails
+            error={membersError}
+            renderText="Something went wrong while getting the member."
+          />
         </div>
       </RenderWrapper>
     );
   }
 
   // Render 404 no member found
-  if (memberNotFound) {
+  if (memberNotFound && isLoadingDone) {
     return (
       <RenderWrapper>
         <NotFound />
@@ -89,9 +98,9 @@ export default function MemberProfile() {
     );
   }
 
-  if (memberDetails) {
-    return (
-      <RenderWrapper>
+  return (
+    <RenderWrapper>
+      {memberDetails ? (
         <>
           <div className="memberprofile__header">Member Profile</div>
           <div className="proposaldetails">
@@ -109,12 +118,12 @@ export default function MemberProfile() {
             </div>
           </div>
         </>
-      </RenderWrapper>
-    );
-  }
-
-  // Render nothing. Should never reach this case.
-  return <></>;
+      ) : (
+        // Render nothing. Should never reach this case.
+        <></>
+      )}
+    </RenderWrapper>
+  );
 }
 
 function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
