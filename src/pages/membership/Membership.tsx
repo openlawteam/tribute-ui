@@ -1,59 +1,25 @@
 import React from 'react';
 import {useHistory} from 'react-router-dom';
 
-import {ProposalHeaderNames} from '../../util/enums';
-// import {truncateEthAddress} from '../../util/helpers';
-import Wrap from '../../components/common/Wrap';
+import {DaoAdapterConstants} from '../../components/adapters-extensions/enums';
 import FadeIn from '../../components/common/FadeIn';
-// import ProposalCard from '../../components/proposals/ProposalCard';
-// import {
-//   fakeMembershipProposalsVoting,
-//   fakeMembershipProposalsRequest,
-//   fakeMembershipProposalsPassed,
-//   fakeMembershipProposalsFailed,
-//   FakeProposal,
-// } from '../../components/proposals/_mockData';
+import Proposals from '../../components/proposals/Proposals';
+import Wrap from '../../components/common/Wrap';
 
 export default function Membership() {
   /**
    * Their hooks
    */
 
-  // const history = useHistory();
-
-  /**
-   * Variables
-   */
-
-  const votingProposals = /* renderProposalCards(fakeMembershipProposalsVoting) */ [] as any;
-  const requestProposals = /* renderProposalCards(fakeMembershipProposalsRequest) */ [] as any;
-  const passedProposals = /* renderProposalCards(fakeMembershipProposalsPassed) */ [] as any;
-  const failedProposals = /* renderProposalCards(fakeMembershipProposalsFailed) */ [] as any;
+  const history = useHistory();
 
   /**
    * Functions
    */
 
-  /* function renderProposalCards(proposals: FakeProposal[]) {
-    return proposals.map((proposal) => {
-      return (
-        <ProposalCard
-          key={proposal.snapshotProposal.hash}
-          onClick={handleClickProposalDetails(proposal.snapshotProposal.hash)}
-          proposal={proposal}
-          name={truncateEthAddress(proposal.snapshotProposal.name, 7)}
-        />
-      );
-    });
-  } */
-
-  /* function handleClickProposalDetails(proposalHash: string) {
-    return () => {
-      if (!proposalHash) return;
-
-      history.push(`/membership/${proposalHash}`);
-    };
-  } */
+  function handleClickProposalDetails(proposalHash: string) {
+    proposalHash && history.push(`/membership/${proposalHash}`);
+  }
 
   /**
    * Render
@@ -61,39 +27,10 @@ export default function Membership() {
 
   return (
     <RenderWrapper>
-      <div className="grid--fluid grid-container">
-        {/* VOTING PROPOSALS */}
-        {votingProposals.length > 0 && (
-          <>
-            <div className="grid__header">{ProposalHeaderNames.VOTING}</div>
-            <div className="grid__cards">{votingProposals}</div>
-          </>
-        )}
-
-        {/* PENDING PROPOSALS (DRAFTS, NOT SPONSORED) */}
-        {requestProposals.length > 0 && (
-          <>
-            <div className="grid__header">{ProposalHeaderNames.REQUESTS}</div>
-            <div className="grid__cards">{requestProposals}</div>
-          </>
-        )}
-
-        {/* PASSED PROPOSALS */}
-        {passedProposals.length > 0 && (
-          <>
-            <div className="grid__header">{ProposalHeaderNames.PASSED}</div>
-            <div className="grid__cards">{passedProposals}</div>
-          </>
-        )}
-
-        {/* FAILED PROPOSALS */}
-        {failedProposals.length > 0 && (
-          <>
-            <div className="grid__header">{ProposalHeaderNames.FAILED}</div>
-            <div className="grid__cards">{failedProposals}</div>
-          </>
-        )}
-      </div>
+      <Proposals
+        adapterName={DaoAdapterConstants.ONBOARDING}
+        onProposalClick={handleClickProposalDetails}
+      />
     </RenderWrapper>
   );
 }
@@ -127,8 +64,8 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
             View members
           </button>
         </div>
+
         {/* RENDER CHILDREN */}
-        @TODO
         {props.children}
       </FadeIn>
     </Wrap>

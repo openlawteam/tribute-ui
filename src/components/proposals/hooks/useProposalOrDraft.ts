@@ -8,12 +8,12 @@ import {
 import {AsyncStatus} from '../../../util/types';
 import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
 import {
+  Proposal,
   ProposalData,
   ProposalOrDraftSnapshotType,
   SnapshotDraft,
   SnapshotProposal,
   SnapshotProposalCommon,
-  SubgraphProposal,
 } from '../types';
 import {useAbortController, useCounter} from '../../../hooks';
 
@@ -54,7 +54,7 @@ export function useProposalOrDraft(
    * @todo Get subgraph data using useLazyQuery
    * @link https://www.apollographql.com/docs/react/data/queries/#executing-queries-manually
    */
-  const [daoProposal /* setDAOProposal */] = useState<SubgraphProposal>();
+  const [daoProposal /* setDAOProposal */] = useState<Proposal>();
   const [snapshotDraft, setSnapshotDraft] = useState<SnapshotDraft>();
   const [snapshotProposal, setSnapshotProposal] = useState<SnapshotProposal>();
   const [proposalNotFound, setProposalNotFound] = useState<boolean>(false);

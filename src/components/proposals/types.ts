@@ -61,6 +61,11 @@ export enum SnapshotMetadataType {
  * TYPES
  */
 
+export type Proposal = {
+  adapterAddress: string;
+  flags: string; // unint256 of Proposal's current flag
+};
+
 // @todo Change the type to be precise
 export type SubgraphProposal = Record<string, any>;
 
@@ -99,7 +104,7 @@ export type SnapshotProposal = {
 export type SnapshotProposalCommon = SnapshotDraft | SnapshotProposal;
 
 export type ProposalData = {
-  daoProposal: SubgraphProposal | undefined;
+  daoProposal: Proposal | undefined;
   /**
    * Data for either a Draft or Proposal which is shared between the two types.
    */

@@ -36,7 +36,6 @@ type UseProposalWithOffchainVoteStatusReturn = {
    * An enum index (string) of the DAO proposal's `VotingState`
    */
   daoProposalVoteResult: string | undefined;
-  transitionMessage: string | undefined;
 };
 
 export function useProposalWithOffchainVoteStatus(
@@ -165,12 +164,10 @@ export function useProposalWithOffchainVoteStatus(
    */
 
   function getReturnData(
-    status: ProposalFlowStatus | undefined,
-    transitionMessage?: string
+    status: ProposalFlowStatus | undefined
   ): UseProposalWithOffchainVoteStatusReturn {
     return {
       status,
-      transitionMessage,
       daoProposal,
       daoProposalVoteResult,
       daoProposalVotes,
@@ -282,7 +279,6 @@ export function useProposalWithOffchainVoteStatus(
   // Fallthrough
   return {
     status: undefined,
-    transitionMessage: undefined,
     daoProposal,
     daoProposalVoteResult,
     daoProposalVotes,

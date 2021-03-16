@@ -1,12 +1,18 @@
-import {FakeProposal} from './_mockData';
+import {useSelector} from 'react-redux';
+
 import {OffchainVotingStatus} from './voting';
+import {ProposalData} from './types';
+import {StoreState} from '../../store/types';
+import {VotingAdapterName} from '../adapters-extensions/enums';
 
 type ProposalCardProps = {
   buttonText?: string;
   onClick: (proposalHash: string) => void;
-  proposal: FakeProposal; // placeholder prop
+  proposal: ProposalData;
   name: string;
 };
+
+const DEFAULT_BUTTON_TEXT: string = 'View Proposal';
 
 /**
  * Shows a preview of a proposal's details
@@ -15,16 +21,43 @@ type ProposalCardProps = {
  * @returns {JSX.Element}
  */
 export default function ProposalCard(props: ProposalCardProps): JSX.Element {
-  const {buttonText = 'View Proposal', proposal, onClick, name} = props;
+  const {buttonText = DEFAULT_BUTTON_TEXT, proposal, onClick, name} = props;
+
+  /**
+   * Selectors
+   */
+
+  const votingAdapterName = useSelector(
+    (s: StoreState) => s.contracts.VotingContract?.adapterOrExtensionName
+  );
 
   /**
    * Functions
    */
 
   function handleClick() {
-    const proposalHash = proposal.snapshotProposal.hash;
+    const proposalHash =
+      proposal.snapshotProposal?.idInDAO || proposal.snapshotDraft?.idInDAO;
 
-    onClick(proposalHash);
+    proposalHash && onClick(proposalHash);
+  }
+
+  /**
+   * Change status component based on voting adapter.
+   *
+   * @todo It's currently not possible to get the voting adapter used for a DAO proposal,
+   *   so until then we need to use the currently registered voting adapter for the DAO.
+   */
+  function renderStatus(proposal: ProposalData) {
+    switch (votingAdapterName) {
+      case VotingAdapterName.OffchainVotingContract:
+        return <OffchainVotingStatus proposal={proposal} />;
+      // @todo On-chain Voting
+      // case VotingAdapterName.VotingContract:
+      //   return <></>
+      default:
+        return <></>;
+    }
   }
 
   /**
@@ -37,11 +70,12 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
       <h3 className="proposalcard__title">{name}</h3>
 
       {/* VOTING PROGRESS STATUS AND BAR */}
-      {/* @todo fix */}
-      <OffchainVotingStatus proposal={proposal as any} />
+      {renderStatus(proposal)}
 
       {/* BUTTON (no click handler) */}
-      <button className="proposalcard__button">{buttonText}</button>
+      <button className="proposalcard__button">
+        {buttonText || DEFAULT_BUTTON_TEXT}
+      </button>
     </div>
   );
 }
