@@ -52,6 +52,16 @@
         "internalType": "uint256",
         "name": "tokensToBurn",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "currentIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "blockNumber",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -161,6 +171,11 @@
         "internalType": "contract DaoRegistry",
         "name": "dao",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "toIndex",
+        "type": "uint256"
       }
     ],
     "name": "rageKick",
