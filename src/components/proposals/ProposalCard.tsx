@@ -1,6 +1,7 @@
+import {useSelector} from 'react-redux';
+
 import {OffchainVotingStatus} from './voting';
 import {ProposalData} from './types';
-import {useSelector} from 'react-redux';
 import {StoreState} from '../../store/types';
 import {VotingAdapterName} from '../adapters-extensions/enums';
 
@@ -11,6 +12,8 @@ type ProposalCardProps = {
   name: string;
 };
 
+const DEFAULT_BUTTON_TEXT: string = 'View Proposal';
+
 /**
  * Shows a preview of a proposal's details
  *
@@ -18,7 +21,7 @@ type ProposalCardProps = {
  * @returns {JSX.Element}
  */
 export default function ProposalCard(props: ProposalCardProps): JSX.Element {
-  const {buttonText = 'View Proposal', proposal, onClick, name} = props;
+  const {buttonText = DEFAULT_BUTTON_TEXT, proposal, onClick, name} = props;
 
   /**
    * Selectors
@@ -70,7 +73,9 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
       {renderStatus(proposal)}
 
       {/* BUTTON (no click handler) */}
-      <button className="proposalcard__button">{buttonText}</button>
+      <button className="proposalcard__button">
+        {buttonText || DEFAULT_BUTTON_TEXT}
+      </button>
     </div>
   );
 }
