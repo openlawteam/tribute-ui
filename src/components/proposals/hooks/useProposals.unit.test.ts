@@ -79,56 +79,67 @@ describe('useProposals unit tests', () => {
       );
 
       expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
 
       await waitForNextUpdate();
 
       expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
 
       await waitForNextUpdate();
 
       expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
 
       await waitForNextUpdate();
 
       expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
 
       await waitForNextUpdate();
 
       expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
 
       await waitForNextUpdate();
 
       expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
 
       await waitForNextUpdate();
 
       expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
 
       await waitForNextUpdate();
 
       expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
 
       await waitForNextUpdate();
 
       expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
 
       await waitForNextUpdate();
 
       expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
 
       await waitForNextUpdate();
 
       expect(result.current.proposalsStatus).toBe(AsyncStatus.FULFILLED);
+      expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposals.length).toBe(2);
 
       expect(result.current.proposals[0].daoProposal).toMatchObject({

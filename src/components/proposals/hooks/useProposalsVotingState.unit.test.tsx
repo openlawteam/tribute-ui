@@ -1,9 +1,9 @@
 import {renderHook, act} from '@testing-library/react-hooks';
 
-import {AsyncStatus} from '../../../util/types';
-import {DEFAULT_PROPOSAL_HASH} from '../../../test/helpers';
 import {useProposalsVotingState} from './useProposalsVotingState';
 import Wrapper from '../../../test/Wrapper';
+import {DEFAULT_PROPOSAL_HASH} from '../../../test/helpers';
+import {AsyncStatus} from '../../../util/types';
 
 describe('useProposalsVotingState unit tests', () => {
   const proposalIds = [
@@ -48,6 +48,7 @@ describe('useProposalsVotingState unit tests', () => {
         AsyncStatus.STANDBY
       );
 
+      expect(result.current.proposalsVotingStateError).toBe(undefined);
       expect(result.current.proposalsVotingState).toMatchObject([]);
 
       await waitForNextUpdate();
@@ -56,6 +57,7 @@ describe('useProposalsVotingState unit tests', () => {
         AsyncStatus.STANDBY
       );
 
+      expect(result.current.proposalsVotingStateError).toBe(undefined);
       expect(result.current.proposalsVotingState).toMatchObject([]);
 
       await waitForNextUpdate();
@@ -64,6 +66,7 @@ describe('useProposalsVotingState unit tests', () => {
         AsyncStatus.STANDBY
       );
 
+      expect(result.current.proposalsVotingStateError).toBe(undefined);
       expect(result.current.proposalsVotingState).toMatchObject([]);
 
       await waitForNextUpdate();
@@ -135,6 +138,7 @@ describe('useProposalsVotingState unit tests', () => {
         AsyncStatus.STANDBY
       );
 
+      expect(result.current.proposalsVotingStateError).toBe(undefined);
       expect(result.current.proposalsVotingState).toMatchObject([]);
 
       await waitForNextUpdate();
@@ -143,6 +147,7 @@ describe('useProposalsVotingState unit tests', () => {
         AsyncStatus.STANDBY
       );
 
+      expect(result.current.proposalsVotingStateError).toBe(undefined);
       expect(result.current.proposalsVotingState).toMatchObject([]);
 
       await waitForNextUpdate();
@@ -151,6 +156,7 @@ describe('useProposalsVotingState unit tests', () => {
         AsyncStatus.STANDBY
       );
 
+      expect(result.current.proposalsVotingStateError).toBe(undefined);
       expect(result.current.proposalsVotingState).toMatchObject([]);
 
       await waitForNextUpdate();
@@ -159,6 +165,9 @@ describe('useProposalsVotingState unit tests', () => {
         AsyncStatus.REJECTED
       );
 
+      expect(
+        result.current.proposalsVotingStateError?.message.length
+      ).toBeGreaterThan(0);
       expect(result.current.proposalsVotingState).toMatchObject([]);
     });
   });
@@ -201,13 +210,7 @@ describe('useProposalsVotingState unit tests', () => {
         AsyncStatus.STANDBY
       );
 
-      expect(result.current.proposalsVotingState).toMatchObject([]);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposalsVotingStateStatus).toBe(
-        AsyncStatus.STANDBY
-      );
+      expect(result.current.proposalsVotingStateError).toBe(undefined);
 
       expect(result.current.proposalsVotingState).toMatchObject([]);
 
@@ -216,6 +219,18 @@ describe('useProposalsVotingState unit tests', () => {
       expect(result.current.proposalsVotingStateStatus).toBe(
         AsyncStatus.STANDBY
       );
+
+      expect(result.current.proposalsVotingStateError).toBe(undefined);
+
+      expect(result.current.proposalsVotingState).toMatchObject([]);
+
+      await waitForNextUpdate();
+
+      expect(result.current.proposalsVotingStateStatus).toBe(
+        AsyncStatus.STANDBY
+      );
+
+      expect(result.current.proposalsVotingStateError).toBe(undefined);
 
       expect(result.current.proposalsVotingState).toMatchObject([]);
     });
