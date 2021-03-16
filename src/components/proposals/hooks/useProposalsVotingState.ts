@@ -79,7 +79,14 @@ export function useProposalsVotingState(
    */
 
   async function getProposalsVotingState() {
-    if (!registryAddress || !votingAddress || !votingABI) return;
+    if (
+      !registryAddress ||
+      !votingAddress ||
+      !votingABI ||
+      !proposalIds.length
+    ) {
+      return;
+    }
 
     try {
       const votingResultAbi = votingABI.find((ai) => ai.name === 'voteResult');
