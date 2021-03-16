@@ -1,6 +1,5 @@
 import {useHistory} from 'react-router-dom';
 
-import {truncateEthAddress} from '../../util/helpers';
 import {AsyncStatus} from '../../util/types';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
@@ -33,7 +32,6 @@ export default function Members() {
           key={member.address}
           onClick={handleClickMemberProfile(member.address)}
           member={member}
-          name={truncateEthAddress(member.address, 7)}
         />
       );
     });
