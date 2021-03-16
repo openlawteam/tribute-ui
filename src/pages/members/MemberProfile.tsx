@@ -1,47 +1,95 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
-import {truncateEthAddress} from '../../util/helpers';
+import {AsyncStatus} from '../../util/types';
+import {truncateEthAddress, normalizeString} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
+import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
+import NotFound from '../subpages/NotFound';
+import useMembers from './hooks/useMembers';
 import {Member} from './types';
-import {fakeMembers, FakeMember} from './_mockData';
 
 export default function MemberProfile() {
+  /**
+   * Our hooks
+   */
+
+  const {members, membersStatus} = useMembers();
+
   /**
    * Their hooks
    */
 
   // Get ethereumAddress for fetching the member.
-  // @todo Use this to check that active member exists.
   const {ethereumAddress} = useParams<{ethereumAddress: string}>();
-  const history = useHistory();
 
   /**
-   * Variables
+   * State
    */
 
-  // @todo replace with actual member fetch and member exists check
-  const activeMember: FakeMember | undefined = fakeMembers.find(
-    (member) => member.address.toLowerCase() === ethereumAddress.toLowerCase()
-  );
+  const [memberDetails, setMemberDetails] = useState<Member>();
+  const [memberNotFound, setMemberNotFound] = useState<boolean>(false);
 
   /**
    * Effects
    */
 
-  // Navigate to 404
   useEffect(() => {
-    if (!activeMember) {
-      history.push('/404');
+    if (!members) {
+      setMemberDetails(undefined);
+      return;
     }
-  }, [history, activeMember]);
+
+    const activeMember = members.find(
+      (member) =>
+        normalizeString(member.address) === normalizeString(ethereumAddress)
+    );
+
+    setMemberDetails(activeMember);
+    if (!activeMember) {
+      setMemberNotFound(true);
+    }
+  }, [ethereumAddress, members]);
 
   /**
    * Render
    */
 
-  if (activeMember) {
+  // Render loading
+  if (membersStatus === AsyncStatus.PENDING) {
+    return (
+      <RenderWrapper>
+        <div className="loader--emjoi-container">
+          <LoaderWithEmoji showAfterMs={300} />
+        </div>
+      </RenderWrapper>
+    );
+  }
+
+  // Render error
+  if (membersStatus === AsyncStatus.REJECTED) {
+    return (
+      <RenderWrapper>
+        <div className="text-center">
+          <p className="error-message">
+            The member details could not be retrieved.
+          </p>
+        </div>
+      </RenderWrapper>
+    );
+  }
+
+  // Render 404 no member found
+  if (memberNotFound) {
+    return (
+      <RenderWrapper>
+        <NotFound />
+      </RenderWrapper>
+    );
+  }
+
+  if (memberDetails) {
     return (
       <RenderWrapper>
         <>
@@ -51,14 +99,13 @@ export default function MemberProfile() {
 
             {/* MEMBER ADDRESS */}
             <div className="memberprofile__left-column">
-              <h3>{truncateEthAddress((activeMember as Member).address, 7)}</h3>
+              <h3>{truncateEthAddress(memberDetails.address, 7)}</h3>
               <div>MemberProfile Info @todo</div>
-              <div>MemberProfile Actions @todo</div>
             </div>
 
             {/* RIGHT COLUMN */}
             <div className="memberprofile__right-column">
-              MemberProfile Voting History @todo
+              MemberProfile Actions @todo
             </div>
           </div>
         </>

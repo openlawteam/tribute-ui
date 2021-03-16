@@ -1,12 +1,12 @@
 import {useHistory} from 'react-router-dom';
 
 import {truncateEthAddress} from '../../util/helpers';
+import {AsyncStatus} from '../../util/types';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
 import MemberCard from './MemberCard';
 import useMembers from './hooks/useMembers';
 import {Member} from './types';
-import {AsyncStatus} from '../../util/types';
 import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 
 export default function Members() {
@@ -47,14 +47,11 @@ export default function Members() {
     };
   }
 
-  function renderContent() {
-    if (
-      membersStatus === AsyncStatus.STANDBY ||
-      membersStatus === AsyncStatus.PENDING
-    ) {
+  function renderMembersContent() {
+    if (membersStatus === AsyncStatus.PENDING) {
       return (
         <div className="loader--emjoi-container">
-          <LoaderWithEmoji />
+          <LoaderWithEmoji showAfterMs={300} />
         </div>
       );
     }
@@ -88,7 +85,7 @@ export default function Members() {
         {/* ACTIVE MEMBERS */}
         <>
           <div className="grid__header">Active Members</div>
-          {renderContent()}
+          {renderMembersContent()}
         </>
       </div>
     </RenderWrapper>
