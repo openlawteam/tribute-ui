@@ -11,6 +11,7 @@ import {
   stripFormatNumber,
   formatNumber,
   formatDecimal,
+  normalizeString,
 } from '../../util/helpers';
 import {
   useContractSend,
@@ -373,7 +374,7 @@ export default function CreateTributeProposal() {
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
         const bodyIntro =
-          applicantAddress.toLowerCase() === account.toLowerCase()
+          normalizeString(applicantAddress) === normalizeString(account)
             ? `Tribute from ${applicantAddress}.`
             : `Tribute from ${truncateEthAddress(
                 account,
