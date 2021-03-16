@@ -102,7 +102,6 @@ export default function MembershipDetails() {
         Number(Web3.utils.fromWei(daoProposal?.amount, 'ether'))
       );
     } catch (error) {
-      console.error(error);
       amount = '\u2026';
     }
 
