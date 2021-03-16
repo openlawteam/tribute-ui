@@ -109,8 +109,8 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
 
       // voting proposal
       if (
-        proposalHasVotingState(VotingState.GRACE_PERIOD, voteState) &&
-        proposalHasVotingState(VotingState.IN_PROGRESS, voteState) &&
+        (proposalHasVotingState(VotingState.GRACE_PERIOD, voteState) ||
+          proposalHasVotingState(VotingState.IN_PROGRESS, voteState)) &&
         proposalHasFlag(ProposalFlag.SPONSORED, p.daoProposal.flags)
       ) {
         filteredProposalsToSet.votingProposals.push(p);
