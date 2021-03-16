@@ -7,10 +7,10 @@ export const GET_DAO = gql`
       daoAddress
       name
       totalShares
-      bank {
-        id
-        bankAddress
-      }
+      # bank {
+      #   id
+      #   bankAddress
+      # }
     }
   }
 `;

@@ -1,9 +1,15 @@
 import Web3 from 'web3';
 
-import {DaoConstants} from './enums';
-// import {AclFlag} from './types';
+import {
+  DaoAdapterConstants,
+  DaoExtensionConstants,
+  OtherAdapterConstants,
+} from './enums';
+import {AclFlag} from './types';
 
-export function getAdapterOrExtensionId(adapterName: DaoConstants): string {
+export function getAdapterOrExtensionId(
+  adapterName: DaoAdapterConstants | DaoExtensionConstants
+): string {
   return sha3(adapterName) as string;
 }
 
@@ -15,21 +21,27 @@ export function getAdapterOrExtensionId(adapterName: DaoConstants): string {
 export function getAccessControlLayer(
   adapterName: string
 ): Record<string, any> {
-  const adapterFlags: Record<DaoConstants, any> = {
-    [DaoConstants.BANK]: {},
-    [DaoConstants.CONFIGURATION]: {
+  const adapterFlags: Record<
+    | DaoAdapterConstants
+    | DaoExtensionConstants.BANK
+    | OtherAdapterConstants.OFFCHAINVOTING,
+    any
+  > = {
+    [DaoExtensionConstants.BANK]: {},
+    [DaoAdapterConstants.CONFIGURATION]: {
       SUBMIT_PROPOSAL: true,
       PROCESS_PROPOSAL: true,
       SPONSOR_PROPOSAL: true,
       SET_CONFIGURATION: true,
     },
-    [DaoConstants.DISTRIBUTE]: {
+    [DaoAdapterConstants.DISTRIBUTE]: {
       SUBMIT_PROPOSAL: true,
       SPONSOR_PROPOSAL: true,
       PROCESS_PROPOSAL: true,
       INTERNAL_TRANSFER: true,
     },
-    [DaoConstants.TRIBUTE]: {
+    [DaoAdapterConstants.EXECUTION]: {},
+    [DaoAdapterConstants.TRIBUTE]: {
       SUBMIT_PROPOSAL: true,
       SPONSOR_PROPOSAL: true,
       PROCESS_PROPOSAL: true,
@@ -37,14 +49,14 @@ export function getAccessControlLayer(
       ADD_TO_BALANCE: true,
       REGISTER_NEW_TOKEN: true,
     },
-    [DaoConstants.FINANCING]: {
+    [DaoAdapterConstants.FINANCING]: {
       SUBMIT_PROPOSAL: true,
       SPONSOR_PROPOSAL: true,
       PROCESS_PROPOSAL: true,
       ADD_TO_BALANCE: true,
       SUB_FROM_BALANCE: true,
     },
-    [DaoConstants.GUILDKICK]: {
+    [DaoAdapterConstants.GUILDKICK]: {
       SUBMIT_PROPOSAL: true,
       SPONSOR_PROPOSAL: true,
       PROCESS_PROPOSAL: true,
@@ -54,15 +66,15 @@ export function getAccessControlLayer(
       UNJAIL_MEMBER: true,
       INTERNAL_TRANSFER: true,
     },
-    [DaoConstants.MANAGING]: {
+    [DaoAdapterConstants.MANAGING]: {
       SUBMIT_PROPOSAL: true,
       PROCESS_PROPOSAL: true,
       SPONSOR_PROPOSAL: true,
       REMOVE_ADAPTER: true,
       ADD_ADAPTER: true,
     },
-    [DaoConstants.OFFCHAINVOTING]: {},
-    [DaoConstants.ONBOARDING]: {
+    [OtherAdapterConstants.OFFCHAINVOTING]: {},
+    [DaoAdapterConstants.ONBOARDING]: {
       SUBMIT_PROPOSAL: true,
       SPONSOR_PROPOSAL: true,
       PROCESS_PROPOSAL: true,
@@ -70,14 +82,15 @@ export function getAccessControlLayer(
       UPDATE_DELEGATE_KEY: true,
       NEW_MEMBER: true,
     },
-    [DaoConstants.RAGEQUIT]: {
+    [DaoAdapterConstants.NONVOTING_ONBOARDING]: {},
+    [DaoAdapterConstants.RAGEQUIT]: {
       SUB_FROM_BALANCE: true,
       JAIL_MEMBER: true,
       UNJAIL_MEMBER: true,
       INTERNAL_TRANSFER: true,
     },
-    [DaoConstants.VOTING]: {},
-    [DaoConstants.WITHDRAW]: {
+    [DaoAdapterConstants.VOTING]: {},
+    [DaoAdapterConstants.WITHDRAW]: {
       WITHDRAW: true,
       SUB_FROM_BALANCE: true,
     },
@@ -97,8 +110,8 @@ export function getAccessControlLayer(
  *
  * @param flags
  */
-function accessFlags(flags: Record<string, boolean>): number {
-  const values = [
+function accessFlags(flags: Record<AclFlag, boolean>): number {
+  const values: boolean[] = [
     flags.ADD_ADAPTER,
     flags.REMOVE_ADAPTER,
     flags.JAIL_MEMBER,

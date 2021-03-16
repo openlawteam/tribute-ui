@@ -9,7 +9,7 @@ import {
   AdaptersOrExtensions,
 } from './types';
 
-import {DaoConstants} from './enums';
+import {DaoAdapterConstants, DaoExtensionConstants} from './enums';
 
 import {
   defaultAdaptersAndExtensions,
@@ -135,7 +135,7 @@ export default function AdapterOrExtensionManager() {
   const isLoading: boolean = adapterExtensionStatus === AsyncStatus.PENDING;
 
   // @todo track the prior selection of a dropdown target
-  // let priorSelectedTargetOption: DaoConstants | null = null;
+  // let priorSelectedTargetOption: DaoAdapterConstants | null = null;
 
   /**
    * Cached callbacks
@@ -217,7 +217,7 @@ export default function AdapterOrExtensionManager() {
       try {
         // Get contract address
         const {contractAddress} = getAdapterOrExtensionFromRedux(
-          adapter.name as DaoConstants
+          adapter.name as DaoAdapterConstants
         );
 
         resolve(contractAddress);
@@ -255,7 +255,7 @@ export default function AdapterOrExtensionManager() {
       try {
         // Get contract address
         const {contractAddress} = getAdapterOrExtensionFromRedux(
-          extension.name as DaoConstants
+          extension.name as DaoExtensionConstants
         );
 
         resolve(contractAddress);
@@ -286,7 +286,7 @@ export default function AdapterOrExtensionManager() {
 
   async function addAdapterOrExtension(
     adapterOrExtensionAddress: string,
-    adapterOrExtensionName: DaoConstants,
+    adapterOrExtensionName: DaoAdapterConstants | DaoExtensionConstants,
     adapterOrExtensionType: 'ADAPTER' | 'EXTENSION'
   ): Promise<void> {
     setSubmitError(undefined);
@@ -393,7 +393,7 @@ export default function AdapterOrExtensionManager() {
 
           // Get adapter contract address
           const {contractAddress} = getAdapterOrExtensionFromRedux(
-            adapterName as DaoConstants
+            adapterName as DaoAdapterConstants
           );
 
           // Get adapters access control layer (acl)

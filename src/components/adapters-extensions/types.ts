@@ -1,15 +1,15 @@
-import {DaoConstants} from './enums';
+import {DaoAdapterConstants, DaoExtensionConstants} from './enums';
 
 export type Adapters = {
   adapterId?: string;
-  name: DaoConstants;
+  name: DaoAdapterConstants;
   description: string;
   abiFunctionName: string;
 };
 
 export type Extensions = {
   extensionId?: string;
-  name: DaoConstants;
+  name: DaoExtensionConstants;
   description: string;
   isExtension: boolean;
   abiFunctionName: string;
@@ -116,7 +116,7 @@ export type AddAdapterFunction =
   | 'submitKickProposal'
   | 'ragequit';
 
-export type AclFlag =  // @todo typify its deps
+export type AclFlag =
   | 'ADD_ADAPTER'
   | 'ADD_EXTENSION'
   | 'JAIL_MEMBER'

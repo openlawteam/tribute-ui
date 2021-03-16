@@ -14,7 +14,7 @@ import {
 } from '../config';
 import {GQL_QUERY_POLLING_INTERVAL} from '../../../config';
 
-import {DaoConstants} from '../enums';
+import {DaoAdapterConstants, DaoExtensionConstants} from '../enums';
 
 export type AdapterType = {
   __typename: string;
@@ -34,7 +34,7 @@ export type ExtensionType = {
 type UseAdaptersOrExtensionsReturn = {
   adapterExtensionStatus: AsyncStatus;
   getAdapterOrExtensionFromRedux: (
-    adapterName: DaoConstants
+    adapterName: DaoAdapterConstants | DaoExtensionConstants
   ) => Record<string, any>;
   registeredAdaptersOrExtensions: AdapterType[] | undefined;
   unRegisteredAdaptersOrExtensions: Adapters[] | undefined;
@@ -180,13 +180,13 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
             registeredList.push({
               ...gqlExtension,
               ...adapterOrExtension,
-              name: adapterOrExtension.name as DaoConstants,
+              name: adapterOrExtension.name as DaoAdapterConstants,
               description: adapterOrExtension.description,
             } as AdaptersAndExtensionsType);
           } else {
             unRegisteredList.push({
               ...adapterOrExtension,
-              name: adapterOrExtension.name as DaoConstants,
+              name: adapterOrExtension.name as DaoAdapterConstants,
               description: adapterOrExtension.description,
             } as AdaptersAndExtensionsType);
           }
@@ -224,7 +224,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
                   registeredList.push({
                     ...gqlExtension,
                     ...option,
-                    name: option.name as DaoConstants,
+                    name: option.name as DaoAdapterConstants,
                     description: option.description,
                   } as AdaptersAndExtensionsType);
 
@@ -233,7 +233,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
                 } else {
                   unRegisteredList.push({
                     ...option,
-                    name: option.name as DaoConstants,
+                    name: option.name as DaoAdapterConstants,
                     description: option.description,
                   } as AdaptersAndExtensionsType);
                 }
@@ -243,7 +243,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
                   registeredList.push({
                     ...gqlAdapter,
                     ...option,
-                    name: option.name as DaoConstants,
+                    name: option.name as DaoAdapterConstants,
                     description: option.description,
                   } as AdaptersAndExtensionsType);
 
@@ -252,7 +252,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
                 } else {
                   unRegisteredList.push({
                     ...option,
-                    name: option.name as DaoConstants,
+                    name: option.name as DaoAdapterConstants,
                     description: option.description,
                   } as AdaptersAndExtensionsType);
                 }
@@ -271,13 +271,13 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
             registeredList.push({
               ...gqlAdapter,
               ...adapterOrExtension,
-              name: adapterOrExtension.name as DaoConstants,
+              name: adapterOrExtension.name as DaoAdapterConstants,
               description: adapterOrExtension.description,
             } as AdaptersAndExtensionsType);
           } else {
             unRegisteredList.push({
               ...adapterOrExtension,
-              name: adapterOrExtension.name as DaoConstants,
+              name: adapterOrExtension.name as DaoAdapterConstants,
               description: adapterOrExtension.description,
             } as AdaptersAndExtensionsType);
           }
@@ -294,10 +294,10 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
   /**
    * getAdapterOrExtensionFromRedux
    *
-   * @param adapterOrExtensionName DaoConstants
+   * @param adapterOrExtensionName DaoAdapterConstants
    */
   function getAdapterOrExtensionFromRedux(
-    adapterOrExtensionName: DaoConstants
+    adapterOrExtensionName: DaoAdapterConstants | DaoExtensionConstants
   ): Record<string, any> {
     return Object.keys(adapterExtensionContracts)
       .map((ae) => adapterExtensionContracts[ae])

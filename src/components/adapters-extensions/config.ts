@@ -1,4 +1,8 @@
-import {DaoConstants} from './enums';
+import {
+  DaoAdapterConstants,
+  DaoExtensionConstants,
+  OtherAdapterConstants,
+} from './enums';
 import {getAdapterOrExtensionId} from './helpers';
 
 import {
@@ -37,7 +41,7 @@ export type AdaptersAndExtensionsType = {
     | 'contractAddress'
     | 'abiFunctionName'
   >;
-  optionDefaultTarget?: DaoConstants;
+  optionDefaultTarget?: DaoAdapterConstants;
 } & Partial<AdapterProps>;
 
 /**
@@ -55,72 +59,72 @@ export type AdaptersAndExtensionsType = {
 export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
   {
     isExtension: true,
-    name: DaoConstants.BANK,
-    extensionId: getAdapterOrExtensionId(DaoConstants.BANK),
+    name: DaoExtensionConstants.BANK,
+    extensionId: getAdapterOrExtensionId(DaoExtensionConstants.BANK),
     contractAddress: BANK_EXTENSION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'configureExtension',
     description:
       'Adds the banking capabilities to the DAO, and keeps track of the DAO accounts and internal token balances.',
   },
   {
-    name: DaoConstants.CONFIGURATION,
-    adapterId: getAdapterOrExtensionId(DaoConstants.CONFIGURATION),
+    name: DaoAdapterConstants.CONFIGURATION,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.CONFIGURATION),
     contractAddress: CONFIGURATION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'submitConfigurationProposal',
     description:
       'Manages storing and retrieving per-DAO settings required by shared adapters.',
   },
   {
-    name: DaoConstants.DISTRIBUTE,
-    adapterId: getAdapterOrExtensionId(DaoConstants.DISTRIBUTE),
+    name: DaoAdapterConstants.DISTRIBUTE,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.DISTRIBUTE),
     contractAddress: DISTRIBUTE_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'submitProposal',
     description:
       'Allows the members to distribute funds to one or all members of the DAO.',
   },
   {
-    name: DaoConstants.FINANCING,
-    adapterId: getAdapterOrExtensionId(DaoConstants.FINANCING),
+    name: DaoAdapterConstants.FINANCING,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.FINANCING),
     contractAddress: FINANCING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'createFinancingRequest',
     description:
       'Allows individuals and/or organizations to request funds to finance their projects, and the members of the DAO have the power to vote and decide which projects should be funded.',
   },
   {
-    name: DaoConstants.GUILDKICK,
-    adapterId: getAdapterOrExtensionId(DaoConstants.GUILDKICK),
+    name: DaoAdapterConstants.GUILDKICK,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.GUILDKICK),
     contractAddress: GUILDKICK_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'submitKickProposal',
     description:
       'Gives the members the freedom to choose which individuals or organizations should really be part of the DAO.',
   },
   {
-    name: DaoConstants.MANAGING,
-    adapterId: getAdapterOrExtensionId(DaoConstants.MANAGING),
+    name: DaoAdapterConstants.MANAGING,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.MANAGING),
     contractAddress: MANAGING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'createAdapterChangeRequest',
     description:
       'Enhances the DAO capabilities by adding/updating the DAO Adapters through a voting process.',
   },
   {
-    name: DaoConstants.ONBOARDING,
-    adapterId: getAdapterOrExtensionId(DaoConstants.ONBOARDING),
+    name: DaoAdapterConstants.ONBOARDING,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.ONBOARDING),
     contractAddress: ONBOARDING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'configureDao',
     description:
       'Triggers the process of minting internal tokens in exchange of a specific token at a fixed price.',
   },
   {
-    name: DaoConstants.RAGEQUIT,
-    adapterId: getAdapterOrExtensionId(DaoConstants.RAGEQUIT),
+    name: DaoAdapterConstants.RAGEQUIT,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.RAGEQUIT),
     contractAddress: RAGEQUIT_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'ragequit',
     description:
       'Gives the members the freedom to choose when it is the best time to exit the DAO for any given reason.',
   },
   {
-    name: DaoConstants.TRIBUTE,
-    adapterId: getAdapterOrExtensionId(DaoConstants.TRIBUTE),
+    name: DaoAdapterConstants.TRIBUTE,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.TRIBUTE),
     contractAddress: TRIBUTE_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'configureDao',
     description:
@@ -129,29 +133,29 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
   {
     options: [
       {
-        name: DaoConstants.VOTING,
-        displayName: DaoConstants.OFFCHAINVOTING,
-        adapterId: getAdapterOrExtensionId(DaoConstants.VOTING),
+        name: DaoAdapterConstants.VOTING,
+        displayName: OtherAdapterConstants.OFFCHAINVOTING,
+        adapterId: getAdapterOrExtensionId(DaoAdapterConstants.VOTING),
         contractAddress: OFFCHAINVOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
         abiFunctionName: 'configureDao',
         description:
           'Adds the offchain voting governance process to the DAO to support gasless voting.',
       },
       {
-        name: DaoConstants.VOTING,
-        displayName: DaoConstants.VOTING,
-        adapterId: getAdapterOrExtensionId(DaoConstants.VOTING),
+        name: DaoAdapterConstants.VOTING,
+        displayName: DaoAdapterConstants.VOTING,
+        adapterId: getAdapterOrExtensionId(DaoAdapterConstants.VOTING),
         contractAddress: VOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
         abiFunctionName: 'configureDao',
         description:
           'Adds the simple on chain voting governance process to the DAO.',
       },
     ],
-    optionDefaultTarget: DaoConstants.VOTING,
+    optionDefaultTarget: DaoAdapterConstants.VOTING,
   },
   {
-    name: DaoConstants.WITHDRAW,
-    adapterId: getAdapterOrExtensionId(DaoConstants.WITHDRAW),
+    name: DaoAdapterConstants.WITHDRAW,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.WITHDRAW),
     contractAddress: WITHDRAW_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'withdraw',
     description:
