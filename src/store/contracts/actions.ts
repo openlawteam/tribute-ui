@@ -15,7 +15,8 @@ import {ContractsStateEntry, StoreState} from '../types';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
 import {
-  DaoConstants,
+  DaoAdapterConstants,
+  DaoExtensionConstants,
   VotingAdapterName,
 } from '../../components/adapters-extensions/enums';
 
@@ -149,7 +150,7 @@ export function initContractOnboarding(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_ONBOARDING,
-    adapterNameForRedux: DaoConstants.ONBOARDING,
+    adapterNameForRedux: DaoAdapterConstants.ONBOARDING,
     adapterOrExtensionName: ContractAdapterNames.onboarding,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/OnboardingContract.json'),
@@ -163,7 +164,7 @@ export function initContractBankExtension(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_BANK_EXTENSION,
-    adapterNameForRedux: DaoConstants.BANK,
+    adapterNameForRedux: DaoExtensionConstants.BANK,
     adapterOrExtensionName: ContractExtensionNames.bank,
     contractAddress,
     isExtension: true,
@@ -178,7 +179,7 @@ export function initContractTribute(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_TRIBUTE,
-    adapterNameForRedux: DaoConstants.TRIBUTE,
+    adapterNameForRedux: DaoAdapterConstants.TRIBUTE,
     adapterOrExtensionName: ContractAdapterNames.tribute,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/TributeContract.json'),
@@ -192,7 +193,7 @@ export function initContractDistribute(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_DISTRIBUTE,
-    adapterNameForRedux: DaoConstants.DISTRIBUTE,
+    adapterNameForRedux: DaoAdapterConstants.DISTRIBUTE,
     adapterOrExtensionName: ContractAdapterNames.distribute,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/DistributeContract.json'),
@@ -206,7 +207,7 @@ export function initContractManaging(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_MANAGING,
-    adapterNameForRedux: DaoConstants.MANAGING,
+    adapterNameForRedux: DaoAdapterConstants.MANAGING,
     adapterOrExtensionName: ContractAdapterNames.managing,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/ManagingContract.json'),
@@ -220,7 +221,7 @@ export function initContractWithdraw(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_WITHDRAW,
-    adapterNameForRedux: DaoConstants.WITHDRAW,
+    adapterNameForRedux: DaoAdapterConstants.WITHDRAW,
     adapterOrExtensionName: ContractAdapterNames.withdraw,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/WithdrawContract.json'),
@@ -234,7 +235,7 @@ export function initContractRagequit(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_RAGEQUIT,
-    adapterNameForRedux: DaoConstants.RAGEQUIT,
+    adapterNameForRedux: DaoAdapterConstants.RAGEQUIT,
     adapterOrExtensionName: ContractAdapterNames.ragequit,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/RagequitContract.json'),
@@ -248,7 +249,7 @@ export function initContractGuildKick(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_GUILDKICK,
-    adapterNameForRedux: DaoConstants.GUILDKICK,
+    adapterNameForRedux: DaoAdapterConstants.GUILDKICK,
     adapterOrExtensionName: ContractAdapterNames.guildkick,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/GuildKickContract.json'),
@@ -262,7 +263,7 @@ export function initContractFinancing(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_FINANCING,
-    adapterNameForRedux: DaoConstants.FINANCING,
+    adapterNameForRedux: DaoAdapterConstants.FINANCING,
     adapterOrExtensionName: ContractAdapterNames.financing,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/FinancingContract.json'),
@@ -276,7 +277,7 @@ export function initContractConfiguration(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_CONFIGURATION,
-    adapterNameForRedux: DaoConstants.CONFIGURATION,
+    adapterNameForRedux: DaoAdapterConstants.CONFIGURATION,
     adapterOrExtensionName: ContractAdapterNames.configuration,
     contractAddress,
     lazyImport: () =>

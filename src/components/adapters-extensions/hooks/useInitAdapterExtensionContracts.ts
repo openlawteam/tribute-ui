@@ -15,7 +15,7 @@ import {
 } from '../../../store/actions';
 
 import {ReduxDispatch} from '../../../store/types';
-import {DaoConstants} from '../enums';
+import {DaoAdapterConstants, DaoExtensionConstants} from '../enums';
 
 import {useWeb3Modal} from '../../web3/hooks';
 
@@ -36,37 +36,37 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
 
   async function initAdapterExtensionContract(adapterExtensionName: string) {
     switch (adapterExtensionName) {
-      case DaoConstants.CONFIGURATION:
+      case DaoAdapterConstants.CONFIGURATION:
         await dispatch(initContractConfiguration(web3Instance));
         break;
-      case DaoConstants.FINANCING:
+      case DaoAdapterConstants.FINANCING:
         await dispatch(initContractFinancing(web3Instance));
         break;
-      case DaoConstants.GUILDKICK:
+      case DaoAdapterConstants.GUILDKICK:
         await dispatch(initContractGuildKick(web3Instance));
         break;
-      case DaoConstants.MANAGING:
+      case DaoAdapterConstants.MANAGING:
         await dispatch(initContractManaging(web3Instance));
         break;
-      case DaoConstants.RAGEQUIT:
+      case DaoAdapterConstants.RAGEQUIT:
         await dispatch(initContractRagequit(web3Instance));
         break;
-      case DaoConstants.WITHDRAW:
+      case DaoAdapterConstants.WITHDRAW:
         await dispatch(initContractWithdraw(web3Instance));
         break;
-      case DaoConstants.BANK:
+      case DaoExtensionConstants.BANK:
         await dispatch(initContractBankExtension(web3Instance));
         break;
-      case DaoConstants.ONBOARDING:
+      case DaoAdapterConstants.ONBOARDING:
         await dispatch(initContractOnboarding(web3Instance));
         break;
-      case DaoConstants.TRIBUTE:
+      case DaoAdapterConstants.TRIBUTE:
         await dispatch(initContractTribute(web3Instance));
         break;
-      case DaoConstants.DISTRIBUTE:
+      case DaoAdapterConstants.DISTRIBUTE:
         await dispatch(initContractDistribute(web3Instance));
         break;
-      case DaoConstants.VOTING:
+      case DaoAdapterConstants.VOTING:
         await dispatch(initRegisteredVotingAdapter(web3Instance));
         break;
     }

@@ -3,19 +3,27 @@
  * and the available adapters as detailed here:
  * https://github.com/openlawteam/molochv3-contracts
  */
-export enum DaoConstants {
-  BANK = 'bank',
+export enum DaoAdapterConstants {
   CONFIGURATION = 'configuration',
   DISTRIBUTE = 'distribute',
+  EXECUTION = 'execution',
   FINANCING = 'financing',
   GUILDKICK = 'guildkick',
   ONBOARDING = 'onboarding',
-  OFFCHAINVOTING = 'offchainvoting',
+  NONVOTING_ONBOARDING = 'nonvoting-onboarding',
   MANAGING = 'managing',
   RAGEQUIT = 'ragequit',
   TRIBUTE = 'tribute',
   VOTING = 'voting',
   WITHDRAW = 'withdraw',
+}
+
+export enum OtherAdapterConstants {
+  OFFCHAINVOTING = 'offchainvoting',
+}
+
+export enum DaoExtensionConstants {
+  BANK = 'bank',
 }
 
 /**

@@ -4,7 +4,8 @@ import {AbiItem} from 'web3-utils/types';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
 
 import {
-  DaoConstants,
+  DaoAdapterConstants,
+  DaoExtensionConstants,
   VotingAdapterName,
 } from '../components/adapters-extensions/enums';
 
@@ -47,7 +48,10 @@ export type ContractsStateEntry = {
   /**
    * (Optional) Adapter/extension name, used for the Adapter/Extension Management
    */
-  adapterOrExtensionName?: DaoConstants | VotingAdapterName;
+  adapterOrExtensionName?:
+    | DaoAdapterConstants
+    | DaoExtensionConstants
+    | VotingAdapterName;
   /**
    * Address of the instantiated contract
    */

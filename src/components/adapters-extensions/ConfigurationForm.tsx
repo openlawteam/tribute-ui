@@ -3,7 +3,7 @@ import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
 
-import {DaoConstants} from './enums';
+import {DaoAdapterConstants} from './enums';
 import {AdaptersOrExtensions} from './types';
 import {StoreState} from '../../store/types';
 import {Web3TxStatus} from '../web3/types';
@@ -170,7 +170,7 @@ export default function ConfigurationForm({
         contractAddress,
         instance: {methods},
       } = getAdapterOrExtensionFromRedux(
-        adapterOrExtension?.name as DaoConstants
+        adapterOrExtension?.name as DaoAdapterConstants
       );
 
       if (!isConnected) {

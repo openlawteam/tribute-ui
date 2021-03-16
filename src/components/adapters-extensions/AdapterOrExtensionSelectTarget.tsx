@@ -1,8 +1,11 @@
 import React, {useState} from 'react';
 
-import {DaoConstants} from './enums';
+import {DaoAdapterConstants, DaoExtensionConstants} from './enums';
 
-type AdapterExtensionTarget = DaoConstants | null;
+type AdapterExtensionTarget =
+  | DaoAdapterConstants
+  | DaoExtensionConstants
+  | null;
 
 type AdapterExtensionSelectTargetRenderActionsArgs = {
   selectedTargetOption: AdapterExtensionTarget;
@@ -72,7 +75,9 @@ export default function AdapterExtensionSelectTarget(
     setSelectedTargetOptionProps(selectedTargetProps);
   }
 
-  function renderDescription(selectedTargetOption: DaoConstants | null) {
+  function renderDescription(
+    selectedTargetOption: DaoAdapterConstants | DaoExtensionConstants | null
+  ) {
     if (!selectedTargetOption) return null;
 
     try {
