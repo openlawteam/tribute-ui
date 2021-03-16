@@ -5,7 +5,7 @@ import {truncateEthAddress} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
 import {Member} from './types';
-import {fakeMembers} from './_mockData';
+import {fakeMembers, FakeMember} from './_mockData';
 
 export default function MemberProfile() {
   /**
@@ -22,7 +22,7 @@ export default function MemberProfile() {
    */
 
   // @todo replace with actual member fetch and member exists check
-  const activeMember: Member | undefined = fakeMembers.find(
+  const activeMember: FakeMember | undefined = fakeMembers.find(
     (member) => member.address.toLowerCase() === ethereumAddress.toLowerCase()
   );
 
