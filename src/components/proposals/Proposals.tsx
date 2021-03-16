@@ -9,6 +9,8 @@ import {truncateEthAddress} from '../../util/helpers';
 import {useProposals, useProposalsVotingState} from './hooks';
 import {VotingState} from './voting/types';
 import ProposalCard from './ProposalCard';
+import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
+import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 
 type ProposalsProps = {
   adapterName: DaoAdapterConstants;
@@ -40,6 +42,20 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
   );
 
   /**
+   * Our hooks
+   */
+
+  const {proposals, proposalsError, proposalsStatus} = useProposals({
+    adapterName,
+  });
+
+  const {
+    proposalsVotingState,
+    proposalsVotingStateError,
+    proposalsVotingStateStatus,
+  } = useProposalsVotingState(proposalIds);
+
+  /**
    * Variables
    */
 
@@ -50,18 +66,19 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
     votingProposals,
   } = filteredProposals;
 
-  /**
-   * Our hooks
-   */
+  const isLoading: boolean =
+    proposalsStatus === AsyncStatus.PENDING ||
+    proposalsStatus === AsyncStatus.STANDBY ||
+    proposalsVotingStateStatus === AsyncStatus.STANDBY ||
+    proposalsVotingStateStatus === AsyncStatus.PENDING;
 
-  const {proposals, proposalsStatus} = useProposals({
-    adapterName,
-  });
+  const isLoadingDone: boolean =
+    proposalsStatus === AsyncStatus.FULFILLED ||
+    proposalsVotingStateStatus === AsyncStatus.FULFILLED;
 
-  const {
-    proposalsVotingState,
-    proposalsVotingStateStatus,
-  } = useProposalsVotingState(proposalIds);
+  const isError: boolean =
+    proposalsStatus === AsyncStatus.REJECTED ||
+    proposalsVotingStateStatus === AsyncStatus.REJECTED;
 
   /**
    * Effects
@@ -173,6 +190,40 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
         />
       );
     });
+  }
+
+  /**
+   * Render
+   */
+
+  // Render loading
+  if (isLoading && !isError) {
+    return (
+      <div style={{width: '3rem', margin: '0 auto'}}>
+        <LoaderWithEmoji />
+      </div>
+    );
+  }
+
+  // Render no proposals
+  if (
+    !Object.values(proposals).length &&
+    !Object.values(filteredProposals).flatMap((p) => p).length &&
+    isLoadingDone
+  ) {
+    return <p className="text-center">No proposals, yet!</p>;
+  }
+
+  // Render error
+  if (isError) {
+    return (
+      <div className="text-center">
+        <ErrorMessageWithDetails
+          error={proposalsError || proposalsVotingStateError}
+          renderText="Something went wrong while getting the proposals."
+        />
+      </div>
+    );
   }
 
   return (
