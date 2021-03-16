@@ -2,7 +2,7 @@ import React, {useState, useCallback, useEffect} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
-import {Link, useHistory} from 'react-router-dom';
+import {useHistory} from 'react-router-dom';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
 import {toBN, AbiItem} from 'web3-utils';
 
@@ -678,12 +678,7 @@ export default function CreateTributeProposal() {
 
             <div className="form__input-description">
               This is the amount of DAO tokens you are requesting be sent to the
-              Applicant Address in exchange for your tribute. Current member
-              allocations can be viewed{' '}
-              <Link to="/members" target="_blank" rel="noopener noreferrer">
-                here
-              </Link>
-              .
+              Applicant Address in exchange for your tribute.
             </div>
           </div>
         </div>
