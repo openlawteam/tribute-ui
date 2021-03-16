@@ -4,7 +4,7 @@ import {
   snapshotAPIDraftResponse,
   snapshotAPIProposalResponse,
 } from '../../test/restResponses';
-import {DaoConstants} from '../adapters-extensions/enums';
+import {DaoAdapterConstants} from '../adapters-extensions/enums';
 import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
 import {rest, server} from '../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../config';
@@ -216,7 +216,7 @@ describe('ProposalCard unit tests', () => {
           );
         }}>
         <Proposals
-          adapterName={DaoConstants.ONBOARDING}
+          adapterName={DaoAdapterConstants.ONBOARDING}
           onProposalClick={spy}
         />
       </Wrapper>

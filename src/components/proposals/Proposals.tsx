@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {AsyncStatus} from '../../util/types';
-import {DaoConstants} from '../adapters-extensions/enums';
+import {DaoAdapterConstants} from '../adapters-extensions/enums';
 import {ProposalData, ProposalFlag} from './types';
 import {proposalHasFlag, proposalHasVotingState} from './helpers';
 import {ProposalHeaderNames} from '../../util/enums';
@@ -11,7 +11,7 @@ import {VotingState} from './voting/types';
 import ProposalCard from './ProposalCard';
 
 type ProposalsProps = {
-  adapterName: DaoConstants;
+  adapterName: DaoAdapterConstants;
   onProposalClick: (id: string) => void;
 };
 

@@ -5,7 +5,7 @@ import {
   snapshotAPIProposalResponse,
 } from '../../../test/restResponses';
 import {AsyncStatus} from '../../../util/types';
-import {DaoConstants} from '../../adapters-extensions/enums';
+import {DaoAdapterConstants} from '../../adapters-extensions/enums';
 import {DEFAULT_ETH_ADDRESS} from '../../../test/helpers';
 import {rest, server} from '../../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../../config';
@@ -29,7 +29,7 @@ describe('useProposals unit tests', () => {
       );
 
       const {result, waitForNextUpdate} = await renderHook(
-        () => useProposals({adapterName: DaoConstants.ONBOARDING}),
+        () => useProposals({adapterName: DaoAdapterConstants.ONBOARDING}),
         {
           wrapper: Wrapper,
           initialProps: {

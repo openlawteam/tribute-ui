@@ -9,7 +9,7 @@ import {
 } from '@openlaw/snapshot-js-erc712';
 
 import {AsyncStatus} from '../../../util/types';
-import {DaoConstants} from '../../adapters-extensions/enums';
+import {DaoAdapterConstants} from '../../adapters-extensions/enums';
 import {multicall, MulticallTuple} from '../../web3/helpers';
 import {Proposal, ProposalData} from '../types';
 import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
@@ -34,7 +34,7 @@ type UseProposalsReturn = {
 export function useProposals({
   adapterName,
 }: {
-  adapterName: DaoConstants;
+  adapterName: DaoAdapterConstants;
 }): UseProposalsReturn {
   /**
    * State

@@ -1,7 +1,7 @@
 import React from 'react';
 import {useHistory} from 'react-router-dom';
 
-import {DaoConstants} from '../../components/adapters-extensions/enums';
+import {DaoAdapterConstants} from '../../components/adapters-extensions/enums';
 import FadeIn from '../../components/common/FadeIn';
 import Proposals from '../../components/proposals/Proposals';
 import Wrap from '../../components/common/Wrap';
@@ -28,7 +28,7 @@ export default function Membership() {
   return (
     <RenderWrapper>
       <Proposals
-        adapterName={DaoConstants.ONBOARDING}
+        adapterName={DaoAdapterConstants.ONBOARDING}
         onProposalClick={handleClickProposalDetails}
       />
     </RenderWrapper>
