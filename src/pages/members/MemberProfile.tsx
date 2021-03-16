@@ -1,49 +1,106 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
-import {truncateEthAddress} from '../../util/helpers';
+import {AsyncStatus} from '../../util/types';
+import {truncateEthAddress, normalizeString} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
-// import AdapterOrExtensionManager from '../../components/adapters-extensions/AdapterOrExtensionManager';
-import {fakeMembers, FakeMember} from './_mockData';
+import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
+import NotFound from '../subpages/NotFound';
+import useMembers from './hooks/useMembers';
+import {Member} from './types';
+import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 
 export default function MemberProfile() {
+  /**
+   * Our hooks
+   */
+
+  const {members, membersError, membersStatus} = useMembers();
+
   /**
    * Their hooks
    */
 
   // Get ethereumAddress for fetching the member.
-  // @todo Use this to check that active member exists.
   const {ethereumAddress} = useParams<{ethereumAddress: string}>();
-  const history = useHistory();
 
   /**
-   * Variables
+   * State
    */
 
-  // @todo replace with actual member fetch and member exists check
-  const activeMember: FakeMember | undefined = fakeMembers.find(
-    (member) => member.address.toLowerCase() === ethereumAddress.toLowerCase()
-  );
+  const [memberDetails, setMemberDetails] = useState<Member>();
+  const [memberNotFound, setMemberNotFound] = useState<boolean>(false);
 
   /**
    * Effects
    */
 
-  // Navigate to 404
   useEffect(() => {
+    if (membersStatus !== AsyncStatus.FULFILLED) return;
+
+    const activeMember = members.find(
+      (member) =>
+        normalizeString(member.address) === normalizeString(ethereumAddress)
+    );
+
+    setMemberDetails(activeMember);
     if (!activeMember) {
-      history.push('/404');
+      setMemberNotFound(true);
     }
-  }, [history, activeMember]);
+  }, [ethereumAddress, members, membersStatus]);
+
+  /**
+   * Variables
+   */
+
+  const isLoading: boolean =
+    membersStatus === AsyncStatus.STANDBY ||
+    membersStatus === AsyncStatus.PENDING;
+  const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
+  const isError: boolean = membersStatus === AsyncStatus.REJECTED;
 
   /**
    * Render
    */
 
-  if (activeMember) {
+  // Render loading
+  if (isLoading && !isError) {
     return (
       <RenderWrapper>
+        <div className="loader--emjoi-container">
+          <LoaderWithEmoji />
+        </div>
+      </RenderWrapper>
+    );
+  }
+
+  // Render error
+  if (isError) {
+    return (
+      <RenderWrapper>
+        <div className="text-center">
+          <ErrorMessageWithDetails
+            error={membersError}
+            renderText="Something went wrong while getting the member."
+          />
+        </div>
+      </RenderWrapper>
+    );
+  }
+
+  // Render 404 no member found
+  if (memberNotFound && isLoadingDone) {
+    return (
+      <RenderWrapper>
+        <NotFound />
+      </RenderWrapper>
+    );
+  }
+
+  return (
+    <RenderWrapper>
+      {memberDetails ? (
         <>
           <div className="memberprofile__header">Member Profile</div>
           <div className="proposaldetails">
@@ -51,25 +108,22 @@ export default function MemberProfile() {
 
             {/* MEMBER ADDRESS */}
             <div className="memberprofile__left-column">
-              <h3>
-                {truncateEthAddress((activeMember as FakeMember).address, 7)}
-              </h3>
+              <h3>{truncateEthAddress(memberDetails.address, 7)}</h3>
               <div>MemberProfile Info @todo</div>
-              <div>MemberProfile Actions @todo</div>
             </div>
 
             {/* RIGHT COLUMN */}
             <div className="memberprofile__right-column">
-              MemberProfile Voting History @todo
+              MemberProfile Actions @todo
             </div>
           </div>
         </>
-      </RenderWrapper>
-    );
-  }
-
-  // Render nothing. Should never reach this case.
-  return <></>;
+      ) : (
+        // Render nothing. Should never reach this case.
+        <></>
+      )}
+    </RenderWrapper>
+  );
 }
 
 function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {

@@ -24,6 +24,7 @@ import {
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
+import {BURN_ADDRESS} from '../../util/constants';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 import {multicall, MulticallTuple} from '../../components/web3/helpers';
@@ -427,7 +428,7 @@ export default function CreateTransferProposal() {
       }
 
       const memberAddressArg = isTypeAllMembers
-        ? '0x0000000000000000000000000000000000000000' //indicates distribution to all active members
+        ? BURN_ADDRESS // 0x0 address indicates distribution to all active members
         : memberAddress;
       /**
        * Prepare `data` argument for submission to DAO

@@ -197,7 +197,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
   // Render loading
   if (isLoading && !isError) {
     return (
-      <div style={{width: '3rem', margin: '0 auto'}}>
+      <div className="loader--emjoi-container">
         <LoaderWithEmoji />
       </div>
     );

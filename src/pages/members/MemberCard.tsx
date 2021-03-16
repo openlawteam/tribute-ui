@@ -1,8 +1,9 @@
-import {FakeMember} from './_mockData';
+import {Member} from './types';
+
+import {truncateEthAddress} from '../../util/helpers';
 
 type MemberCardProps = {
-  member: FakeMember; // placeholder prop
-  name: string;
+  member: Member;
   onClick: (ethereumAddress: string) => void;
 };
 
@@ -13,7 +14,7 @@ type MemberCardProps = {
  * @returns {JSX.Element}
  */
 export default function MemberCard(props: MemberCardProps): JSX.Element {
-  const {member, name, onClick} = props;
+  const {member, onClick} = props;
 
   /**
    * Functions
@@ -32,7 +33,9 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
   return (
     <div className="membercard" onClick={handleClick}>
       {/* TITLE */}
-      <h3 className="membercard__title">{name}</h3>
+      <h3 className="membercard__title">
+        {truncateEthAddress(member.address, 7)}
+      </h3>
     </div>
   );
 }

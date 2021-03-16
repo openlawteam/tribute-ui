@@ -1,12 +1,21 @@
 import {useHistory} from 'react-router-dom';
 
-import {truncateEthAddress} from '../../util/helpers';
+import {AsyncStatus} from '../../util/types';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
 import MemberCard from './MemberCard';
-import {fakeMembers, FakeMember} from './_mockData';
+import useMembers from './hooks/useMembers';
+import {Member} from './types';
+import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
+import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 
 export default function Members() {
+  /**
+   * Our hooks
+   */
+
+  const {members, membersError, membersStatus} = useMembers();
+
   /**
    * Their hooks
    */
@@ -17,20 +26,23 @@ export default function Members() {
    * Variables
    */
 
-  const activeMembers = renderMemberCards(fakeMembers);
+  const isLoading: boolean =
+    membersStatus === AsyncStatus.STANDBY ||
+    membersStatus === AsyncStatus.PENDING;
+  const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
+  const isError: boolean = membersStatus === AsyncStatus.REJECTED;
 
   /**
    * Functions
    */
 
-  function renderMemberCards(members: FakeMember[]) {
+  function renderMemberCards(members: Member[]) {
     return members.map((member) => {
       return (
         <MemberCard
           key={member.address}
           onClick={handleClickMemberProfile(member.address)}
           member={member}
-          name={truncateEthAddress(member.address, 7)}
         />
       );
     });
@@ -48,14 +60,48 @@ export default function Members() {
    * Render
    */
 
+  // Render loading
+  if (isLoading && !isError) {
+    return (
+      <RenderWrapper>
+        <div className="loader--emjoi-container">
+          <LoaderWithEmoji />
+        </div>
+      </RenderWrapper>
+    );
+  }
+
+  // Render error
+  if (isError) {
+    return (
+      <RenderWrapper>
+        <div className="text-center">
+          <ErrorMessageWithDetails
+            error={membersError}
+            renderText="Something went wrong while getting the members."
+          />
+        </div>
+      </RenderWrapper>
+    );
+  }
+
+  // Render no members
+  if (!Object.values(members).length && isLoadingDone) {
+    return (
+      <RenderWrapper>
+        <p className="text-center">No members, yet!</p>
+      </RenderWrapper>
+    );
+  }
+
   return (
     <RenderWrapper>
       <div className="grid--fluid grid-container">
         {/* ACTIVE MEMBERS */}
-        <>
+        <div>
           <div className="grid__header">Active Members</div>
-          <div className="grid__cards">{activeMembers}</div>
-        </>
+          <div className="grid__cards">{renderMemberCards(members)}</div>
+        </div>
       </div>
     </RenderWrapper>
   );

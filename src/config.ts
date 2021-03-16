@@ -113,7 +113,7 @@ export const BANK_EXTENSION_CONTRACT_ADDRESS = {
  * - Offchain voting
  * - Financing
  * - Tribute
- * - Distribute @todo add to initContracts
+ * - Distribute
  * - Rage quit
  * - Guild kick
  * - Withdraw
@@ -263,6 +263,8 @@ export const SHARES_ADDRESS: string =
   '0x00000000000000000000000000000000000FF1CE';
 export const LOOT_ADDRESS: string =
   '0x00000000000000000000000000000000B105F00D';
+export const LOCKED_LOOT_ADDRESS: string =
+  '0x00000000000000000000000000000000BAAAAAAD';
 export const ETH_TOKEN_ADDRESS: string =
   '0x0000000000000000000000000000000000000000';
 export const DAI_TOKEN_ADDRESS: string =
