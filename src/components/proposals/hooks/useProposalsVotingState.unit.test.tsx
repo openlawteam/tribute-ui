@@ -1,9 +1,9 @@
 import {renderHook, act} from '@testing-library/react-hooks';
 
+import {AsyncStatus} from '../../../util/types';
+import {DEFAULT_PROPOSAL_HASH} from '../../../test/helpers';
 import {useProposalsVotingState} from './useProposalsVotingState';
 import Wrapper from '../../../test/Wrapper';
-import {DEFAULT_PROPOSAL_HASH} from '../../../test/helpers';
-import {AsyncStatus} from '../../../util/types';
 
 describe('useProposalsVotingState unit tests', () => {
   const proposalIds = [

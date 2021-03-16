@@ -6,8 +6,7 @@ import {ProposalData, ProposalFlag} from './types';
 import {proposalHasFlag, proposalHasVotingState} from './helpers';
 import {ProposalHeaderNames} from '../../util/enums';
 import {truncateEthAddress} from '../../util/helpers';
-import {useProposals} from './hooks/useProposals';
-import {useProposalsVotingState} from './hooks';
+import {useProposals, useProposalsVotingState} from './hooks';
 import {VotingState} from './voting/types';
 import ProposalCard from './ProposalCard';
 
