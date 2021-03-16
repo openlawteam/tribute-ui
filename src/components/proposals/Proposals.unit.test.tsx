@@ -223,6 +223,10 @@ describe('ProposalCard unit tests', () => {
     );
 
     await waitFor(() => {
+      expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
       // Proposal headers
       expect(screen.getByText(/^proposals$/i)).toBeInTheDocument();
       expect(screen.getByText(/^passed$/i)).toBeInTheDocument();
@@ -245,6 +249,103 @@ describe('ProposalCard unit tests', () => {
       expect(spy.mock.calls[0][0]).toBe(
         '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c1111'
       );
+    });
+  });
+
+  test('should render no proposals text', async () => {
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/drafts/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json({}))
+        ),
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json({}))
+        ),
+      ]
+    );
+
+    render(
+      <Wrapper useInit useWallet>
+        <Proposals
+          adapterName={DaoAdapterConstants.ONBOARDING}
+          onProposalClick={() => {}}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/no proposals, yet!/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Proposal headers
+      expect(() => screen.getByText(/^proposals$/i)).toThrow();
+      expect(() => screen.getByText(/^passed$/i)).toThrow();
+      expect(() => screen.getByText(/^failed$/i)).toThrow();
+      expect(() => screen.getByText(/^voting$/i)).toThrow();
+
+      // Proposal names
+      expect(() => screen.getByText(/another nice one/i)).toThrow();
+      expect(() => screen.getByText(/another cool one/i)).toThrow();
+      expect(() => screen.getByText(/another great one/i)).toThrow();
+      expect(() => screen.getByText(/another rad one/i)).toThrow();
+      expect(() => screen.getByText(/another awesome one/i)).toThrow();
+    });
+  });
+
+  // @note Just to throw something we purposefully do not mock the multicall responses
+  test('should render error', async () => {
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/drafts/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json(draftsResponse))
+        ),
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json(proposalsResponse))
+        ),
+      ]
+    );
+
+    render(
+      <Wrapper useInit useWallet>
+        <Proposals
+          adapterName={DaoAdapterConstants.ONBOARDING}
+          onProposalClick={() => {}}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/something went wrong while getting the proposals/i)
+      ).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/^details$/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Proposal headers
+      expect(() => screen.getByText(/^proposals$/i)).toThrow();
+      expect(() => screen.getByText(/^passed$/i)).toThrow();
+      expect(() => screen.getByText(/^failed$/i)).toThrow();
+      expect(() => screen.getByText(/^voting$/i)).toThrow();
+
+      // Proposal names
+      expect(() => screen.getByText(/another nice one/i)).toThrow();
+      expect(() => screen.getByText(/another cool one/i)).toThrow();
+      expect(() => screen.getByText(/another great one/i)).toThrow();
+      expect(() => screen.getByText(/another rad one/i)).toThrow();
+      expect(() => screen.getByText(/another awesome one/i)).toThrow();
     });
   });
 });

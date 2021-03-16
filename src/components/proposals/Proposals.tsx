@@ -68,8 +68,6 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
 
   const isLoading: boolean =
     proposalsStatus === AsyncStatus.PENDING ||
-    proposalsStatus === AsyncStatus.STANDBY ||
-    proposalsVotingStateStatus === AsyncStatus.STANDBY ||
     proposalsVotingStateStatus === AsyncStatus.PENDING;
 
   const isLoadingDone: boolean =
