@@ -19,6 +19,7 @@ REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS=...
 REACT_APP_MULTICALL_CONTRACT_ADDRESS=...
 REACT_APP_SNAPSHOT_HUB_API_URL=http://localhost:8081
 REACT_APP_SNAPSHOT_SPACE=...
+REACT_APP_GRAPH_API_URL=...
 ```
 
 NOTE:
@@ -26,8 +27,9 @@ NOTE:
 - `REACT_APP_INFURA_PROJECT_ID_LOCAL` can be the same value you use for LAO local development.
 - `REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS` is the address of the `DaoRegistry` smart contract deployed to your network.
 - `REACT_APP_MULTICALL_CONTRACT_ADDRESS` is the address of the `Multicall` smart contract deployed to your network.
-- `REACT_APP_SNAPSHOT_HUB_API_URL` is the url of [snaphot-hub](https://github.com/openlawteam/snapshot-hub) running locally in a container.
+- `REACT_APP_SNAPSHOT_HUB_API_URL` is the url of [snaphot-hub](https://github.com/openlawteam/snapshot-hub/tree/erc-712) running locally in a container.
 - `REACT_APP_SNAPSHOT_SPACE` is the unique name registered in Snapshot Hub under which proposals, votes, etc. will be stored.
+- `REACT_APP_GRAPH_API_URL` is the url of the [subgraph](#running-the-local-graph-node) running locally in a container.
 
 #### Optional env vars for local development
 
@@ -35,12 +37,15 @@ NOTE:
 
 ### Ganache Workspace Setup
 
-When you set up your Ganache network workspace in the [Ganache GUI app](https://www.trufflesuite.com/ganache), change the Network ID to `1337`. That is necessary in order to connect MetaMask to your Ganache network. The DApp is configured for Ganache to be `chainId` `1337`.
+When you set up your Ganache network workspace in the [Ganache GUI app](https://www.trufflesuite.com/ganache):
+
+- Change the Network ID to `1337`. That is necessary in order to connect MetaMask to your Ganache network. The DApp is configured for Ganache to be `chainId` `1337`.
+- Turn off Automine and set the Mining Block Time (Seconds) to `10`.
 
 Alternatively (and for now the more stable method), you can run the network with the [Ganache CLI](https://github.com/trufflesuite/ganache-cli):
 
 - `npm install -g ganache-cli` (if not already installed)
-- `ganache-cli --port 7545 --networkId 1337`
+- `ganache-cli --port 7545 --networkId 1337 --blockTime 10`
 
 **Remember**: After you deploy the `DaoRegistry` smart contract on your local Ganache network you must include the deployed contract's address in your local root `.env` file.
 
@@ -49,6 +54,12 @@ Alternatively (and for now the more stable method), you can run the network with
 Clone the https://github.com/openlawteam/molochv3-contracts repo and from the root open up a terminal, `npm ci`.
 
 Follow the instructions [here](https://github.com/openlawteam/molochv3-contracts/tree/master/docker) to setup and run the local graph-node.
+
+## GitHub Pages Deployments
+
+Deployments for the development environment are handled automatically with a GitHub Action:
+
+- `GitHub Pages development deployment`: push to `main` branch -> https://molochv3.org
 
 ---
 
