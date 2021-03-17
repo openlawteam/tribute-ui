@@ -182,6 +182,10 @@ export function useSignAndSubmitProposal<
         throw new Error('No "SNAPSHOT_HUB_API_URL" was found.');
       }
 
+      if (!SPACE) {
+        throw new Error('No Snapshot "SPACE" was found.');
+      }
+
       if (type !== SnapshotType.draft && type !== SnapshotType.proposal) {
         throw new Error('Handling for type "vote" is not implemented.');
       }

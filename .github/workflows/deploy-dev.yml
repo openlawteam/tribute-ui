@@ -42,6 +42,7 @@ jobs:
           REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0x83eA12d54D5DCF88FeD2fB80dcEa1336A8Ac8924"
           REACT_APP_MULTICALL_CONTRACT_ADDRESS: "0xE1306199D95a1Ee0Ef155A984B0a0B50F7B0c216"
           REACT_APP_SNAPSHOT_HUB_API_URL: https://snapshot-hub-erc712.dev.thelao.io
+          REACT_APP_SNAPSHOT_SPACE: thelao
           REACT_APP_GRAPH_API_URL: https://api.thegraph.com/subgraphs/name/sophiacodes/molochv3-dev
         run: npm run build
 

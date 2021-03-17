@@ -8,12 +8,13 @@ const {
   REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS,
   REACT_APP_DEFAULT_CHAIN_NAME_LOCAL,
   REACT_APP_ENVIRONMENT,
+  REACT_APP_GRAPH_API_URL,
   REACT_APP_INFURA_PROJECT_ID_DEV,
   REACT_APP_INFURA_PROJECT_ID_LOCAL,
   REACT_APP_INFURA_PROJECT_ID_PROD,
   REACT_APP_MULTICALL_CONTRACT_ADDRESS,
   REACT_APP_SNAPSHOT_HUB_API_URL,
-  REACT_APP_GRAPH_API_URL,
+  REACT_APP_SNAPSHOT_SPACE,
 } = process.env;
 
 export const ENVIRONMENT = REACT_APP_ENVIRONMENT as EnvironmentName | undefined;
@@ -271,21 +272,10 @@ export const DAI_TOKEN_ADDRESS: string =
   '0x95b58a6bff3d14b7db2f5cb5f0ad413dc2940658';
 
 /**
- * Space is a unique key (typically a contract address)
- * used by Moloch and Snapshot for building core proposal data.
- *
- * It is also used inside a Snapshot Hub for matching a `space`
+ * `SPACE` is used inside Snapshot Hub for matching a `space`
  * with its own proposals and votes.
  */
-export const SPACES: Record<EnvironmentName, string> = {
-  development: 'thelao',
-  // @todo Get local Docker snapshot and "registered" space set up.
-  localhost: 'thelao',
-  production: 'thelao',
-};
-
-// Defaults to `localhost` space if `ENVIRONMENT` is `undefined`.
-export const SPACE: string = SPACES[ENVIRONMENT || 'localhost'];
+export const SPACE: string | undefined = REACT_APP_SNAPSHOT_SPACE;
 
 /**
  * POLLING INTERVAL FOR GQL QUERIES
