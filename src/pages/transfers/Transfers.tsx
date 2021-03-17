@@ -1,17 +1,36 @@
 import React from 'react';
 import {useHistory} from 'react-router-dom';
 
-import Wrap from '../../components/common/Wrap';
+import {DaoAdapterConstants} from '../../components/adapters-extensions/enums';
 import FadeIn from '../../components/common/FadeIn';
+import Proposals from '../../components/proposals/Proposals';
+import Wrap from '../../components/common/Wrap';
 
 export default function Transfers() {
+  /**
+   * Their hooks
+   */
+
+  const history = useHistory();
+
+  /**
+   * Functions
+   */
+
+  function handleClickProposalDetails(proposalHash: string) {
+    proposalHash && history.push(`/transfers/${proposalHash}`);
+  }
+
   /**
    * Render
    */
 
   return (
     <RenderWrapper>
-      <div>Transfers @todo</div>
+      <Proposals
+        adapterName={DaoAdapterConstants.DISTRIBUTE}
+        onProposalClick={handleClickProposalDetails}
+      />
     </RenderWrapper>
   );
 }
