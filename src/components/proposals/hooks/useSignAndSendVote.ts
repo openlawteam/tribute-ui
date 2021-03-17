@@ -140,6 +140,10 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
         throw new Error('No "SNAPSHOT_HUB_API_URL" was found.');
       }
 
+      if (!SPACE) {
+        throw new Error('No Snapshot "SPACE" was found.');
+      }
+
       setVoteDataStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       const adapterAddress = adapterName

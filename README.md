@@ -18,6 +18,7 @@ REACT_APP_INFURA_PROJECT_ID_LOCAL=...
 REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS=...
 REACT_APP_MULTICALL_CONTRACT_ADDRESS=...
 REACT_APP_SNAPSHOT_HUB_API_URL=http://localhost:8081
+REACT_APP_SNAPSHOT_SPACE=...
 ```
 
 NOTE:
@@ -26,6 +27,7 @@ NOTE:
 - `REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS` is the address of the `DaoRegistry` smart contract deployed to your network.
 - `REACT_APP_MULTICALL_CONTRACT_ADDRESS` is the address of the `Multicall` smart contract deployed to your network.
 - `REACT_APP_SNAPSHOT_HUB_API_URL` is the url of [snaphot-hub](https://github.com/openlawteam/snapshot-hub) running locally in a container.
+- `REACT_APP_SNAPSHOT_SPACE` is the unique name registered in Snapshot Hub under which proposals, votes, etc. will be stored.
 
 #### Optional env vars for local development
 
