@@ -1,17 +1,36 @@
 import React from 'react';
 import {useHistory} from 'react-router-dom';
 
-import Wrap from '../../components/common/Wrap';
+import {DaoAdapterConstants} from '../../components/adapters-extensions/enums';
 import FadeIn from '../../components/common/FadeIn';
+import Proposals from '../../components/proposals/Proposals';
+import Wrap from '../../components/common/Wrap';
 
 export default function Tributes() {
+  /**
+   * Their hooks
+   */
+
+  const history = useHistory();
+
+  /**
+   * Functions
+   */
+
+  function handleClickProposalDetails(proposalHash: string) {
+    proposalHash && history.push(`/tributes/${proposalHash}`);
+  }
+
   /**
    * Render
    */
 
   return (
     <RenderWrapper>
-      <div>Tributes @todo</div>
+      <Proposals
+        adapterName={DaoAdapterConstants.TRIBUTE}
+        onProposalClick={handleClickProposalDetails}
+      />
     </RenderWrapper>
   );
 }
