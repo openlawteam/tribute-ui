@@ -109,6 +109,12 @@ export function useProposals({
 
       const drafts = await fetch(`${baseURL}/drafts/${adapterAddress}`);
 
+      if (!drafts.ok) {
+        throw new Error(
+          'Something went wrong while fetching the Snapshot drafts.'
+        );
+      }
+
       const draftsJSON: SnapshotDraftResponse = await drafts.json();
 
       // Get Drafts which have not yet been sponsored (Proposal created)
@@ -130,6 +136,12 @@ export function useProposals({
       const proposals = await fetch(
         `${baseURL}/proposals/${adapterAddress}?includeVotes=true`
       );
+
+      if (!proposals.ok) {
+        throw new Error(
+          'Something went wrong while fetching the Snapshot proposals.'
+        );
+      }
 
       const proposalsJSON: SnapshotProposalResponse = await proposals.json();
 
