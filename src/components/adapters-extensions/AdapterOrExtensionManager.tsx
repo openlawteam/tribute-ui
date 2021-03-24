@@ -5,6 +5,7 @@ import {StoreState} from '../../store/types';
 import {AsyncStatus} from '../../util/types';
 import {
   AddAdapterArguments,
+  AddAdaptersArguments,
   AddExtensionArguments,
   AdaptersOrExtensions,
 } from './types';
@@ -326,8 +327,18 @@ export default function AdapterOrExtensionManager() {
         | AddAdapterArguments
         | AddExtensionArguments =
         adapterOrExtensionType === 'ADAPTER'
-          ? [adapterOrExtensionId, adapterOrExtensionAddress, acl]
-          : [adapterOrExtensionId, adapterOrExtensionAddress, account];
+          ? ([
+              adapterOrExtensionId,
+              adapterOrExtensionAddress,
+              acl,
+              [],
+              [],
+            ] as AddAdapterArguments)
+          : ([
+              adapterOrExtensionId,
+              adapterOrExtensionAddress,
+              account,
+            ] as AddExtensionArguments);
 
       const txArguments = {
         from: account || '',
@@ -336,7 +347,9 @@ export default function AdapterOrExtensionManager() {
       };
 
       const txSendMethod =
-        adapterOrExtensionType === 'ADAPTER' ? 'addAdapter' : 'addExtension';
+        adapterOrExtensionType === 'ADAPTER'
+          ? 'replaceAdapter'
+          : 'addExtension';
 
       // Execute contract call for `addAdapter` or `addExtension`
       await txSend(
@@ -385,7 +398,7 @@ export default function AdapterOrExtensionManager() {
     }
 
     try {
-      let adaptersArguments: AddAdapterArguments[] = [];
+      let adaptersArguments: AddAdaptersArguments[] = [];
 
       // Set the `Add` button states to true for all selected adapters
       for (const adapterName in selections) {
@@ -415,7 +428,11 @@ export default function AdapterOrExtensionManager() {
 
           // skip if `adapterId` or `adapterContractAddress` are undefined
           if (adapterId && adapterContractAddress) {
-            adaptersArguments.push([adapterId, adapterContractAddress, acl]);
+            adaptersArguments.push([
+              adapterId,
+              adapterContractAddress,
+              acl,
+            ] as AddAdaptersArguments);
 
             setIsInProcess((prevState) => ({
               ...prevState,
@@ -425,7 +442,7 @@ export default function AdapterOrExtensionManager() {
         }
       }
 
-      const addAdaptersArguments: [string, AddAdapterArguments[]] = [
+      const addAdaptersArguments: [string, AddAdaptersArguments[]] = [
         dao?.daoAddress,
         adaptersArguments,
       ];

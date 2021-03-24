@@ -23,6 +23,19 @@ export type AddAdapterArguments = [
   // `adapterAddress`
   string,
   // `acl`
+  number,
+  // `keys`
+  string[],
+  // `values`
+  number[]
+];
+
+export type AddAdaptersArguments = [
+  // `adapterId`
+  string,
+  // `adapterAddress`
+  string,
+  // `acl`
   number
 ];
 

@@ -16,9 +16,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint256",
+        "internalType": "uint160",
         "name": "amount",
-        "type": "uint256"
+        "type": "uint160"
       }
     ],
     "name": "NewBalance",
@@ -191,6 +191,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "maxExternalTokens",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -339,6 +352,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "maxTokens",
+        "type": "uint8"
+      }
+    ],
+    "name": "setMaxExternalTokens",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

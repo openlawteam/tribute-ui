@@ -190,9 +190,9 @@
             "type": "address"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint128",
             "name": "flags",
-            "type": "uint256"
+            "type": "uint128"
           }
         ],
         "internalType": "struct DaoFactory.Adapter[]",
@@ -230,9 +230,9 @@
             "type": "address"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint128",
             "name": "flags",
-            "type": "uint256"
+            "type": "uint128"
           }
         ],
         "internalType": "struct DaoFactory.Adapter[]",
@@ -265,9 +265,9 @@
             "type": "address"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint128",
             "name": "flags",
-            "type": "uint256"
+            "type": "uint128"
           }
         ],
         "internalType": "struct DaoFactory.Adapter",
