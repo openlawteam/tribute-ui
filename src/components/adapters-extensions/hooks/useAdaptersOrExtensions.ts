@@ -106,7 +106,10 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
 
       if (data) {
         // extract adapters and extensions from gql data
-        const {adapters, extensions} = data.tributes[0] as Record<string, any>;
+        const {adapters, extensions} = data.tributeDaos[0] as Record<
+          string,
+          any
+        >;
 
         // create a list of registered and un-registered adapters and extensions
         const {

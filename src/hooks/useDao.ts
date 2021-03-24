@@ -52,9 +52,9 @@ export function useDao(): UseDaoReturn {
   function getDaoRegistry() {
     try {
       if (!loading && data) {
-        setDao(data.tributes[0]);
+        setDao(data.tributeDaos[0]);
 
-        if (data.tributes.length === 0) {
+        if (data.tributeDaos.length === 0) {
           const error = new Error(
             `"${daoRegistryContract?.contractAddress}" dao address not found.`
           );
