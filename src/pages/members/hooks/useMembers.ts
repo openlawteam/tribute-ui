@@ -1,11 +1,14 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AbiItem, toBN} from 'web3-utils';
+import {useQuery} from '@apollo/react-hooks';
+import Web3 from 'web3';
 
 import {
   SHARES_ADDRESS,
   LOOT_ADDRESS,
   LOCKED_LOOT_ADDRESS,
+  GQL_QUERY_POLLING_INTERVAL,
 } from '../../../config';
 import {AsyncStatus} from '../../../util/types';
 import {normalizeString} from '../../../util/helpers';
@@ -13,6 +16,7 @@ import {StoreState} from '../../../store/types';
 import {multicall, MulticallTuple} from '../../../components/web3/helpers';
 import {useWeb3Modal} from '../../../components/web3/hooks';
 import {Member, MemberFlag} from '../types';
+import {GET_MEMBERS} from '../../../gql';
 
 type UseMembersReturn = {
   members: Member[];
@@ -23,8 +27,7 @@ type UseMembersReturn = {
 /**
  * useMembers
  *
- * @todo Get members from subgraph.
- * @todo switch/case for retrieval method based on subgraph up/down
+ * @todo switch/case for retrieval method (subgraph vs direct calls) based on subgraph up/down
  * @returns `UseMembersReturn` An object with the members, and the current async status.
  */
 export default function useMembers(): UseMembersReturn {
@@ -44,6 +47,16 @@ export default function useMembers(): UseMembersReturn {
    */
 
   const {web3Instance, account} = useWeb3Modal();
+
+  /**
+   * GQL Query
+   */
+
+  const getMembersFromSubgraph = useQuery<Record<string, any>>(GET_MEMBERS, {
+    pollInterval: GQL_QUERY_POLLING_INTERVAL,
+    variables: {daoAddress: DaoRegistryContract?.contractAddress.toLowerCase()},
+  });
+  const {loading, error, data} = getMembersFromSubgraph;
 
   /**
    * State
@@ -70,9 +83,49 @@ export default function useMembers(): UseMembersReturn {
    * Effects
    */
 
+  // useEffect(() => {
+  //   getMembersFromRegistryCached();
+  // }, [getMembersFromRegistryCached]);
+
   useEffect(() => {
-    getMembersFromRegistryCached();
-  }, [getMembersFromRegistryCached]);
+    try {
+      setMembersStatus(AsyncStatus.PENDING);
+
+      if (!loading && data) {
+        // extract members from gql data
+        const {members} = data.molochv3S[0] as Record<string, any>;
+        // Filter out any member that has fully ragequit (no positive balance in
+        // either SHARES, LOOT or LOCKED_LOOT)
+        const filteredMembers = members.filter(
+          (member: Record<string, any>) => !member.didFullyRagequit
+        );
+        const filteredMembersWithDetails = filteredMembers.map(
+          (member: Record<string, any>) => {
+            // remove gql data that is no longer needed
+            const {createdAt, didFullyRagequit, ...parsedMember} = member;
+
+            return {
+              ...parsedMember,
+              // use formatted addresses
+              address: Web3.utils.toChecksumAddress(member.address),
+              delegateKey: Web3.utils.toChecksumAddress(member.delegateKey),
+            };
+          }
+        );
+
+        setMembersStatus(AsyncStatus.FULFILLED);
+        setMembers(filteredMembersWithDetails);
+      } else {
+        if (error) {
+          throw new Error(error.message);
+        }
+      }
+    } catch (error) {
+      setMembersStatus(AsyncStatus.REJECTED);
+      setMembers([]);
+      setMembersError(error);
+    }
+  }, [data, error, loading]);
 
   /**
    * Functions
@@ -206,12 +259,16 @@ export default function useMembers(): UseMembersReturn {
         );
 
         // Filter out any member addresses that don't have a positive balance in either SHARES, LOOT or LOCKED_LOOT
-        const filteredMembersWithDetails = membersWithDetails.filter(
-          (member) =>
-            toBN(member.shares).gt(toBN(0)) ||
-            toBN(member.loot).gt(toBN(0)) ||
-            toBN(member.lockedLoot).gt(toBN(0))
-        );
+        const filteredMembersWithDetails = membersWithDetails
+          .filter(
+            (member) =>
+              toBN(member.shares).gt(toBN(0)) ||
+              toBN(member.loot).gt(toBN(0)) ||
+              toBN(member.lockedLoot).gt(toBN(0))
+          )
+          // display in descending order of when the member joined (e.g., newest
+          // member first)
+          .reverse();
 
         setMembers(filteredMembersWithDetails);
       }
