@@ -1,13 +1,13 @@
 import {
   DaoAdapterConstants,
-  DaoExtensionConstants,
+  // DaoExtensionConstants,
   OtherAdapterConstants,
 } from './enums';
 import {getAdapterOrExtensionId} from './helpers';
 
 import {
   DEFAULT_CHAIN,
-  BANK_EXTENSION_CONTRACT_ADDRESS,
+  // BANK_EXTENSION_CONTRACT_ADDRESS,
   CONFIGURATION_CONTRACT_ADDRESS,
   FINANCING_CONTRACT_ADDRESS,
   GUILDKICK_CONTRACT_ADDRESS,
@@ -57,15 +57,15 @@ export type AdaptersAndExtensionsType = {
  *    - Choosing an adapter/extension from a group: must be defined within a nested `options` key
  */
 export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
-  {
-    isExtension: true,
-    name: DaoExtensionConstants.BANK,
-    extensionId: getAdapterOrExtensionId(DaoExtensionConstants.BANK),
-    contractAddress: BANK_EXTENSION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    abiFunctionName: 'configureExtension',
-    description:
-      'Adds the banking capabilities to the DAO, and keeps track of the DAO accounts and internal token balances.',
-  },
+  // {
+  //   isExtension: true,
+  //   name: DaoExtensionConstants.BANK,
+  //   extensionId: getAdapterOrExtensionId(DaoExtensionConstants.BANK),
+  //   contractAddress: BANK_EXTENSION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+  //   abiFunctionName: 'configureExtension',
+  //   description:
+  //     'Adds the banking capabilities to the DAO, and keeps track of the DAO accounts and internal token balances.',
+  // },
   {
     name: DaoAdapterConstants.CONFIGURATION,
     adapterId: getAdapterOrExtensionId(DaoAdapterConstants.CONFIGURATION),
