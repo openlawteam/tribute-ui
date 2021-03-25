@@ -102,6 +102,21 @@ export default function FinalizeModal({
     }
   }
 
+  function configureExtensions() {
+    // @todo if any adapters have the `setAclToExtensionForAdapter` flag set we need to call
+    //  `configureExtension(
+    //     DaoRegistry dao,
+    //     address extension,
+    //     Adapter[] calldata adapters
+    // )` to set the permission for those adapters for the bank before finalizing the DAO
+    /**
+     * STEPS
+     * - get all added adapters from the subgraph
+     * - check the `setAclToExtensionForAdapter` flag against the added adpaters
+     * - set the permission for any adapters that are required
+     */
+  }
+
   async function finalizeDao(): Promise<void> {
     try {
       if (!isConnected) {
@@ -113,6 +128,9 @@ export default function FinalizeModal({
       if (!DaoRegistryContract) {
         throw new Error('No DAO Registry contract was found.');
       }
+
+      // @todo set permissions for adapters
+      configureExtensions();
 
       const txArguments = {
         from: account || '',
@@ -155,7 +173,7 @@ export default function FinalizeModal({
           <TimesSVG />
         </span>
 
-        <h1>Finalize </h1>
+        <h1>Finalize</h1>
         <h2>
           {dao && dao.name}{' '}
           <small>{dao && truncateEthAddress(dao.daoAddress, 7)}</small>

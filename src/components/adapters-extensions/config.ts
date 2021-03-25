@@ -22,24 +22,34 @@ import {
 } from '../../config';
 
 type AdapterProps = {
+  abiFunctionName: string;
   adapterId?: string;
-  extensionId?: string;
-  name: string;
   contractAddress: string;
   description: string;
-  abiFunctionName: string;
+  extensionId?: string;
+  name: string;
+  /**
+   * Sets the access control for a particular adapter (by address)
+   * to a specific extension. Both adapter and extension need to be
+   * already registered to the DAO.
+   *
+   * We call the `setAclToExtensionForAdapter` function from the
+   * DaoRegistry, and set the access for each adapter based on this flag
+   */
+  setAclToExtensionForAdapter?: boolean;
 };
 
 export type AdaptersAndExtensionsType = {
   isExtension?: boolean;
   options?: Omit<
     AdapterProps,
+    | 'abiFunctionName'
     | 'adapterId'
+    | 'contractAddress'
+    | 'description'
     | 'extensionId'
     | 'name'
-    | 'description'
-    | 'contractAddress'
-    | 'abiFunctionName'
+    | 'setAclToExtensionForAdapter'
   >;
   optionDefaultTarget?: DaoAdapterConstants;
 } & Partial<AdapterProps>;
@@ -140,6 +150,7 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
         abiFunctionName: 'configureDao',
         description:
           'Adds the offchain voting governance process to the DAO to support gasless voting.',
+        setAclToExtensionForAdapter: true,
       },
       {
         name: DaoAdapterConstants.VOTING,
@@ -149,6 +160,7 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
         abiFunctionName: 'configureDao',
         description:
           'Adds the simple on chain voting governance process to the DAO.',
+        setAclToExtensionForAdapter: true,
       },
     ],
     optionDefaultTarget: DaoAdapterConstants.VOTING,
