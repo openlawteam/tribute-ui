@@ -102,7 +102,7 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
     name: DaoAdapterConstants.MANAGING,
     adapterId: getAdapterOrExtensionId(DaoAdapterConstants.MANAGING),
     contractAddress: MANAGING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    abiFunctionName: 'createAdapterChangeRequest',
+    abiFunctionName: 'submitProposal',
     description:
       'Enhances the DAO capabilities by adding/updating the DAO Adapters through a voting process.',
   },

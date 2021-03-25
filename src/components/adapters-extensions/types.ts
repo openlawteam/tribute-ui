@@ -123,7 +123,7 @@ export type AdapterFormArguments =
 
 export type AddAdapterFunction =
   | 'createFinancingRequest'
-  | 'createAdapterChangeRequest'
+  | 'submitProposal'
   | 'configureDao'
   | 'submitConfigurationProposal'
   | 'submitKickProposal'
