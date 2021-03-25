@@ -119,7 +119,7 @@ export default function ConfigurationForm({
   /**
    * handleRemove()
    */
-  async function handleRemove(): Promise<void> {
+  async function handleRemoveExtension(): Promise<void> {
     if (!DaoRegistryContract) return;
 
     try {
@@ -136,9 +136,9 @@ export default function ConfigurationForm({
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      // Execute contract call for `removeAdapter` | `removeExtension`
+      // Execute contract call to `removeExtension`
       await txSend(
-        adapterOrExtension?.isExtension ? 'removeExtension' : 'removeAdapter',
+        'removeExtension',
         DaoRegistryContract.instance.methods,
         removeArguments,
         txArguments
@@ -284,11 +284,6 @@ export default function ConfigurationForm({
         )}
       </button>
 
-      {/* SUBMIT CONFIGURE STATUS */}
-      {/* <div className="form__submit-status-container">
-      {isConfigureInProcessOrDone && renderSubmitStatus()}
-    </div> */}
-
       {/* SUBMIT ERROR */}
       {configureAdapterError && (
         <div className="form__submit-error-container">
@@ -299,24 +294,21 @@ export default function ConfigurationForm({
         </div>
       )}
 
-      {/** REMOVE ADAPTER BUTTON - only show if DAO isn't finalized */}
-      <div className="adapter-extension__remove">
-        <p>
-          Delete this adapter. Once you delete this adapter, it can be re-added
-          if the DAO isn't finalized.
-        </p>
-        <button
-          className="button--secondary"
-          disabled={isRemoveInProcessOrDone || isConfigureInProcessOrDone}
-          onClick={() => (isRemoveDone ? {} : handleRemove())}>
-          {isRemoveInProcess ? <Loader /> : isRemoveDone ? 'Done' : 'Remove'}
-        </button>
-
-        {/* SUBMIT REMOVE STATUS */}
-        {/* <div className="form__submit-status-container">
-        {isRemoveInProcessOrDone && renderSubmitStatus()}
-      </div> */}
-      </div>
+      {/** REMOVE EXTENSION BUTTON - @todo only show if DAO isn't finalized */}
+      {adapterOrExtension?.isExtension && (
+        <div className="adapter-extension__remove">
+          <p>
+            Delete this extension. Once you delete this extension, it can be
+            re-added if the DAO isn't finalized.
+          </p>
+          <button
+            className="button--secondary"
+            disabled={isRemoveInProcessOrDone || isConfigureInProcessOrDone}
+            onClick={() => (isRemoveDone ? {} : handleRemoveExtension())}>
+            {isRemoveInProcess ? <Loader /> : isRemoveDone ? 'Done' : 'Remove'}
+          </button>
+        </div>
+      )}
     </form>
   );
 }
