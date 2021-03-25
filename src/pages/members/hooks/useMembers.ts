@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AbiItem, toBN} from 'web3-utils';
-import {useQuery} from '@apollo/react-hooks';
+import {useLazyQuery} from '@apollo/react-hooks';
 import Web3 from 'web3';
 
 import {
@@ -17,6 +17,7 @@ import {multicall, MulticallTuple} from '../../../components/web3/helpers';
 import {useWeb3Modal} from '../../../components/web3/hooks';
 import {Member, MemberFlag} from '../types';
 import {GET_MEMBERS} from '../../../gql';
+import {useSubgraphCheck} from '../../../hooks';
 
 type UseMembersReturn = {
   members: Member[];
@@ -27,7 +28,6 @@ type UseMembersReturn = {
 /**
  * useMembers
  *
- * @todo switch/case for retrieval method (subgraph vs direct calls) based on subgraph up/down
  * @returns `UseMembersReturn` An object with the members, and the current async status.
  */
 export default function useMembers(): UseMembersReturn {
@@ -47,16 +47,21 @@ export default function useMembers(): UseMembersReturn {
    */
 
   const {web3Instance, account} = useWeb3Modal();
+  const {subgraphIsResponding, isSubgraphCheckDone} = useSubgraphCheck();
 
   /**
    * GQL Query
    */
 
-  const getMembersFromSubgraph = useQuery<Record<string, any>>(GET_MEMBERS, {
+  const [
+    getMembersFromSubgraphResult,
+    {called, loading, data, error},
+  ] = useLazyQuery(GET_MEMBERS, {
     pollInterval: GQL_QUERY_POLLING_INTERVAL,
-    variables: {daoAddress: DaoRegistryContract?.contractAddress.toLowerCase()},
+    variables: {
+      daoAddress: DaoRegistryContract?.contractAddress.toLowerCase(),
+    },
   });
-  const {loading, error, data} = getMembersFromSubgraph;
 
   /**
    * State
@@ -72,6 +77,11 @@ export default function useMembers(): UseMembersReturn {
    * Cached callbacks
    */
 
+  const getMembersFromSubgraphCached = useCallback(getMembersFromSubgraph, [
+    data,
+    error,
+    loading,
+  ]);
   const getMembersFromRegistryCached = useCallback(getMembersFromRegistry, [
     BankExtensionContract,
     DaoRegistryContract,
@@ -83,11 +93,32 @@ export default function useMembers(): UseMembersReturn {
    * Effects
    */
 
-  // useEffect(() => {
-  //   getMembersFromRegistryCached();
-  // }, [getMembersFromRegistryCached]);
-
   useEffect(() => {
+    if (!isSubgraphCheckDone) return;
+
+    if (subgraphIsResponding) {
+      if (!called && DaoRegistryContract?.contractAddress) {
+        getMembersFromSubgraphResult();
+      }
+      getMembersFromSubgraphCached();
+    } else {
+      getMembersFromRegistryCached();
+    }
+  }, [
+    DaoRegistryContract?.contractAddress,
+    called,
+    getMembersFromRegistryCached,
+    getMembersFromSubgraphCached,
+    getMembersFromSubgraphResult,
+    isSubgraphCheckDone,
+    subgraphIsResponding,
+  ]);
+
+  /**
+   * Functions
+   */
+
+  function getMembersFromSubgraph() {
     try {
       setMembersStatus(AsyncStatus.PENDING);
 
@@ -125,11 +156,7 @@ export default function useMembers(): UseMembersReturn {
       setMembers([]);
       setMembersError(error);
     }
-  }, [data, error, loading]);
-
-  /**
-   * Functions
-   */
+  }
 
   async function getMembersFromRegistry() {
     if (
