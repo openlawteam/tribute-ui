@@ -8,6 +8,7 @@ import {
 } from '../../components/web3/types';
 import {
   DEFAULT_CHAIN,
+  BANK_FACTORY_CONTRACT_ADDRESS,
   DAO_FACTORY_CONTRACT_ADDRESS,
   DAO_REGISTRY_CONTRACT_ADDRESS,
 } from '../../config';
@@ -22,6 +23,7 @@ import {
 
 type ContractAction =
   | typeof CONTRACT_BANK_EXTENSION
+  | typeof CONTRACT_BANK_FACTORY
   | typeof CONTRACT_CONFIGURATION
   | typeof CONTRACT_DAO_FACTORY
   | typeof CONTRACT_DAO_REGISTRY
@@ -37,6 +39,7 @@ type ContractAction =
   | typeof CONTRACT_WITHDRAW;
 
 export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
+export const CONTRACT_BANK_FACTORY = 'CONTRACT_BANK_FACTORY';
 export const CONTRACT_CONFIGURATION = 'CONTRACT_CONFIGURATION';
 export const CONTRACT_DAO_FACTORY = 'CONTRACT_DAO_FACTORY';
 export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
@@ -50,6 +53,35 @@ export const CONTRACT_TRIBUTE = 'CONTRACT_TRIBUTE';
 export const CONTRACT_VOTING = 'CONTRACT_VOTING';
 export const CONTRACT_VOTING_OP_ROLLUP = 'CONTRACT_VOTING_OP_ROLLUP';
 export const CONTRACT_WITHDRAW = 'CONTRACT_WITHDRAW';
+
+export function initContractBankFactory(web3Instance: Web3) {
+  return async function (dispatch: Dispatch<any>) {
+    try {
+      if (web3Instance) {
+        const {default: lazyBankFactoryABI} = await import(
+          '../../truffle-contracts/BankFactory.json'
+        );
+        const bankFactoryContract: AbiItem[] = lazyBankFactoryABI as any;
+        const contractAddress = BANK_FACTORY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
+        const instance = new web3Instance.eth.Contract(
+          bankFactoryContract,
+          contractAddress
+        );
+
+        dispatch(
+          createContractAction({
+            type: CONTRACT_BANK_FACTORY,
+            abi: bankFactoryContract,
+            contractAddress,
+            instance,
+          })
+        );
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+}
 
 export function initContractDaoFactory(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {

@@ -4,6 +4,7 @@ import {useDispatch} from 'react-redux';
 import {
   initContractDaoFactory,
   initContractBankExtension,
+  initContractBankFactory,
   initContractDaoRegistry,
   initContractDistribute,
   initContractManaging,
@@ -63,6 +64,7 @@ export function useInitContracts(): () => Promise<void> {
 
       // Init more contracts
       await dispatch(initContractDaoFactory(web3Instance));
+      await dispatch(initContractBankFactory(web3Instance));
       await dispatch(initContractConfiguration(web3Instance));
       await dispatch(initContractFinancing(web3Instance));
       await dispatch(initContractGuildKick(web3Instance));

@@ -1,5 +1,6 @@
 import {
   CONTRACT_BANK_EXTENSION,
+  CONTRACT_BANK_FACTORY,
   CONTRACT_CONFIGURATION,
   CONTRACT_DAO_FACTORY,
   CONTRACT_DAO_REGISTRY,
@@ -18,6 +19,7 @@ import {ContractsState} from '../types';
 
 const initialState = {
   BankExtensionContract: null,
+  BankFactoryContract: null,
   ConfigurationContract: null,
   DaoFactoryContract: null,
   DaoRegistryContract: null,
@@ -41,6 +43,8 @@ export default function reducer(
   switch (type) {
     case CONTRACT_BANK_EXTENSION:
       return contractBankExtension(state, payload);
+    case CONTRACT_BANK_FACTORY:
+      return contractBankFactory(state, payload);
     case CONTRACT_CONFIGURATION:
       return contractConfiguration(state, payload);
     case CONTRACT_DAO_FACTORY:
@@ -70,6 +74,10 @@ export default function reducer(
     default:
       return state;
   }
+}
+
+function contractBankFactory(state: ContractsState, payload: any) {
+  return {...state, BankFactoryContract: {...payload}};
 }
 
 function contractDAOFactory(state: ContractsState, payload: any) {

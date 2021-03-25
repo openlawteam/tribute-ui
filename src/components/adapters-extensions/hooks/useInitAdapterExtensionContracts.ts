@@ -1,7 +1,7 @@
 import {useDispatch} from 'react-redux';
 
 import {
-  initContractBankExtension,
+  // initContractBankExtension,
   initContractDistribute,
   initContractManaging,
   initContractOnboarding,
@@ -15,7 +15,7 @@ import {
 } from '../../../store/actions';
 
 import {ReduxDispatch} from '../../../store/types';
-import {DaoAdapterConstants, DaoExtensionConstants} from '../enums';
+import {DaoAdapterConstants /*DaoExtensionConstants*/} from '../enums';
 
 import {useWeb3Modal} from '../../web3/hooks';
 
@@ -54,9 +54,9 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
       case DaoAdapterConstants.WITHDRAW:
         await dispatch(initContractWithdraw(web3Instance));
         break;
-      case DaoExtensionConstants.BANK:
-        await dispatch(initContractBankExtension(web3Instance));
-        break;
+      // case DaoExtensionConstants.BANK:
+      //   await dispatch(initContractBankExtension(web3Instance));
+      //   break;
       case DaoAdapterConstants.ONBOARDING:
         await dispatch(initContractOnboarding(web3Instance));
         break;
