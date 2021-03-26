@@ -53,8 +53,7 @@ export default function GovernanceProposals(
     actionId,
   });
 
-  // @todo Use batch voting results hook to do the same as `useOffchainVotingResults`
-  // @todo Share logic between batch and single off-chain voting result hooks
+  // @todo Use batch voting results from `useOffchainVotingResults` (need to update to allow array)
   // @todo Pass `OffchainVotingResult` down to `OffchainVotingStatus` via `ProposalCard`
 
   /**
