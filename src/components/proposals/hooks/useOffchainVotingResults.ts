@@ -1,10 +1,12 @@
-import {VoteChoicesIndex} from '@openlaw/snapshot-js-erc712';
+import {AbiItem} from 'web3-utils/types';
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
+import {VoteChoicesIndex} from '@openlaw/snapshot-js-erc712';
+import Web3 from 'web3';
 
 import {multicall, MulticallTuple} from '../../web3/helpers';
-import {ProposalData} from '../types';
 import {SHARES_ADDRESS, TOTAL_ADDRESS} from '../../../config';
+import {SnapshotProposal} from '../types';
 import {StoreState} from '../../../store/types';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VoteChoices} from '../../web3/types';
@@ -20,17 +22,18 @@ type OffchainVotingResult = {
   totalShares: number;
 };
 
+type OffchainVotingResultEntries = [
+  proposalHash: string,
+  votingResult: OffchainVotingResult
+][];
+
 /**
  * @todo Polling
  * @todo Attempt to use subgraph data first.
  */
 export function useOffchainVotingResults(
-  proposal: ProposalData
-): OffchainVotingResult | undefined {
-  const {snapshotProposal} = proposal;
-  const votes = snapshotProposal?.votes;
-  const snapshot = snapshotProposal?.msg.payload.snapshot;
-
+  proposals: SnapshotProposal[]
+): OffchainVotingResultEntries {
   /**
    * Selectors
    */
@@ -46,10 +49,10 @@ export function useOffchainVotingResults(
    * State
    */
 
-  const [voterAddressesAndChoices, setVoterAddressesAndChoices] = useState<
-    [string, number][]
-  >();
-  const [sharesResults, setSharesResults] = useState<OffchainVotingResult>();
+  const [
+    votingResults,
+    setVotingResults,
+  ] = useState<OffchainVotingResultEntries>([]);
 
   /**
    * Our hooks
@@ -69,54 +72,88 @@ export function useOffchainVotingResults(
    * Cached callbacks
    */
 
-  const getSharesPerChoiceCached = useCallback(getSharesPerChoiceFromContract, [
-    bankAddress,
-    getPriorAmountABI,
-    snapshot,
-    voterAddressesAndChoices,
-    web3Instance,
-  ]);
+  const getSharesPerChoiceCached = useCallback(
+    getSharesPerChoiceFromContract,
+    []
+  );
 
   /**
    * Effects
    */
 
-  // Collect voter addresses
+  // Build result entries of `OffchainVotingResultEntries`
   useEffect(() => {
-    if (!votes) return;
+    if (!bankAddress || !getPriorAmountABI) {
+      return;
+    }
 
-    const voterEntries = votes.map((v) => {
-      const vote = v[Object.keys(v)[0]];
+    const votingResultPromises = proposals.map(async (p) => {
+      const snapshot = p?.msg.payload.snapshot;
+      const idInSnapshot = p?.idInSnapshot;
 
-      return [vote.msg.payload.metadata.memberAddress, vote.msg.payload.choice];
+      if (!idInSnapshot || !snapshot) return;
+
+      const voterEntries = p?.votes?.map((v): [string, number] => {
+        const vote = v[Object.keys(v)[0]];
+
+        return [
+          vote.msg.payload.metadata.memberAddress,
+          vote.msg.payload.choice,
+        ];
+      });
+
+      if (!voterEntries) return;
+
+      // Dedupe any duplicate addresses to be safe.
+      const voterAddressesAndChoices = Object.entries(
+        Object.fromEntries(voterEntries)
+      );
+
+      try {
+        const result = await getSharesPerChoiceCached({
+          bankAddress,
+          getPriorAmountABI,
+          snapshot,
+          voterAddressesAndChoices,
+          web3Instance,
+        });
+
+        return [idInSnapshot, result];
+      } catch (error) {
+        return;
+      }
     });
 
-    setVoterAddressesAndChoices(
-      // Dedupe any duplicate addresses to be safe.
-      Object.entries(Object.fromEntries(voterEntries))
-    );
-  }, [votes]);
-
-  useEffect(() => {
-    // @todo If subgraph active, then exit.
-
-    getSharesPerChoiceCached();
-  }, [getSharesPerChoiceCached]);
+    Promise.all(votingResultPromises)
+      .then((p) => p.filter((p) => p) as OffchainVotingResultEntries)
+      .then(setVotingResults)
+      .catch(() => setVotingResults([]));
+  }, [
+    bankAddress,
+    getPriorAmountABI,
+    getSharesPerChoiceCached,
+    proposals,
+    web3Instance,
+  ]);
 
   /**
    * Functions
    */
 
-  async function getSharesPerChoiceFromContract() {
+  async function getSharesPerChoiceFromContract({
+    bankAddress,
+    getPriorAmountABI,
+    snapshot,
+    voterAddressesAndChoices,
+    web3Instance,
+  }: {
+    bankAddress: string;
+    getPriorAmountABI: AbiItem;
+    snapshot: number;
+    voterAddressesAndChoices: [string, number][];
+    web3Instance: Web3;
+  }): Promise<OffchainVotingResult> {
     try {
-      if (!bankAddress || !getPriorAmountABI || !voterAddressesAndChoices) {
-        return;
-      }
-
-      if (!snapshot) {
-        throw new Error('No snapshot was found.');
-      }
-
       // Create results object to set later
       const results = {
         [VoteChoices.Yes]: {
@@ -156,13 +193,13 @@ export function useOffchainVotingResults(
 
       const calls = [totalSharesCall, ...sharesCalls];
 
-      const [totalSharesResult, ...sharesResults]: string[] = await multicall({
+      const [totalSharesResult, ...votingResults]: string[] = await multicall({
         calls,
         web3Instance,
       });
 
       // Set shares values for choices
-      sharesResults.forEach((shares, i) => {
+      votingResults.forEach((shares, i) => {
         const isYes =
           VoteChoicesIndex[voterAddressesAndChoices[i][1]] ===
           VoteChoicesIndex[VoteChoicesIndex.Yes];
@@ -181,14 +218,11 @@ export function useOffchainVotingResults(
       // Set total shares
       results.totalShares = Number(totalSharesResult);
 
-      setSharesResults((prevState) => ({
-        ...prevState,
-        ...results,
-      }));
+      return results;
     } catch (error) {
-      setSharesResults(undefined);
+      throw error;
     }
   }
 
-  return sharesResults;
+  return votingResults;
 }
