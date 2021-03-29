@@ -1,16 +1,20 @@
 import React, {useEffect, useState} from 'react';
 
+import {
+  OffchainVotingResult,
+  useOffchainVotingResults,
+} from '../proposals/hooks';
 import {AsyncStatus} from '../../util/types';
 import {BURN_ADDRESS} from '../../util/constants';
+import {normalizeString, truncateEthAddress} from '../../util/helpers';
 import {ProposalData} from '../proposals/types';
 import {ProposalHeaderNames} from '../../util/enums';
-import {truncateEthAddress} from '../../util/helpers';
 import {useGovernanceProposals} from './hooks';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
 import ProposalCard from '../proposals/ProposalCard';
 
-type GovernanceProposalsProps = {
+type GovernanceProposalsListProps = {
   /**
    * The `actionId` to get proposals for in Snapshot Hub.
    */
@@ -23,9 +27,9 @@ type FilteredProposals = {
   passedProposals: ProposalData[];
   votingProposals: ProposalData[];
 };
-
-export default function GovernanceProposals(
-  props: GovernanceProposalsProps
+// @todo Pass `OffchainVotingResult` down to `OffchainVotingStatus` via `ProposalCard`
+export default function GovernanceProposalsList(
+  props: GovernanceProposalsListProps
 ): JSX.Element {
   const {actionId = BURN_ADDRESS, onProposalClick} = props;
 
@@ -33,6 +37,9 @@ export default function GovernanceProposals(
    * State
    */
 
+  const [proposalsForVotingResults, setProposalsForVotingResults] = useState<
+    ProposalData['snapshotProposal'][]
+  >([]);
   const [filteredProposals, setFilteredProposals] = useState<FilteredProposals>(
     {
       failedProposals: [],
@@ -53,8 +60,11 @@ export default function GovernanceProposals(
     actionId,
   });
 
-  // @todo Use batch voting results from `useOffchainVotingResults` (need to update to allow array)
-  // @todo Pass `OffchainVotingResult` down to `OffchainVotingStatus` via `ProposalCard`
+  const {
+    offchainVotingResults,
+    offchainVotingResultsError,
+    offchainVotingResultsStatus,
+  } = useOffchainVotingResults(proposalsForVotingResults);
 
   /**
    * Variables
@@ -62,14 +72,27 @@ export default function GovernanceProposals(
 
   const {failedProposals, passedProposals, votingProposals} = filteredProposals;
 
-  const isLoading: boolean = governanceProposalsStatus === AsyncStatus.PENDING;
-  const isError: boolean = governanceProposalsStatus === AsyncStatus.REJECTED;
-  const isLoadingDone: boolean =
-    governanceProposalsStatus === AsyncStatus.FULFILLED;
+  const isLoading: boolean =
+    governanceProposalsStatus === AsyncStatus.STANDBY ||
+    governanceProposalsStatus === AsyncStatus.PENDING ||
+    // Getting ready to fetch using `useOffchainVotingResults`; helps to show continuous loader.
+    (offchainVotingResultsStatus === AsyncStatus.STANDBY &&
+      proposalsForVotingResults.length > 0) ||
+    offchainVotingResultsStatus === AsyncStatus.PENDING;
+
+  const isError: boolean =
+    governanceProposalsStatus === AsyncStatus.REJECTED ||
+    offchainVotingResultsStatus === AsyncStatus.REJECTED;
 
   /**
    * Effects
    */
+
+  useEffect(() => {
+    setProposalsForVotingResults(
+      governanceProposals.map((gp) => gp.snapshotProposal)
+    );
+  }, [governanceProposals]);
 
   // Separate proposals into categories: voting, passed, failed
   useEffect(() => {
@@ -85,33 +108,52 @@ export default function GovernanceProposals(
       const end = p.snapshotProposal?.msg.payload.end || 0;
       const hasVoteEnded = end < Math.ceil(Date.now() / 1000);
 
-      // @todo Determine passed / failed status
-
       // voting proposal
       if (!hasVoteEnded) {
         filteredProposalsToSet.votingProposals.push(p);
+
+        return;
       }
 
+      const offchainResult = offchainVotingResults.find(
+        ([proposalHash, _result]) =>
+          normalizeString(proposalHash) === p.snapshotProposal?.idInSnapshot
+      )?.[1];
+
+      if (!offchainResult) return;
+
+      const didPass = didPassSimpleMajority(offchainResult);
+
       // passed proposal
-      // if (true) {
-      //   filteredProposalsToSet.passedProposals.push(p);
-      // }
+      if (didPass) {
+        filteredProposalsToSet.passedProposals.push(p);
+
+        return;
+      }
 
       // failed proposal
-      // if (true) {
-      //   filteredProposalsToSet.failedProposals.push(p);
-      // }
+      if (!didPass) {
+        filteredProposalsToSet.failedProposals.push(p);
+
+        return;
+      }
     });
 
     setFilteredProposals((prevState) => ({
       ...prevState,
       ...filteredProposalsToSet,
     }));
-  }, [governanceProposals, governanceProposalsStatus]);
+  }, [governanceProposals, governanceProposalsStatus, offchainVotingResults]);
 
   /**
    * Functions
    */
+
+  function didPassSimpleMajority(
+    offchainVoteResult: OffchainVotingResult
+  ): boolean {
+    return offchainVoteResult.Yes.shares > offchainVoteResult.No.shares;
+  }
 
   function renderProposalCards(
     proposals: ProposalData[]
@@ -151,7 +193,7 @@ export default function GovernanceProposals(
   if (
     !governanceProposals.length &&
     !Object.values(filteredProposals).flatMap((p) => p).length &&
-    isLoadingDone
+    governanceProposalsStatus === AsyncStatus.FULFILLED
   ) {
     return <p className="text-center">No proposals, yet!</p>;
   }
@@ -161,7 +203,7 @@ export default function GovernanceProposals(
     return (
       <div className="text-center">
         <ErrorMessageWithDetails
-          error={governanceProposalsError}
+          error={governanceProposalsError || offchainVotingResultsError}
           renderText="Something went wrong while getting the proposals."
         />
       </div>
