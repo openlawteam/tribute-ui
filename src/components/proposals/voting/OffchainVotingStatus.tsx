@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
 
 import {ContractDAOConfigKeys} from '../../web3/types';
 import {CycleEllipsis} from '../../feedback';
@@ -6,7 +7,6 @@ import {getDAOConfigEntry} from '../../web3/helpers';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
 import {useOffchainVotingResults, useOffchainVotingStartEnd} from '../hooks';
-import {useSelector} from 'react-redux';
 import {VotingStatus} from './VotingStatus';
 
 type OffchainVotingStatusProps = {
@@ -80,17 +80,21 @@ export function OffchainVotingStatus({
     offchainVotingStartEndInitReady,
   } = useOffchainVotingStartEnd(proposal);
 
-  const votingResults = useOffchainVotingResults(proposal);
+  const {offchainVotingResults} = useOffchainVotingResults(
+    proposal.snapshotProposal
+  );
 
   /**
    * Variables
    */
 
+  // There is only one vote result entry as we only passed a single proposal
+  const votingResult = offchainVotingResults[0]?.[1];
   const votingStartSeconds = snapshotProposal?.msg.payload.start || 0;
   const votingEndSeconds = snapshotProposal?.msg.payload.end || 0;
-  const yesShares = votingResults?.Yes.shares || 0;
-  const noShares = votingResults?.No.shares || 0;
-  const totalShares = votingResults?.totalShares;
+  const yesShares = votingResult?.Yes.shares || 0;
+  const noShares = votingResult?.No.shares || 0;
+  const totalShares = votingResult?.totalShares;
 
   /**
    * Effects
