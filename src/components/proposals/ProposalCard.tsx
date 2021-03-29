@@ -37,7 +37,11 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
 
   function handleClick() {
     const proposalHash =
-      proposal.snapshotProposal?.idInDAO || proposal.snapshotDraft?.idInDAO;
+      // i.e. Snapshot->DAO proposals
+      proposal.snapshotProposal?.idInDAO ||
+      proposal.snapshotDraft?.idInDAO ||
+      // i.e. Snapshot Governance proposals
+      proposal.snapshotProposal?.idInSnapshot;
 
     proposalHash && onClick(proposalHash);
   }
