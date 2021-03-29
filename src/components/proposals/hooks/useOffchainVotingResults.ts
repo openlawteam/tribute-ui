@@ -4,6 +4,7 @@ import {useSelector} from 'react-redux';
 import {VoteChoicesIndex} from '@openlaw/snapshot-js-erc712';
 import Web3 from 'web3';
 
+import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
 import {SHARES_ADDRESS, TOTAL_ADDRESS} from '../../../config';
 import {SnapshotProposal} from '../types';
@@ -16,7 +17,7 @@ type VoteChoiceResult = {
   shares: number;
 };
 
-type OffchainVotingResult = {
+export type OffchainVotingResult = {
   [VoteChoices.Yes]: VoteChoiceResult;
   [VoteChoices.No]: VoteChoiceResult;
   totalShares: number;
@@ -27,13 +28,22 @@ type OffchainVotingResultEntries = [
   votingResult: OffchainVotingResult
 ][];
 
+type UseOffchainVotingResultsReturn = {
+  offchainVotingResults: OffchainVotingResultEntries;
+  offchainVotingResultsError: Error | undefined;
+  offchainVotingResultsStatus: AsyncStatus;
+};
+
 /**
  * @todo Polling
  * @todo Attempt to use subgraph data first.
  */
 export function useOffchainVotingResults(
-  proposals: SnapshotProposal[]
-): OffchainVotingResultEntries {
+  /**
+   * Accepts a single `SnapshotProposal` or `SnapshotProposal[]`
+   */
+  proposals: (SnapshotProposal | undefined) | (SnapshotProposal | undefined)[]
+): UseOffchainVotingResultsReturn {
   /**
    * Selectors
    */
@@ -53,6 +63,15 @@ export function useOffchainVotingResults(
     votingResults,
     setVotingResults,
   ] = useState<OffchainVotingResultEntries>([]);
+
+  const [
+    offchainVotingResultsStatus,
+    setOffchainVotingResultsStatus,
+  ] = useState<AsyncStatus>(AsyncStatus.STANDBY);
+
+  const [offchainVotingResultsError, setOffchainVotingResultsError] = useState<
+    Error | undefined
+  >();
 
   /**
    * Our hooks
@@ -83,11 +102,15 @@ export function useOffchainVotingResults(
 
   // Build result entries of `OffchainVotingResultEntries`
   useEffect(() => {
-    if (!bankAddress || !getPriorAmountABI) {
+    const proposalsToMap = Array.isArray(proposals) ? proposals : [proposals];
+
+    if (!bankAddress || !getPriorAmountABI || !proposalsToMap.length) {
       return;
     }
 
-    const votingResultPromises = proposals.map(async (p) => {
+    setOffchainVotingResultsStatus(AsyncStatus.PENDING);
+
+    const votingResultPromises = proposalsToMap.map(async (p) => {
       const snapshot = p?.msg.payload.snapshot;
       const idInSnapshot = p?.idInSnapshot;
 
@@ -126,8 +149,16 @@ export function useOffchainVotingResults(
 
     Promise.all(votingResultPromises)
       .then((p) => p.filter((p) => p) as OffchainVotingResultEntries)
-      .then(setVotingResults)
-      .catch(() => setVotingResults([]));
+      .then((r) => {
+        setOffchainVotingResultsStatus(AsyncStatus.FULFILLED);
+        setVotingResults(r);
+        setOffchainVotingResultsError(undefined);
+      })
+      .catch((error) => {
+        setOffchainVotingResultsStatus(AsyncStatus.REJECTED);
+        setVotingResults([]);
+        setOffchainVotingResultsError(error);
+      });
   }, [
     bankAddress,
     getPriorAmountABI,
@@ -224,5 +255,9 @@ export function useOffchainVotingResults(
     }
   }
 
-  return votingResults;
+  return {
+    offchainVotingResults: votingResults,
+    offchainVotingResultsError,
+    offchainVotingResultsStatus,
+  };
 }

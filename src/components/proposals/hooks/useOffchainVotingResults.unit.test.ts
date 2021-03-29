@@ -154,39 +154,52 @@ describe('useOffchainVotingResults unit tests', () => {
         }
       );
 
-      await waitForNextUpdate();
+      expect(result.current).toMatchObject({
+        offchainVotingResults: [],
+        offchainVotingResultsError: undefined,
+        offchainVotingResultsStatus: 'STANDBY',
+      });
+
       await waitForNextUpdate();
 
-      expect(result.current).toMatchObject([
-        [
-          DEFAULT_PROPOSAL_HASH,
-          {
-            No: {
-              percentage: 1,
-              shares: 100000,
+      expect(result.current).toMatchObject({
+        offchainVotingResults: [],
+        offchainVotingResultsError: undefined,
+        offchainVotingResultsStatus: 'STANDBY',
+      });
+
+      await waitForNextUpdate();
+
+      expect(result.current).toMatchObject({
+        offchainVotingResults: [],
+        offchainVotingResultsError: undefined,
+        offchainVotingResultsStatus: 'PENDING',
+      });
+
+      await waitForNextUpdate();
+
+      expect(result.current).toMatchObject({
+        offchainVotingResults: [
+          [
+            '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
+            {
+              No: {percentage: 1, shares: 100000},
+              Yes: {percentage: 2, shares: 200000},
+              totalShares: 10000000,
             },
-            Yes: {
-              percentage: 2,
-              shares: 200000,
+          ],
+          [
+            '0x0000000000000000000000000000000000000000000000000000000000000000',
+            {
+              No: {percentage: 1, shares: 200000},
+              Yes: {percentage: 2, shares: 400000},
+              totalShares: 20000000,
             },
-            totalShares: 10000000,
-          },
+          ],
         ],
-        [
-          someRandomHash,
-          {
-            No: {
-              percentage: 1,
-              shares: 200000,
-            },
-            Yes: {
-              percentage: 2,
-              shares: 400000,
-            },
-            totalShares: 20000000,
-          },
-        ],
-      ]);
+        offchainVotingResultsError: undefined,
+        offchainVotingResultsStatus: 'FULFILLED',
+      });
     });
   });
 });
