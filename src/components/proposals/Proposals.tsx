@@ -191,6 +191,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
           key={proposalId}
           onClick={onProposalClick}
           proposal={proposal}
+          proposalOnClickId={proposalId}
           // @note If the proposal title is not an address it will fall back to a normal, non-truncated string.
           name={truncateEthAddress(proposalName, 7)}
         />
