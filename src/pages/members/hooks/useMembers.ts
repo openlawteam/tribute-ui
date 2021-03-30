@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AbiItem, toBN} from 'web3-utils';
@@ -17,7 +18,6 @@ import {multicall, MulticallTuple} from '../../../components/web3/helpers';
 import {useWeb3Modal} from '../../../components/web3/hooks';
 import {Member, MemberFlag} from '../types';
 import {GET_MEMBERS} from '../../../gql';
-import {useSubgraphCheck} from '../../../hooks';
 
 type UseMembersReturn = {
   members: Member[];
@@ -28,6 +28,7 @@ type UseMembersReturn = {
 /**
  * useMembers
  *
+ * @todo switch/case for retrieval method based on subgraph up/down
  * @returns `UseMembersReturn` An object with the members, and the current async status.
  */
 export default function useMembers(): UseMembersReturn {
@@ -47,7 +48,6 @@ export default function useMembers(): UseMembersReturn {
    */
 
   const {web3Instance, account} = useWeb3Modal();
-  const {subgraphIsResponding, isSubgraphCheckDone} = useSubgraphCheck();
 
   /**
    * GQL Query
@@ -93,26 +93,21 @@ export default function useMembers(): UseMembersReturn {
    * Effects
    */
 
-  useEffect(() => {
-    if (!isSubgraphCheckDone) return;
+  // useEffect(() => {
+  //   if (!called && DaoRegistryContract?.contractAddress) {
+  //     getMembersFromSubgraphResult();
+  //   }
+  //   getMembersFromSubgraphCached();
+  // }, [
+  //   DaoRegistryContract?.contractAddress,
+  //   called,
+  //   getMembersFromSubgraphCached,
+  //   getMembersFromSubgraphResult,
+  // ]);
 
-    if (subgraphIsResponding) {
-      if (!called && DaoRegistryContract?.contractAddress) {
-        getMembersFromSubgraphResult();
-      }
-      getMembersFromSubgraphCached();
-    } else {
-      getMembersFromRegistryCached();
-    }
-  }, [
-    DaoRegistryContract?.contractAddress,
-    called,
-    getMembersFromRegistryCached,
-    getMembersFromSubgraphCached,
-    getMembersFromSubgraphResult,
-    isSubgraphCheckDone,
-    subgraphIsResponding,
-  ]);
+  useEffect(() => {
+    getMembersFromRegistryCached();
+  }, [getMembersFromRegistryCached]);
 
   /**
    * Functions
