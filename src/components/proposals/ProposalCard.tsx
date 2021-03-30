@@ -7,8 +7,14 @@ import {VotingAdapterName} from '../adapters-extensions/enums';
 
 type ProposalCardProps = {
   buttonText?: string;
-  onClick: (proposalHash: string) => void;
+  onClick: (proposalOnClickId: string) => void;
   proposal: ProposalData;
+  /**
+   * The ID for the proposal to be used for navigation.
+   * As there can be a few different options, it's best to provide it
+   * explicitly.
+   */
+  proposalOnClickId: string;
   name: string;
 };
 
@@ -21,7 +27,13 @@ const DEFAULT_BUTTON_TEXT: string = 'View Proposal';
  * @returns {JSX.Element}
  */
 export default function ProposalCard(props: ProposalCardProps): JSX.Element {
-  const {buttonText = DEFAULT_BUTTON_TEXT, proposal, onClick, name} = props;
+  const {
+    buttonText = DEFAULT_BUTTON_TEXT,
+    proposal,
+    proposalOnClickId,
+    onClick,
+    name,
+  } = props;
 
   /**
    * Selectors
@@ -36,10 +48,7 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
    */
 
   function handleClick() {
-    const proposalHash =
-      proposal.snapshotProposal?.idInDAO || proposal.snapshotDraft?.idInDAO;
-
-    proposalHash && onClick(proposalHash);
+    onClick(proposalOnClickId);
   }
 
   /**

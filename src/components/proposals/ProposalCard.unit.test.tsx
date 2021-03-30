@@ -41,6 +41,7 @@ describe('ProposalCard unit tests', () => {
         <ProposalCard
           name={name}
           proposal={fakeProposal as ProposalData}
+          proposalOnClickId={fakeProposal.snapshotProposal?.idInDAO as string}
           onClick={() => {}}
         />
       </Wrapper>
@@ -61,6 +62,7 @@ describe('ProposalCard unit tests', () => {
         <ProposalCard
           name={name}
           proposal={fakeProposal as ProposalData}
+          proposalOnClickId={fakeProposal.snapshotProposal?.idInDAO as string}
           onClick={spy}
         />
       </Wrapper>
@@ -87,6 +89,7 @@ describe('ProposalCard unit tests', () => {
           buttonText="Sponsor proposal"
           name={name}
           proposal={fakeProposal as ProposalData}
+          proposalOnClickId={fakeProposal.snapshotProposal?.idInDAO as string}
           onClick={spy}
         />
       </Wrapper>
@@ -110,6 +113,7 @@ describe('ProposalCard unit tests', () => {
           buttonText=""
           name={name}
           proposal={fakeProposal as ProposalData}
+          proposalOnClickId={fakeProposal.snapshotProposal?.idInDAO as string}
           onClick={spy}
         />
       </Wrapper>
