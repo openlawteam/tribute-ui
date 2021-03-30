@@ -228,4 +228,197 @@ describe('GovernanceProposalsList unit tests', () => {
       );
     });
   });
+
+  test('should render no proposals text', async () => {
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json({}))
+        ),
+      ]
+    );
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={({mockWeb3Provider, web3Instance}) => {
+          /**
+           * Inject voting results. The order should align with the order above of fake responses.
+           */
+
+          // 1. Inject passed result
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+                  web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+                ],
+              ]
+            ),
+            {abi: MulticallABI, abiMethodName: 'aggregate'}
+          );
+
+          // 2. Inject failed result
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+                  web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+                  web3Instance.eth.abi.encodeParameter('uint256', '300000'),
+                ],
+              ]
+            ),
+            {abi: MulticallABI, abiMethodName: 'aggregate'}
+          );
+
+          // 3. Inject voting result
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+                ],
+              ]
+            ),
+            {abi: MulticallABI, abiMethodName: 'aggregate'}
+          );
+        }}>
+        <GovernanceProposalsList
+          actionId={BURN_ADDRESS}
+          onProposalClick={() => {}}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/no proposals, yet!/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Proposal headers
+      expect(() => screen.getByText(/^passed$/i)).toThrow();
+      expect(() => screen.getByText(/^failed$/i)).toThrow();
+      expect(() => screen.getByText(/^voting$/i)).toThrow();
+
+      // Proposal names
+      expect(() => screen.getByText(/another cool one/i)).toThrow();
+      expect(() => screen.getByText(/another rad one/i)).toThrow();
+      expect(() => screen.getByText(/another awesome one/i)).toThrow();
+    });
+  });
+
+  test('should render error', async () => {
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.status(500))
+        ),
+      ]
+    );
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={({mockWeb3Provider, web3Instance}) => {
+          /**
+           * Inject voting results. The order should align with the order above of fake responses.
+           */
+
+          // 1. Inject passed result
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+                  web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+                ],
+              ]
+            ),
+            {abi: MulticallABI, abiMethodName: 'aggregate'}
+          );
+
+          // 2. Inject failed result
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+                  web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+                  web3Instance.eth.abi.encodeParameter('uint256', '300000'),
+                ],
+              ]
+            ),
+            {abi: MulticallABI, abiMethodName: 'aggregate'}
+          );
+
+          // 3. Inject voting result
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+                ],
+              ]
+            ),
+            {abi: MulticallABI, abiMethodName: 'aggregate'}
+          );
+        }}>
+        <GovernanceProposalsList
+          actionId={BURN_ADDRESS}
+          onProposalClick={() => {}}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/something went wrong while getting the proposals/i)
+      ).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/^details$/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Proposal headers
+      expect(() => screen.getByText(/^proposals$/i)).toThrow();
+      expect(() => screen.getByText(/^passed$/i)).toThrow();
+      expect(() => screen.getByText(/^failed$/i)).toThrow();
+      expect(() => screen.getByText(/^voting$/i)).toThrow();
+
+      // Proposal names
+      expect(() => screen.getByText(/another cool one/i)).toThrow();
+      expect(() => screen.getByText(/another rad one/i)).toThrow();
+      expect(() => screen.getByText(/another awesome one/i)).toThrow();
+    });
+  });
 });
