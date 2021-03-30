@@ -7,25 +7,14 @@ import Web3 from 'web3';
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
 import {SHARES_ADDRESS, TOTAL_ADDRESS} from '../../../config';
-import {SnapshotProposal} from '../types';
+import {SnapshotProposal, VotingResult} from '../types';
 import {StoreState} from '../../../store/types';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VoteChoices} from '../../web3/types';
 
-type VoteChoiceResult = {
-  percentage: number;
-  shares: number;
-};
-
-export type OffchainVotingResult = {
-  [VoteChoices.Yes]: VoteChoiceResult;
-  [VoteChoices.No]: VoteChoiceResult;
-  totalShares: number;
-};
-
 type OffchainVotingResultEntries = [
   proposalHash: string,
-  votingResult: OffchainVotingResult
+  votingResult: VotingResult
 ][];
 
 type UseOffchainVotingResultsReturn = {
@@ -183,7 +172,7 @@ export function useOffchainVotingResults(
     snapshot: number;
     voterAddressesAndChoices: [string, number][];
     web3Instance: Web3;
-  }): Promise<OffchainVotingResult> {
+  }): Promise<VotingResult> {
     try {
       // Create results object to set later
       const results = {
