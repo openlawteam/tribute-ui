@@ -1,23 +1,26 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
+import {Store} from 'redux';
 import {Provider} from 'react-redux';
 import {BrowserRouter} from 'react-router-dom';
 import {ApolloProvider} from '@apollo/react-hooks';
 import {
   ApolloClient,
+  concat,
   InMemoryCache,
   NormalizedCacheObject,
+  HttpLink,
 } from '@apollo/client';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 
+import {DefaultTheme} from './components/web3/hooks/useWeb3ModalManager';
 import {disableReactDevTools} from './util/helpers';
 import {ENVIRONMENT, INFURA_PROJECT_ID, GRAPH_API_URL} from './config';
-import {DefaultTheme} from './components/web3/hooks/useWeb3ModalManager';
+import {handleSubgraphError} from './gql';
 import {store} from './store';
 import App from './App';
 import Init, {InitError} from './Init';
-import Web3ModalManager from './components/web3/Web3ModalManager';
 import reportWebVitals from './reportWebVitals';
+import Web3ModalManager from './components/web3/Web3ModalManager';
 
 import './assets/scss/style.scss';
 
@@ -63,40 +66,46 @@ function getProviderOptions() {
   return providerOptions;
 }
 
-// Create apolloClient
-export const apolloClient:
-  | ApolloClient<NormalizedCacheObject>
-  | undefined = new ApolloClient({
-  uri: GRAPH_API_URL,
-  cache: new InMemoryCache({
-    // Cache data may be lost when replacing the `adapters|extensions`
-    // field of a Query object. To address this problem
-    // (which is not a bug in Apollo Client), define a custom
-    // merge function for the Query.adapters|extensions field, so
-    // InMemoryCache can safely merge these objects
-    // https://www.apollographql.com/docs/react/caching/cache-field-behavior/#the-merge-function
-    typePolicies: {
-      Adapter: {
-        fields: {
-          adapters: {
-            merge(existing = [], incoming: any[]) {
-              return [...existing, ...incoming];
+// Create `ApolloClient`
+export const getApolloClient = (
+  store: Store
+): ApolloClient<NormalizedCacheObject> =>
+  new ApolloClient({
+    link: concat(
+      handleSubgraphError(store),
+      new HttpLink({
+        uri: ({operationName}) => `${GRAPH_API_URL}?${operationName}`,
+      })
+    ),
+    cache: new InMemoryCache({
+      // Cache data may be lost when replacing the `adapters|extensions`
+      // field of a Query object. To address this problem
+      // (which is not a bug in Apollo Client), define a custom
+      // merge function for the Query.adapters|extensions field, so
+      // InMemoryCache can safely merge these objects
+      // https://www.apollographql.com/docs/react/caching/cache-field-behavior/#the-merge-function
+      typePolicies: {
+        Adapter: {
+          fields: {
+            adapters: {
+              merge(existing = [], incoming: any[]) {
+                return [...existing, ...incoming];
+              },
+            },
+          },
+        },
+        Extension: {
+          fields: {
+            extensions: {
+              merge(existing = [], incoming: any[]) {
+                return [...existing, ...incoming];
+              },
             },
           },
         },
       },
-      Extension: {
-        fields: {
-          extensions: {
-            merge(existing = [], incoming: any[]) {
-              return [...existing, ...incoming];
-            },
-          },
-        },
-      },
-    },
-  }),
-});
+    }),
+  });
 
 if (root !== null) {
   ReactDOM.render(
@@ -105,7 +114,7 @@ if (root !== null) {
         <Web3ModalManager
           providerOptions={getProviderOptions()}
           defaultTheme={DefaultTheme.LIGHT}>
-          <ApolloProvider client={apolloClient}>
+          <ApolloProvider client={getApolloClient(store)}>
             <Init
               render={({error, isInitComplete}) =>
                 error ? (
