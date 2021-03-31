@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AbiItem, toBN} from 'web3-utils';
@@ -8,7 +7,6 @@ import Web3 from 'web3';
 import {
   SHARES_ADDRESS,
   LOOT_ADDRESS,
-  LOCKED_LOOT_ADDRESS,
   GQL_QUERY_POLLING_INTERVAL,
 } from '../../../config';
 import {AsyncStatus} from '../../../util/types';
@@ -16,7 +14,7 @@ import {normalizeString} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
 import {multicall, MulticallTuple} from '../../../components/web3/helpers';
 import {useWeb3Modal} from '../../../components/web3/hooks';
-import {Member, MemberFlag} from '../types';
+import {Member} from '../types';
 import {GET_MEMBERS} from '../../../gql';
 
 type UseMembersReturn = {
@@ -121,7 +119,7 @@ export default function useMembers(): UseMembersReturn {
         // extract members from gql data
         const {members} = data.molochv3S[0] as Record<string, any>;
         // Filter out any member that has fully ragequit (no positive balance in
-        // either SHARES, LOOT or LOCKED_LOOT)
+        // either SHARES or LOOT)
         const filteredMembers = members.filter(
           (member: Record<string, any>) => !member.didFullyRagequit
         );
@@ -203,7 +201,7 @@ export default function useMembers(): UseMembersReturn {
           ]
         );
 
-        // Build calls to get member balances in SHARES, LOOT and LOCKED_LOOT
+        // Build calls to get member balances in SHARES and LOOT
         const {
           abi: bankABI,
           contractAddress: bankAddress,
@@ -224,33 +222,12 @@ export default function useMembers(): UseMembersReturn {
             [address, LOOT_ADDRESS],
           ]
         );
-        const lockedLootBalanceOfCalls = fetchedMemberAddresses.map(
-          (address): MulticallTuple => [
-            bankAddress,
-            balanceOfABI as AbiItem,
-            [address, LOCKED_LOOT_ADDRESS],
-          ]
-        );
-
-        // Build calls to check if member is jailed
-        const getMemberFlagABI = daoRegistryABI.find(
-          (item) => item.name === 'getMemberFlag'
-        );
-        const getMemberFlagCalls = fetchedMemberAddresses.map(
-          (address): MulticallTuple => [
-            daoRegistryAddress,
-            getMemberFlagABI as AbiItem,
-            [address, MemberFlag.JAILED.toString()],
-          ]
-        );
 
         // Use multicall to get details for each member address
         const calls = [
           ...memberAddressesByDelegatedKeyCalls,
           ...sharesBalanceOfCalls,
           ...lootBalanceOfCalls,
-          ...lockedLootBalanceOfCalls,
-          ...getMemberFlagCalls,
         ];
         let results = await multicall({
           calls,
@@ -260,13 +237,7 @@ export default function useMembers(): UseMembersReturn {
         while (results.length) {
           chunkedResults.push(results.splice(0, fetchedMemberAddresses.length));
         }
-        const [
-          delegateKeys,
-          sharesBalances,
-          lootBalances,
-          lockedLootBalances,
-          isJailedChecks,
-        ] = chunkedResults;
+        const [delegateKeys, sharesBalances, lootBalances] = chunkedResults;
         const membersWithDetails = fetchedMemberAddresses.map(
           (address, index) => ({
             address,
@@ -275,18 +246,15 @@ export default function useMembers(): UseMembersReturn {
               normalizeString(address) !== normalizeString(delegateKeys[index]),
             shares: sharesBalances[index],
             loot: lootBalances[index],
-            lockedLoot: lockedLootBalances[index],
-            isJailed: isJailedChecks[index],
           })
         );
 
-        // Filter out any member addresses that don't have a positive balance in either SHARES, LOOT or LOCKED_LOOT
+        // Filter out any member addresses that don't have a positive balance in
+        // either SHARES or LOOT
         const filteredMembersWithDetails = membersWithDetails
           .filter(
             (member) =>
-              toBN(member.shares).gt(toBN(0)) ||
-              toBN(member.loot).gt(toBN(0)) ||
-              toBN(member.lockedLoot).gt(toBN(0))
+              toBN(member.shares).gt(toBN(0)) || toBN(member.loot).gt(toBN(0))
           )
           // display in descending order of when the member joined (e.g., newest
           // member first)

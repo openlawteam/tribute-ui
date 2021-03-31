@@ -10,8 +10,6 @@ export const GET_MEMBERS = gql`
         isDelegated
         shares
         loot
-        lockedLoot
-        isJailed
         didFullyRagequit
       }
     }
