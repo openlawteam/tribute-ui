@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 
 import {AsyncStatus} from '../../util/types';
 import {DaoAdapterConstants} from '../adapters-extensions/enums';
@@ -13,7 +13,16 @@ import ProposalCard from './ProposalCard';
 
 type ProposalsProps = {
   adapterName: DaoAdapterConstants;
-  onProposalClick: (id: string) => void;
+  /**
+   * Optionally provide a click handler for `ProposalCard`.
+   * The proposal's id (in the DAO) will be provided as an argument.
+   * Defaults to noop: `() => {}`
+   */
+  onProposalClick?: (id: string) => void;
+  /**
+   * Optionally render a custom proposal card.
+   */
+  renderProposalCard?: (data: {proposalData: ProposalData}) => React.ReactNode;
 };
 
 type FilteredProposals = {
@@ -24,7 +33,7 @@ type FilteredProposals = {
 };
 
 export default function Proposals(props: ProposalsProps): JSX.Element {
-  const {adapterName, onProposalClick} = props;
+  const {adapterName, onProposalClick = () => {}, renderProposalCard} = props;
 
   /**
    * State
@@ -184,6 +193,14 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
         '';
 
       if (!proposalId) return null;
+
+      if (renderProposalCard) {
+        return (
+          <Fragment key={proposalId}>
+            {renderProposalCard({proposalData: proposal})}
+          </Fragment>
+        );
+      }
 
       return (
         <ProposalCard

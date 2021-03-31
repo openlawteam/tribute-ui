@@ -5,14 +5,15 @@ import {
 } from '@openlaw/snapshot-js-erc712';
 
 import {BURN_ADDRESS} from '../../util/constants';
-import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
+import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../test/helpers';
 import {rest, server} from '../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../config';
 import {snapshotAPIProposalResponse} from '../../test/restResponses';
 import GovernanceProposalsList from './GovernanceProposalsList';
 import MulticallABI from '../../truffle-contracts/Multicall.json';
-import Wrapper from '../../test/Wrapper';
 import userEvent from '@testing-library/user-event';
+import Wrapper from '../../test/Wrapper';
+import Web3 from 'web3';
 
 describe('GovernanceProposalsList unit tests', () => {
   const defaultProposalVotes: SnapshotProposalResponseData['votes'] = [
@@ -124,6 +125,66 @@ describe('GovernanceProposalsList unit tests', () => {
       },
       votes: defaultProposalVotes,
     },
+  };
+
+  const getWeb3Results = ({
+    mockWeb3Provider,
+    web3Instance,
+  }: {
+    mockWeb3Provider: FakeHttpProvider;
+    web3Instance: Web3;
+  }) => {
+    /**
+     * Inject voting results. The order should align with the order above of fake responses.
+     */
+
+    // 1. Inject passed result
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
+        [
+          0,
+          [
+            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+          ],
+        ]
+      ),
+      {abi: MulticallABI, abiMethodName: 'aggregate'}
+    );
+
+    // 2. Inject failed result
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
+        [
+          0,
+          [
+            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '300000'),
+          ],
+        ]
+      ),
+      {abi: MulticallABI, abiMethodName: 'aggregate'}
+    );
+
+    // 3. Inject voting result
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
+        [
+          0,
+          [
+            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+          ],
+        ]
+      ),
+      {abi: MulticallABI, abiMethodName: 'aggregate'}
+    );
   };
 
   test('should render proposal cards', async () => {
@@ -240,62 +301,7 @@ describe('GovernanceProposalsList unit tests', () => {
     );
 
     render(
-      <Wrapper
-        useInit
-        useWallet
-        getProps={({mockWeb3Provider, web3Instance}) => {
-          /**
-           * Inject voting results. The order should align with the order above of fake responses.
-           */
-
-          // 1. Inject passed result
-          mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameters(
-              ['uint256', 'bytes[]'],
-              [
-                0,
-                [
-                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-                ],
-              ]
-            ),
-            {abi: MulticallABI, abiMethodName: 'aggregate'}
-          );
-
-          // 2. Inject failed result
-          mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameters(
-              ['uint256', 'bytes[]'],
-              [
-                0,
-                [
-                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '300000'),
-                ],
-              ]
-            ),
-            {abi: MulticallABI, abiMethodName: 'aggregate'}
-          );
-
-          // 3. Inject voting result
-          mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameters(
-              ['uint256', 'bytes[]'],
-              [
-                0,
-                [
-                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-                ],
-              ]
-            ),
-            {abi: MulticallABI, abiMethodName: 'aggregate'}
-          );
-        }}>
+      <Wrapper useInit useWallet getProps={getWeb3Results}>
         <GovernanceProposalsList
           actionId={BURN_ADDRESS}
           onProposalClick={() => {}}
@@ -335,62 +341,7 @@ describe('GovernanceProposalsList unit tests', () => {
     );
 
     render(
-      <Wrapper
-        useInit
-        useWallet
-        getProps={({mockWeb3Provider, web3Instance}) => {
-          /**
-           * Inject voting results. The order should align with the order above of fake responses.
-           */
-
-          // 1. Inject passed result
-          mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameters(
-              ['uint256', 'bytes[]'],
-              [
-                0,
-                [
-                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-                ],
-              ]
-            ),
-            {abi: MulticallABI, abiMethodName: 'aggregate'}
-          );
-
-          // 2. Inject failed result
-          mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameters(
-              ['uint256', 'bytes[]'],
-              [
-                0,
-                [
-                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '300000'),
-                ],
-              ]
-            ),
-            {abi: MulticallABI, abiMethodName: 'aggregate'}
-          );
-
-          // 3. Inject voting result
-          mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameters(
-              ['uint256', 'bytes[]'],
-              [
-                0,
-                [
-                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-                ],
-              ]
-            ),
-            {abi: MulticallABI, abiMethodName: 'aggregate'}
-          );
-        }}>
+      <Wrapper useInit useWallet getProps={getWeb3Results}>
         <GovernanceProposalsList
           actionId={BURN_ADDRESS}
           onProposalClick={() => {}}
@@ -419,6 +370,61 @@ describe('GovernanceProposalsList unit tests', () => {
       expect(() => screen.getByText(/another cool one/i)).toThrow();
       expect(() => screen.getByText(/another rad one/i)).toThrow();
       expect(() => screen.getByText(/another awesome one/i)).toThrow();
+    });
+  });
+
+  test('should render custom proposal card', async () => {
+    const spy = jest.fn();
+
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json(proposalsResponse))
+        ),
+      ]
+    );
+
+    render(
+      <Wrapper useInit useWallet getProps={getWeb3Results}>
+        <GovernanceProposalsList
+          actionId={BURN_ADDRESS}
+          onProposalClick={spy}
+          renderProposalCard={({proposalData, votingResult}) => (
+            <div>
+              <h2>{`custom card: ${proposalData.snapshotProposal?.msg.payload.name}`}</h2>
+              <p>Yes votes: {votingResult?.Yes.shares}</p>
+              <p>No votes: {votingResult?.No.shares}</p>
+            </div>
+          )}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Proposal headers
+      expect(screen.getByText(/^voting$/i)).toBeInTheDocument();
+      expect(screen.getByText(/^passed$/i)).toBeInTheDocument();
+      expect(screen.getByText(/^failed$/i)).toBeInTheDocument();
+
+      // Proposal names
+      expect(
+        screen.getByText(/^custom card: another awesome one$/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/^custom card: another cool one$/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/^custom card: another rad one$/i)
+      ).toBeInTheDocument();
+
+      // Voting result
+      expect(screen.getAllByText(/^yes votes: \d+$/i).length).toBe(3);
+      expect(screen.getAllByText(/^no votes: \d+$/i).length).toBe(3);
     });
   });
 });
