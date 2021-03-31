@@ -24,7 +24,7 @@ type OffchainVotingStatusProps = {
    * it will save the need to fetch inside of this component.
    *
    * e.g. Governance proposals listing may fetch all voting results
-   *   in order to filter the `ProposalCard`s.
+   *   in order to filter the `ProposalCard`s and be able to provide the results.
    */
   votingResult?: VotingResult;
 };
