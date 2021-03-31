@@ -4,6 +4,7 @@ import {
   SnapshotDraftResponseData,
   SnapshotProposalResponseData,
   SnapshotType,
+  VoteChoices,
 } from '@openlaw/snapshot-js-erc712';
 
 /**
@@ -136,3 +137,21 @@ export type ProposalOrDraftSnapshotType =
 export type ProposalOrDraftSignDataFromType<
   T extends ProposalOrDraftSnapshotType
 > = T extends SnapshotType.proposal ? SnapshotProposalData : SnapshotDraftData;
+
+/**
+ * VotingResult
+ *
+ * A custom result we build to deliver to components.
+ * It should accommodate all types of yes/no voting (i.e. on-chain, off-chain).
+ */
+
+export type VoteChoiceResult = {
+  percentage: number;
+  shares: number;
+};
+
+export type VotingResult = {
+  [VoteChoices.Yes]: VoteChoiceResult;
+  [VoteChoices.No]: VoteChoiceResult;
+  totalShares: number;
+};

@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import {ContractDAOConfigKeys} from '../../web3/types';
 import {CycleEllipsis} from '../../feedback';
 import {getDAOConfigEntry} from '../../web3/helpers';
-import {ProposalData} from '../types';
+import {ProposalData, VotingResult} from '../types';
 import {StoreState} from '../../../store/types';
 import {useOffchainVotingResults, useOffchainVotingStartEnd} from '../hooks';
 import {VotingStatus} from './VotingStatus';
@@ -18,7 +18,14 @@ type OffchainVotingStatusProps = {
    */
   countdownGracePeriodStartMs?: number;
   proposal: ProposalData;
-  showPercentages?: boolean;
+  /**
+   * If a fetched `VotingResult` is provided
+   * it will save the need to fetch inside of this component.
+   *
+   * e.g. Governance proposals listing may fetch all voting results
+   *   in order to filter the `ProposalCard`s and be able to provide the results.
+   */
+  votingResult?: VotingResult;
 };
 
 // Cached grace period label
@@ -52,6 +59,7 @@ const cycleEllipsisFadeInProps = {duration: 150};
 export function OffchainVotingStatus({
   countdownGracePeriodStartMs,
   proposal,
+  votingResult,
 }: OffchainVotingStatusProps): JSX.Element {
   const {snapshotProposal} = proposal;
 
@@ -81,7 +89,7 @@ export function OffchainVotingStatus({
   } = useOffchainVotingStartEnd(proposal);
 
   const {offchainVotingResults} = useOffchainVotingResults(
-    proposal.snapshotProposal
+    votingResult ? undefined : proposal.snapshotProposal
   );
 
   /**
@@ -89,12 +97,15 @@ export function OffchainVotingStatus({
    */
 
   // There is only one vote result entry as we only passed a single proposal
-  const votingResult = offchainVotingResults[0]?.[1];
+  const votingResultToUse = votingResult
+    ? votingResult
+    : offchainVotingResults[0]?.[1];
+
   const votingStartSeconds = snapshotProposal?.msg.payload.start || 0;
   const votingEndSeconds = snapshotProposal?.msg.payload.end || 0;
-  const yesShares = votingResult?.Yes.shares || 0;
-  const noShares = votingResult?.No.shares || 0;
-  const totalShares = votingResult?.totalShares;
+  const yesShares = votingResultToUse?.Yes.shares || 0;
+  const noShares = votingResultToUse?.No.shares || 0;
+  const totalShares = votingResultToUse?.totalShares;
 
   /**
    * Effects
@@ -127,6 +138,7 @@ export function OffchainVotingStatus({
     if (!offchainVotingStartEndInitReady) {
       return (
         <CycleEllipsis
+          ariaLabel="Getting off-chain voting status"
           intervalMs={200}
           fadeInProps={cycleEllipsisFadeInProps}
         />

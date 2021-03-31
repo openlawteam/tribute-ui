@@ -1,15 +1,12 @@
 import React, {useEffect, useState} from 'react';
 
-import {
-  OffchainVotingResult,
-  useOffchainVotingResults,
-} from '../proposals/hooks';
 import {AsyncStatus} from '../../util/types';
 import {BURN_ADDRESS} from '../../util/constants';
 import {normalizeString} from '../../util/helpers';
-import {ProposalData} from '../proposals/types';
+import {ProposalData, VotingResult} from '../proposals/types';
 import {ProposalHeaderNames} from '../../util/enums';
 import {useGovernanceProposals} from './hooks';
+import {useOffchainVotingResults} from '../proposals/hooks';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
 import ProposalCard from '../proposals/ProposalCard';
@@ -28,7 +25,7 @@ type FilteredProposals = {
   votingProposals: ProposalData[];
 };
 
-// @todo Pass `OffchainVotingResult` down to `OffchainVotingStatus` via `ProposalCard`
+// @todo Pass `VotingResult` down to `OffchainVotingStatus` via `ProposalCard`
 export default function GovernanceProposalsList(
   props: GovernanceProposalsListProps
 ): JSX.Element {
@@ -118,7 +115,8 @@ export default function GovernanceProposalsList(
 
       const offchainResult = offchainVotingResults.find(
         ([proposalHash, _result]) =>
-          normalizeString(proposalHash) === p.snapshotProposal?.idInSnapshot
+          normalizeString(proposalHash) ===
+          normalizeString(p.snapshotProposal?.idInSnapshot || '')
       )?.[1];
 
       if (!offchainResult) return;
@@ -150,9 +148,7 @@ export default function GovernanceProposalsList(
    * Functions
    */
 
-  function didPassSimpleMajority(
-    offchainVoteResult: OffchainVotingResult
-  ): boolean {
+  function didPassSimpleMajority(offchainVoteResult: VotingResult): boolean {
     return offchainVoteResult.Yes.shares > offchainVoteResult.No.shares;
   }
 
@@ -165,13 +161,19 @@ export default function GovernanceProposalsList(
 
       if (!proposalId) return null;
 
+      const offchainResult = offchainVotingResults.find(
+        ([proposalHash, _result]) =>
+          normalizeString(proposalHash) === normalizeString(proposalId)
+      )?.[1];
+
       return (
         <ProposalCard
           key={proposalId}
+          name={proposalName}
           onClick={onProposalClick}
           proposal={proposal}
           proposalOnClickId={proposalId}
-          name={proposalName}
+          votingResult={offchainResult}
         />
       );
     });

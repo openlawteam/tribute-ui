@@ -3,7 +3,7 @@ import LinesEllipsis from 'react-lines-ellipsis';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 
 import {OffchainVotingStatus} from './voting';
-import {ProposalData} from './types';
+import {ProposalData, VotingResult} from './types';
 import {StoreState} from '../../store/types';
 import {VotingAdapterName} from '../adapters-extensions/enums';
 import {isEthAddressValid} from '../../util/validation';
@@ -20,6 +20,14 @@ type ProposalCardProps = {
    */
   proposalOnClickId: string;
   name: string;
+  /**
+   * If a fetched `VotingResult` is provided
+   * it will save the need to fetch inside of `OffchainVotingStatus`.
+   *
+   * e.g. Governance proposals listing may fetch all voting results
+   *   in order to filter the `ProposalCard`s and be able to provide the results.
+   */
+  votingResult?: VotingResult;
 };
 
 const DEFAULT_BUTTON_TEXT: string = 'View Proposal';
@@ -39,6 +47,7 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
     proposalOnClickId,
     onClick,
     name,
+    votingResult,
   } = props;
 
   /**
@@ -66,7 +75,12 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
   function renderStatus(proposal: ProposalData) {
     switch (votingAdapterName) {
       case VotingAdapterName.OffchainVotingContract:
-        return <OffchainVotingStatus proposal={proposal} />;
+        return (
+          <OffchainVotingStatus
+            proposal={proposal}
+            votingResult={votingResult}
+          />
+        );
       // @todo On-chain Voting
       // case VotingAdapterName.VotingContract:
       //   return <></>

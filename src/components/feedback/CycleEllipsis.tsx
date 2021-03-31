@@ -2,6 +2,7 @@ import React, {useState, useEffect, CSSProperties} from 'react';
 import FadeIn from '../common/FadeIn';
 
 type CycleEllipsisProps = {
+  ariaLabel?: string;
   /**
    * What is the interval of cycling the message?
    */
@@ -20,7 +21,7 @@ const nbspStyles = {
 } as CSSProperties;
 
 export function CycleEllipsis(props: CycleEllipsisProps) {
-  const {intervalMs = 1000, fadeInProps} = props;
+  const {ariaLabel, intervalMs = 1000, fadeInProps} = props;
   const fadeInPropsMerged = {...fadeInProps, inline: true};
 
   const [upToIndex, setUpToIndex] = useState<number>(1);
@@ -38,7 +39,7 @@ export function CycleEllipsis(props: CycleEllipsisProps) {
 
   return (
     <>
-      <span style={rootStyles}>
+      <span aria-label={ariaLabel} style={rootStyles}>
         <span>{upToIndex >= 0 && MESSAGES[0]}</span>
         <span>
           {upToIndex >= 1 && (
