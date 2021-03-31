@@ -188,6 +188,7 @@ export default function CreateMembershipProposal() {
       let proposalId: string = proposalData?.uniqueId || '';
 
       const {ethAddress, ethAmount} = values;
+      const ethAddressToChecksum = Web3.utils.toChecksumAddress(ethAddress);
       const ethAmountInWei = Web3.utils.toWei(
         stripFormatNumber(ethAmount),
         'ether'
@@ -198,8 +199,8 @@ export default function CreateMembershipProposal() {
         // Sign and submit draft for snapshot-hub
         const {uniqueId} = await signAndSendProposal({
           partialProposalData: {
-            name: ethAddress,
-            body: `Membership for ${ethAddress}.`,
+            name: ethAddressToChecksum,
+            body: `Membership for ${ethAddressToChecksum}.`,
             metadata: {amountUnit: 'ETH'},
           },
           adapterName: ContractAdapterNames.onboarding,
@@ -212,7 +213,7 @@ export default function CreateMembershipProposal() {
       const onboardArguments: OnboardArguments = [
         DaoRegistryContract.contractAddress,
         proposalId,
-        ethAddress,
+        ethAddressToChecksum,
         SHARES_ADDRESS,
         ethAmountInWei,
       ];

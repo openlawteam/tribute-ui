@@ -4,7 +4,7 @@ import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
 import {useHistory} from 'react-router-dom';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
-import {toBN, AbiItem} from 'web3-utils';
+import {toBN, AbiItem, toChecksumAddress} from 'web3-utils';
 
 import {
   getValidationError,
@@ -344,6 +344,7 @@ export default function CreateTributeProposal() {
         stripFormatNumber(tributeAmount)
       ).mul(multiplier);
       const requestAmountArg = stripFormatNumber(requestAmount);
+      const applicantAddressToChecksum = toChecksumAddress(applicantAddress);
 
       // Check if adapter is allowed to spend amount of tribute tokens on behalf
       // of user. If allowance is not sufficient, approve the adapter to spend
@@ -375,17 +376,20 @@ export default function CreateTributeProposal() {
       if (!proposalId) {
         const bodyIntro =
           normalizeString(applicantAddress) === normalizeString(account)
-            ? `Tribute from ${applicantAddress}.`
+            ? `Tribute from ${applicantAddressToChecksum}.`
             : `Tribute from ${truncateEthAddress(
-                account,
+                toChecksumAddress(account),
                 7
-              )} for applicant ${truncateEthAddress(applicantAddress, 7)}.`;
+              )} for applicant ${truncateEthAddress(
+                applicantAddressToChecksum,
+                7
+              )}.`;
         const body = description ? `${bodyIntro}\n${description}` : bodyIntro;
 
         // Sign and submit draft for snapshot-hub
         const {uniqueId} = await signAndSendProposal({
           partialProposalData: {
-            name: applicantAddress,
+            name: applicantAddressToChecksum,
             body,
             metadata: {
               tributeAmountUnit: erc20Details.symbol,
@@ -403,7 +407,7 @@ export default function CreateTributeProposal() {
       const tributeArguments: TributeArguments = [
         DaoRegistryContract.contractAddress,
         proposalId,
-        applicantAddress,
+        applicantAddressToChecksum,
         SHARES_ADDRESS,
         requestAmountArg,
         erc20Address,
