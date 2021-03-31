@@ -5,7 +5,6 @@ import {DaoAdapterConstants} from '../adapters-extensions/enums';
 import {ProposalData, ProposalFlag} from './types';
 import {proposalHasFlag, proposalHasVotingState} from './helpers';
 import {ProposalHeaderNames} from '../../util/enums';
-import {truncateEthAddress} from '../../util/helpers';
 import {useProposals, useProposalsVotingState} from './hooks';
 import {VotingState} from './voting/types';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
@@ -192,8 +191,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
           onClick={onProposalClick}
           proposal={proposal}
           proposalOnClickId={proposalId}
-          // @note If the proposal title is not an address it will fall back to a normal, non-truncated string.
-          name={truncateEthAddress(proposalName, 7)}
+          name={proposalName}
         />
       );
     });
