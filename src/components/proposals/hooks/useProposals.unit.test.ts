@@ -167,4 +167,137 @@ describe('useProposals unit tests', () => {
       );
     });
   });
+
+  test('should return error', async () => {
+    await act(async () => {
+      server.use(
+        ...[
+          rest.get(
+            `${SNAPSHOT_HUB_API_URL}/api/:spaceName/drafts/:adapterAddress`,
+            async (_req, res, ctx) => res(ctx.status(500))
+          ),
+          rest.get(
+            `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+            async (_req, res, ctx) => res(ctx.status(500))
+          ),
+        ]
+      );
+
+      const {result, waitForNextUpdate} = await renderHook(
+        () => useProposals({adapterName: DaoAdapterConstants.ONBOARDING}),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useWallet: true,
+            useInit: true,
+            getProps: ({mockWeb3Provider, web3Instance}) => {
+              // Mock the proposals' multicall response
+              mockWeb3Provider.injectResult(
+                web3Instance.eth.abi.encodeParameters(
+                  ['uint256', 'bytes[]'],
+                  [
+                    0,
+                    [
+                      web3Instance.eth.abi.encodeParameter(
+                        {
+                          Proposal: {
+                            adapterAddress: 'address',
+                            flags: 'uint256',
+                          },
+                        },
+                        {
+                          adapterAddress: DEFAULT_ETH_ADDRESS,
+                          // ProposalFlag.SPONSORED
+                          flags: '3',
+                        }
+                      ),
+                      web3Instance.eth.abi.encodeParameter(
+                        {
+                          Proposal: {
+                            adapterAddress: 'address',
+                            flags: 'uint256',
+                          },
+                        },
+                        {
+                          adapterAddress: DEFAULT_ETH_ADDRESS,
+                          // ProposalFlag.EXISTS
+                          flags: '1',
+                        }
+                      ),
+                    ],
+                  ]
+                )
+              );
+            },
+          },
+        }
+      );
+
+      expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
+
+      await waitForNextUpdate();
+
+      expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
+
+      await waitForNextUpdate();
+
+      expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
+
+      await waitForNextUpdate();
+
+      expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
+
+      await waitForNextUpdate();
+
+      expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
+
+      await waitForNextUpdate();
+
+      expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
+
+      await waitForNextUpdate();
+
+      expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
+
+      await waitForNextUpdate();
+
+      expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
+
+      await waitForNextUpdate();
+
+      expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
+
+      await waitForNextUpdate();
+
+      expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
+
+      await waitForNextUpdate();
+
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.REJECTED);
+      expect(result.current.proposalsError?.message).toMatch(
+        /something went wrong while fetching the/i
+      );
+      expect(result.current.proposals.length).toBe(0);
+    });
+  });
 });

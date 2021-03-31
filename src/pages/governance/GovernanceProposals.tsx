@@ -1,17 +1,32 @@
 import React from 'react';
 import {useHistory} from 'react-router-dom';
 
-import Wrap from '../../components/common/Wrap';
+import {BURN_ADDRESS} from '../../util/constants';
 import FadeIn from '../../components/common/FadeIn';
+import GovernanceProposalsList from '../../components/governance/GovernanceProposalsList';
+import Wrap from '../../components/common/Wrap';
 
 export default function GovernanceProposals() {
+  const history = useHistory();
+
+  /**
+   * Functions
+   */
+
+  function handleClickProposalDetails(id: string) {
+    id && history.push(`/governance-proposals/${id}`);
+  }
+
   /**
    * Render
    */
 
   return (
     <RenderWrapper>
-      <div>GovernanceProposals @todo</div>
+      <GovernanceProposalsList
+        actionId={BURN_ADDRESS}
+        onProposalClick={handleClickProposalDetails}
+      />
     </RenderWrapper>
   );
 }

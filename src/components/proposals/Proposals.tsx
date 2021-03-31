@@ -5,12 +5,11 @@ import {DaoAdapterConstants} from '../adapters-extensions/enums';
 import {ProposalData, ProposalFlag} from './types';
 import {proposalHasFlag, proposalHasVotingState} from './helpers';
 import {ProposalHeaderNames} from '../../util/enums';
-import {truncateEthAddress} from '../../util/helpers';
 import {useProposals, useProposalsVotingState} from './hooks';
 import {VotingState} from './voting/types';
-import ProposalCard from './ProposalCard';
-import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
+import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
+import ProposalCard from './ProposalCard';
 
 type ProposalsProps = {
   adapterName: DaoAdapterConstants;
@@ -67,12 +66,12 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
   } = filteredProposals;
 
   const isLoading: boolean =
+    proposalsStatus === AsyncStatus.STANDBY ||
     proposalsStatus === AsyncStatus.PENDING ||
+    // Getting ready to fetch using `useProposalsVotingState`; helps to show continuous loader.
+    (proposalsVotingStateStatus === AsyncStatus.STANDBY &&
+      proposalIds.length > 0) ||
     proposalsVotingStateStatus === AsyncStatus.PENDING;
-
-  const isLoadingDone: boolean =
-    proposalsStatus === AsyncStatus.FULFILLED ||
-    proposalsVotingStateStatus === AsyncStatus.FULFILLED;
 
   const isError: boolean =
     proposalsStatus === AsyncStatus.REJECTED ||
@@ -119,6 +118,8 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
         proposalHasFlag(ProposalFlag.EXISTS, p.daoProposal.flags)
       ) {
         filteredProposalsToSet.nonsponsoredProposals.push(p);
+
+        return;
       }
 
       // voting proposal
@@ -128,6 +129,8 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
         proposalHasFlag(ProposalFlag.SPONSORED, p.daoProposal.flags)
       ) {
         filteredProposalsToSet.votingProposals.push(p);
+
+        return;
       }
 
       // passed proposal
@@ -137,6 +140,8 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
           proposalHasFlag(ProposalFlag.PROCESSED, p.daoProposal.flags))
       ) {
         filteredProposalsToSet.passedProposals.push(p);
+
+        return;
       }
 
       // failed proposal
@@ -147,6 +152,8 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
           proposalHasFlag(ProposalFlag.PROCESSED, p.daoProposal.flags))
       ) {
         filteredProposalsToSet.failedProposals.push(p);
+
+        return;
       }
     });
 
@@ -183,8 +190,8 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
           key={proposalId}
           onClick={onProposalClick}
           proposal={proposal}
-          // @note If the proposal title is not an address it will fall back to a normal, non-truncated string.
-          name={truncateEthAddress(proposalName, 7)}
+          proposalOnClickId={proposalId}
+          name={proposalName}
         />
       );
     });
@@ -207,7 +214,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
   if (
     !Object.values(proposals).length &&
     !Object.values(filteredProposals).flatMap((p) => p).length &&
-    isLoadingDone
+    proposalsStatus === AsyncStatus.FULFILLED
   ) {
     return <p className="text-center">No proposals, yet!</p>;
   }
