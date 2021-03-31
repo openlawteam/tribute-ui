@@ -115,7 +115,8 @@ export default function GovernanceProposalsList(
 
       const offchainResult = offchainVotingResults.find(
         ([proposalHash, _result]) =>
-          normalizeString(proposalHash) === p.snapshotProposal?.idInSnapshot
+          normalizeString(proposalHash) ===
+          normalizeString(p.snapshotProposal?.idInSnapshot || '')
       )?.[1];
 
       if (!offchainResult) return;
@@ -160,13 +161,19 @@ export default function GovernanceProposalsList(
 
       if (!proposalId) return null;
 
+      const offchainResult = offchainVotingResults.find(
+        ([proposalHash, _result]) =>
+          normalizeString(proposalHash) === normalizeString(proposalId)
+      )?.[1];
+
       return (
         <ProposalCard
           key={proposalId}
+          name={proposalName}
           onClick={onProposalClick}
           proposal={proposal}
           proposalOnClickId={proposalId}
-          name={proposalName}
+          votingResult={offchainResult}
         />
       );
     });
