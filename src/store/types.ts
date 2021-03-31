@@ -8,6 +8,7 @@ import {
   DaoExtensionConstants,
   VotingAdapterName,
 } from '../components/adapters-extensions/enums';
+import {SubgraphNetworkStatusState} from './subgraphNetworkStatus/types';
 
 export type ContractsState = {
   BankExtensionContract: ContractsStateEntry | null;
@@ -34,6 +35,7 @@ export type ConnectedMemberState = {
 export type StoreState = {
   connectedMember: ConnectedMemberState;
   contracts: ContractsState;
+  subgraphNetworkStatus: SubgraphNetworkStatusState;
 };
 
 export type ContractsStateEntry = {
