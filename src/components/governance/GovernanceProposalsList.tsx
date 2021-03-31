@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 
 import {AsyncStatus} from '../../util/types';
 import {BURN_ADDRESS} from '../../util/constants';
 import {normalizeString} from '../../util/helpers';
-import {ProposalData, VotingResult} from '../proposals/types';
+import {ProposalData, SnapshotProposal, VotingResult} from '../proposals/types';
 import {ProposalHeaderNames} from '../../util/enums';
 import {useGovernanceProposals} from './hooks';
 import {useOffchainVotingResults} from '../proposals/hooks';
@@ -17,6 +17,10 @@ type GovernanceProposalsListProps = {
    */
   actionId?: string;
   onProposalClick: (id: string) => void;
+  renderProposalCard?: (data: {
+    proposal: SnapshotProposal;
+    votingResult?: VotingResult;
+  }) => React.ReactNode;
 };
 
 type FilteredProposals = {
@@ -29,7 +33,7 @@ type FilteredProposals = {
 export default function GovernanceProposalsList(
   props: GovernanceProposalsListProps
 ): JSX.Element {
-  const {actionId = BURN_ADDRESS, onProposalClick} = props;
+  const {actionId = BURN_ADDRESS, onProposalClick, renderProposalCard} = props;
 
   /**
    * State
@@ -156,15 +160,27 @@ export default function GovernanceProposalsList(
     proposals: ProposalData[]
   ): React.ReactNode | null {
     return proposals.map((proposal) => {
+      const {snapshotProposal} = proposal;
       const proposalId = proposal.snapshotProposal?.idInSnapshot;
       const proposalName = proposal.snapshotProposal?.msg.payload.name || '';
 
-      if (!proposalId) return null;
+      if (!snapshotProposal || !proposalId) return null;
 
       const offchainResult = offchainVotingResults.find(
         ([proposalHash, _result]) =>
           normalizeString(proposalHash) === normalizeString(proposalId)
       )?.[1];
+
+      if (renderProposalCard) {
+        return (
+          <Fragment key={proposalId}>
+            {renderProposalCard({
+              proposal: snapshotProposal,
+              votingResult: offchainResult,
+            })}
+          </Fragment>
+        );
+      }
 
       return (
         <ProposalCard
