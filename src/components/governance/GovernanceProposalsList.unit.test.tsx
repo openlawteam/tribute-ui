@@ -390,9 +390,9 @@ describe('GovernanceProposalsList unit tests', () => {
         <GovernanceProposalsList
           actionId={BURN_ADDRESS}
           onProposalClick={spy}
-          renderProposalCard={({proposal, votingResult}) => (
+          renderProposalCard={({proposalData, votingResult}) => (
             <div>
-              <h2>{`custom card: ${proposal.msg.payload.name}`}</h2>
+              <h2>{`custom card: ${proposalData.snapshotProposal?.msg.payload.name}`}</h2>
               <p>Yes votes: {votingResult?.Yes.shares}</p>
               <p>No votes: {votingResult?.No.shares}</p>
             </div>

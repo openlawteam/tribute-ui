@@ -3,7 +3,7 @@ import React, {Fragment, useEffect, useState} from 'react';
 import {AsyncStatus} from '../../util/types';
 import {BURN_ADDRESS} from '../../util/constants';
 import {normalizeString} from '../../util/helpers';
-import {ProposalData, SnapshotProposal, VotingResult} from '../proposals/types';
+import {ProposalData, VotingResult} from '../proposals/types';
 import {ProposalHeaderNames} from '../../util/enums';
 import {useGovernanceProposals} from './hooks';
 import {useOffchainVotingResults} from '../proposals/hooks';
@@ -17,8 +17,11 @@ type GovernanceProposalsListProps = {
    */
   actionId?: string;
   onProposalClick: (id: string) => void;
+  /**
+   * Optionally render a custom proposal card.
+   */
   renderProposalCard?: (data: {
-    proposal: SnapshotProposal;
+    proposalData: ProposalData;
     votingResult?: VotingResult;
   }) => React.ReactNode;
 };
@@ -160,11 +163,10 @@ export default function GovernanceProposalsList(
     proposals: ProposalData[]
   ): React.ReactNode | null {
     return proposals.map((proposal) => {
-      const {snapshotProposal} = proposal;
       const proposalId = proposal.snapshotProposal?.idInSnapshot;
       const proposalName = proposal.snapshotProposal?.msg.payload.name || '';
 
-      if (!snapshotProposal || !proposalId) return null;
+      if (!proposalId) return null;
 
       const offchainResult = offchainVotingResults.find(
         ([proposalHash, _result]) =>
@@ -175,7 +177,7 @@ export default function GovernanceProposalsList(
         return (
           <Fragment key={proposalId}>
             {renderProposalCard({
-              proposal: snapshotProposal,
+              proposalData: proposal,
               votingResult: offchainResult,
             })}
           </Fragment>
