@@ -18,7 +18,6 @@ type OffchainVotingStatusProps = {
    */
   countdownGracePeriodStartMs?: number;
   proposal: ProposalData;
-  showPercentages?: boolean;
   /**
    * If a fetched `VotingResult` is provided
    * it will save the need to fetch inside of this component.
