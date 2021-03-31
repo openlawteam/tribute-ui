@@ -21,6 +21,7 @@
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
     "react-hook-form": "^6.15.4",
+    "react-lines-ellipsis": "^0.14.1",
     "react-media": "^1.10.0",
     "react-modal": "^3.12.1",
     "react-redux": "^7.2.2",

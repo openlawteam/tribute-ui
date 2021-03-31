@@ -34,7 +34,10 @@ export default function ProposalDetails(props: ProposalDetailsProps) {
       <div className="proposaldetails">
         {/* PROPOSAL NAME (an address in most cases) AND BODY */}
         <div className="proposaldetails__content">
-          <h3>{truncateEthAddress(commonData.msg.payload.name || '', 7)}</h3>
+          <h3>
+            {/* @note If the proposal title is not an address it will fall back to a normal, non-truncated string. */}
+            {truncateEthAddress(commonData.msg.payload.name || '', 7)}
+          </h3>
 
           <Markdown>{commonData.msg.payload.body}</Markdown>
         </div>

@@ -6,7 +6,7 @@ import {
 } from '../proposals/hooks';
 import {AsyncStatus} from '../../util/types';
 import {BURN_ADDRESS} from '../../util/constants';
-import {normalizeString, truncateEthAddress} from '../../util/helpers';
+import {normalizeString} from '../../util/helpers';
 import {ProposalData} from '../proposals/types';
 import {ProposalHeaderNames} from '../../util/enums';
 import {useGovernanceProposals} from './hooks';
@@ -171,8 +171,7 @@ export default function GovernanceProposalsList(
           onClick={onProposalClick}
           proposal={proposal}
           proposalOnClickId={proposalId}
-          // @note If the proposal title is not an address it will fall back to a normal, non-truncated string.
-          name={truncateEthAddress(proposalName, 7)}
+          name={proposalName}
         />
       );
     });

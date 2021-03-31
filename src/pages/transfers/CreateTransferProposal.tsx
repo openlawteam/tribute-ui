@@ -7,7 +7,7 @@ import {
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
 import {useHistory} from 'react-router-dom';
-import {toBN, AbiItem, toWei} from 'web3-utils';
+import {toBN, AbiItem, toWei, toChecksumAddress} from 'web3-utils';
 
 import {ETH_TOKEN_ADDRESS, GUILD_ADDRESS, SHARES_ADDRESS} from '../../config';
 import {
@@ -374,6 +374,7 @@ export default function CreateTransferProposal() {
       }
 
       const {selectedToken, memberAddress, amount, notes} = values;
+      const memberAddressToChecksum = toChecksumAddress(memberAddress);
       const selectedTokenObj = JSON.parse(selectedToken);
       const {symbol, decimals, address: tokenAddress} = selectedTokenObj;
       let amountArg;
@@ -394,12 +395,12 @@ export default function CreateTransferProposal() {
 
       const bodyIntro = isTypeAllMembers
         ? 'Transfer to all members pro rata.'
-        : `Transfer to ${memberAddress}.`;
+        : `Transfer to ${memberAddressToChecksum}.`;
 
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
         const body = notes ? `${bodyIntro}\n${notes}` : bodyIntro;
-        const name = isTypeAllMembers ? 'All members' : memberAddress;
+        const name = isTypeAllMembers ? 'All members' : memberAddressToChecksum;
         const now = Math.floor(Date.now() / 1000);
 
         // Sign and submit proposal for snapshot-hub
@@ -429,7 +430,7 @@ export default function CreateTransferProposal() {
 
       const memberAddressArg = isTypeAllMembers
         ? BURN_ADDRESS // 0x0 address indicates distribution to all active members
-        : memberAddress;
+        : memberAddressToChecksum;
       /**
        * Prepare `data` argument for submission to DAO
        *
