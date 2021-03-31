@@ -16,7 +16,12 @@ type GovernanceProposalsListProps = {
    * The `actionId` to get proposals for in Snapshot Hub.
    */
   actionId?: string;
-  onProposalClick: (id: string) => void;
+  /**
+   * Optionally provide a click handler for `ProposalCard`.
+   * The proposal's id (in Snapshot) will be provided as an argument.
+   * Defaults to noop: `() => {}`
+   */
+  onProposalClick?: (id: string) => void;
   /**
    * Optionally render a custom proposal card.
    */
@@ -36,7 +41,11 @@ type FilteredProposals = {
 export default function GovernanceProposalsList(
   props: GovernanceProposalsListProps
 ): JSX.Element {
-  const {actionId = BURN_ADDRESS, onProposalClick, renderProposalCard} = props;
+  const {
+    actionId = BURN_ADDRESS,
+    onProposalClick = () => {},
+    renderProposalCard,
+  } = props;
 
   /**
    * State
