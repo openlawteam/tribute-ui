@@ -8,7 +8,10 @@ import {
 import {AclFlag} from './types';
 
 export function getAdapterOrExtensionId(
-  adapterName: DaoAdapterConstants | DaoExtensionConstants
+  adapterName:
+    | DaoAdapterConstants
+    | OtherAdapterConstants
+    | DaoExtensionConstants
 ): string {
   return sha3(adapterName) as string;
 }
@@ -19,12 +22,14 @@ export function getAdapterOrExtensionId(
  * @param adapterName
  */
 export function getAccessControlLayer(
-  adapterName: string
+  adapterOrExtensionName: string
 ): Record<string, any> {
-  const adapterFlags: Record<
+  const adapterAndExtensionFlags: Record<
     | DaoAdapterConstants
     | DaoExtensionConstants.BANK
-    | OtherAdapterConstants.OFFCHAINVOTING,
+    | DaoExtensionConstants.NFT
+    | OtherAdapterConstants.OFFCHAINVOTING
+    | OtherAdapterConstants.COUPON_ONBOARDING,
     any
   > = {
     [DaoExtensionConstants.BANK]: {},
@@ -94,9 +99,19 @@ export function getAccessControlLayer(
       WITHDRAW: true,
       SUB_FROM_BALANCE: true,
     },
+    [OtherAdapterConstants.COUPON_ONBOARDING]: {},
+    [DaoAdapterConstants.TRIBUTE_NFT]: {
+      SUBMIT_PROPOSAL: true,
+      NEW_MEMBER: true,
+    },
+    [DaoExtensionConstants.NFT]: {
+      TRANSFER_NFT: true,
+      RETURN_NFT: true,
+      REGISTER_NFT: true,
+    },
   };
 
-  const flags = adapterFlags[adapterName];
+  const flags = adapterAndExtensionFlags[adapterOrExtensionName];
 
   return {acl: accessFlags(flags)};
 }
@@ -111,7 +126,7 @@ export function getAccessControlLayer(
  * @param flags
  */
 function accessFlags(flags: Record<AclFlag, boolean>): number {
-  const values: boolean[] = [
+  const ADAPTER_ACCESS_FLAGS = [
     flags.ADD_ADAPTER,
     flags.REMOVE_ADAPTER,
     flags.JAIL_MEMBER,
@@ -124,6 +139,12 @@ function accessFlags(flags: Record<AclFlag, boolean>): number {
     flags.ADD_EXTENSION,
     flags.REMOVE_EXTENSION,
     flags.NEW_MEMBER,
+  ];
+  const EXTENSION_ACCESS_FLAGS = [flags.TRANSFER_NFT];
+
+  const values: boolean[] = [
+    ...ADAPTER_ACCESS_FLAGS,
+    ...EXTENSION_ACCESS_FLAGS,
   ];
 
   return entry(values) as number;

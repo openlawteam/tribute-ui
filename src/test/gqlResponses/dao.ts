@@ -1,7 +1,7 @@
 import {DEFAULT_ETH_ADDRESS, DEFAULT_DAO_NAME} from '../helpers';
 
 export const daoResponse = {
-  molochv3S: [
+  tributes: [
     {
       id: DEFAULT_ETH_ADDRESS,
       daoAddress: DEFAULT_ETH_ADDRESS,

@@ -9,6 +9,7 @@ import {StoreState} from '../../store/types';
 import {Web3TxStatus} from '../web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {getValidationError} from '../../util/helpers';
+import {BURN_ADDRESS} from '../../util/constants';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useAdaptersOrExtensions, useValidation} from './hooks';
 import {ParamInputType, ParamType} from './hooks/useValidation';
@@ -24,8 +25,22 @@ type ConfigurationFormProps = {
   closeHandler?: () => void;
 };
 
-type RemoveArgument = [
-  string // `adapterId` | `extensionId`
+type RemoveExtensionArgument = [
+  //`extensionId`
+  string
+];
+
+type RemoveAdapterArguments = [
+  // `adapterId`
+  string,
+  // set to `BURN_ADDRESS` zero address
+  string,
+  // acl set to `0` - no access/permissions
+  number,
+  // keys
+  [],
+  // values
+  []
 ];
 
 export default function ConfigurationForm({
@@ -86,6 +101,9 @@ export default function ConfigurationForm({
   const {errors, formState, getValues, setValue, register, trigger} = form;
   const configureAdapterError = submitError || txError;
   const isConnected = connected && account;
+  const adapterOrExtensionText = adapterOrExtension?.isExtension
+    ? 'extension'
+    : 'adapter';
 
   /**
    * @note From the docs: "Read the formState before render to subscribe the form state through Proxy"
@@ -125,22 +143,31 @@ export default function ConfigurationForm({
     try {
       setRemoveStatus(Web3TxStatus.AWAITING_CONFIRM);
 
-      const removeArguments: RemoveArgument = [
-        adapterOrExtension?.isExtension
-          ? adapterOrExtension?.extensionId
-          : adapterOrExtension?.adapterId,
-      ] as any;
+      const removeExtensionArgument: RemoveExtensionArgument = [
+        adapterOrExtension?.extensionId,
+      ];
+
+      const removeAdapterArguments: RemoveAdapterArguments = [
+        adapterOrExtension?.adapterId,
+        BURN_ADDRESS,
+        0,
+        [],
+        [],
+      ];
+
       const txArguments = {
         from: account || '',
         // Set a fast gas price
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      // Execute contract call for `removeAdapter` | `removeExtension`
+      // Execute contract call to `removeExtension` or `replaceAdapter`
       await txSend(
-        adapterOrExtension?.isExtension ? 'removeExtension' : 'removeAdapter',
+        adapterOrExtension?.isExtension ? 'removeExtension' : 'replaceAdapter',
         DaoRegistryContract.instance.methods,
-        removeArguments,
+        adapterOrExtension?.isExtension
+          ? removeExtensionArgument
+          : removeAdapterArguments,
         txArguments
       );
 
@@ -284,11 +311,6 @@ export default function ConfigurationForm({
         )}
       </button>
 
-      {/* SUBMIT CONFIGURE STATUS */}
-      {/* <div className="form__submit-status-container">
-      {isConfigureInProcessOrDone && renderSubmitStatus()}
-    </div> */}
-
       {/* SUBMIT ERROR */}
       {configureAdapterError && (
         <div className="form__submit-error-container">
@@ -299,11 +321,12 @@ export default function ConfigurationForm({
         </div>
       )}
 
-      {/** REMOVE ADAPTER BUTTON - only show if DAO isn't finalized */}
+      {/** REMOVE EXTENSION BUTTON - @todo only show if DAO isn't finalized */}
       <div className="adapter-extension__remove">
         <p>
-          Delete this adapter. Once you delete this adapter, it can be re-added
-          if the DAO isn't finalized.
+          Delete this {adapterOrExtensionText}. Once you delete this{' '}
+          {adapterOrExtensionText}, it can be re-added if the DAO isn't
+          finalized.
         </p>
         <button
           className="button--secondary"
@@ -311,11 +334,6 @@ export default function ConfigurationForm({
           onClick={() => (isRemoveDone ? {} : handleRemove())}>
           {isRemoveInProcess ? <Loader /> : isRemoveDone ? 'Done' : 'Remove'}
         </button>
-
-        {/* SUBMIT REMOVE STATUS */}
-        {/* <div className="form__submit-status-container">
-        {isRemoveInProcessOrDone && renderSubmitStatus()}
-      </div> */}
       </div>
     </form>
   );

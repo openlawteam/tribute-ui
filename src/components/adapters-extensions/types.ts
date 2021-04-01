@@ -23,6 +23,19 @@ export type AddAdapterArguments = [
   // `adapterAddress`
   string,
   // `acl`
+  number,
+  // `keys`
+  string[],
+  // `values`
+  number[]
+];
+
+export type AddAdaptersArguments = [
+  // `adapterId`
+  string,
+  // `adapterAddress`
+  string,
+  // `acl`
   number
 ];
 
@@ -110,7 +123,7 @@ export type AdapterFormArguments =
 
 export type AddAdapterFunction =
   | 'createFinancingRequest'
-  | 'createAdapterChangeRequest'
+  | 'submitProposal'
   | 'configureDao'
   | 'submitConfigurationProposal'
   | 'submitKickProposal'
@@ -128,4 +141,7 @@ export type AclFlag =
   | 'REMOVE_EXTENSION'
   | 'NEW_MEMBER'
   | 'UNJAIL_MEMBER'
-  | 'UPDATE_DELEGATE_KEY';
+  | 'UPDATE_DELEGATE_KEY'
+  | 'TRANSFER_NFT'
+  | 'RETURN_NFT'
+  | 'REGISTER_NFT';

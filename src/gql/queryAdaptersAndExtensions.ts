@@ -2,7 +2,7 @@ import {gql} from '@apollo/client';
 
 export const GET_ADAPTERS_AND_EXTENSIONS = gql`
   query GetAdaptersAndExtensions($daoAddress: String) {
-    molochv3S(where: {daoAddress: $daoAddress}) {
+    tributeDaos(where: {daoAddress: $daoAddress}) {
       adapters {
         id
         acl

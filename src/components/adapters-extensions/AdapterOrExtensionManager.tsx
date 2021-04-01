@@ -5,6 +5,7 @@ import {StoreState} from '../../store/types';
 import {AsyncStatus} from '../../util/types';
 import {
   AddAdapterArguments,
+  AddAdaptersArguments,
   AddExtensionArguments,
   AdaptersOrExtensions,
 } from './types';
@@ -154,19 +155,26 @@ export default function AdapterOrExtensionManager() {
     checkDaoStateCached();
   }, [checkDaoStateCached, DaoRegistryContract]);
 
-  // Sets the initial checkbox selections for non-registered adapters to `false`
-  // and sets the `Select All` checkbox to disabled if no adapters are available
   useEffect(() => {
     // Set the select all check to false by default
     setSelectAll(false);
 
     if (!unRegisteredAdaptersOrExtensions) return;
 
+    /**
+     * @note Select all functionality is for adding adapters only.
+     * Extensions must be added separately.
+     *
+     * Sets the initial checkbox selections for non-registered adapters to `false`
+     * and sets the `Select All` checkbox to disabled if no adapters are available
+     */
     unRegisteredAdaptersOrExtensions &&
       unRegisteredAdaptersOrExtensions?.forEach(
         (adapterOrExtension: Record<string, any>) => {
           // only add a selection if it doesn't have nested `options`
+          // and if it's not an extension
           !adapterOrExtension?.options &&
+            !adapterOrExtension.isExtension &&
             setSelections((prevState: Record<string, boolean> | undefined) => ({
               ...prevState,
               [adapterOrExtension.name]: false,
@@ -319,8 +327,18 @@ export default function AdapterOrExtensionManager() {
         | AddAdapterArguments
         | AddExtensionArguments =
         adapterOrExtensionType === 'ADAPTER'
-          ? [adapterOrExtensionId, adapterOrExtensionAddress, acl]
-          : [adapterOrExtensionId, adapterOrExtensionAddress, account];
+          ? ([
+              adapterOrExtensionId,
+              adapterOrExtensionAddress,
+              acl,
+              [],
+              [],
+            ] as AddAdapterArguments)
+          : ([
+              adapterOrExtensionId,
+              adapterOrExtensionAddress,
+              account,
+            ] as AddExtensionArguments);
 
       const txArguments = {
         from: account || '',
@@ -329,7 +347,9 @@ export default function AdapterOrExtensionManager() {
       };
 
       const txSendMethod =
-        adapterOrExtensionType === 'ADAPTER' ? 'addAdapter' : 'addExtension';
+        adapterOrExtensionType === 'ADAPTER'
+          ? 'replaceAdapter'
+          : 'addExtension';
 
       // Execute contract call for `addAdapter` or `addExtension`
       await txSend(
@@ -378,40 +398,51 @@ export default function AdapterOrExtensionManager() {
     }
 
     try {
-      let adaptersArguments: AddAdapterArguments[] = [];
+      let adaptersArguments: AddAdaptersArguments[] = [];
 
       // Set the `Add` button states to true for all selected adapters
       for (const adapterName in selections) {
         if (selections[adapterName]) {
-          // @todo check for extension
           // Get adapterOrExtensionId from `defaultAdaptersAndExtensions`
           const {
             adapterId,
+            contractAddress,
           }: AdaptersAndExtensionsType = defaultAdaptersAndExtensions.filter(
             (a: AdaptersAndExtensionsType) => a.name === adapterName
           )[0];
 
-          // Get adapter contract address
-          const {contractAddress} = getAdapterOrExtensionFromRedux(
-            adapterName as DaoAdapterConstants
-          );
+          let adapterContractAddress = contractAddress;
+
+          if (!adapterContractAddress) {
+            // Get adapter contract address from redux
+            let contractAddressFromRedux = getAdapterOrExtensionFromRedux(
+              adapterName as DaoAdapterConstants
+            );
+
+            adapterContractAddress = contractAddressFromRedux?.contractAddress;
+          }
 
           // Get adapters access control layer (acl)
           // these are the functions the adapter will have access to
           const {acl} = getAccessControlLayer(adapterName);
 
-          // skip if adapterId undefined
-          adapterId &&
-            adaptersArguments.push([adapterId, contractAddress, acl]);
+          // skip if `adapterId` or `adapterContractAddress` are undefined
+          if (adapterId && adapterContractAddress) {
+            adaptersArguments.push([
+              adapterId,
+              adapterContractAddress,
+              acl,
+            ] as AddAdaptersArguments);
 
-          setIsInProcess((prevState) => ({
-            ...prevState,
-            [adapterName]: true,
-          }));
+            setIsInProcess((prevState) => ({
+              ...prevState,
+              [adapterName]: true,
+            }));
+          }
         }
       }
 
-      const addAdaptersArguments: [string, AddAdapterArguments[]] = [
+      const addAdaptersArguments: [string, AddAdaptersArguments[]] = [
         dao?.daoAddress,
         adaptersArguments,
       ];
@@ -430,8 +461,12 @@ export default function AdapterOrExtensionManager() {
         txArguments
       );
 
-      // enable buttons @todo
-      // re-init contracts @todo
+      // init adapter contracts to the store for all added adapters
+      for (const adapterName in selections) {
+        if (selections[adapterName]) {
+          adapterName && initAdapterExtensionContract(adapterName);
+        }
+      }
     } catch (error) {
       const errorMessage = new Error(
         error && error?.code === 4001
@@ -499,7 +534,7 @@ export default function AdapterOrExtensionManager() {
     // Update the select all checkbox
     setSelectAll(checked);
 
-    // Update all un-registered adapter/extension
+    // Update all un-registered adapters only
     for (const key in selections) {
       setSelections((s) => ({
         ...s,
@@ -509,10 +544,9 @@ export default function AdapterOrExtensionManager() {
   }
 
   function handleSelectTargetChange({event, selectedTargetOption}: any): void {
+    // @todo Remove previously selected target if its from an `options` list
     // update the prior selected target to track the change
     // so we can remove the old target from checkbox `selections`
-
-    // @todo Remove previously selected target if its from an `options` list
 
     setSelections((s) => ({
       ...s,
@@ -649,12 +683,12 @@ export default function AdapterOrExtensionManager() {
           unRegisteredAdaptersOrExtensions &&
           unRegisteredAdaptersOrExtensions?.length > 0 &&
           unRegisteredAdaptersOrExtensions.map(
-            (adapter: Record<string, any>, idx: number) => (
+            (adapterOrExtension: Record<string, any>, idx: number) => (
               <div className="adapter-extension__grid unregistered" key={idx}>
                 {/** RENDER ADAPTER/EXTENSION DROPDOWN */}
-                {adapter?.options ? (
+                {adapterOrExtension?.options ? (
                   <AdapterExtensionSelectTarget
-                    adapterOrExtension={adapter}
+                    adapterOrExtension={adapterOrExtension}
                     renderCheckboxAction={({selectedTargetOption}) => {
                       return (
                         <>
@@ -671,7 +705,7 @@ export default function AdapterOrExtensionManager() {
                               disabled={
                                 isDisabled ||
                                 selectedTargetOption === null ||
-                                adapter?.isExtension
+                                adapterOrExtension?.isExtension
                               }
                               name={selectedTargetOption || ''}
                               size={CheckboxSize.LARGE}
@@ -731,31 +765,35 @@ export default function AdapterOrExtensionManager() {
                     {/** RENDER ADAPTER/EXTENSION */}
                     <div className="adapter-extension__inner-wrapper ">
                       <div className="adapter-extension__checkbox">
-                        <Checkbox
-                          id={adapter.name}
-                          label={''}
-                          checked={
-                            (selections && selections[adapter.name] === true) ||
-                            false
-                          }
-                          disabled={isDisabled}
-                          name={adapter.name}
-                          size={CheckboxSize.LARGE}
-                          onChange={(event) => {
-                            setSelections((s) => ({
-                              ...s,
-                              [adapter.name]: event.target.checked,
-                            }));
-                          }}
-                        />
+                        {!adapterOrExtension?.isExtension && (
+                          <Checkbox
+                            id={adapterOrExtension.name}
+                            label={''}
+                            checked={
+                              (selections &&
+                                selections[adapterOrExtension.name] === true) ||
+                              false
+                            }
+                            disabled={isDisabled}
+                            name={adapterOrExtension.name}
+                            size={CheckboxSize.LARGE}
+                            onChange={(event) => {
+                              setSelections((s) => ({
+                                ...s,
+                                [adapterOrExtension.name]: event.target.checked,
+                              }));
+                            }}
+                          />
+                        )}
                       </div>
 
                       <div className="adapter-extension__info">
                         <span className="adapter-extension__name">
-                          {adapter.name} {adapter?.isExtension && '(EXTENSION)'}
+                          {adapterOrExtension.name}{' '}
+                          {adapterOrExtension?.isExtension && '(EXTENSION)'}
                         </span>
                         <span className="adapter-extension__desc">
-                          {adapter.description}
+                          {adapterOrExtension.description}
                         </span>
                       </div>
                     </div>
@@ -764,18 +802,19 @@ export default function AdapterOrExtensionManager() {
                       <button
                         className="button--secondary"
                         disabled={
-                          (isInProcess && isInProcess[adapter.name]) ||
-                          (isDone && isDone[adapter.name]) ||
+                          (isInProcess &&
+                            isInProcess[adapterOrExtension.name]) ||
+                          (isDone && isDone[adapterOrExtension.name]) ||
                           isDisabled
                         }
                         onClick={() =>
-                          adapter?.isExtension
-                            ? handleAddExtension(adapter)
-                            : handleAddAdapter(adapter)
+                          adapterOrExtension?.isExtension
+                            ? handleAddExtension(adapterOrExtension)
+                            : handleAddAdapter(adapterOrExtension)
                         }>
-                        {isInProcess && isInProcess[adapter.name] ? (
+                        {isInProcess && isInProcess[adapterOrExtension.name] ? (
                           <Loader />
-                        ) : isDone && isDone[adapter.name] ? (
+                        ) : isDone && isDone[adapterOrExtension.name] ? (
                           'Done'
                         ) : (
                           'Add'

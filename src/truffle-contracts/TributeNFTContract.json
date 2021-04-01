@@ -1,24 +1,5 @@
 [
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "applicant",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes32",
-        "name": "cause",
-        "type": "bytes32"
-      }
-    ],
-    "name": "FailedOnboarding",
-    "type": "event"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -88,27 +69,17 @@
       },
       {
         "internalType": "address",
-        "name": "proposer",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "tokenToMint",
+        "name": "nftAddr",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "requestAmount",
+        "name": "nftTokenId",
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
-        "name": "tributeAmount",
+        "name": "requestedShares",
         "type": "uint256"
       }
     ],
@@ -152,6 +123,24 @@
     "inputs": [
       {
         "internalType": "contract DaoRegistry",
+        "name": "dao",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "nftToCollect",
+        "type": "address"
+      }
+    ],
+    "name": "configureDao",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract DaoRegistry",
         "name": "",
         "type": "address"
       },
@@ -166,37 +155,29 @@
         "type": "address"
       },
       {
-        "internalType": "uint256",
+        "internalType": "address",
         "name": "",
-        "type": "uint256"
+        "type": "address"
       },
       {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "name": "provideTributeNFT",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
       },
       {
         "internalType": "address",
-        "name": "tokenAddrToMint",
+        "name": "",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
-    "name": "configureDao",
+    "name": "provideTribute",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -213,31 +194,21 @@
       },
       {
         "internalType": "address",
-        "name": "applicant",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "tokenToMint",
+        "name": "nftAddr",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "requestAmount",
+        "name": "nftTokenId",
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "tokenAddr",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
-        "name": "tributeAmount",
+        "name": "requestedShares",
         "type": "uint256"
       }
     ],
-    "name": "provideTribute",
+    "name": "provideTributeNFT",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -299,6 +270,40 @@
     "name": "processProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "name": "onERC721Received",
+    "outputs": [
+      {
+        "internalType": "bytes4",
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "stateMutability": "pure",
     "type": "function"
   }
 ]

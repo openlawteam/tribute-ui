@@ -4,6 +4,7 @@ import {useDispatch} from 'react-redux';
 import {
   initContractDaoFactory,
   initContractBankExtension,
+  initContractBankFactory,
   initContractDaoRegistry,
   initContractDistribute,
   initContractManaging,
@@ -15,6 +16,9 @@ import {
   initContractTribute,
   initRegisteredVotingAdapter,
   initContractWithdraw,
+  initContractTributeNFT,
+  initContractNFTExtension,
+  initContractCouponOnboarding,
 } from '../../../store/actions';
 import {ReduxDispatch} from '../../../store/types';
 import {useIsDefaultChain} from './useIsDefaultChain';
@@ -63,6 +67,7 @@ export function useInitContracts(): () => Promise<void> {
 
       // Init more contracts
       await dispatch(initContractDaoFactory(web3Instance));
+      await dispatch(initContractBankFactory(web3Instance));
       await dispatch(initContractConfiguration(web3Instance));
       await dispatch(initContractFinancing(web3Instance));
       await dispatch(initContractGuildKick(web3Instance));
@@ -76,6 +81,9 @@ export function useInitContracts(): () => Promise<void> {
       await dispatch(initContractTribute(web3Instance));
       await dispatch(initContractDistribute(web3Instance));
       await dispatch(initRegisteredVotingAdapter(web3Instance));
+      await dispatch(initContractTributeNFT(web3Instance));
+      await dispatch(initContractNFTExtension(web3Instance));
+      await dispatch(initContractCouponOnboarding(web3Instance));
     } catch (error) {
       throw error;
     }

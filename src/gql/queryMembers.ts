@@ -2,7 +2,7 @@ import {gql} from '@apollo/client';
 
 export const GET_MEMBERS = gql`
   query GetMembers($daoAddress: String) {
-    molochv3S(where: {daoAddress: $daoAddress}) {
+    tributeDaos(where: {daoAddress: $daoAddress}) {
       members(orderBy: createdAt, orderDirection: desc) {
         createdAt
         address: memberAddress

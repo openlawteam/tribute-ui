@@ -107,6 +107,25 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "isNotReservedAddress",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "flags",
         "type": "uint256"
@@ -190,9 +209,9 @@
             "type": "address"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint128",
             "name": "flags",
-            "type": "uint256"
+            "type": "uint128"
           }
         ],
         "internalType": "struct DaoFactory.Adapter[]",
@@ -230,9 +249,9 @@
             "type": "address"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint128",
             "name": "flags",
-            "type": "uint256"
+            "type": "uint128"
           }
         ],
         "internalType": "struct DaoFactory.Adapter[]",
@@ -265,9 +284,9 @@
             "type": "address"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint128",
             "name": "flags",
-            "type": "uint256"
+            "type": "uint128"
           }
         ],
         "internalType": "struct DaoFactory.Adapter",

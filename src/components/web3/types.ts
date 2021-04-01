@@ -24,6 +24,15 @@ export enum ContractAdapterNames {
   tribute = 'tribute',
   voting = 'voting',
   withdraw = 'withdraw',
+  tribute_nft = 'tribute-nft',
+}
+
+/**
+ * These are custom adapters that don't exist in
+ * DaoContracts
+ */
+export enum OtherContractAdapterNames {
+  coupon_onboarding = 'coupon-onboarding',
 }
 
 /**
@@ -33,6 +42,7 @@ export enum ContractAdapterNames {
  */
 export enum ContractExtensionNames {
   bank = 'bank',
+  nft = 'nft',
 }
 
 /**

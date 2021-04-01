@@ -16,9 +16,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint256",
+        "internalType": "uint160",
         "name": "amount",
-        "type": "uint256"
+        "type": "uint160"
       }
     ],
     "name": "NewBalance",
@@ -41,9 +41,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint256",
+        "internalType": "uint160",
         "name": "amount",
-        "type": "uint256"
+        "type": "uint160"
       }
     ],
     "name": "Withdraw",
@@ -185,6 +185,38 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "isNotReservedAddress",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxExternalTokens",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "stateMutability": "view",
@@ -344,6 +376,19 @@
   {
     "inputs": [
       {
+        "internalType": "uint8",
+        "name": "maxTokens",
+        "type": "uint8"
+      }
+    ],
+    "name": "setMaxExternalTokens",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "token",
         "type": "address"
@@ -378,25 +423,6 @@
     "name": "updateToken",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "applicant",
-        "type": "address"
-      }
-    ],
-    "name": "isNotReservedAddress",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -566,9 +592,9 @@
     "name": "balanceOf",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint160",
         "name": "",
-        "type": "uint256"
+        "type": "uint160"
       }
     ],
     "stateMutability": "view",

@@ -112,32 +112,6 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "memberAddr",
-        "type": "address"
-      }
-    ],
-    "name": "MemberJailed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "memberAddr",
-        "type": "address"
-      }
-    ],
-    "name": "MemberUnjailed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "bytes32",
         "name": "proposalId",
         "type": "bytes32"
@@ -166,6 +140,12 @@
         "internalType": "uint256",
         "name": "flags",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "votingAdapter",
+        "type": "address"
       }
     ],
     "name": "SponsoredProposal",
@@ -349,6 +329,25 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "isNotReservedAddress",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
@@ -464,6 +463,25 @@
         "internalType": "enum DaoRegistry.DaoState",
         "name": "",
         "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "votingAdapter",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -611,29 +629,6 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "adapterId",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "adapterAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "acl",
-        "type": "uint256"
-      }
-    ],
-    "name": "addAdapter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "extensionAddress",
         "type": "address"
@@ -660,9 +655,29 @@
         "internalType": "bytes32",
         "name": "adapterId",
         "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "adapterAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint128",
+        "name": "acl",
+        "type": "uint128"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "keys",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "values",
+        "type": "uint256[]"
       }
     ],
-    "name": "removeAdapter",
+    "name": "replaceAdapter",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -812,32 +827,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "memberAddr",
-        "type": "address"
-      }
-    ],
-    "name": "jailMember",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "memberAddr",
-        "type": "address"
-      }
-    ],
-    "name": "unjailMember",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "bytes32",
         "name": "proposalId",
         "type": "bytes32"
@@ -858,6 +847,11 @@
       {
         "internalType": "address",
         "name": "sponsoringMember",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "votingAdapterAddr",
         "type": "address"
       }
     ],
@@ -994,25 +988,6 @@
     "name": "updateDelegateKey",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "applicant",
-        "type": "address"
-      }
-    ],
-    "name": "isNotReservedAddress",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "pure",
     "type": "function"
   },
   {

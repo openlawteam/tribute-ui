@@ -7,7 +7,6 @@ import {getAdapterOrExtensionId} from './helpers';
 
 import {
   DEFAULT_CHAIN,
-  BANK_EXTENSION_CONTRACT_ADDRESS,
   CONFIGURATION_CONTRACT_ADDRESS,
   FINANCING_CONTRACT_ADDRESS,
   GUILDKICK_CONTRACT_ADDRESS,
@@ -19,27 +18,40 @@ import {
   WITHDRAW_CONTRACT_ADDRESS,
   OFFCHAINVOTING_CONTRACT_ADDRESS,
   DISTRIBUTE_CONTRACT_ADDRESS,
+  COUPONONBOARDING_CONTRACT_ADDRESS,
+  NFT_EXTENSION_CONTRACT_ADDRESS,
+  TRIBUTE_NFT_CONTRACT_ADDRESS,
 } from '../../config';
 
 type AdapterProps = {
+  abiFunctionName: string;
   adapterId?: string;
-  extensionId?: string;
-  name: string;
   contractAddress: string;
   description: string;
-  abiFunctionName: string;
+  extensionId?: string;
+  name: string;
+  /**
+   * Sets the access control for a particular adapter (by address)
+   * to a specific extension. Both adapter and extension need to be
+   * already registered to the DAO.
+   *
+   * We call the `setAclToExtensionForAdapter` function from the
+   * DaoRegistry, and set the access for each adapter based on this flag
+   */
+  setAclToExtensionForAdapter?: boolean;
 };
 
 export type AdaptersAndExtensionsType = {
   isExtension?: boolean;
   options?: Omit<
     AdapterProps,
+    | 'abiFunctionName'
     | 'adapterId'
+    | 'contractAddress'
+    | 'description'
     | 'extensionId'
     | 'name'
-    | 'description'
-    | 'contractAddress'
-    | 'abiFunctionName'
+    | 'setAclToExtensionForAdapter'
   >;
   optionDefaultTarget?: DaoAdapterConstants;
 } & Partial<AdapterProps>;
@@ -57,15 +69,6 @@ export type AdaptersAndExtensionsType = {
  *    - Choosing an adapter/extension from a group: must be defined within a nested `options` key
  */
 export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
-  {
-    isExtension: true,
-    name: DaoExtensionConstants.BANK,
-    extensionId: getAdapterOrExtensionId(DaoExtensionConstants.BANK),
-    contractAddress: BANK_EXTENSION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    abiFunctionName: 'configureExtension',
-    description:
-      'Adds the banking capabilities to the DAO, and keeps track of the DAO accounts and internal token balances.',
-  },
   {
     name: DaoAdapterConstants.CONFIGURATION,
     adapterId: getAdapterOrExtensionId(DaoAdapterConstants.CONFIGURATION),
@@ -102,7 +105,7 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
     name: DaoAdapterConstants.MANAGING,
     adapterId: getAdapterOrExtensionId(DaoAdapterConstants.MANAGING),
     contractAddress: MANAGING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    abiFunctionName: 'createAdapterChangeRequest',
+    abiFunctionName: 'submitProposal',
     description:
       'Enhances the DAO capabilities by adding/updating the DAO Adapters through a voting process.',
   },
@@ -131,6 +134,14 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
       'Allows potential and existing DAO members to contribute any amount of ERC-20 tokens to the DAO in exchange for any amount of DAO internal tokens.',
   },
   {
+    name: DaoAdapterConstants.TRIBUTE_NFT,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.TRIBUTE_NFT),
+    contractAddress: TRIBUTE_NFT_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    abiFunctionName: 'provideTributeNFT',
+    description:
+      'Allows potential DAO members to contribute a registered ERC-721 asset to the DAO in exchange for any amount of DAO shares.',
+  },
+  {
     options: [
       {
         name: DaoAdapterConstants.VOTING,
@@ -140,6 +151,7 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
         abiFunctionName: 'configureDao',
         description:
           'Adds the offchain voting governance process to the DAO to support gasless voting.',
+        setAclToExtensionForAdapter: true,
       },
       {
         name: DaoAdapterConstants.VOTING,
@@ -149,6 +161,7 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
         abiFunctionName: 'configureDao',
         description:
           'Adds the simple on chain voting governance process to the DAO.',
+        setAclToExtensionForAdapter: true,
       },
     ],
     optionDefaultTarget: DaoAdapterConstants.VOTING,
@@ -160,5 +173,22 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
     abiFunctionName: 'withdraw',
     description:
       'Allows the members to withdraw their funds from the DAO bank.',
+  },
+  {
+    name: OtherAdapterConstants.COUPON_ONBOARDING,
+    adapterId: getAdapterOrExtensionId(OtherAdapterConstants.COUPON_ONBOARDING),
+    contractAddress: COUPONONBOARDING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    abiFunctionName: 'configureDao',
+    description:
+      'Provides a way to onboard an initial group of members quickly without requiring multiple proposals.',
+  },
+  {
+    isExtension: true,
+    name: DaoExtensionConstants.NFT,
+    extensionId: getAdapterOrExtensionId(DaoExtensionConstants.NFT),
+    contractAddress: NFT_EXTENSION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    abiFunctionName: 'registerPotentialNewNFT',
+    description:
+      'Adds to the DAO the capability of managing and curate a collection of standard NFTs.',
   },
 ];
