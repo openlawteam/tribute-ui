@@ -9,6 +9,7 @@ import {multicall, MulticallTuple} from '../../web3/helpers';
 import {SHARES_ADDRESS, TOTAL_ADDRESS} from '../../../config';
 import {SnapshotProposal, VotingResult} from '../types';
 import {StoreState} from '../../../store/types';
+import {useIsMounted} from '../../../hooks';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VoteChoices} from '../../web3/types';
 
@@ -67,6 +68,7 @@ export function useOffchainVotingResults(
    */
 
   const {web3Instance} = useWeb3Modal();
+  const {isMountedRef} = useIsMounted();
 
   /**
    * Variables
@@ -139,11 +141,15 @@ export function useOffchainVotingResults(
     Promise.all(votingResultPromises)
       .then((p) => p.filter((p) => p) as OffchainVotingResultEntries)
       .then((r) => {
+        if (!isMountedRef) return;
+
         setOffchainVotingResultsStatus(AsyncStatus.FULFILLED);
         setVotingResults(r);
         setOffchainVotingResultsError(undefined);
       })
       .catch((error) => {
+        if (!isMountedRef) return;
+
         setOffchainVotingResultsStatus(AsyncStatus.REJECTED);
         setVotingResults([]);
         setOffchainVotingResultsError(error);
@@ -152,6 +158,7 @@ export function useOffchainVotingResults(
     bankAddress,
     getPriorAmountABI,
     getSharesPerChoiceCached,
+    isMountedRef,
     proposals,
     web3Instance,
   ]);
