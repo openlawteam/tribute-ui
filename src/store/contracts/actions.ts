@@ -365,6 +365,7 @@ export function initContractNFTExtension(
     adapterNameForRedux: DaoExtensionConstants.NFT,
     adapterOrExtensionName: ContractExtensionNames.nft,
     contractAddress,
+    isExtension: true,
     lazyImport: () => import('../../truffle-contracts/NFTExtension.json'),
     web3Instance,
   });
