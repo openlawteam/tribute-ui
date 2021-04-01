@@ -39,11 +39,11 @@ jobs:
         env:
           REACT_APP_ENVIRONMENT: development
           REACT_APP_INFURA_PROJECT_ID_DEV: ${{ secrets.REACT_APP_INFURA_PROJECT_ID_DEV }}
-          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0x83eA12d54D5DCF88FeD2fB80dcEa1336A8Ac8924"
-          REACT_APP_MULTICALL_CONTRACT_ADDRESS: "0xE1306199D95a1Ee0Ef155A984B0a0B50F7B0c216"
+          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0xaC87308bB216124fD84BbC3356073f4DFecacF6e"
+          REACT_APP_MULTICALL_CONTRACT_ADDRESS: "0x8AF7413a544176647a17937813AFcF00Fb7ED0bB"
           REACT_APP_SNAPSHOT_HUB_API_URL: https://snapshot-hub-erc712.dev.thelao.io
           REACT_APP_SNAPSHOT_SPACE: tribute
-          REACT_APP_GRAPH_API_URL: https://api.thegraph.com/subgraphs/name/sophiacodes/molochv3-dev
+          REACT_APP_GRAPH_API_URL: https://api.thegraph.com/subgraphs/name/openlawteam/tribute-dev
         run: npm run build
 
       - name: Deploy to GitHub Pages site
