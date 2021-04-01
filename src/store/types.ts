@@ -1,7 +1,9 @@
 import {Action} from 'redux';
 import {ThunkDispatch} from 'redux-thunk';
-import {AbiItem} from 'web3-utils/types';
-import {Contract as Web3Contract} from 'web3-eth-contract/types';
+
+import {ConnectedMemberState} from './connectedMember/types';
+import {ContractsState} from './contracts/types';
+import {SubgraphNetworkStatusState} from './subgraphNetworkStatus/types';
 
 import {
   DaoAdapterConstants,
@@ -9,7 +11,6 @@ import {
   OtherAdapterConstants,
   VotingAdapterName,
 } from '../components/adapters-extensions/enums';
-import {SubgraphNetworkStatusState} from './subgraphNetworkStatus/types';
 
 export type ContractsState = {
   BankExtensionContract: ContractsStateEntry | null;

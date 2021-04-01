@@ -1,7 +1,8 @@
 import {Dispatch} from 'redux';
 
 import {BURN_ADDRESS} from '../../util/constants';
-import {ConnectedMemberState, ContractsStateEntry} from '../types';
+import {ConnectedMemberState} from '../connectedMember/types';
+import {ContractsStateEntry} from '../contracts/types';
 import {normalizeString} from '../../util/helpers';
 
 export const SET_CONNECTED_MEMBER = 'SET_CONNECTED_MEMBER';

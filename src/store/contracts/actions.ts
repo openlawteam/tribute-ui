@@ -13,9 +13,10 @@ import {
   DAO_FACTORY_CONTRACT_ADDRESS,
   DAO_REGISTRY_CONTRACT_ADDRESS,
 } from '../../config';
-import {ContractsStateEntry, StoreState} from '../types';
+import {ContractsStateEntry} from '../contracts/types';
 import {getAdapterAddress} from '../../components/web3/helpers';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
+import {StoreState} from '../types';
 import {
   DaoAdapterConstants,
   DaoExtensionConstants,

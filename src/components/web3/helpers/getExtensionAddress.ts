@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 
-import {ContractsStateEntry} from '../../../store/types';
+import {ContractsStateEntry} from '../../../store/contracts/types';
 import {ContractExtensionNames} from '../types';
 
 export async function getExtensionAddress(

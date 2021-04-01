@@ -1,4 +1,4 @@
-import {ContractsStateEntry} from '../../../store/types';
+import {ContractsStateEntry} from '../../../store/contracts/types';
 
 export enum DaoState {
   CREATION = 'CREATION',
