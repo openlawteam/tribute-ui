@@ -112,32 +112,6 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "memberAddr",
-        "type": "address"
-      }
-    ],
-    "name": "MemberJailed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "memberAddr",
-        "type": "address"
-      }
-    ],
-    "name": "MemberUnjailed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "bytes32",
         "name": "proposalId",
         "type": "bytes32"
@@ -344,6 +318,25 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "isNotReservedAddress",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -809,32 +802,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "memberAddr",
-        "type": "address"
-      }
-    ],
-    "name": "jailMember",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "memberAddr",
-        "type": "address"
-      }
-    ],
-    "name": "unjailMember",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "bytes32",
         "name": "proposalId",
         "type": "bytes32"
@@ -991,25 +958,6 @@
     "name": "updateDelegateKey",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "applicant",
-        "type": "address"
-      }
-    ],
-    "name": "isNotReservedAddress",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "pure",
     "type": "function"
   },
   {

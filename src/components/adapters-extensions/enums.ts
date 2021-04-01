@@ -14,16 +14,19 @@ export enum DaoAdapterConstants {
   MANAGING = 'managing',
   RAGEQUIT = 'ragequit',
   TRIBUTE = 'tribute',
+  TRIBUTE_NFT = 'tribute-nft',
   VOTING = 'voting',
   WITHDRAW = 'withdraw',
 }
 
 export enum OtherAdapterConstants {
   OFFCHAINVOTING = 'offchainvoting',
+  COUPONON_BOARDING = 'coupon-onboarding',
 }
 
 export enum DaoExtensionConstants {
   BANK = 'bank',
+  NFT = 'nft',
 }
 
 /**

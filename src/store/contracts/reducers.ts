@@ -14,22 +14,27 @@ import {
   CONTRACT_VOTING_OP_ROLLUP,
   CONTRACT_VOTING,
   CONTRACT_WITHDRAW,
+  CONTRACT_TRIBUTE_NFT,
 } from '../actions';
 import {ContractsState} from '../types';
+import {CONTRACT_COUPON_ONBOARDING, CONTRACT_NFT_EXTENSION} from './actions';
 
 const initialState = {
   BankExtensionContract: null,
   BankFactoryContract: null,
   ConfigurationContract: null,
+  CouponOnboardingContract: null,
   DaoFactoryContract: null,
   DaoRegistryContract: null,
   DistributeContract: null,
   FinancingContract: null,
   GuildBankContract: null,
   ManagingContract: null,
+  NFTExtensionContract: null,
   OnboardingContract: null,
   RagequitContract: null,
   TributeContract: null,
+  TributeNFTContract: null,
   VotingContract: null,
   WithdrawContract: null,
 };
@@ -71,6 +76,12 @@ export default function reducer(
       return contractVoting(state, payload);
     case CONTRACT_WITHDRAW:
       return contractWithdraw(state, payload);
+    case CONTRACT_TRIBUTE_NFT:
+      return contractTributeNFT(state, payload);
+    case CONTRACT_COUPON_ONBOARDING:
+      return contractCouponOnboarding(state, payload);
+    case CONTRACT_NFT_EXTENSION:
+      return contractNFTExtension(state, payload);
     default:
       return state;
   }
@@ -136,4 +147,25 @@ function contractManaging(state: ContractsState, payload: any): ContractsState {
 
 function contractWithdraw(state: ContractsState, payload: any): ContractsState {
   return {...state, WithdrawContract: {...payload}};
+}
+
+function contractTributeNFT(
+  state: ContractsState,
+  payload: any
+): ContractsState {
+  return {...state, TributeNFTContract: {...payload}};
+}
+
+function contractCouponOnboarding(
+  state: ContractsState,
+  payload: any
+): ContractsState {
+  return {...state, CouponOnboardingContract: {...payload}};
+}
+
+function contractNFTExtension(
+  state: ContractsState,
+  payload: any
+): ContractsState {
+  return {...state, NFTExtensionContract: {...payload}};
 }

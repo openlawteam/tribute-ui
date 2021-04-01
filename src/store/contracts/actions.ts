@@ -5,6 +5,7 @@ import {Dispatch} from 'redux';
 import {
   ContractAdapterNames,
   ContractExtensionNames,
+  OtherContractAdapterNames,
 } from '../../components/web3/types';
 import {
   DEFAULT_CHAIN,
@@ -18,6 +19,7 @@ import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAdd
 import {
   DaoAdapterConstants,
   DaoExtensionConstants,
+  OtherAdapterConstants,
   VotingAdapterName,
 } from '../../components/adapters-extensions/enums';
 
@@ -36,7 +38,10 @@ type ContractAction =
   | typeof CONTRACT_TRIBUTE
   | typeof CONTRACT_VOTING
   | typeof CONTRACT_VOTING_OP_ROLLUP
-  | typeof CONTRACT_WITHDRAW;
+  | typeof CONTRACT_WITHDRAW
+  | typeof CONTRACT_TRIBUTE_NFT
+  | typeof CONTRACT_COUPON_ONBOARDING
+  | typeof CONTRACT_NFT_EXTENSION;
 
 export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
 export const CONTRACT_BANK_FACTORY = 'CONTRACT_BANK_FACTORY';
@@ -53,6 +58,9 @@ export const CONTRACT_TRIBUTE = 'CONTRACT_TRIBUTE';
 export const CONTRACT_VOTING = 'CONTRACT_VOTING';
 export const CONTRACT_VOTING_OP_ROLLUP = 'CONTRACT_VOTING_OP_ROLLUP';
 export const CONTRACT_WITHDRAW = 'CONTRACT_WITHDRAW';
+export const CONTRACT_TRIBUTE_NFT = 'CONTRACT_TRIBUTE_NFT';
+export const CONTRACT_COUPON_ONBOARDING = 'CONTRACT_COUPON_ONBOARDING';
+export const CONTRACT_NFT_EXTENSION = 'CONTRACT_NFT_EXTENSION';
 
 export function initContractBankFactory(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {
@@ -318,6 +326,49 @@ export function initContractConfiguration(
   });
 }
 
+export function initContractTributeNFT(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_TRIBUTE_NFT,
+    adapterNameForRedux: DaoAdapterConstants.TRIBUTE_NFT,
+    adapterOrExtensionName: ContractAdapterNames.tribute_nft,
+    contractAddress,
+    lazyImport: () => import('../../truffle-contracts/TributeNFTContract.json'),
+    web3Instance,
+  });
+}
+
+export function initContractCouponOnboarding(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_COUPON_ONBOARDING,
+    adapterNameForRedux: OtherAdapterConstants.COUPONON_BOARDING,
+    adapterOrExtensionName: OtherContractAdapterNames.coupon_onboarding,
+    contractAddress,
+    lazyImport: () =>
+      import('../../truffle-contracts/CouponOnboardingContract.json'),
+    web3Instance,
+  });
+}
+
+export function initContractNFTExtension(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_NFT_EXTENSION,
+    adapterNameForRedux: DaoExtensionConstants.NFT,
+    adapterOrExtensionName: ContractExtensionNames.nft,
+    contractAddress,
+    lazyImport: () => import('../../truffle-contracts/NFTExtension.json'),
+    web3Instance,
+  });
+}
+
 /**
  * Inits the currently registered `voting` contract.
  *
@@ -415,7 +466,10 @@ export function initContractThunkFactory({
   web3Instance,
 }: {
   actionType: ContractAction;
-  adapterOrExtensionName: ContractAdapterNames | ContractExtensionNames;
+  adapterOrExtensionName:
+    | ContractAdapterNames
+    | ContractExtensionNames
+    | OtherContractAdapterNames;
   /**
    * The name to be shown in Redux state as `adapterOrExtensionName`.
    */

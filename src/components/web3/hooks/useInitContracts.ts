@@ -16,6 +16,9 @@ import {
   initContractTribute,
   initRegisteredVotingAdapter,
   initContractWithdraw,
+  initContractTributeNFT,
+  initContractNFTExtension,
+  initContractCouponOnboarding,
 } from '../../../store/actions';
 import {ReduxDispatch} from '../../../store/types';
 import {useIsDefaultChain} from './useIsDefaultChain';
@@ -78,6 +81,9 @@ export function useInitContracts(): () => Promise<void> {
       await dispatch(initContractTribute(web3Instance));
       await dispatch(initContractDistribute(web3Instance));
       await dispatch(initRegisteredVotingAdapter(web3Instance));
+      await dispatch(initContractTributeNFT(web3Instance));
+      await dispatch(initContractNFTExtension(web3Instance));
+      await dispatch(initContractCouponOnboarding(web3Instance));
     } catch (error) {
       throw error;
     }

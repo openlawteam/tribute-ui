@@ -6,6 +6,7 @@ import {Contract as Web3Contract} from 'web3-eth-contract/types';
 import {
   DaoAdapterConstants,
   DaoExtensionConstants,
+  OtherAdapterConstants,
   VotingAdapterName,
 } from '../components/adapters-extensions/enums';
 import {SubgraphNetworkStatusState} from './subgraphNetworkStatus/types';
@@ -13,15 +14,18 @@ import {SubgraphNetworkStatusState} from './subgraphNetworkStatus/types';
 export type ContractsState = {
   BankExtensionContract: ContractsStateEntry | null;
   ConfigurationContract: ContractsStateEntry | null;
+  CouponOnboardingContract: ContractsStateEntry | null;
   DaoFactoryContract: ContractsStateEntry | null;
   DaoRegistryContract: ContractsStateEntry | null;
   DistributeContract: ContractsStateEntry | null;
   FinancingContract: ContractsStateEntry | null;
   GuildBankContract: ContractsStateEntry | null;
   ManagingContract: ContractsStateEntry | null;
+  NFTExtensionContract: ContractsStateEntry | null;
   OnboardingContract: ContractsStateEntry | null;
   RagequitContract: ContractsStateEntry | null;
   TributeContract: ContractsStateEntry | null;
+  TributeNFTContract: ContractsStateEntry | null;
   VotingContract: ContractsStateEntry | null;
   WithdrawContract: ContractsStateEntry | null;
 };
@@ -53,6 +57,7 @@ export type ContractsStateEntry = {
   adapterOrExtensionName?:
     | DaoAdapterConstants
     | DaoExtensionConstants
+    | OtherAdapterConstants
     | VotingAdapterName;
   /**
    * Address of the instantiated contract
