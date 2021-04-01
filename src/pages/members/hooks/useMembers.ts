@@ -133,7 +133,7 @@ export default function useMembers(): UseMembersReturn {
 
       if (!loading && data) {
         // extract members from gql data
-        const {members} = data.molochv3S[0] as Record<string, any>;
+        const {members} = data.tributeDaos[0] as Record<string, any>;
         // Filter out any member that has fully ragequit (no positive balance in
         // either SHARES or LOOT)
         const filteredMembers = members.filter(
