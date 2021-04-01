@@ -89,7 +89,7 @@ export const INFURA_PROJECT_ID =
     ? REACT_APP_INFURA_PROJECT_ID_DEV
     : REACT_APP_INFURA_PROJECT_ID_LOCAL;
 
-// Infura Project Id
+// Infura API URL
 export const INFURA_API_URL: string = `${INFURA_WS_URLS[DEFAULT_CHAIN]}/${INFURA_PROJECT_ID}`;
 
 /**
