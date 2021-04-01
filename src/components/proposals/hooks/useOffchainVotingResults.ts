@@ -141,14 +141,14 @@ export function useOffchainVotingResults(
     Promise.all(votingResultPromises)
       .then((p) => p.filter((p) => p) as OffchainVotingResultEntries)
       .then((r) => {
-        if (!isMountedRef) return;
+        if (!isMountedRef.current) return;
 
         setOffchainVotingResultsStatus(AsyncStatus.FULFILLED);
         setVotingResults(r);
         setOffchainVotingResultsError(undefined);
       })
       .catch((error) => {
-        if (!isMountedRef) return;
+        if (!isMountedRef.current) return;
 
         setOffchainVotingResultsStatus(AsyncStatus.REJECTED);
         setVotingResults([]);
