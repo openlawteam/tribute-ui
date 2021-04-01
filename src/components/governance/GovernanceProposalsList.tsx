@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 
 import {AsyncStatus} from '../../util/types';
 import {BURN_ADDRESS} from '../../util/constants';
@@ -16,7 +16,19 @@ type GovernanceProposalsListProps = {
    * The `actionId` to get proposals for in Snapshot Hub.
    */
   actionId?: string;
-  onProposalClick: (id: string) => void;
+  /**
+   * Optionally provide a click handler for `ProposalCard`.
+   * The proposal's id (in Snapshot) will be provided as an argument.
+   * Defaults to noop: `() => {}`
+   */
+  onProposalClick?: (id: string) => void;
+  /**
+   * Optionally render a custom proposal card.
+   */
+  renderProposalCard?: (data: {
+    proposalData: ProposalData;
+    votingResult?: VotingResult;
+  }) => React.ReactNode;
 };
 
 type FilteredProposals = {
@@ -29,7 +41,11 @@ type FilteredProposals = {
 export default function GovernanceProposalsList(
   props: GovernanceProposalsListProps
 ): JSX.Element {
-  const {actionId = BURN_ADDRESS, onProposalClick} = props;
+  const {
+    actionId = BURN_ADDRESS,
+    onProposalClick = () => {},
+    renderProposalCard,
+  } = props;
 
   /**
    * State
@@ -165,6 +181,17 @@ export default function GovernanceProposalsList(
         ([proposalHash, _result]) =>
           normalizeString(proposalHash) === normalizeString(proposalId)
       )?.[1];
+
+      if (renderProposalCard) {
+        return (
+          <Fragment key={proposalId}>
+            {renderProposalCard({
+              proposalData: proposal,
+              votingResult: offchainResult,
+            })}
+          </Fragment>
+        );
+      }
 
       return (
         <ProposalCard

@@ -1,18 +1,23 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AbiItem, toBN} from 'web3-utils';
+import {useLazyQuery} from '@apollo/react-hooks';
+import Web3 from 'web3';
 
 import {
   SHARES_ADDRESS,
   LOOT_ADDRESS,
-  LOCKED_LOOT_ADDRESS,
+  GQL_QUERY_POLLING_INTERVAL,
 } from '../../../config';
 import {AsyncStatus} from '../../../util/types';
 import {normalizeString} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
+import {SubgraphNetworkStatus} from '../../../store/subgraphNetworkStatus/types';
+
 import {multicall, MulticallTuple} from '../../../components/web3/helpers';
 import {useWeb3Modal} from '../../../components/web3/hooks';
-import {Member, MemberFlag} from '../types';
+import {Member} from '../types';
+import {GET_MEMBERS} from '../../../gql';
 
 type UseMembersReturn = {
   members: Member[];
@@ -23,8 +28,6 @@ type UseMembersReturn = {
 /**
  * useMembers
  *
- * @todo Get members from subgraph.
- * @todo switch/case for retrieval method based on subgraph up/down
  * @returns `UseMembersReturn` An object with the members, and the current async status.
  */
 export default function useMembers(): UseMembersReturn {
@@ -33,10 +36,13 @@ export default function useMembers(): UseMembersReturn {
    */
 
   const DaoRegistryContract = useSelector(
-    (state: StoreState) => state.contracts?.DaoRegistryContract
+    (state: StoreState) => state.contracts.DaoRegistryContract
   );
   const BankExtensionContract = useSelector(
-    (state: StoreState) => state.contracts?.BankExtensionContract
+    (state: StoreState) => state.contracts.BankExtensionContract
+  );
+  const subgraphNetworkStatus = useSelector(
+    (state: StoreState) => state.subgraphNetworkStatus.status
   );
 
   /**
@@ -44,6 +50,20 @@ export default function useMembers(): UseMembersReturn {
    */
 
   const {web3Instance, account} = useWeb3Modal();
+
+  /**
+   * GQL Query
+   */
+
+  const [
+    getMembersFromSubgraphResult,
+    {called, loading, data, error, stopPolling},
+  ] = useLazyQuery(GET_MEMBERS, {
+    pollInterval: GQL_QUERY_POLLING_INTERVAL,
+    variables: {
+      daoAddress: DaoRegistryContract?.contractAddress.toLowerCase(),
+    },
+  });
 
   /**
    * State
@@ -65,18 +85,89 @@ export default function useMembers(): UseMembersReturn {
     account,
     web3Instance,
   ]);
+  const getMembersFromSubgraphCached = useCallback(getMembersFromSubgraph, [
+    data,
+    error,
+    getMembersFromRegistryCached,
+    loading,
+    stopPolling,
+  ]);
 
   /**
    * Effects
    */
 
   useEffect(() => {
-    getMembersFromRegistryCached();
-  }, [getMembersFromRegistryCached]);
+    if (!called) {
+      getMembersFromSubgraphResult();
+    }
+  }, [called, getMembersFromSubgraphResult]);
+
+  useEffect(() => {
+    if (subgraphNetworkStatus === SubgraphNetworkStatus.OK) {
+      if (!loading && DaoRegistryContract?.contractAddress) {
+        getMembersFromSubgraphCached();
+      }
+    } else {
+      // If there is a subgraph network error fallback to fetching members info
+      // directly from smart contracts
+      stopPolling && stopPolling();
+      getMembersFromRegistryCached();
+    }
+  }, [
+    DaoRegistryContract?.contractAddress,
+    getMembersFromRegistryCached,
+    getMembersFromSubgraphCached,
+    loading,
+    stopPolling,
+    subgraphNetworkStatus,
+  ]);
 
   /**
    * Functions
    */
+
+  function getMembersFromSubgraph() {
+    try {
+      setMembersStatus(AsyncStatus.PENDING);
+
+      if (!loading && data) {
+        // extract members from gql data
+        const {members} = data.molochv3S[0] as Record<string, any>;
+        // Filter out any member that has fully ragequit (no positive balance in
+        // either SHARES or LOOT)
+        const filteredMembers = members.filter(
+          (member: Record<string, any>) => !member.didFullyRagequit
+        );
+        const filteredMembersWithDetails = filteredMembers.map(
+          (member: Record<string, any>) => {
+            // remove gql data that is no longer needed
+            const {createdAt, didFullyRagequit, ...parsedMember} = member;
+
+            return {
+              ...parsedMember,
+              // use formatted addresses
+              address: Web3.utils.toChecksumAddress(member.address),
+              delegateKey: Web3.utils.toChecksumAddress(member.delegateKey),
+            };
+          }
+        );
+
+        setMembersStatus(AsyncStatus.FULFILLED);
+        setMembers(filteredMembersWithDetails);
+      } else {
+        if (error) {
+          throw new Error(error.message);
+        }
+      }
+    } catch (error) {
+      // If there is a subgraph query error fallback to fetching members info
+      // directly from smart contracts
+      console.log(`subgraph query error: ${error.message}`);
+      stopPolling && stopPolling();
+      getMembersFromRegistryCached();
+    }
+  }
 
   async function getMembersFromRegistry() {
     if (
@@ -128,7 +219,7 @@ export default function useMembers(): UseMembersReturn {
           ]
         );
 
-        // Build calls to get member balances in SHARES, LOOT and LOCKED_LOOT
+        // Build calls to get member balances in SHARES and LOOT
         const {
           abi: bankABI,
           contractAddress: bankAddress,
@@ -149,33 +240,12 @@ export default function useMembers(): UseMembersReturn {
             [address, LOOT_ADDRESS],
           ]
         );
-        const lockedLootBalanceOfCalls = fetchedMemberAddresses.map(
-          (address): MulticallTuple => [
-            bankAddress,
-            balanceOfABI as AbiItem,
-            [address, LOCKED_LOOT_ADDRESS],
-          ]
-        );
-
-        // Build calls to check if member is jailed
-        const getMemberFlagABI = daoRegistryABI.find(
-          (item) => item.name === 'getMemberFlag'
-        );
-        const getMemberFlagCalls = fetchedMemberAddresses.map(
-          (address): MulticallTuple => [
-            daoRegistryAddress,
-            getMemberFlagABI as AbiItem,
-            [address, MemberFlag.JAILED.toString()],
-          ]
-        );
 
         // Use multicall to get details for each member address
         const calls = [
           ...memberAddressesByDelegatedKeyCalls,
           ...sharesBalanceOfCalls,
           ...lootBalanceOfCalls,
-          ...lockedLootBalanceOfCalls,
-          ...getMemberFlagCalls,
         ];
         let results = await multicall({
           calls,
@@ -185,13 +255,7 @@ export default function useMembers(): UseMembersReturn {
         while (results.length) {
           chunkedResults.push(results.splice(0, fetchedMemberAddresses.length));
         }
-        const [
-          delegateKeys,
-          sharesBalances,
-          lootBalances,
-          lockedLootBalances,
-          isJailedChecks,
-        ] = chunkedResults;
+        const [delegateKeys, sharesBalances, lootBalances] = chunkedResults;
         const membersWithDetails = fetchedMemberAddresses.map(
           (address, index) => ({
             address,
@@ -200,18 +264,19 @@ export default function useMembers(): UseMembersReturn {
               normalizeString(address) !== normalizeString(delegateKeys[index]),
             shares: sharesBalances[index],
             loot: lootBalances[index],
-            lockedLoot: lockedLootBalances[index],
-            isJailed: isJailedChecks[index],
           })
         );
 
-        // Filter out any member addresses that don't have a positive balance in either SHARES, LOOT or LOCKED_LOOT
-        const filteredMembersWithDetails = membersWithDetails.filter(
-          (member) =>
-            toBN(member.shares).gt(toBN(0)) ||
-            toBN(member.loot).gt(toBN(0)) ||
-            toBN(member.lockedLoot).gt(toBN(0))
-        );
+        // Filter out any member addresses that don't have a positive balance in
+        // either SHARES or LOOT
+        const filteredMembersWithDetails = membersWithDetails
+          .filter(
+            (member) =>
+              toBN(member.shares).gt(toBN(0)) || toBN(member.loot).gt(toBN(0))
+          )
+          // display in descending order of when the member joined (e.g., newest
+          // member first)
+          .reverse();
 
         setMembers(filteredMembersWithDetails);
       }
