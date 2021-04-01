@@ -1,30 +1,8 @@
 import {Action} from 'redux';
 import {ThunkDispatch} from 'redux-thunk';
-import {AbiItem} from 'web3-utils/types';
-import {Contract as Web3Contract} from 'web3-eth-contract/types';
 
-import {
-  DaoAdapterConstants,
-  DaoExtensionConstants,
-  VotingAdapterName,
-} from '../components/adapters-extensions/enums';
 import {SubgraphNetworkStatusState} from './subgraphNetworkStatus/types';
-
-export type ContractsState = {
-  BankExtensionContract: ContractsStateEntry | null;
-  ConfigurationContract: ContractsStateEntry | null;
-  DaoFactoryContract: ContractsStateEntry | null;
-  DaoRegistryContract: ContractsStateEntry | null;
-  DistributeContract: ContractsStateEntry | null;
-  FinancingContract: ContractsStateEntry | null;
-  GuildBankContract: ContractsStateEntry | null;
-  ManagingContract: ContractsStateEntry | null;
-  OnboardingContract: ContractsStateEntry | null;
-  RagequitContract: ContractsStateEntry | null;
-  TributeContract: ContractsStateEntry | null;
-  VotingContract: ContractsStateEntry | null;
-  WithdrawContract: ContractsStateEntry | null;
-};
+import {ContractsState} from './contracts/types';
 
 export type ConnectedMemberState = {
   delegateKey: string;
@@ -36,28 +14,6 @@ export type StoreState = {
   connectedMember: ConnectedMemberState;
   contracts: ContractsState;
   subgraphNetworkStatus: SubgraphNetworkStatusState;
-};
-
-export type ContractsStateEntry = {
-  /**
-   * Web3 `Contract` instance
-   */
-  instance: Web3Contract;
-  /**
-   * Contract JSON ABI
-   */
-  abi: AbiItem[];
-  /**
-   * (Optional) Adapter/extension name, used for the Adapter/Extension Management
-   */
-  adapterOrExtensionName?:
-    | DaoAdapterConstants
-    | DaoExtensionConstants
-    | VotingAdapterName;
-  /**
-   * Address of the instantiated contract
-   */
-  contractAddress: string;
 };
 
 /**

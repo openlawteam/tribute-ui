@@ -1,5 +1,6 @@
 import {ContractAdapterNames} from '../types';
-import {ContractsStateEntry, StoreState} from '../../../store/types';
+import {ContractsStateEntry} from '../../../store/contracts/types';
+import {StoreState} from '../../../store/types';
 
 function getContractAddressOrThrow(
   contract: ContractsStateEntry | null
