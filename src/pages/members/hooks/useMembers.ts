@@ -12,6 +12,8 @@ import {
 import {AsyncStatus} from '../../../util/types';
 import {normalizeString} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
+import {SubgraphNetworkStatus} from '../../../store/subgraphNetworkStatus/types';
+
 import {multicall, MulticallTuple} from '../../../components/web3/helpers';
 import {useWeb3Modal} from '../../../components/web3/hooks';
 import {Member} from '../types';
@@ -26,7 +28,6 @@ type UseMembersReturn = {
 /**
  * useMembers
  *
- * @todo switch/case for retrieval method based on subgraph up/down
  * @returns `UseMembersReturn` An object with the members, and the current async status.
  */
 export default function useMembers(): UseMembersReturn {
@@ -35,10 +36,13 @@ export default function useMembers(): UseMembersReturn {
    */
 
   const DaoRegistryContract = useSelector(
-    (state: StoreState) => state.contracts?.DaoRegistryContract
+    (state: StoreState) => state.contracts.DaoRegistryContract
   );
   const BankExtensionContract = useSelector(
-    (state: StoreState) => state.contracts?.BankExtensionContract
+    (state: StoreState) => state.contracts.BankExtensionContract
+  );
+  const subgraphNetworkStatus = useSelector(
+    (state: StoreState) => state.subgraphNetworkStatus.status
   );
 
   /**
@@ -53,7 +57,7 @@ export default function useMembers(): UseMembersReturn {
 
   const [
     getMembersFromSubgraphResult,
-    {called, loading, data, error},
+    {called, loading, data, error, stopPolling},
   ] = useLazyQuery(GET_MEMBERS, {
     pollInterval: GQL_QUERY_POLLING_INTERVAL,
     variables: {
@@ -75,37 +79,49 @@ export default function useMembers(): UseMembersReturn {
    * Cached callbacks
    */
 
-  const getMembersFromSubgraphCached = useCallback(getMembersFromSubgraph, [
-    data,
-    error,
-    loading,
-  ]);
   const getMembersFromRegistryCached = useCallback(getMembersFromRegistry, [
     BankExtensionContract,
     DaoRegistryContract,
     account,
     web3Instance,
   ]);
+  const getMembersFromSubgraphCached = useCallback(getMembersFromSubgraph, [
+    data,
+    error,
+    getMembersFromRegistryCached,
+    loading,
+    stopPolling,
+  ]);
 
   /**
    * Effects
    */
 
-  // useEffect(() => {
-  //   if (!called && DaoRegistryContract?.contractAddress) {
-  //     getMembersFromSubgraphResult();
-  //   }
-  //   getMembersFromSubgraphCached();
-  // }, [
-  //   DaoRegistryContract?.contractAddress,
-  //   called,
-  //   getMembersFromSubgraphCached,
-  //   getMembersFromSubgraphResult,
-  // ]);
+  useEffect(() => {
+    if (!called) {
+      getMembersFromSubgraphResult();
+    }
+  }, [called, getMembersFromSubgraphResult]);
 
   useEffect(() => {
-    getMembersFromRegistryCached();
-  }, [getMembersFromRegistryCached]);
+    if (subgraphNetworkStatus === SubgraphNetworkStatus.OK) {
+      if (!loading && DaoRegistryContract?.contractAddress) {
+        getMembersFromSubgraphCached();
+      }
+    } else {
+      // If there is a subgraph network error fallback to fetching members info
+      // directly from smart contracts
+      stopPolling && stopPolling();
+      getMembersFromRegistryCached();
+    }
+  }, [
+    DaoRegistryContract?.contractAddress,
+    getMembersFromRegistryCached,
+    getMembersFromSubgraphCached,
+    loading,
+    stopPolling,
+    subgraphNetworkStatus,
+  ]);
 
   /**
    * Functions
@@ -145,9 +161,11 @@ export default function useMembers(): UseMembersReturn {
         }
       }
     } catch (error) {
-      setMembersStatus(AsyncStatus.REJECTED);
-      setMembers([]);
-      setMembersError(error);
+      // If there is a subgraph query error fallback to fetching members info
+      // directly from smart contracts
+      console.log(`subgraph query error: ${error.message}`);
+      stopPolling && stopPolling();
+      getMembersFromRegistryCached();
     }
   }
 
