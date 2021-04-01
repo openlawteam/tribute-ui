@@ -57,6 +57,7 @@ export default function Web3ModalManager({
    * Refs
    */
 
+  // @todo Option to use `ganache.provider()`, as well?
   const defaultWeb3InstanceRef = useRef<Web3>(
     new Web3(new Web3.providers.WebsocketProvider(INFURA_API_URL))
   );
