@@ -1,14 +1,9 @@
 import {Action} from 'redux';
 import {ThunkDispatch} from 'redux-thunk';
 
-import {SubgraphNetworkStatusState} from './subgraphNetworkStatus/types';
+import {ConnectedMemberState} from './connectedMember/types';
 import {ContractsState} from './contracts/types';
-
-export type ConnectedMemberState = {
-  delegateKey: string;
-  isActiveMember: boolean;
-  memberAddress: string;
-} | null;
+import {SubgraphNetworkStatusState} from './subgraphNetworkStatus/types';
 
 export type StoreState = {
   connectedMember: ConnectedMemberState;

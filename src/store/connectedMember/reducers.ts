@@ -1,5 +1,5 @@
 import {CLEAR_CONNECTED_MEMBER, SET_CONNECTED_MEMBER} from './actions';
-import {ConnectedMemberState} from '../types';
+import {ConnectedMemberState} from './types';
 
 const INITIAL_STATE = null;
 
