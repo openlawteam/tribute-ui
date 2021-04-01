@@ -1,5 +1,24 @@
 [
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "applicant",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "cause",
+        "type": "bytes32"
+      }
+    ],
+    "name": "FailedOnboarding",
+    "type": "event"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -68,14 +87,14 @@
         "type": "address"
       },
       {
-        "internalType": "uint256",
+        "internalType": "uint160",
         "name": "amount",
-        "type": "uint256"
+        "type": "uint160"
       },
       {
-        "internalType": "uint256",
+        "internalType": "uint88",
         "name": "sharesRequested",
-        "type": "uint256"
+        "type": "uint88"
       },
       {
         "internalType": "address",
@@ -146,9 +165,9 @@
     "name": "shares",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint88",
         "name": "",
-        "type": "uint256"
+        "type": "uint88"
       }
     ],
     "stateMutability": "view",

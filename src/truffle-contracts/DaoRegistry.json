@@ -140,6 +140,12 @@
         "internalType": "uint256",
         "name": "flags",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "votingAdapter",
+        "type": "address"
       }
     ],
     "name": "SponsoredProposal",
@@ -457,6 +463,25 @@
         "internalType": "enum DaoRegistry.DaoState",
         "name": "",
         "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "votingAdapter",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -822,6 +847,11 @@
       {
         "internalType": "address",
         "name": "sponsoringMember",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "votingAdapterAddr",
         "type": "address"
       }
     ],

@@ -1,5 +1,24 @@
 [
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "applicant",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "cause",
+        "type": "bytes32"
+      }
+    ],
+    "name": "FailedOnboarding",
+    "type": "event"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
