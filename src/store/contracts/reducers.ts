@@ -16,7 +16,7 @@ import {
   CONTRACT_WITHDRAW,
   CONTRACT_TRIBUTE_NFT,
 } from '../actions';
-import {ContractsState} from '../types';
+import {ContractsState} from './types';
 import {CONTRACT_COUPON_ONBOARDING, CONTRACT_NFT_EXTENSION} from './actions';
 
 const initialState = {

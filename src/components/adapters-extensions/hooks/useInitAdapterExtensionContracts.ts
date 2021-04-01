@@ -75,7 +75,7 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
       case DaoAdapterConstants.VOTING:
         await dispatch(initRegisteredVotingAdapter(web3Instance));
         break;
-      case OtherAdapterConstants.COUPONON_BOARDING:
+      case OtherAdapterConstants.COUPON_ONBOARDING:
         await dispatch(initContractCouponOnboarding(web3Instance));
         break;
       case DaoAdapterConstants.TRIBUTE_NFT:

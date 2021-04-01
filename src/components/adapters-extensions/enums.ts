@@ -21,7 +21,7 @@ export enum DaoAdapterConstants {
 
 export enum OtherAdapterConstants {
   OFFCHAINVOTING = 'offchainvoting',
-  COUPONON_BOARDING = 'coupon-onboarding',
+  COUPON_ONBOARDING = 'coupon-onboarding',
 }
 
 export enum DaoExtensionConstants {

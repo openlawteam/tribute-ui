@@ -29,7 +29,7 @@ export function getAccessControlLayer(
     | DaoExtensionConstants.BANK
     | DaoExtensionConstants.NFT
     | OtherAdapterConstants.OFFCHAINVOTING
-    | OtherAdapterConstants.COUPONON_BOARDING,
+    | OtherAdapterConstants.COUPON_ONBOARDING,
     any
   > = {
     [DaoExtensionConstants.BANK]: {},
@@ -99,7 +99,7 @@ export function getAccessControlLayer(
       WITHDRAW: true,
       SUB_FROM_BALANCE: true,
     },
-    [OtherAdapterConstants.COUPONON_BOARDING]: {},
+    [OtherAdapterConstants.COUPON_ONBOARDING]: {},
     [DaoAdapterConstants.TRIBUTE_NFT]: {
       SUBMIT_PROPOSAL: true,
       NEW_MEMBER: true,

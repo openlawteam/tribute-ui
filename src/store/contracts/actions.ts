@@ -347,7 +347,7 @@ export function initContractCouponOnboarding(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_COUPON_ONBOARDING,
-    adapterNameForRedux: OtherAdapterConstants.COUPONON_BOARDING,
+    adapterNameForRedux: OtherAdapterConstants.COUPON_ONBOARDING,
     adapterOrExtensionName: OtherContractAdapterNames.coupon_onboarding,
     contractAddress,
     lazyImport: () =>

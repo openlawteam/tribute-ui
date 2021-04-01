@@ -175,8 +175,8 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
       'Allows the members to withdraw their funds from the DAO bank.',
   },
   {
-    name: OtherAdapterConstants.COUPONON_BOARDING,
-    adapterId: getAdapterOrExtensionId(OtherAdapterConstants.COUPONON_BOARDING),
+    name: OtherAdapterConstants.COUPON_ONBOARDING,
+    adapterId: getAdapterOrExtensionId(OtherAdapterConstants.COUPON_ONBOARDING),
     contractAddress: COUPONONBOARDING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'configureDao',
     description:
