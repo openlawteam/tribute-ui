@@ -2,8 +2,9 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {getApiStatus as getSnapshotAPIStatus} from '@openlaw/snapshot-js-erc712';
 
 import {AsyncStatus} from './util/types';
+import {ContractsStateEntry} from './store/contracts/types';
 import {getConnectedMember} from './store/actions';
-import {ContractsStateEntry, ReduxDispatch, StoreState} from './store/types';
+import {ReduxDispatch, StoreState} from './store/types';
 import {SNAPSHOT_HUB_API_URL} from './config';
 import {useDispatch, useSelector} from 'react-redux';
 import {useInitContracts} from './components/web3/hooks';

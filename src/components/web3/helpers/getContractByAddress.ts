@@ -1,5 +1,6 @@
+import {ContractsStateEntry} from '../../../store/contracts/types';
 import {normalizeString} from '../../../util/helpers';
-import {ContractsStateEntry, StoreState} from '../../../store/types';
+import {StoreState} from '../../../store/types';
 
 /**
  * getContractByAddress

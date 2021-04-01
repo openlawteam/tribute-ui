@@ -14,7 +14,7 @@ import {
   CONTRACT_VOTING,
   CONTRACT_WITHDRAW,
 } from '../actions';
-import {ContractsState} from '../types';
+import {ContractsState} from './types';
 
 const initialState = {
   BankExtensionContract: null,
