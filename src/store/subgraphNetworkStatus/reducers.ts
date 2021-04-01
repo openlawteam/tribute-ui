@@ -13,13 +13,13 @@ export default function reducer(
 
   switch (type) {
     case SET_SUBGRAPH_NETWORK_STATUS:
-      return setConnectedMemberReducer(state, payload);
+      return setSubgraphNetworkStatus(state, payload);
     default:
       return state;
   }
 }
 
-function setConnectedMemberReducer(
+function setSubgraphNetworkStatus(
   state: Partial<SubgraphNetworkStatusState>,
   payload: Record<string, any>
 ) {
