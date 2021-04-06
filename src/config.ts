@@ -95,7 +95,7 @@ export const ETHEREUM_PROVIDER_URL: string = INFURA_WS_URLS[DEFAULT_CHAIN]
   : DEFAULT_CHAIN === CHAINS.GANACHE
   ? /**
      * Ganache over WebSocket should work. @note Is not tested, yet.
-     * Attempting to be consistent and to avoid more logic.
+     * Attempting to be consistent with a WebSocket URL to avoid more logic.
      *
      * @link https://www.trufflesuite.com/docs/truffle/reference/configuration#networks
      */
