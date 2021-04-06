@@ -1,4 +1,5 @@
 import {useEffect, useState, useRef} from 'react';
+import {ENVIRONMENT} from '../../../config';
 
 type GasStationResponse = {
   average: number;
@@ -51,7 +52,7 @@ export function useETHGasPrice() {
      * If the environment is not production, then exit.
      * Sometimes using mainnet gas prices for Rinkeby won't work well with wallets.
      */
-    if (process.env.REACT_APP_ENVIRONMENT !== 'production') return;
+    if (ENVIRONMENT !== 'production') return;
 
     isMounted.current = true;
 
