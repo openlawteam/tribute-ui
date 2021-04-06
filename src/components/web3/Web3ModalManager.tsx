@@ -1,6 +1,7 @@
-import React, {createContext} from 'react';
+import {createContext, useEffect, useRef, useState} from 'react';
 import Web3 from 'web3';
 
+import {ETHEREUM_PROVIDER_URL} from '../../config';
 import useWeb3ModalManager, {DefaultTheme} from './hooks/useWeb3ModalManager';
 
 type Web3ModalProviderArguments = {
@@ -16,11 +17,11 @@ type Web3ModalManagerProps = {
 export type Web3ModalContextValue = {
   account: string | undefined;
   connected: boolean | undefined;
-  providerOptions: Record<string, any>;
+  networkId: number | undefined;
   onConnectTo: (providerName: string) => void;
   onDisconnect: () => void;
-  networkId: number | undefined;
   provider: any;
+  providerOptions: Record<string, any>;
   web3Instance: Web3;
   web3Modal: any;
 };
@@ -52,21 +53,64 @@ export default function Web3ModalManager({
   defaultTheme = DefaultTheme.DARK,
   providerOptions,
 }: Web3ModalManagerProps) {
+  /**
+   * Refs
+   */
+
+  const defaultWeb3InstanceRef = useRef<Web3 | undefined>(
+    new Web3(new Web3.providers.WebsocketProvider(ETHEREUM_PROVIDER_URL))
+  );
+
+  /**
+   * State
+   */
+
+  const [defaultWeb3NetID, setDefaultWeb3NetID] = useState<
+    number | undefined
+  >();
+
+  /**
+   * Variables
+   */
+
   const web3ModalProviderArguments: Web3ModalProviderArguments = {
     defaultChain,
     defaultTheme,
     providerOptions,
   };
+
+  /**
+   * Our hooks
+   */
+
   const {
     account,
     connected,
     onConnectTo,
     onDisconnect,
-    networkId,
-    provider,
-    web3Instance,
+    networkId = defaultWeb3NetID,
+    provider = defaultWeb3InstanceRef.current?.currentProvider,
+    web3Instance = defaultWeb3InstanceRef.current,
     web3Modal,
   } = useWeb3ModalManager(web3ModalProviderArguments);
+
+  /**
+   * Effects
+   */
+
+  // Set network ID when using `defaultWeb3InstanceRef` (i.e. not connected to a wallet)
+  useEffect(() => {
+    if (!connected) {
+      defaultWeb3InstanceRef.current?.eth.net
+        .getId()
+        .then(setDefaultWeb3NetID)
+        .catch(() => setDefaultWeb3NetID(undefined));
+    }
+  }, [connected]);
+
+  /**
+   * Render
+   */
 
   const web3ModalContext = {
     account,
