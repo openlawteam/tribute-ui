@@ -18,7 +18,7 @@
     "markdown-to-jsx": "^7.1.1",
     "react": "^17.0.1",
     "react-device-detect": "^1.15.0",
-    "react-dom": "^17.0.1",
+    "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
     "react-hook-form": "^6.15.4",
     "react-lines-ellipsis": "^0.14.1",
