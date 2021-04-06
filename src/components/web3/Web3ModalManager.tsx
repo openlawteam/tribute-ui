@@ -1,7 +1,7 @@
 import {createContext, useEffect, useRef, useState} from 'react';
 import Web3 from 'web3';
 
-import {INFURA_API_URL} from '../../config';
+import {ETHEREUM_PROVIDER_URL} from '../../config';
 import useWeb3ModalManager, {DefaultTheme} from './hooks/useWeb3ModalManager';
 
 type Web3ModalProviderArguments = {
@@ -57,9 +57,8 @@ export default function Web3ModalManager({
    * Refs
    */
 
-  // @todo Option to use `ganache.provider()`, as well?
-  const defaultWeb3InstanceRef = useRef<Web3>(
-    new Web3(new Web3.providers.WebsocketProvider(INFURA_API_URL))
+  const defaultWeb3InstanceRef = useRef<Web3 | undefined>(
+    new Web3(new Web3.providers.WebsocketProvider(ETHEREUM_PROVIDER_URL))
   );
 
   /**
@@ -90,7 +89,7 @@ export default function Web3ModalManager({
     onConnectTo,
     onDisconnect,
     networkId = defaultWeb3NetID,
-    provider = defaultWeb3InstanceRef.current.currentProvider,
+    provider = defaultWeb3InstanceRef.current?.currentProvider,
     web3Instance = defaultWeb3InstanceRef.current,
     web3Modal,
   } = useWeb3ModalManager(web3ModalProviderArguments);
@@ -102,7 +101,7 @@ export default function Web3ModalManager({
   // Set network ID when using `defaultWeb3InstanceRef` (i.e. not connected to a wallet)
   useEffect(() => {
     if (!connected) {
-      defaultWeb3InstanceRef.current.eth.net
+      defaultWeb3InstanceRef.current?.eth.net
         .getId()
         .then(setDefaultWeb3NetID)
         .catch(() => setDefaultWeb3NetID(undefined));
