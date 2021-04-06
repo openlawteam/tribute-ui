@@ -47,7 +47,7 @@ Alternatively (and for now the more stable method), you can run the network with
 - `npm install -g ganache-cli` (if not already installed)
 - `ganache-cli --port 7545 --networkId 1337 --blockTime 10`
 
-**Remember**: After you deploy the `DaoRegistry` smart contract on your local Ganache network you must include the deployed contract's address in your local root `.env` file.
+**Remember**: After you deploy the `DaoRegistry` smart contract on your local Ganache network you must include the deployed contract's address in your local root `.env` file. Additionally, you will need to add the contract addresses for the deployed adapters and extensions contracts to the config in `/src/config.ts`.
 
 ## Running the local graph-node
 
