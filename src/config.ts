@@ -89,8 +89,18 @@ export const INFURA_PROJECT_ID =
     ? REACT_APP_INFURA_PROJECT_ID_DEV
     : REACT_APP_INFURA_PROJECT_ID_LOCAL;
 
-// Infura API URL
-export const INFURA_API_URL: string = `${INFURA_WS_URLS[DEFAULT_CHAIN]}/${INFURA_PROJECT_ID}`;
+// Ethereum Provider URL
+export const ETHEREUM_PROVIDER_URL: string = INFURA_WS_URLS[DEFAULT_CHAIN]
+  ? `${INFURA_WS_URLS[DEFAULT_CHAIN]}/${INFURA_PROJECT_ID}`
+  : DEFAULT_CHAIN === CHAINS.GANACHE
+  ? /**
+     * Ganache over WebSocket should work. @note Is not tested, yet.
+     * Attempting to be consistent and to avoid more logic.
+     *
+     * @link https://www.trufflesuite.com/docs/truffle/reference/configuration#networks
+     */
+    'ws://127.0.0.1:7545'
+  : '';
 
 /**
  * CORE CONTRACTS
