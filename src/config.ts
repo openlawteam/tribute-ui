@@ -33,14 +33,6 @@ export const SNAPSHOT_HUB_API_URL: string | undefined =
     ? '/snapshot-hub'
     : REACT_APP_SNAPSHOT_HUB_API_URL;
 
-// Infura Project Id
-export const INFURA_PROJECT_ID =
-  REACT_APP_ENVIRONMENT === 'production'
-    ? REACT_APP_INFURA_PROJECT_ID_PROD
-    : REACT_APP_ENVIRONMENT === 'development'
-    ? REACT_APP_INFURA_PROJECT_ID_DEV
-    : REACT_APP_INFURA_PROJECT_ID_LOCAL;
-
 // The Graph API URL
 export const GRAPH_API_URL = REACT_APP_GRAPH_API_URL;
 
@@ -64,6 +56,15 @@ export const CHAIN_NAME = {
   [CHAINS.GANACHE]: 'Ganache Test Network',
 };
 
+export const DEFAULT_CHAIN =
+  REACT_APP_ENVIRONMENT === 'production'
+    ? CHAINS.MAINNET
+    : REACT_APP_ENVIRONMENT === 'development'
+    ? CHAINS.RINKEBY
+    : REACT_APP_DEFAULT_CHAIN_NAME_LOCAL // Set this to change local development chain
+    ? CHAINS[REACT_APP_DEFAULT_CHAIN_NAME_LOCAL]
+    : CHAINS.GANACHE; // Defaults to a Ganache private network (1337)
+
 export const ETHERSCAN_URLS: {[chainId: number]: string} = {
   [CHAINS.MAINNET]: `https://etherscan.io`,
   [CHAINS.ROPSTEN]: `https://ropsten.etherscan.io`,
@@ -71,6 +72,35 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
   [CHAINS.GOERLI]: `https://goerli.etherscan.io`,
   [CHAINS.KOVAN]: `https://kovan.etherscan.io`,
 };
+
+export const INFURA_WS_URLS: {[chainId: number]: string} = {
+  [CHAINS.MAINNET]: `wss://mainnet.infura.io/ws/v3`,
+  [CHAINS.ROPSTEN]: `wss://ropsten.infura.io/ws/v3`,
+  [CHAINS.RINKEBY]: `wss://rinkeby.infura.io/ws/v3`,
+  [CHAINS.GOERLI]: `wss://goerli.infura.io/ws/v3`,
+  [CHAINS.KOVAN]: `wss://kovan.infura.io/ws/v3`,
+};
+
+// Infura Project Id
+export const INFURA_PROJECT_ID =
+  REACT_APP_ENVIRONMENT === 'production'
+    ? REACT_APP_INFURA_PROJECT_ID_PROD
+    : REACT_APP_ENVIRONMENT === 'development'
+    ? REACT_APP_INFURA_PROJECT_ID_DEV
+    : REACT_APP_INFURA_PROJECT_ID_LOCAL;
+
+// Ethereum Provider URL
+export const ETHEREUM_PROVIDER_URL: string = INFURA_WS_URLS[DEFAULT_CHAIN]
+  ? `${INFURA_WS_URLS[DEFAULT_CHAIN]}/${INFURA_PROJECT_ID}`
+  : DEFAULT_CHAIN === CHAINS.GANACHE
+  ? /**
+     * Ganache over WebSocket should work. @note Is not tested, yet.
+     * Attempting to be consistent with a WebSocket URL to avoid more logic.
+     *
+     * @link https://www.trufflesuite.com/docs/truffle/reference/configuration#networks
+     */
+    'ws://127.0.0.1:7545'
+  : '';
 
 /**
  * CORE CONTRACTS
@@ -258,15 +288,6 @@ export const OFFCHAINVOTING_CONTRACT_ADDRESS = {
 
 // If developing locally, include your Multicall contract address in your `.env` file.
 export const MULTICALL_CONTRACT_ADDRESS = REACT_APP_MULTICALL_CONTRACT_ADDRESS;
-
-export const DEFAULT_CHAIN =
-  REACT_APP_ENVIRONMENT === 'production'
-    ? CHAINS.MAINNET
-    : REACT_APP_ENVIRONMENT === 'development'
-    ? CHAINS.RINKEBY
-    : REACT_APP_DEFAULT_CHAIN_NAME_LOCAL // Set this to change local development chain
-    ? CHAINS[REACT_APP_DEFAULT_CHAIN_NAME_LOCAL]
-    : CHAINS.GANACHE; // Defaults to a Ganache private network (1337)
 
 /**
  * These addresses are important as the contracts use them in their configs.

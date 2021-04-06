@@ -14,7 +14,6 @@ const {parsed: parsedEnv} = require('dotenv').config({
 process.env = {
   ...process.env,
   ...parsedEnv,
-  REACT_APP_DEFAULT_CHAIN_NAME_LOCAL: '',
 };
 
 const {server} = require('./test/server');

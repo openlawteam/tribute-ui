@@ -78,7 +78,7 @@ export default function Init(props: InitProps) {
    */
 
   const initContracts = useInitContracts();
-  const {account, connected, provider, web3Instance} = useWeb3Modal();
+  const {account, connected, web3Instance} = useWeb3Modal();
   const {isMountedRef} = useIsMounted();
 
   /**
@@ -111,8 +111,8 @@ export default function Init(props: InitProps) {
   }, [processReadyMap]);
 
   useEffect(() => {
-    connected && provider && web3Instance && handleInitContractsCached();
-  }, [connected, handleInitContractsCached, provider, web3Instance]);
+    web3Instance && handleInitContractsCached();
+  }, [handleInitContractsCached, web3Instance]);
 
   useEffect(() => {
     connected &&
