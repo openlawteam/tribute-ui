@@ -6,6 +6,7 @@ import {ProposalData, ProposalFlag} from './types';
 import {proposalHasFlag, proposalHasVotingState} from './helpers';
 import {ProposalHeaderNames} from '../../util/enums';
 import {useProposals, useProposalsVotingState} from './hooks';
+import {useProposalsVotes} from './hooks/useProposalsVotes';
 import {VotingState} from './voting/types';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
@@ -62,6 +63,10 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
     proposalsVotingStateError,
     proposalsVotingStateStatus,
   } = useProposalsVotingState(proposalIds);
+
+  const {proposalsVotes} = useProposalsVotes(proposalIds);
+
+  console.log('proposalsVotes', proposalsVotes);
 
   /**
    * Variables
