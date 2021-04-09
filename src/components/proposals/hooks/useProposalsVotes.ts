@@ -163,8 +163,6 @@ export function useProposalsVotes(
         web3Instance,
       });
 
-      console.log('votesDataResults', votesDataResults);
-
       setProposalsVotesStatus(AsyncStatus.FULFILLED);
       setProposaslsVotes(
         proposalIds.map((id, i) => [
