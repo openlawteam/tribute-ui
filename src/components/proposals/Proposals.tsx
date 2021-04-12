@@ -138,7 +138,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
 
       if (voteState === undefined || !p.daoProposal) return;
 
-      // @note Add other off-chain voting styles as needed (i.e. Batch)
+      // @note Add more logic for other off-chain voting styles as needed (i.e. Batch)
       const offchainResultNotYetSubmitted: boolean =
         proposalHasVotingState(VotingState.TIE, voteState) &&
         proposalHasFlag(ProposalFlag.SPONSORED, p.daoProposal.flags) &&
