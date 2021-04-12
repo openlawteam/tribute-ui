@@ -144,12 +144,10 @@ export type ProposalOrDraftSignDataFromType<
  * @link https://github.com/openlawteam/molochv3-contracts/blob/master/contracts/adapters/voting/Voting.sol
  */
 export type VotingAdapterVotes = {
-  nbYes: string;
-  nbNo: string;
-  startingTime: string;
   blockNumber: string;
-  // {[address]: vote index}
-  votes: Record<string, string>;
+  nbNo: string;
+  nbYes: string;
+  startingTime: string;
 };
 
 /**
@@ -158,19 +156,17 @@ export type VotingAdapterVotes = {
  * @link https://github.com/openlawteam/molochv3-contracts/blob/master/contracts/adapters/voting/OffchainVoting.sol
  */
 export type OffchainVotingAdapterVotes = {
-  snapshot: string;
+  fallbackVotesCount: string;
+  gracePeriodStartingTime: string;
+  index: string;
+  isChallenged: boolean;
+  nbNo: string;
+  nbYes: string;
   proposalHash: string;
   reporter: string;
   resultRoot: string;
-  nbYes: string;
-  nbNo: string;
-  index: string;
+  snapshot: string;
   startingTime: string;
-  gracePeriodStartingTime: string;
-  isChallenged: boolean;
-  // {[address]: boolean}
-  fallbackVotes: Record<string, boolean>;
-  fallbackVotesCount: string;
 };
 
 /**
