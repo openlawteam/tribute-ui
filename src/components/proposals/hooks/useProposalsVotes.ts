@@ -83,7 +83,7 @@ export function useProposalsVotes(
    */
 
   async function getProposalsVotesOnchain() {
-    if (!registryAddress || !registryABI) {
+    if (!registryAddress || !registryABI || !proposalIds.length) {
       return;
     }
 
