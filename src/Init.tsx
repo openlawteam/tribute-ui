@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {getApiStatus as getSnapshotAPIStatus} from '@openlaw/snapshot-js-erc712';
 
 import {AsyncStatus} from './util/types';
-import {ContractsStateEntry} from './store/contracts/types';
 import {getConnectedMember} from './store/actions';
 import {ReduxDispatch, StoreState} from './store/types';
 import {SNAPSHOT_HUB_API_URL} from './config';
@@ -60,6 +59,9 @@ export default function Init(props: InitProps) {
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
   );
+  const bankExtensionMethods = useSelector(
+    (s: StoreState) => s.contracts.BankExtensionContract?.instance.methods
+  );
 
   /**
    * State
@@ -94,7 +96,13 @@ export default function Init(props: InitProps) {
   const handleInitContractsCached = useCallback(handleInitContracts, [
     initContracts,
   ]);
-  const handleGetMemberCached = useCallback(handleGetMember, [dispatch]);
+
+  const handleGetMemberCached = useCallback(handleGetMember, [
+    bankExtensionMethods,
+    daoRegistryContract,
+    dispatch,
+  ]);
+
   const handleGetSnapshotAPIStatusCached = useCallback(
     handleGetSnapshotAPIStatus,
     [isMountedRef]
@@ -118,7 +126,7 @@ export default function Init(props: InitProps) {
     connected &&
       account &&
       daoRegistryContract &&
-      handleGetMemberCached(account, daoRegistryContract);
+      handleGetMemberCached(account);
   }, [account, connected, daoRegistryContract, handleGetMemberCached]);
 
   useEffect(() => {
@@ -163,12 +171,13 @@ export default function Init(props: InitProps) {
     }
   }
 
-  async function handleGetMember(
-    account: string,
-    daoRegistryContract: ContractsStateEntry
-  ) {
+  async function handleGetMember(account: string) {
     try {
-      await dispatch(getConnectedMember(account, daoRegistryContract));
+      if (!bankExtensionMethods || !daoRegistryContract) {
+        return;
+      }
+
+      await dispatch(getConnectedMember(account));
     } catch (error) {
       setError(error);
     }
