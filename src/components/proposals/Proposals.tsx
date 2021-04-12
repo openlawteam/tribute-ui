@@ -1,11 +1,13 @@
 import React, {Fragment, useEffect, useState} from 'react';
 
 import {AsyncStatus} from '../../util/types';
+import {BURN_ADDRESS} from '../../util/constants';
 import {DaoAdapterConstants} from '../adapters-extensions/enums';
 import {ProposalData, ProposalFlag} from './types';
 import {proposalHasFlag, proposalHasVotingState} from './helpers';
 import {ProposalHeaderNames} from '../../util/enums';
 import {useProposals, useProposalsVotingState} from './hooks';
+import {useProposalsVotes} from './hooks/useProposalsVotes';
 import {VotingState} from './voting/types';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
@@ -63,6 +65,12 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
     proposalsVotingStateStatus,
   } = useProposalsVotingState(proposalIds);
 
+  const {
+    proposalsVotes,
+    proposalsVotesError,
+    proposalsVotesStatus,
+  } = useProposalsVotes(proposalIds);
+
   /**
    * Variables
    */
@@ -80,11 +88,15 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
     // Getting ready to fetch using `useProposalsVotingState`; helps to show continuous loader.
     (proposalsVotingStateStatus === AsyncStatus.STANDBY &&
       proposalIds.length > 0) ||
-    proposalsVotingStateStatus === AsyncStatus.PENDING;
+    proposalsVotingStateStatus === AsyncStatus.PENDING ||
+    // Getting ready to fetch using `useProposalsVotes`; helps to show continuous loader.
+    (proposalsVotesStatus === AsyncStatus.STANDBY && proposalIds.length > 0) ||
+    proposalsVotesStatus === AsyncStatus.PENDING;
 
   const isError: boolean =
     proposalsStatus === AsyncStatus.REJECTED ||
-    proposalsVotingStateStatus === AsyncStatus.REJECTED;
+    proposalsVotingStateStatus === AsyncStatus.REJECTED ||
+    proposalsVotesStatus === AsyncStatus.REJECTED;
 
   /**
    * Effects
@@ -105,6 +117,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
   useEffect(() => {
     if (proposalsStatus !== AsyncStatus.FULFILLED) return;
     if (proposalsVotingStateStatus !== AsyncStatus.FULFILLED) return;
+    if (proposalsVotesStatus !== AsyncStatus.FULFILLED) return;
 
     const filteredProposalsToSet: FilteredProposals = {
       failedProposals: [],
@@ -114,12 +127,22 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
     };
 
     proposals.forEach((p) => {
+      const proposalId =
+        p.snapshotDraft?.idInDAO || p.snapshotProposal?.idInDAO || '';
+
       const voteState = proposalsVotingState.find(
-        ([id]) =>
-          id === (p.snapshotDraft?.idInDAO || p.snapshotProposal?.idInDAO || '')
+        ([id]) => id === proposalId
       )?.[1];
 
+      const votesData = proposalsVotes.find(([id]) => id === proposalId)?.[1];
+
       if (voteState === undefined || !p.daoProposal) return;
+
+      // @note Add more logic for other off-chain voting styles as needed (i.e. Batch)
+      const offchainResultNotYetSubmitted: boolean =
+        proposalHasVotingState(VotingState.TIE, voteState) &&
+        proposalHasFlag(ProposalFlag.SPONSORED, p.daoProposal.flags) &&
+        votesData?.OffchainVotingContract?.reporter === BURN_ADDRESS;
 
       // non-sponsored proposal
       if (
@@ -133,9 +156,10 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
 
       // voting proposal
       if (
-        (proposalHasVotingState(VotingState.GRACE_PERIOD, voteState) ||
+        ((proposalHasVotingState(VotingState.GRACE_PERIOD, voteState) ||
           proposalHasVotingState(VotingState.IN_PROGRESS, voteState)) &&
-        proposalHasFlag(ProposalFlag.SPONSORED, p.daoProposal.flags)
+          proposalHasFlag(ProposalFlag.SPONSORED, p.daoProposal.flags)) ||
+        offchainResultNotYetSubmitted
       ) {
         filteredProposalsToSet.votingProposals.push(p);
 
@@ -173,6 +197,8 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
   }, [
     proposals,
     proposalsStatus,
+    proposalsVotes,
+    proposalsVotesStatus,
     proposalsVotingState,
     proposalsVotingStateStatus,
   ]);
@@ -229,7 +255,6 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
 
   // Render no proposals
   if (
-    !Object.values(proposals).length &&
     !Object.values(filteredProposals).flatMap((p) => p).length &&
     proposalsStatus === AsyncStatus.FULFILLED
   ) {
@@ -241,7 +266,9 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
     return (
       <div className="text-center">
         <ErrorMessageWithDetails
-          error={proposalsError || proposalsVotingStateError}
+          error={
+            proposalsError || proposalsVotingStateError || proposalsVotesError
+          }
           renderText="Something went wrong while getting the proposals."
         />
       </div>

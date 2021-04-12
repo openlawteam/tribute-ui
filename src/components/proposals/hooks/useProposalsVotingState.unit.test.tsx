@@ -100,7 +100,7 @@ describe('useProposalsVotingState unit tests', () => {
     });
   });
 
-  test('should throw if bad proposalIds not bytes32[]', async () => {
+  test('should return empty result if every proposalIds is not bytes32[]', async () => {
     const badProposalIds = ['abc123', 'abc456'];
 
     await act(async () => {
@@ -162,12 +162,10 @@ describe('useProposalsVotingState unit tests', () => {
       await waitForNextUpdate();
 
       expect(result.current.proposalsVotingStateStatus).toBe(
-        AsyncStatus.REJECTED
+        AsyncStatus.FULFILLED
       );
 
-      expect(
-        result.current.proposalsVotingStateError?.message.length
-      ).toBeGreaterThan(0);
+      expect(result.current.proposalsVotingStateError).toBe(undefined);
       expect(result.current.proposalsVotingState).toMatchObject([]);
     });
   });

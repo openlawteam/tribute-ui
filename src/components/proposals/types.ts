@@ -139,6 +139,37 @@ export type ProposalOrDraftSignDataFromType<
 > = T extends SnapshotType.proposal ? SnapshotProposalData : SnapshotDraftData;
 
 /**
+ * Voting.sol->Voting
+ *
+ * @link https://github.com/openlawteam/molochv3-contracts/blob/master/contracts/adapters/voting/Voting.sol
+ */
+export type VotingAdapterVotes = {
+  blockNumber: string;
+  nbNo: string;
+  nbYes: string;
+  startingTime: string;
+};
+
+/**
+ * OffchainVoting.sol->Voting
+ *
+ * @link https://github.com/openlawteam/molochv3-contracts/blob/master/contracts/adapters/voting/OffchainVoting.sol
+ */
+export type OffchainVotingAdapterVotes = {
+  fallbackVotesCount: string;
+  gracePeriodStartingTime: string;
+  index: string;
+  isChallenged: boolean;
+  nbNo: string;
+  nbYes: string;
+  proposalHash: string;
+  reporter: string;
+  resultRoot: string;
+  snapshot: string;
+  startingTime: string;
+};
+
+/**
  * VotingResult
  *
  * A custom result we build to deliver to components.
