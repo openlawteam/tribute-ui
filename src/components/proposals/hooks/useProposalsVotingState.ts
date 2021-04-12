@@ -94,6 +94,15 @@ export function useProposalsVotingState(
       return;
     }
 
+    // Only use hex (more specifically `bytes32`) id's
+    const safeProposalIds = proposalIds.filter(web3Instance.utils.isHexStrict);
+
+    if (!safeProposalIds.length) {
+      setProposalsVotingStateStatus(AsyncStatus.FULFILLED);
+
+      return;
+    }
+
     try {
       const votingResultAbi = votingABI.find((ai) => ai.name === 'voteResult');
 
@@ -103,7 +112,7 @@ export function useProposalsVotingState(
         );
       }
 
-      const calls: MulticallTuple[] = proposalIds.map((id) => [
+      const calls: MulticallTuple[] = safeProposalIds.map((id) => [
         votingAddress,
         votingResultAbi,
         [registryAddress, id],
@@ -118,7 +127,7 @@ export function useProposalsVotingState(
 
       setProposalsVotingStateStatus(AsyncStatus.FULFILLED);
       setProposaslsVotingState(
-        proposalIds.map((id, i) => [id, proposalsVotingStateResult[i]])
+        safeProposalIds.map((id, i) => [id, proposalsVotingStateResult[i]])
       );
     } catch (error) {
       setProposalsVotingStateStatus(AsyncStatus.REJECTED);
