@@ -2,8 +2,9 @@ import {Dispatch} from 'redux';
 
 import {BURN_ADDRESS} from '../../util/constants';
 import {ConnectedMemberState} from '../connectedMember/types';
-import {ContractsStateEntry} from '../contracts/types';
 import {normalizeString} from '../../util/helpers';
+import {SHARES_ADDRESS} from '../../config';
+import {StoreState} from '../types';
 
 export const SET_CONNECTED_MEMBER = 'SET_CONNECTED_MEMBER';
 export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
@@ -19,27 +20,32 @@ export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
  * is to ensure we're not too restrictive in our Dapp logic and
  * letting the contract do its job.
  */
-export function getConnectedMember(
-  account: string,
-  daoRegistryContract: ContractsStateEntry
-) {
-  return async function (dispatch: Dispatch<any>) {
-    const daoRegistryInstance = daoRegistryContract.instance;
+export function getConnectedMember(account: string) {
+  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
+    const daoRegistryMethods = getState().contracts.DaoRegistryContract
+      ?.instance.methods;
+    const bankExtensionMethods = getState().contracts.BankExtensionContract
+      ?.instance.methods;
 
-    if (!daoRegistryInstance || !account) {
+    if (!daoRegistryMethods || !bankExtensionMethods || !account) {
       dispatch(clearConnectedMember());
 
       return;
     }
 
     try {
-      const memberAddressByDelegateKey: string = await daoRegistryInstance.methods
+      const memberAddressByDelegateKey: string = await daoRegistryMethods
         .memberAddressesByDelegatedKey(account)
         .call({from: account});
-      const isActiveMember: boolean = await daoRegistryInstance.methods
-        .isActiveMember(memberAddressByDelegateKey)
-        .call({from: account});
-      const currentDelegateKey: string = await daoRegistryInstance.methods
+
+      const isActiveMember: boolean =
+        Number(
+          await bankExtensionMethods
+            .balanceOf(memberAddressByDelegateKey, SHARES_ADDRESS)
+            .call({from: account})
+        ) > 0;
+
+      const currentDelegateKey: string = await daoRegistryMethods
         .getCurrentDelegateKey(memberAddressByDelegateKey)
         .call({from: account});
 
