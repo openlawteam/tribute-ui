@@ -13,8 +13,8 @@ import {
   Web3ModalContextValue,
 } from '../components/web3/Web3ModalManager';
 import {
+  balanceOfMember,
   getCurrentDelegateKey,
-  isActiveMember,
   memberAddressesByDelegatedKey,
 } from './web3Responses';
 import {CHAINS as mockChains} from '../config';
@@ -172,7 +172,8 @@ export default function Wrapper(
       mockWeb3Provider.injectResult(
         ...memberAddressesByDelegatedKey({web3Instance})
       );
-      mockWeb3Provider.injectResult(...isActiveMember({web3Instance}));
+      // Defaults to `100`
+      mockWeb3Provider.injectResult(...balanceOfMember({web3Instance}));
       mockWeb3Provider.injectResult(...getCurrentDelegateKey({web3Instance}));
     }
   }, [mockWeb3Provider, useInit, useWallet, web3Instance]);

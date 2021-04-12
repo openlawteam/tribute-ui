@@ -165,14 +165,6 @@ describe('useOffchainVotingResults unit tests', () => {
       expect(result.current).toMatchObject({
         offchainVotingResults: [],
         offchainVotingResultsError: undefined,
-        offchainVotingResultsStatus: 'STANDBY',
-      });
-
-      await waitForNextUpdate();
-
-      expect(result.current).toMatchObject({
-        offchainVotingResults: [],
-        offchainVotingResultsError: undefined,
         offchainVotingResultsStatus: 'PENDING',
       });
 
