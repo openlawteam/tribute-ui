@@ -1,8 +1,10 @@
 import {useReducer, useCallback, useEffect} from 'react';
+import {useDispatch} from 'react-redux';
 import Web3 from 'web3';
 import Web3Modal from 'web3modal';
 
 import {DEFAULT_CHAIN} from '../../../config';
+import {clearConnectedMember} from '../../../store/actions';
 import {NetworkNames, NetworkIDs} from '../../../util/enums';
 
 type NetworkNameType = NetworkNames;
@@ -124,6 +126,12 @@ export default function useWeb3ModalManager({
   const getNetworkNameCached = useCallback(getNetworkName, [web3ModalChain]);
 
   /**
+   * Their hooks
+   */
+
+  const storeDispatch = useDispatch();
+
+  /**
    * Init Web3Modal
    */
   useEffect(() => {
@@ -215,6 +223,7 @@ export default function useWeb3ModalManager({
 
       // Reset all states; except for web3Modal?!
       dispatch({type: ActionType.DEACTIVATE_PROVIDER});
+      storeDispatch(clearConnectedMember());
     } catch (error) {
       console.error(error);
     }
