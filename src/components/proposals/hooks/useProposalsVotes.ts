@@ -3,6 +3,7 @@ import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
 
 import {AsyncStatus} from '../../../util/types';
+import {BURN_ADDRESS} from '../../../util/constants';
 import {multicall, MulticallTuple} from '../../web3/helpers';
 import {OffchainVotingAdapterVotes, VotingAdapterVotes} from '../types';
 import {StoreState} from '../../../store/types';
@@ -50,12 +51,10 @@ export function useProposalsVotes(
    * State
    */
 
-  const [proposalsVotes, setProposaslsVotes] = useState<ProposalsVotesTuples>(
+  const [proposalsVotes, setProposalsVotes] = useState<ProposalsVotesTuples>(
     []
   );
-
   const [proposalsVotesError, setProposalsVotesError] = useState<Error>();
-
   const [proposalsVotesStatus, setProposalsVotesStatus] = useState<AsyncStatus>(
     AsyncStatus.STANDBY
   );
@@ -84,7 +83,16 @@ export function useProposalsVotes(
    */
 
   async function getProposalsVotesOnchain() {
-    if (!registryAddress || !registryABI || !proposalIds.length) {
+    if (!registryAddress || !registryABI) {
+      return;
+    }
+
+    // Only use hex (more specifically `bytes32`) id's
+    const safeProposalIds = proposalIds.filter(web3Instance.utils.isHexStrict);
+
+    if (!safeProposalIds.length) {
+      setProposalsVotesStatus(AsyncStatus.FULFILLED);
+
       return;
     }
 
@@ -100,7 +108,7 @@ export function useProposalsVotes(
       }
 
       // `DaoRegistry.votingAdapter` calls
-      const votingAdapterCalls: MulticallTuple[] = proposalIds.map((id) => [
+      const votingAdapterCalls: MulticallTuple[] = safeProposalIds.map((id) => [
         registryAddress,
         votingAdapterABI,
         [id],
@@ -127,7 +135,23 @@ export function useProposalsVotes(
         );
       }
 
-      const votingAdapterNameCalls: MulticallTuple[] = votingAdapterAddressResults.map(
+      /**
+       * Filter out `safeProposalIds` which are not sponsored (i.e. voting adapter address === `BURN_ADDRESS`).
+       * Filter out `votingAdapterAddressResults` which equal the `BURN_ADDRESS`.
+       *
+       * This ensures these two arrays maintain the same length as they rely on indexes for the
+       * proposals to match up to the array of `multicall` results.
+       */
+
+      const filteredProposalIds = safeProposalIds.filter(
+        (_id, i) => votingAdapterAddressResults[i] !== BURN_ADDRESS
+      );
+
+      const filteredVotingAdapterAddressResults = votingAdapterAddressResults.filter(
+        (a) => a !== BURN_ADDRESS
+      );
+
+      const votingAdapterNameCalls: MulticallTuple[] = filteredVotingAdapterAddressResults.map(
         (votingAdapterAddress) => [votingAdapterAddress, getAdapterNameABI, []]
       );
 
@@ -138,15 +162,18 @@ export function useProposalsVotes(
 
       let adapterNameMap: Record<string, VotingAdapterName>;
 
+      // Build votes results
       const votesDataCalls: MulticallTuple[] = await Promise.all(
-        proposalIds.map(
+        filteredProposalIds.map(
           async (id, i): Promise<MulticallTuple> => {
+            // Set adapter name for setting the state later
             adapterNameMap = {
+              ...adapterNameMap,
               [id]: adapterNameResults[i],
             };
 
             return [
-              votingAdapterAddressResults[i],
+              filteredVotingAdapterAddressResults[i],
               await getVotesDataABI(adapterNameResults[i]),
               /**
                * We build the call arguments the same way for the different voting adapters
@@ -164,8 +191,8 @@ export function useProposalsVotes(
       });
 
       setProposalsVotesStatus(AsyncStatus.FULFILLED);
-      setProposaslsVotes(
-        proposalIds.map((id, i) => [
+      setProposalsVotes(
+        safeProposalIds.map((id, i) => [
           id,
           {
             [adapterNameMap[id]]: votesDataResults[i],
@@ -174,7 +201,7 @@ export function useProposalsVotes(
       );
     } catch (error) {
       setProposalsVotesStatus(AsyncStatus.REJECTED);
-      setProposaslsVotes([]);
+      setProposalsVotes([]);
       setProposalsVotesError(error);
     }
   }
@@ -184,10 +211,8 @@ export function useProposalsVotes(
    *
    * Gets the ABI for the public mapping getter of voting data.
    *
-   *
-   *
    * @param {VotingAdapterName} votingAdapterName
-   * @returns {Promise<AbiItem | undefined>}
+   * @returns {Promise<AbiItem>}
    */
   async function getVotesDataABI(
     votingAdapterName: VotingAdapterName
