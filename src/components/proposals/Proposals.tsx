@@ -255,7 +255,6 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
 
   // Render no proposals
   if (
-    !Object.values(proposals).length &&
     !Object.values(filteredProposals).flatMap((p) => p).length &&
     proposalsStatus === AsyncStatus.FULFILLED
   ) {
