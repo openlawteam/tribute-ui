@@ -1,4 +1,5 @@
 import {Dispatch} from 'redux';
+import {toBN} from 'web3-utils';
 
 import {BURN_ADDRESS} from '../../util/constants';
 import {ConnectedMemberState} from '../connectedMember/types';
@@ -38,12 +39,11 @@ export function getConnectedMember(account: string) {
         .memberAddressesByDelegatedKey(account)
         .call({from: account});
 
-      const isActiveMember: boolean =
-        Number(
-          await bankExtensionMethods
-            .balanceOf(memberAddressByDelegateKey, SHARES_ADDRESS)
-            .call({from: account})
-        ) > 0;
+      const isActiveMember: boolean = toBN(
+        await bankExtensionMethods
+          .balanceOf(memberAddressByDelegateKey, SHARES_ADDRESS)
+          .call({from: account})
+      ).gt(toBN(0));
 
       const currentDelegateKey: string = await daoRegistryMethods
         .getCurrentDelegateKey(memberAddressByDelegateKey)
