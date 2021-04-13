@@ -45,7 +45,7 @@ export default function useMembers(): UseMembersReturn {
    * Our hooks
    */
 
-  const {web3Instance, account} = useWeb3Modal();
+  const {web3Instance} = useWeb3Modal();
 
   /**
    * GQL Query
@@ -78,7 +78,6 @@ export default function useMembers(): UseMembersReturn {
   const getMembersFromRegistryCached = useCallback(getMembersFromRegistry, [
     BankExtensionContract,
     DaoRegistryContract,
-    account,
     web3Instance,
   ]);
   const getMembersFromSubgraphCached = useCallback(getMembersFromSubgraph, [
@@ -166,12 +165,7 @@ export default function useMembers(): UseMembersReturn {
   }
 
   async function getMembersFromRegistry() {
-    if (
-      !DaoRegistryContract ||
-      !BankExtensionContract ||
-      !account ||
-      !web3Instance
-    ) {
+    if (!DaoRegistryContract || !BankExtensionContract || !web3Instance) {
       return;
     }
 
