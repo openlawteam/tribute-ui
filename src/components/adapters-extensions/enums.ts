@@ -16,7 +16,7 @@ export enum DaoAdapterConstants {
   TRIBUTE = 'tribute',
   TRIBUTE_NFT = 'tribute-nft',
   VOTING = 'voting',
-  WITHDRAW = 'withdraw',
+  BANK = 'bank',
 }
 
 export enum OtherAdapterConstants {

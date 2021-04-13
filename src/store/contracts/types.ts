@@ -47,5 +47,5 @@ export type ContractsState = {
   TributeContract: ContractsStateEntry | null;
   TributeNFTContract: ContractsStateEntry | null;
   VotingContract: ContractsStateEntry | null;
-  WithdrawContract: ContractsStateEntry | null;
+  BankAdapterContract: ContractsStateEntry | null;
 };

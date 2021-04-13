@@ -23,7 +23,7 @@ export enum ContractAdapterNames {
   ragequit = 'ragequit',
   tribute = 'tribute',
   voting = 'voting',
-  withdraw = 'withdraw',
+  bank = 'bank',
   tribute_nft = 'tribute-nft',
 }
 

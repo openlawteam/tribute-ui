@@ -169,7 +169,7 @@ export const NFT_COLLECTION_FACTORY_CONTRACT_ADDRESS = {
  * - Distribute
  * - Rage quit
  * - Guild kick
- * - Withdraw
+ * - BankAdapter
  */
 
 export const VOTING_CONTRACT_ADDRESS = {
@@ -235,7 +235,7 @@ export const GUILDKICK_CONTRACT_ADDRESS = {
   [CHAINS.GANACHE]: '0xbD6Ce04529AdE60bbb5Fbd7185460B7Ae0838f93',
 };
 
-export const WITHDRAW_CONTRACT_ADDRESS = {
+export const BANK_ADAPTER_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
   [CHAINS.RINKEBY]: '0x0B24B4557cD426c9F84a19C94Aa910e002215104',

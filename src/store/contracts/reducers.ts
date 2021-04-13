@@ -13,7 +13,7 @@ import {
   CONTRACT_TRIBUTE,
   CONTRACT_VOTING_OP_ROLLUP,
   CONTRACT_VOTING,
-  CONTRACT_WITHDRAW,
+  CONTRACT_BANK_ADAPTER,
   CONTRACT_TRIBUTE_NFT,
 } from '../actions';
 import {ContractsState} from './types';
@@ -36,7 +36,7 @@ const initialState = {
   TributeContract: null,
   TributeNFTContract: null,
   VotingContract: null,
-  WithdrawContract: null,
+  BankAdapterContract: null,
 };
 
 export default function reducer(
@@ -46,6 +46,8 @@ export default function reducer(
   const {type, ...payload} = action;
 
   switch (type) {
+    case CONTRACT_BANK_ADAPTER:
+      return contractBankAdapter(state, payload);
     case CONTRACT_BANK_EXTENSION:
       return contractBankExtension(state, payload);
     case CONTRACT_BANK_FACTORY:
@@ -74,8 +76,6 @@ export default function reducer(
       return contractVoting(state, payload);
     case CONTRACT_VOTING_OP_ROLLUP:
       return contractVoting(state, payload);
-    case CONTRACT_WITHDRAW:
-      return contractWithdraw(state, payload);
     case CONTRACT_TRIBUTE_NFT:
       return contractTributeNFT(state, payload);
     case CONTRACT_COUPON_ONBOARDING:
@@ -145,8 +145,11 @@ function contractManaging(state: ContractsState, payload: any): ContractsState {
   return {...state, ManagingContract: {...payload}};
 }
 
-function contractWithdraw(state: ContractsState, payload: any): ContractsState {
-  return {...state, WithdrawContract: {...payload}};
+function contractBankAdapter(
+  state: ContractsState,
+  payload: any
+): ContractsState {
+  return {...state, BankAdapterContract: {...payload}};
 }
 
 function contractTributeNFT(
