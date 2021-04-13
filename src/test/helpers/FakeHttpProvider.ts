@@ -31,8 +31,8 @@ type Validation = (
 ) => void;
 
 type ResponseError = {
-  code: 1234;
-  message: 'Stub error';
+  code: number;
+  message: string;
 };
 
 export type InjectResultOptions = {
@@ -123,12 +123,22 @@ export class FakeHttpProvider {
     method: string;
     params?: any[] | Record<string, any>;
   }): Promise<any> {
-    const response = this.getResponseOrError(
-      'response',
-      payload
-    ) as ResponseStub;
+    try {
+      const response = this.getResponseOrError(
+        'response',
+        payload
+      ) as ResponseStub;
 
-    return response.result;
+      const error = this.getResponseOrError('error', payload) as ErrorStub;
+
+      if (error) {
+        throw error.error;
+      }
+
+      return response.result;
+    } catch (error) {
+      throw error;
+    }
   }
 
   getResponseOrError(type: 'response' | 'error', payload: Record<string, any>) {
