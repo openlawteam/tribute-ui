@@ -320,11 +320,6 @@
       },
       {
         "internalType": "uint256",
-        "name": "nbVoters",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
         "name": "nbYes",
         "type": "uint256"
       },
