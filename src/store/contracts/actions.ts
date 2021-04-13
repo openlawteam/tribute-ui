@@ -5,7 +5,6 @@ import {Dispatch} from 'redux';
 import {
   ContractAdapterNames,
   ContractExtensionNames,
-  OtherContractAdapterNames,
 } from '../../components/web3/types';
 import {
   DEFAULT_CHAIN,
@@ -20,7 +19,6 @@ import {StoreState} from '../types';
 import {
   DaoAdapterConstants,
   DaoExtensionConstants,
-  OtherAdapterConstants,
   VotingAdapterName,
 } from '../../components/adapters-extensions/enums';
 
@@ -348,8 +346,8 @@ export function initContractCouponOnboarding(
 ) {
   return initContractThunkFactory({
     actionType: CONTRACT_COUPON_ONBOARDING,
-    adapterNameForRedux: OtherAdapterConstants.COUPON_ONBOARDING,
-    adapterOrExtensionName: OtherContractAdapterNames.coupon_onboarding,
+    adapterNameForRedux: DaoAdapterConstants.COUPON_ONBOARDING,
+    adapterOrExtensionName: ContractAdapterNames.coupon_onboarding,
     contractAddress,
     lazyImport: () =>
       import('../../truffle-contracts/CouponOnboardingContract.json'),
@@ -469,10 +467,7 @@ export function initContractThunkFactory({
   web3Instance,
 }: {
   actionType: ContractAction;
-  adapterOrExtensionName:
-    | ContractAdapterNames
-    | ContractExtensionNames
-    | OtherContractAdapterNames;
+  adapterOrExtensionName: ContractAdapterNames | ContractExtensionNames;
   /**
    * The name to be shown in Redux state as `adapterOrExtensionName`.
    */
