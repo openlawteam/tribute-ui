@@ -25,6 +25,17 @@ type ProcessActionProps = {
   proposal: ProposalData;
 };
 
+/**
+ * Cached outside the component to prevent infinite re-renders.
+ *
+ * The same can be accomplished inside the component using
+ * `useState`, `useRef`, etc., depending on the use case.
+ */
+const useMemberActionDisabledProps = {
+  // Anyone can process a proposal - it's just a question of gas payment.
+  skipIsActiveMemberCheck: true,
+};
+
 export default function ProcessAction(props: ProcessActionProps) {
   const {
     disabled: propsDisabled,
@@ -58,7 +69,7 @@ export default function ProcessAction(props: ProcessActionProps) {
     isDisabled,
     openWhyDisabledModal,
     WhyDisabledModal,
-  } = useMemberActionDisabled();
+  } = useMemberActionDisabled(useMemberActionDisabledProps);
 
   const gasPrices = useETHGasPrice();
 
