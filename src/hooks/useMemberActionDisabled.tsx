@@ -7,6 +7,19 @@ import {useWeb3Modal} from '../components/web3/hooks';
 import FadeIn from '../components/common/FadeIn';
 import TimesSVG from '../assets/svg/TimesSVG';
 
+/**
+ * Props should be cached somehow to prevent a new object
+ * making the hook re-render each time the parent re-renders,
+ * causing a continuous loop.
+ */
+type UseMemberActionDisabledProps = {
+  /**
+   * Allows the active member check to be skipped.
+   * e.g. A tx does not require the account to be a member.
+   */
+  skipIsActiveMemberCheck?: boolean;
+};
+
 type UseMemberActionDisabledReturn = {
   disabledReason: string;
   isDisabled: boolean;
@@ -28,7 +41,11 @@ type WhyDisabledModalProps = {
  * @param {ProposalActionWhyDisabledProps} props
  * @returns {UseMemberActionDisabledReturn}
  */
-export function useMemberActionDisabled(): UseMemberActionDisabledReturn {
+export function useMemberActionDisabled(
+  props?: UseMemberActionDisabledProps
+): UseMemberActionDisabledReturn {
+  const {skipIsActiveMemberCheck = false} = props || {};
+
   /**
    * State
    */
@@ -59,9 +76,9 @@ export function useMemberActionDisabled(): UseMemberActionDisabledReturn {
   // Get the first index of other reasons.
   const otherReasonNext =
     otherDisabledReasons && otherDisabledReasons.find((r) => r);
-  const isDisabled =
-    !connected || !isActiveMember || (otherReasonNext ? true : false);
   const disabledReason = getDisabledReason();
+  const isDisabled =
+    (disabledReason ? true : false) || (otherReasonNext ? true : false);
   const canShowDisabledReason = isDisabled && disabledReason ? true : false;
 
   /**
@@ -92,7 +109,7 @@ export function useMemberActionDisabled(): UseMemberActionDisabledReturn {
       return 'Your wallet is not connected.';
     }
 
-    if (!isActiveMember) {
+    if (!isActiveMember && !skipIsActiveMemberCheck) {
       return 'Either you are not a member, or your membership is not active.';
     }
 

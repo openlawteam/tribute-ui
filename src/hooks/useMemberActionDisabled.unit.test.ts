@@ -101,6 +101,53 @@ describe('useMemberActionDisabled unit tests', () => {
     expect(result.current.setOtherDisabledReasons).toBeInstanceOf(Function);
   });
 
+  test('should skip member check when "props.skipIsActiveMemberCheck" is "true"', async () => {
+    await act(async () => {
+      let reduxStore: any;
+
+      // @note By default <Wrapper /> set the member to active when using `useWallet`
+      const {result} = await renderHook(
+        () => useMemberActionDisabled({skipIsActiveMemberCheck: true}),
+        {
+          initialProps: {
+            getProps: ({store}) => {
+              reduxStore = store;
+            },
+            useInit: true,
+            useWallet: true,
+          },
+          wrapper: Wrapper,
+        }
+      );
+
+      // Assert initial state
+      expect(result.current.isDisabled).toBe(false);
+      expect(result.current.disabledReason).toMatch('');
+      expect(result.current.openWhyDisabledModal).toBeInstanceOf(Function);
+      expect(result.current.WhyDisabledModal).toBeInstanceOf(Function);
+      expect(result.current.setOtherDisabledReasons).toBeInstanceOf(Function);
+
+      await waitFor(() => {
+        expect(reduxStore.getState().connectedMember).not.toBeNull();
+      });
+
+      reduxStore.dispatch({
+        type: SET_CONNECTED_MEMBER,
+        ...reduxStore.getState().connectedMember,
+        isActiveMember: false,
+      });
+
+      // await waitForNextUpdate();
+
+      // Assert post-init state
+      expect(result.current.isDisabled).toBe(false);
+      expect(result.current.disabledReason).toBe('');
+      expect(result.current.openWhyDisabledModal).toBeInstanceOf(Function);
+      expect(result.current.WhyDisabledModal).toBeInstanceOf(Function);
+      expect(result.current.setOtherDisabledReasons).toBeInstanceOf(Function);
+    });
+  });
+
   test('should return correct data when other reason is set', async () => {
     // @note By default <Wrapper /> set the member to active when using `useWallet`
     const {result, waitForNextUpdate} = renderHook(
