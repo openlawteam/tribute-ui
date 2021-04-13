@@ -4,11 +4,7 @@ import {AbiItem, toBN} from 'web3-utils';
 import {useLazyQuery} from '@apollo/react-hooks';
 import Web3 from 'web3';
 
-import {
-  SHARES_ADDRESS,
-  LOOT_ADDRESS,
-  GQL_QUERY_POLLING_INTERVAL,
-} from '../../../config';
+import {SHARES_ADDRESS, GQL_QUERY_POLLING_INTERVAL} from '../../../config';
 import {AsyncStatus} from '../../../util/types';
 import {normalizeString} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
@@ -135,7 +131,7 @@ export default function useMembers(): UseMembersReturn {
         // extract members from gql data
         const {members} = data.tributeDaos[0] as Record<string, any>;
         // Filter out any member that has fully ragequit (no positive balance in
-        // either SHARES or LOOT)
+        // SHARES)
         const filteredMembers = members.filter(
           (member: Record<string, any>) => !member.didFullyRagequit
         );
@@ -202,7 +198,7 @@ export default function useMembers(): UseMembersReturn {
             [index.toString()],
           ]
         );
-        const fetchedMemberAddresses: string[] = await multicall({
+        const memberAddresses: string[] = await multicall({
           calls: getMemberAddressCalls,
           web3Instance,
         });
@@ -211,69 +207,50 @@ export default function useMembers(): UseMembersReturn {
         const memberAddressesByDelegatedKeyABI = daoRegistryABI.find(
           (item) => item.name === 'memberAddressesByDelegatedKey'
         );
-        const memberAddressesByDelegatedKeyCalls = fetchedMemberAddresses.map(
+        const memberAddressesByDelegatedKeyCalls = memberAddresses.map(
           (address): MulticallTuple => [
             daoRegistryAddress,
             memberAddressesByDelegatedKeyABI as AbiItem,
             [address],
           ]
         );
+        const memberAddressesByDelegatedKey: string[] = await multicall({
+          calls: memberAddressesByDelegatedKeyCalls,
+          web3Instance,
+        });
 
-        // Build calls to get member balances in SHARES and LOOT
+        // Build calls to get member balances in SHARES
         const {
           abi: bankABI,
           contractAddress: bankAddress,
         } = BankExtensionContract;
 
         const balanceOfABI = bankABI.find((item) => item.name === 'balanceOf');
-        const sharesBalanceOfCalls = fetchedMemberAddresses.map(
+        const sharesBalanceOfCalls = memberAddressesByDelegatedKey.map(
           (address): MulticallTuple => [
             bankAddress,
             balanceOfABI as AbiItem,
             [address, SHARES_ADDRESS],
           ]
         );
-        const lootBalanceOfCalls = fetchedMemberAddresses.map(
-          (address): MulticallTuple => [
-            bankAddress,
-            balanceOfABI as AbiItem,
-            [address, LOOT_ADDRESS],
-          ]
-        );
-
-        // Use multicall to get details for each member address
-        const calls = [
-          ...memberAddressesByDelegatedKeyCalls,
-          ...sharesBalanceOfCalls,
-          ...lootBalanceOfCalls,
-        ];
-        let results = await multicall({
-          calls,
+        const sharesBalances: string[] = await multicall({
+          calls: sharesBalanceOfCalls,
           web3Instance,
         });
-        let chunkedResults = [];
-        while (results.length) {
-          chunkedResults.push(results.splice(0, fetchedMemberAddresses.length));
-        }
-        const [delegateKeys, sharesBalances, lootBalances] = chunkedResults;
-        const membersWithDetails = fetchedMemberAddresses.map(
-          (address, index) => ({
-            address,
-            delegateKey: delegateKeys[index],
-            isDelegated:
-              normalizeString(address) !== normalizeString(delegateKeys[index]),
-            shares: sharesBalances[index],
-            loot: lootBalances[index],
-          })
-        );
+
+        const membersWithDetails = memberAddresses.map((address, index) => ({
+          address,
+          delegateKey: memberAddressesByDelegatedKey[index],
+          isDelegated:
+            normalizeString(address) !==
+            normalizeString(memberAddressesByDelegatedKey[index]),
+          shares: sharesBalances[index],
+        }));
 
         // Filter out any member addresses that don't have a positive balance in
-        // either SHARES or LOOT
+        // SHARES
         const filteredMembersWithDetails = membersWithDetails
-          .filter(
-            (member) =>
-              toBN(member.shares).gt(toBN(0)) || toBN(member.loot).gt(toBN(0))
-          )
+          .filter((member) => toBN(member.shares).gt(toBN(0)))
           // display in descending order of when the member joined (e.g., newest
           // member first)
           .reverse();

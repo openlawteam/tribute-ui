@@ -9,7 +9,6 @@ export const GET_MEMBERS = gql`
         delegateKey
         isDelegated
         shares
-        loot
         didFullyRagequit
       }
     }

@@ -8,5 +8,4 @@ export type Member = {
   delegateKey: string;
   isDelegated: boolean;
   shares: string;
-  loot: string;
 };
