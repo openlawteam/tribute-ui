@@ -2,21 +2,22 @@ import {DaoAdapterConstants, DaoExtensionConstants} from './enums';
 import {getAdapterOrExtensionId} from './helpers';
 
 import {
-  DEFAULT_CHAIN,
+  BANK_ADAPTER_CONTRACT_ADDRESS,
   CONFIGURATION_CONTRACT_ADDRESS,
+  COUPONONBOARDING_CONTRACT_ADDRESS,
+  DEFAULT_CHAIN,
+  DISTRIBUTE_CONTRACT_ADDRESS,
   FINANCING_CONTRACT_ADDRESS,
   GUILDKICK_CONTRACT_ADDRESS,
   MANAGING_CONTRACT_ADDRESS,
+  NFT_ADAPTER_CONTRACT_ADDRESS,
+  NFT_EXTENSION_CONTRACT_ADDRESS,
+  OFFCHAINVOTING_CONTRACT_ADDRESS,
   ONBOARDING_CONTRACT_ADDRESS,
   RAGEQUIT_CONTRACT_ADDRESS,
   TRIBUTE_CONTRACT_ADDRESS,
-  VOTING_CONTRACT_ADDRESS,
-  BANK_ADAPTER_CONTRACT_ADDRESS,
-  OFFCHAINVOTING_CONTRACT_ADDRESS,
-  DISTRIBUTE_CONTRACT_ADDRESS,
-  COUPONONBOARDING_CONTRACT_ADDRESS,
-  NFT_EXTENSION_CONTRACT_ADDRESS,
   TRIBUTE_NFT_CONTRACT_ADDRESS,
+  VOTING_CONTRACT_ADDRESS,
 } from '../../config';
 
 type AdapterProps = {
@@ -169,6 +170,13 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
     abiFunctionName: 'withdraw',
     description:
       'Allows the members to withdraw their funds from the DAO bank.',
+  },
+  {
+    name: DaoAdapterConstants.NFT,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.NFT),
+    contractAddress: NFT_ADAPTER_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    abiFunctionName: 'collect',
+    description: 'Transfers ownership of an NFT to the DAO collection.',
   },
   {
     name: DaoAdapterConstants.COUPON_ONBOARDING,

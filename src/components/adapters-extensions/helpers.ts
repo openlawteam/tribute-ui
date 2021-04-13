@@ -89,16 +89,22 @@ export function getAccessControlLayer(
     [DaoAdapterConstants.BANK]: {
       WITHDRAW: true,
       SUB_FROM_BALANCE: true,
+      UPDATE_TOKEN: true,
+    },
+    [DaoAdapterConstants.NFT]: {
+      COLLECT_NFT: true,
     },
     [DaoAdapterConstants.COUPON_ONBOARDING]: {},
     [DaoAdapterConstants.TRIBUTE_NFT]: {
       SUBMIT_PROPOSAL: true,
       NEW_MEMBER: true,
+      ADD_TO_BALANCE: true,
+      COLLECT_NFT: true,
     },
     [DaoExtensionConstants.NFT]: {
-      TRANSFER_NFT: true,
-      RETURN_NFT: true,
-      REGISTER_NFT: true,
+      WITHDRAW_NFT: true,
+      COLLECT_NFT: true,
+      INTERNAL_TRANSFER: true,
     },
   };
 

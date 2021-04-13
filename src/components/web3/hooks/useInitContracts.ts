@@ -2,23 +2,24 @@ import {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
 
 import {
-  initContractDaoFactory,
+  initContractBankAdapter,
   initContractBankExtension,
   initContractBankFactory,
+  initContractConfiguration,
+  initContractCouponOnboarding,
+  initContractDaoFactory,
   initContractDaoRegistry,
   initContractDistribute,
-  initContractManaging,
-  initContractOnboarding,
-  initContractConfiguration,
   initContractFinancing,
   initContractGuildKick,
+  initContractManaging,
+  initContractNFTAdapter,
+  initContractNFTExtension,
+  initContractOnboarding,
   initContractRagequit,
   initContractTribute,
-  initRegisteredVotingAdapter,
-  initContractBankAdapter,
   initContractTributeNFT,
-  initContractNFTExtension,
-  initContractCouponOnboarding,
+  initRegisteredVotingAdapter,
 } from '../../../store/actions';
 import {ReduxDispatch} from '../../../store/types';
 import {useIsDefaultChain} from './useIsDefaultChain';
@@ -83,6 +84,7 @@ export function useInitContracts(): () => Promise<void> {
       await dispatch(initRegisteredVotingAdapter(web3Instance));
       await dispatch(initContractTributeNFT(web3Instance));
       await dispatch(initContractNFTExtension(web3Instance));
+      await dispatch(initContractNFTAdapter(web3Instance));
       await dispatch(initContractCouponOnboarding(web3Instance));
     } catch (error) {
       throw error;
