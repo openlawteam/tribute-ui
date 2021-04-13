@@ -25,6 +25,7 @@ import {
 } from '../../components/adapters-extensions/enums';
 
 type ContractAction =
+  | typeof CONTRACT_BANK_ADAPTER
   | typeof CONTRACT_BANK_EXTENSION
   | typeof CONTRACT_BANK_FACTORY
   | typeof CONTRACT_CONFIGURATION
@@ -39,7 +40,6 @@ type ContractAction =
   | typeof CONTRACT_TRIBUTE
   | typeof CONTRACT_VOTING
   | typeof CONTRACT_VOTING_OP_ROLLUP
-  | typeof CONTRACT_WITHDRAW
   | typeof CONTRACT_TRIBUTE_NFT
   | typeof CONTRACT_COUPON_ONBOARDING
   | typeof CONTRACT_NFT_EXTENSION;
@@ -58,7 +58,7 @@ export const CONTRACT_RAGEQUIT = 'CONTRACT_RAGEQUIT';
 export const CONTRACT_TRIBUTE = 'CONTRACT_TRIBUTE';
 export const CONTRACT_VOTING = 'CONTRACT_VOTING';
 export const CONTRACT_VOTING_OP_ROLLUP = 'CONTRACT_VOTING_OP_ROLLUP';
-export const CONTRACT_WITHDRAW = 'CONTRACT_WITHDRAW';
+export const CONTRACT_BANK_ADAPTER = 'CONTRACT_BANK_ADAPTER';
 export const CONTRACT_TRIBUTE_NFT = 'CONTRACT_TRIBUTE_NFT';
 export const CONTRACT_COUPON_ONBOARDING = 'CONTRACT_COUPON_ONBOARDING';
 export const CONTRACT_NFT_EXTENSION = 'CONTRACT_NFT_EXTENSION';
@@ -256,16 +256,17 @@ export function initContractManaging(
   });
 }
 
-export function initContractWithdraw(
+export function initContractBankAdapter(
   web3Instance: Web3,
   contractAddress?: string
 ) {
   return initContractThunkFactory({
-    actionType: CONTRACT_WITHDRAW,
-    adapterNameForRedux: DaoAdapterConstants.WITHDRAW,
-    adapterOrExtensionName: ContractAdapterNames.withdraw,
+    actionType: CONTRACT_BANK_ADAPTER,
+    adapterNameForRedux: DaoAdapterConstants.BANK,
+    adapterOrExtensionName: ContractAdapterNames.bank,
     contractAddress,
-    lazyImport: () => import('../../truffle-contracts/WithdrawContract.json'),
+    lazyImport: () =>
+      import('../../truffle-contracts/BankAdapterContract.json'),
     web3Instance,
   });
 }

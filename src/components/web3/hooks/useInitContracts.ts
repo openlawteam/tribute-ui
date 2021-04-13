@@ -15,7 +15,7 @@ import {
   initContractRagequit,
   initContractTribute,
   initRegisteredVotingAdapter,
-  initContractWithdraw,
+  initContractBankAdapter,
   initContractTributeNFT,
   initContractNFTExtension,
   initContractCouponOnboarding,
@@ -73,7 +73,7 @@ export function useInitContracts(): () => Promise<void> {
       await dispatch(initContractGuildKick(web3Instance));
       await dispatch(initContractManaging(web3Instance));
       await dispatch(initContractRagequit(web3Instance));
-      await dispatch(initContractWithdraw(web3Instance));
+      await dispatch(initContractBankAdapter(web3Instance));
       // Init other contracts
       await dispatch(initContractBankExtension(web3Instance));
       await dispatch(initContractManaging(web3Instance));

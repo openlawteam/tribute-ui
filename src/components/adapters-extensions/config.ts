@@ -15,7 +15,7 @@ import {
   RAGEQUIT_CONTRACT_ADDRESS,
   TRIBUTE_CONTRACT_ADDRESS,
   VOTING_CONTRACT_ADDRESS,
-  WITHDRAW_CONTRACT_ADDRESS,
+  BANK_ADAPTER_CONTRACT_ADDRESS,
   OFFCHAINVOTING_CONTRACT_ADDRESS,
   DISTRIBUTE_CONTRACT_ADDRESS,
   COUPONONBOARDING_CONTRACT_ADDRESS,
@@ -167,9 +167,9 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
     optionDefaultTarget: DaoAdapterConstants.VOTING,
   },
   {
-    name: DaoAdapterConstants.WITHDRAW,
-    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.WITHDRAW),
-    contractAddress: WITHDRAW_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    name: DaoAdapterConstants.BANK,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.BANK),
+    contractAddress: BANK_ADAPTER_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'withdraw',
     description:
       'Allows the members to withdraw their funds from the DAO bank.',

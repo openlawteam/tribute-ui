@@ -10,7 +10,7 @@ import {
   initContractRagequit,
   initContractTribute,
   initRegisteredVotingAdapter,
-  initContractWithdraw,
+  initContractBankAdapter,
   initContractTributeNFT,
   initContractNFTExtension,
   initContractCouponOnboarding,
@@ -57,8 +57,8 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
       case DaoAdapterConstants.RAGEQUIT:
         await dispatch(initContractRagequit(web3Instance));
         break;
-      case DaoAdapterConstants.WITHDRAW:
-        await dispatch(initContractWithdraw(web3Instance));
+      case DaoAdapterConstants.BANK:
+        await dispatch(initContractBankAdapter(web3Instance));
         break;
       case DaoExtensionConstants.NFT:
         await dispatch(initContractNFTExtension(web3Instance));
