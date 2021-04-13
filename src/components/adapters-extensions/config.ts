@@ -1,8 +1,4 @@
-import {
-  DaoAdapterConstants,
-  DaoExtensionConstants,
-  OtherAdapterConstants,
-} from './enums';
+import {DaoAdapterConstants, DaoExtensionConstants} from './enums';
 import {getAdapterOrExtensionId} from './helpers';
 
 import {
@@ -145,7 +141,7 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
     options: [
       {
         name: DaoAdapterConstants.VOTING,
-        displayName: OtherAdapterConstants.OFFCHAINVOTING,
+        displayName: DaoAdapterConstants.OFFCHAINVOTING,
         adapterId: getAdapterOrExtensionId(DaoAdapterConstants.VOTING),
         contractAddress: OFFCHAINVOTING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
         abiFunctionName: 'configureDao',
@@ -175,8 +171,8 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
       'Allows the members to withdraw their funds from the DAO bank.',
   },
   {
-    name: OtherAdapterConstants.COUPON_ONBOARDING,
-    adapterId: getAdapterOrExtensionId(OtherAdapterConstants.COUPON_ONBOARDING),
+    name: DaoAdapterConstants.COUPON_ONBOARDING,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.COUPON_ONBOARDING),
     contractAddress: COUPONONBOARDING_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'configureDao',
     description:

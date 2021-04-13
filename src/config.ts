@@ -159,7 +159,7 @@ export const NFT_COLLECTION_FACTORY_CONTRACT_ADDRESS = {
  * @note as per https://github.com/openlawteam/molochv3-contracts#architecture
  *
  * - Configuration
- * - CouponOnboardingContract @todo add to initContracts
+ * - CouponOnboardingContract
  * - Managing
  * - Onboarding
  * - Voting

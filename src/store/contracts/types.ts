@@ -4,7 +4,6 @@ import {Contract as Web3Contract} from 'web3-eth-contract/types';
 import {
   DaoAdapterConstants,
   DaoExtensionConstants,
-  OtherAdapterConstants,
   VotingAdapterName,
 } from '../../components/adapters-extensions/enums';
 
@@ -23,7 +22,6 @@ export type ContractsStateEntry = {
   adapterOrExtensionName?:
     | DaoAdapterConstants
     | DaoExtensionConstants
-    | OtherAdapterConstants
     | VotingAdapterName;
   /**
    * Address of the instantiated contract

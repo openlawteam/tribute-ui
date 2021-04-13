@@ -17,11 +17,7 @@ import {
 } from '../../../store/actions';
 
 import {ReduxDispatch} from '../../../store/types';
-import {
-  DaoAdapterConstants,
-  DaoExtensionConstants,
-  OtherAdapterConstants,
-} from '../enums';
+import {DaoAdapterConstants, DaoExtensionConstants} from '../enums';
 
 import {useWeb3Modal} from '../../web3/hooks';
 
@@ -75,7 +71,7 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
       case DaoAdapterConstants.VOTING:
         await dispatch(initRegisteredVotingAdapter(web3Instance));
         break;
-      case OtherAdapterConstants.COUPON_ONBOARDING:
+      case DaoAdapterConstants.COUPON_ONBOARDING:
         await dispatch(initContractCouponOnboarding(web3Instance));
         break;
       case DaoAdapterConstants.TRIBUTE_NFT:

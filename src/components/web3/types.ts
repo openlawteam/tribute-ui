@@ -14,7 +14,9 @@
  * @todo Add other extensions as needs arise
  */
 export enum ContractAdapterNames {
+  bank = 'bank',
   configuration = 'configuration',
+  coupon_onboarding = 'coupon-onboarding',
   distribute = 'distribute',
   financing = 'financing',
   guildkick = 'guildkick',
@@ -22,17 +24,8 @@ export enum ContractAdapterNames {
   onboarding = 'onboarding',
   ragequit = 'ragequit',
   tribute = 'tribute',
-  voting = 'voting',
-  bank = 'bank',
   tribute_nft = 'tribute-nft',
-}
-
-/**
- * These are custom adapters that don't exist in
- * DaoContracts
- */
-export enum OtherContractAdapterNames {
-  coupon_onboarding = 'coupon-onboarding',
+  voting = 'voting',
 }
 
 /**
