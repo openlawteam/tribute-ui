@@ -1,19 +1,20 @@
 import {useDispatch} from 'react-redux';
 
 import {
-  initContractDistribute,
-  initContractManaging,
-  initContractOnboarding,
+  initContractBankAdapter,
   initContractConfiguration,
+  initContractCouponOnboarding,
+  initContractDistribute,
   initContractFinancing,
   initContractGuildKick,
+  initContractManaging,
+  initContractNFTAdapter,
+  initContractNFTExtension,
+  initContractOnboarding,
   initContractRagequit,
   initContractTribute,
-  initRegisteredVotingAdapter,
-  initContractBankAdapter,
   initContractTributeNFT,
-  initContractNFTExtension,
-  initContractCouponOnboarding,
+  initRegisteredVotingAdapter,
 } from '../../../store/actions';
 
 import {ReduxDispatch} from '../../../store/types';
@@ -76,6 +77,9 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
         break;
       case DaoAdapterConstants.TRIBUTE_NFT:
         await dispatch(initContractTributeNFT(web3Instance));
+        break;
+      case DaoAdapterConstants.NFT:
+        await dispatch(initContractNFTAdapter(web3Instance));
         break;
     }
   }

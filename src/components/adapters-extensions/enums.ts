@@ -12,6 +12,7 @@ export enum DaoAdapterConstants {
   FINANCING = 'financing',
   GUILDKICK = 'guildkick',
   MANAGING = 'managing',
+  NFT = 'nft',
   NONVOTING_ONBOARDING = 'nonvoting-onboarding',
   OFFCHAINVOTING = 'offchainvoting',
   ONBOARDING = 'onboarding',

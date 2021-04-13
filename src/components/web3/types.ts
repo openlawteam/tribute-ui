@@ -21,6 +21,7 @@ export enum ContractAdapterNames {
   financing = 'financing',
   guildkick = 'guildkick',
   managing = 'managing',
+  nft = 'nft',
   onboarding = 'onboarding',
   ragequit = 'ragequit',
   tribute = 'tribute',

@@ -170,6 +170,8 @@ export const NFT_COLLECTION_FACTORY_CONTRACT_ADDRESS = {
  * - Rage quit
  * - Guild kick
  * - BankAdapter
+ * - TributeNFT
+ * - NFTAdapter
  */
 
 export const VOTING_CONTRACT_ADDRESS = {
@@ -278,6 +280,15 @@ export const TRIBUTE_NFT_CONTRACT_ADDRESS = {
   [CHAINS.GOERLI]: '',
   [CHAINS.KOVAN]: '',
   [CHAINS.GANACHE]: '0xd173322607d9c00F8F7EE18F93678CA0a76a432e',
+};
+
+export const NFT_ADAPTER_CONTRACT_ADDRESS = {
+  [CHAINS.MAINNET]: '',
+  [CHAINS.ROPSTEN]: '',
+  [CHAINS.RINKEBY]: '',
+  [CHAINS.GOERLI]: '',
+  [CHAINS.KOVAN]: '',
+  [CHAINS.GANACHE]: '',
 };
 
 export const OFFCHAINVOTING_CONTRACT_ADDRESS = {

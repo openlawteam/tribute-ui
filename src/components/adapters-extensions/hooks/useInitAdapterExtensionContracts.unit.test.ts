@@ -11,6 +11,7 @@ import {
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
   CONTRACT_MANAGING,
+  CONTRACT_NFT_ADAPTER,
   CONTRACT_ONBOARDING,
   CONTRACT_RAGEQUIT,
   CONTRACT_TRIBUTE,
@@ -76,6 +77,7 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
         expect(reduxStore.getState().contracts.TributeContract).toBeNull();
         expect(reduxStore.getState().contracts.VotingContract).toBeNull();
         expect(reduxStore.getState().contracts.BankAdapterContract).toBeNull();
+        expect(reduxStore.getState().contracts.NFTAdapterContract).toBeNull();
       });
 
       reduxStore.dispatch({
@@ -111,6 +113,9 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
       reduxStore.dispatch({
         type: CONTRACT_BANK_ADAPTER,
       });
+      reduxStore.dispatch({
+        type: CONTRACT_NFT_ADAPTER,
+      });
 
       expect(
         reduxStore.getState().contracts.BankExtensionContract
@@ -129,6 +134,7 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
       expect(
         reduxStore.getState().contracts.BankAdapterContract
       ).not.toBeNull();
+      expect(reduxStore.getState().contracts.NFTAdapterContract).not.toBeNull();
     });
   });
 });
