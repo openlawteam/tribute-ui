@@ -123,24 +123,6 @@
     "inputs": [
       {
         "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "nftToCollect",
-        "type": "address"
-      }
-    ],
-    "name": "configureDao",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
         "name": "",
         "type": "address"
       },
@@ -178,6 +160,19 @@
     "name": "provideTribute",
     "outputs": [],
     "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract DaoRegistry",
+        "name": "dao",
+        "type": "address"
+      }
+    ],
+    "name": "configureDao",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
