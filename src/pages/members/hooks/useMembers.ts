@@ -180,7 +180,7 @@ export default function useMembers(): UseMembersReturn {
 
       const nbMembers = await daoRegistryMethods.getNbMembers().call();
 
-      if (Number(nbMembers) > 1) {
+      if (Number(nbMembers) > 0) {
         // Build calls to get list of member addresses
         const getMemberAddressABI = daoRegistryABI.find(
           (item) => item.name === 'getMemberAddress'
