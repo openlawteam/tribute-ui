@@ -370,6 +370,126 @@ describe('ProposalCard unit tests', () => {
     });
   });
 
+  test('should render only unsponsored proposals (e.g. first proposals in DAO)', async () => {
+    const spy = jest.fn();
+
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/drafts/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json(draftsResponse))
+        ),
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json({}))
+        ),
+      ]
+    );
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={({mockWeb3Provider, web3Instance}) => {
+          // Mock the unsponsored proposals' multicall response
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    {
+                      adapterAddress: DEFAULT_ETH_ADDRESS,
+                      // ProposalFlag.EXISTS
+                      flags: '1',
+                    }
+                  ),
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    {
+                      adapterAddress: DEFAULT_ETH_ADDRESS,
+                      // ProposalFlag.EXISTS
+                      flags: '1',
+                    }
+                  ),
+                ],
+              ]
+            )
+          );
+
+          // Mock unsponsored proposals' voting state multicall response
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  // VotingState.NOT_STARTED
+                  web3Instance.eth.abi.encodeParameter('uint8', '0'),
+                  // VotingState.NOT_STARTED
+                  web3Instance.eth.abi.encodeParameter('uint8', '0'),
+                ],
+              ]
+            )
+          );
+
+          // For `useProposalsVotes`
+          const noVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
+            'address',
+            BURN_ADDRESS
+          );
+
+          // `useProposalsVotes`: Mock `dao.votingAdapter` responses
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [0, [noVotingAdapterResponse, noVotingAdapterResponse]]
+            )
+          );
+        }}>
+        <Proposals
+          adapterName={DaoAdapterConstants.ONBOARDING}
+          onProposalClick={spy}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Proposal headers
+      expect(screen.getByText(/^proposals$/i)).toBeInTheDocument();
+
+      // Proposal names
+      expect(screen.getByText(/another nice one/i)).toBeInTheDocument();
+      expect(screen.getByText(/another great one/i)).toBeInTheDocument();
+    });
+
+    // Click on a proposal
+    userEvent.click(screen.getByText(/another nice one/i));
+
+    // Expect correct proposal id to come through in function args
+    await waitFor(() => {
+      expect(spy.mock.calls[0][0]).toBe(
+        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c1111'
+      );
+    });
+  });
+
   test('should render no proposals text', async () => {
     server.use(
       ...[

@@ -49,6 +49,14 @@ Alternatively (and for now the more stable method), you can run the network with
 
 **Remember**: After you deploy the `DaoRegistry` smart contract on your local Ganache network you must include the deployed contract's address in your local root `.env` file. Additionally, you will need to add the contract addresses for the deployed adapters and extensions contracts to the config in `/src/config.ts`.
 
+#### Saving Ganache data
+
+If you want to use the same accounts and data from a previous Ganache chain, you can add the following arguments to the `ganache-cli` command. The `--db` path can be any path with any structure. Ganache creates many "loose" files, so it may be easiest to keep each chain in its own directory (e.g. `some/path/your-ganache-dbs/01-01-1999`).
+
+`... -d --db some/path/your-ganache-dbs/[DIR_WHERE_CHAIN_DATA_WILL_BE_SAVED]`
+
+[Ganache CLI Options](https://github.com/trufflesuite/ganache-cli#options)
+
 ## Running the local graph-node
 
 Clone the https://github.com/openlawteam/molochv3-contracts repo and from the root open up a terminal, `npm ci`.
