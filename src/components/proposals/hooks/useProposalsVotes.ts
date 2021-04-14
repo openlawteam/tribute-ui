@@ -151,6 +151,17 @@ export function useProposalsVotes(
         (a) => a !== BURN_ADDRESS
       );
 
+      /**
+       * Exit early if there's no voting adapter addresses.
+       * It means no proposals were found to be sponsored
+       */
+      if (!filteredVotingAdapterAddressResults.length) {
+        setProposalsVotesStatus(AsyncStatus.FULFILLED);
+        setProposalsVotes([]);
+
+        return;
+      }
+
       const votingAdapterNameCalls: MulticallTuple[] = filteredVotingAdapterAddressResults.map(
         (votingAdapterAddress) => [votingAdapterAddress, getAdapterNameABI, []]
       );
