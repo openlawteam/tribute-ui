@@ -1,4 +1,4 @@
-import {DaoAdapterConstants, DaoExtensionConstants} from './enums';
+import {DaoAdapterConstants /*DaoExtensionConstants*/} from './enums';
 import {getAdapterOrExtensionId} from './helpers';
 
 import {
@@ -11,7 +11,7 @@ import {
   GUILDKICK_CONTRACT_ADDRESS,
   MANAGING_CONTRACT_ADDRESS,
   NFT_ADAPTER_CONTRACT_ADDRESS,
-  NFT_EXTENSION_CONTRACT_ADDRESS,
+  // NFT_EXTENSION_CONTRACT_ADDRESS,
   OFFCHAINVOTING_CONTRACT_ADDRESS,
   ONBOARDING_CONTRACT_ADDRESS,
   RAGEQUIT_CONTRACT_ADDRESS,
@@ -186,13 +186,13 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
     description:
       'Provides a way to onboard an initial group of members quickly without requiring multiple proposals.',
   },
-  {
-    isExtension: true,
-    name: DaoExtensionConstants.NFT,
-    extensionId: getAdapterOrExtensionId(DaoExtensionConstants.NFT),
-    contractAddress: NFT_EXTENSION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    abiFunctionName: 'registerPotentialNewNFT',
-    description:
-      'Adds to the DAO the capability of managing and curate a collection of standard NFTs.',
-  },
+  // {
+  //   isExtension: true,
+  //   name: DaoExtensionConstants.NFT,
+  //   extensionId: getAdapterOrExtensionId(DaoExtensionConstants.NFT),
+  //   contractAddress: NFT_EXTENSION_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+  //   abiFunctionName: 'registerPotentialNewNFT',
+  //   description:
+  //     'Adds to the DAO the capability of managing and curate a collection of standard NFTs.',
+  // },
 ];
