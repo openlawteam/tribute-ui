@@ -6,8 +6,8 @@ import {
 } from '../../../test/helpers';
 import {AsyncStatus} from '../../../util/types';
 import {useProposalsVotes} from './useProposalsVotes';
-import Wrapper from '../../../test/Wrapper';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
+import Wrapper from '../../../test/Wrapper';
 
 describe('useProposalsVotes unit tests', () => {
   test('should return correct data when OK', async () => {
@@ -56,7 +56,6 @@ describe('useProposalsVotes unit tests', () => {
                     proposalHash: 'bytes32',
                     reporter: 'address',
                     resultRoot: 'bytes32',
-                    nbVoters: 'uint256',
                     nbYes: 'uint256',
                     nbNo: 'uint256',
                     index: 'uint256',
@@ -72,7 +71,6 @@ describe('useProposalsVotes unit tests', () => {
                   reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
                   resultRoot:
                     '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                  nbVoters: '0',
                   nbYes: '1',
                   nbNo: '0',
                   index: '0',
@@ -174,24 +172,22 @@ describe('useProposalsVotes unit tests', () => {
               '0': '8376297',
               '1':
                 '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
-              '10': false,
-              '11': '0',
+              '10': '0',
               '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
               '3':
                 '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-              '4': '0',
-              '5': '1',
+              '4': '1',
+              '5': '0',
               '6': '0',
-              '7': '0',
-              '8': '1617878162',
-              '9': '1617964640',
-              __length__: 12,
+              '7': '1617878162',
+              '8': '1617964640',
+              '9': false,
+              __length__: 11,
               fallbackVotesCount: '0',
               gracePeriodStartingTime: '1617964640',
               index: '0',
               isChallenged: false,
               nbNo: '0',
-              nbVoters: '0',
               nbYes: '1',
               proposalHash:
                 '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
@@ -210,24 +206,22 @@ describe('useProposalsVotes unit tests', () => {
               '0': '8376297',
               '1':
                 '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
-              '10': false,
-              '11': '0',
+              '10': '0',
               '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
               '3':
                 '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-              '4': '0',
-              '5': '1',
+              '4': '1',
+              '5': '0',
               '6': '0',
-              '7': '0',
-              '8': '1617878162',
-              '9': '1617964640',
-              __length__: 12,
+              '7': '1617878162',
+              '8': '1617964640',
+              '9': false,
+              __length__: 11,
               fallbackVotesCount: '0',
               gracePeriodStartingTime: '1617964640',
               index: '0',
               isChallenged: false,
               nbNo: '0',
-              nbVoters: '0',
               nbYes: '1',
               proposalHash:
                 '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
@@ -293,7 +287,6 @@ describe('useProposalsVotes unit tests', () => {
                     proposalHash: 'bytes32',
                     reporter: 'address',
                     resultRoot: 'bytes32',
-                    nbVoters: 'uint256',
                     nbYes: 'uint256',
                     nbNo: 'uint256',
                     index: 'uint256',
@@ -309,7 +302,6 @@ describe('useProposalsVotes unit tests', () => {
                   reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
                   resultRoot:
                     '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                  nbVoters: '0',
                   nbYes: '1',
                   nbNo: '0',
                   index: '0',
@@ -401,7 +393,6 @@ describe('useProposalsVotes unit tests', () => {
                     proposalHash: 'bytes32',
                     reporter: 'address',
                     resultRoot: 'bytes32',
-                    nbVoters: 'uint256',
                     nbYes: 'uint256',
                     nbNo: 'uint256',
                     index: 'uint256',
@@ -417,7 +408,6 @@ describe('useProposalsVotes unit tests', () => {
                   reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
                   resultRoot:
                     '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                  nbVoters: '0',
                   nbYes: '1',
                   nbNo: '0',
                   index: '0',
@@ -478,24 +468,22 @@ describe('useProposalsVotes unit tests', () => {
               '0': '8376297',
               '1':
                 '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
-              '10': false,
-              '11': '0',
+              '10': '0',
               '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
               '3':
                 '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-              '4': '0',
-              '5': '1',
+              '4': '1',
+              '5': '0',
               '6': '0',
-              '7': '0',
-              '8': '1617878162',
-              '9': '1617964640',
-              __length__: 12,
+              '7': '1617878162',
+              '8': '1617964640',
+              '9': false,
+              __length__: 11,
               fallbackVotesCount: '0',
               gracePeriodStartingTime: '1617964640',
               index: '0',
               isChallenged: false,
               nbNo: '0',
-              nbVoters: '0',
               nbYes: '1',
               proposalHash:
                 '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
@@ -545,7 +533,6 @@ describe('useProposalsVotes unit tests', () => {
                     proposalHash: 'bytes32',
                     reporter: 'address',
                     resultRoot: 'bytes32',
-                    nbVoters: 'uint256',
                     nbYes: 'uint256',
                     nbNo: 'uint256',
                     index: 'uint256',
@@ -561,7 +548,6 @@ describe('useProposalsVotes unit tests', () => {
                   reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
                   resultRoot:
                     '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                  nbVoters: '0',
                   nbYes: '1',
                   nbNo: '0',
                   index: '0',
@@ -646,7 +632,6 @@ describe('useProposalsVotes unit tests', () => {
                     proposalHash: 'bytes32',
                     reporter: 'address',
                     resultRoot: 'bytes32',
-                    nbVoters: 'uint256',
                     nbYes: 'uint256',
                     nbNo: 'uint256',
                     index: 'uint256',
@@ -662,7 +647,6 @@ describe('useProposalsVotes unit tests', () => {
                   reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
                   resultRoot:
                     '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                  nbVoters: '0',
                   nbYes: '1',
                   nbNo: '0',
                   index: '0',

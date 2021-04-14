@@ -1,17 +1,10 @@
 import Web3 from 'web3';
 
-import {
-  DaoAdapterConstants,
-  DaoExtensionConstants,
-  OtherAdapterConstants,
-} from './enums';
+import {DaoAdapterConstants, DaoExtensionConstants} from './enums';
 import {AclFlag} from './types';
 
 export function getAdapterOrExtensionId(
-  adapterName:
-    | DaoAdapterConstants
-    | OtherAdapterConstants
-    | DaoExtensionConstants
+  adapterName: DaoAdapterConstants | DaoExtensionConstants
 ): string {
   return sha3(adapterName) as string;
 }
@@ -27,9 +20,7 @@ export function getAccessControlLayer(
   const adapterAndExtensionFlags: Record<
     | DaoAdapterConstants
     | DaoExtensionConstants.BANK
-    | DaoExtensionConstants.NFT
-    | OtherAdapterConstants.OFFCHAINVOTING
-    | OtherAdapterConstants.COUPON_ONBOARDING,
+    | DaoExtensionConstants.NFT,
     any
   > = {
     [DaoExtensionConstants.BANK]: {},
@@ -78,7 +69,7 @@ export function getAccessControlLayer(
       REMOVE_ADAPTER: true,
       ADD_ADAPTER: true,
     },
-    [OtherAdapterConstants.OFFCHAINVOTING]: {},
+    [DaoAdapterConstants.OFFCHAINVOTING]: {},
     [DaoAdapterConstants.ONBOARDING]: {
       SUBMIT_PROPOSAL: true,
       SPONSOR_PROPOSAL: true,
@@ -95,19 +86,25 @@ export function getAccessControlLayer(
       INTERNAL_TRANSFER: true,
     },
     [DaoAdapterConstants.VOTING]: {},
-    [DaoAdapterConstants.WITHDRAW]: {
+    [DaoAdapterConstants.BANK]: {
       WITHDRAW: true,
       SUB_FROM_BALANCE: true,
+      UPDATE_TOKEN: true,
     },
-    [OtherAdapterConstants.COUPON_ONBOARDING]: {},
+    [DaoAdapterConstants.NFT]: {
+      COLLECT_NFT: true,
+    },
+    [DaoAdapterConstants.COUPON_ONBOARDING]: {},
     [DaoAdapterConstants.TRIBUTE_NFT]: {
       SUBMIT_PROPOSAL: true,
       NEW_MEMBER: true,
+      ADD_TO_BALANCE: true,
+      COLLECT_NFT: true,
     },
     [DaoExtensionConstants.NFT]: {
-      TRANSFER_NFT: true,
-      RETURN_NFT: true,
-      REGISTER_NFT: true,
+      WITHDRAW_NFT: true,
+      COLLECT_NFT: true,
+      INTERNAL_TRANSFER: true,
     },
   };
 

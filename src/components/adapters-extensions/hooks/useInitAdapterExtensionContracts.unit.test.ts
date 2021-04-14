@@ -4,17 +4,18 @@ import {waitFor} from '@testing-library/react';
 import {useInitAdapterExtensionContracts} from './useInitAdapterExtensionContracts';
 
 import {
+  CONTRACT_BANK_ADAPTER,
   CONTRACT_BANK_EXTENSION,
   CONTRACT_CONFIGURATION,
   CONTRACT_DISTRIBUTE,
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
   CONTRACT_MANAGING,
+  CONTRACT_NFT_ADAPTER,
   CONTRACT_ONBOARDING,
   CONTRACT_RAGEQUIT,
   CONTRACT_TRIBUTE,
   CONTRACT_VOTING,
-  CONTRACT_WITHDRAW,
 } from '../../../store/actions';
 
 import Wrapper from '../../../test/Wrapper';
@@ -75,7 +76,8 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
         expect(reduxStore.getState().contracts.RagequitContract).toBeNull();
         expect(reduxStore.getState().contracts.TributeContract).toBeNull();
         expect(reduxStore.getState().contracts.VotingContract).toBeNull();
-        expect(reduxStore.getState().contracts.WithdrawContract).toBeNull();
+        expect(reduxStore.getState().contracts.BankAdapterContract).toBeNull();
+        expect(reduxStore.getState().contracts.NFTAdapterContract).toBeNull();
       });
 
       reduxStore.dispatch({
@@ -109,7 +111,10 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
         type: CONTRACT_TRIBUTE,
       });
       reduxStore.dispatch({
-        type: CONTRACT_WITHDRAW,
+        type: CONTRACT_BANK_ADAPTER,
+      });
+      reduxStore.dispatch({
+        type: CONTRACT_NFT_ADAPTER,
       });
 
       expect(
@@ -126,7 +131,10 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
       expect(reduxStore.getState().contracts.RagequitContract).not.toBeNull();
       expect(reduxStore.getState().contracts.TributeContract).not.toBeNull();
       expect(reduxStore.getState().contracts.VotingContract).not.toBeNull();
-      expect(reduxStore.getState().contracts.WithdrawContract).not.toBeNull();
+      expect(
+        reduxStore.getState().contracts.BankAdapterContract
+      ).not.toBeNull();
+      expect(reduxStore.getState().contracts.NFTAdapterContract).not.toBeNull();
     });
   });
 });

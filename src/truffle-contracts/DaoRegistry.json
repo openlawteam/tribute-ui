@@ -346,6 +346,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "lockedAt",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "bytes32",
@@ -512,6 +525,20 @@
   {
     "inputs": [],
     "name": "finalizeDao",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lockSession",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "unlockSession",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -881,7 +908,7 @@
         "type": "address"
       }
     ],
-    "name": "isActiveMember",
+    "name": "isMember",
     "outputs": [
       {
         "internalType": "bool",

@@ -4,24 +4,22 @@
  * https://github.com/openlawteam/molochv3-contracts
  */
 export enum DaoAdapterConstants {
+  BANK = 'bank',
   CONFIGURATION = 'configuration',
+  COUPON_ONBOARDING = 'coupon-onboarding',
   DISTRIBUTE = 'distribute',
   EXECUTION = 'execution',
   FINANCING = 'financing',
   GUILDKICK = 'guildkick',
-  ONBOARDING = 'onboarding',
-  NONVOTING_ONBOARDING = 'nonvoting-onboarding',
   MANAGING = 'managing',
+  NFT = 'nft',
+  NONVOTING_ONBOARDING = 'nonvoting-onboarding',
+  OFFCHAINVOTING = 'offchainvoting',
+  ONBOARDING = 'onboarding',
   RAGEQUIT = 'ragequit',
   TRIBUTE = 'tribute',
   TRIBUTE_NFT = 'tribute-nft',
   VOTING = 'voting',
-  WITHDRAW = 'withdraw',
-}
-
-export enum OtherAdapterConstants {
-  OFFCHAINVOTING = 'offchainvoting',
-  COUPON_ONBOARDING = 'coupon-onboarding',
 }
 
 export enum DaoExtensionConstants {

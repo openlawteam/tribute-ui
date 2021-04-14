@@ -4,7 +4,6 @@ import {Contract as Web3Contract} from 'web3-eth-contract/types';
 import {
   DaoAdapterConstants,
   DaoExtensionConstants,
-  OtherAdapterConstants,
   VotingAdapterName,
 } from '../../components/adapters-extensions/enums';
 
@@ -23,7 +22,6 @@ export type ContractsStateEntry = {
   adapterOrExtensionName?:
     | DaoAdapterConstants
     | DaoExtensionConstants
-    | OtherAdapterConstants
     | VotingAdapterName;
   /**
    * Address of the instantiated contract
@@ -32,6 +30,7 @@ export type ContractsStateEntry = {
 };
 
 export type ContractsState = {
+  BankAdapterContract: ContractsStateEntry | null;
   BankExtensionContract: ContractsStateEntry | null;
   ConfigurationContract: ContractsStateEntry | null;
   CouponOnboardingContract: ContractsStateEntry | null;
@@ -41,11 +40,11 @@ export type ContractsState = {
   FinancingContract: ContractsStateEntry | null;
   GuildBankContract: ContractsStateEntry | null;
   ManagingContract: ContractsStateEntry | null;
+  NFTAdapterContract: ContractsStateEntry | null;
   NFTExtensionContract: ContractsStateEntry | null;
   OnboardingContract: ContractsStateEntry | null;
   RagequitContract: ContractsStateEntry | null;
   TributeContract: ContractsStateEntry | null;
   TributeNFTContract: ContractsStateEntry | null;
   VotingContract: ContractsStateEntry | null;
-  WithdrawContract: ContractsStateEntry | null;
 };

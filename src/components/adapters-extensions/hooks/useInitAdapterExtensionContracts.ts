@@ -1,27 +1,24 @@
 import {useDispatch} from 'react-redux';
 
 import {
-  initContractDistribute,
-  initContractManaging,
-  initContractOnboarding,
+  initContractBankAdapter,
   initContractConfiguration,
+  initContractCouponOnboarding,
+  initContractDistribute,
   initContractFinancing,
   initContractGuildKick,
+  initContractManaging,
+  initContractNFTAdapter,
+  initContractNFTExtension,
+  initContractOnboarding,
   initContractRagequit,
   initContractTribute,
-  initRegisteredVotingAdapter,
-  initContractWithdraw,
   initContractTributeNFT,
-  initContractNFTExtension,
-  initContractCouponOnboarding,
+  initRegisteredVotingAdapter,
 } from '../../../store/actions';
 
 import {ReduxDispatch} from '../../../store/types';
-import {
-  DaoAdapterConstants,
-  DaoExtensionConstants,
-  OtherAdapterConstants,
-} from '../enums';
+import {DaoAdapterConstants, DaoExtensionConstants} from '../enums';
 
 import {useWeb3Modal} from '../../web3/hooks';
 
@@ -57,8 +54,8 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
       case DaoAdapterConstants.RAGEQUIT:
         await dispatch(initContractRagequit(web3Instance));
         break;
-      case DaoAdapterConstants.WITHDRAW:
-        await dispatch(initContractWithdraw(web3Instance));
+      case DaoAdapterConstants.BANK:
+        await dispatch(initContractBankAdapter(web3Instance));
         break;
       case DaoExtensionConstants.NFT:
         await dispatch(initContractNFTExtension(web3Instance));
@@ -75,11 +72,14 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
       case DaoAdapterConstants.VOTING:
         await dispatch(initRegisteredVotingAdapter(web3Instance));
         break;
-      case OtherAdapterConstants.COUPON_ONBOARDING:
+      case DaoAdapterConstants.COUPON_ONBOARDING:
         await dispatch(initContractCouponOnboarding(web3Instance));
         break;
       case DaoAdapterConstants.TRIBUTE_NFT:
         await dispatch(initContractTributeNFT(web3Instance));
+        break;
+      case DaoAdapterConstants.NFT:
+        await dispatch(initContractNFTAdapter(web3Instance));
         break;
     }
   }

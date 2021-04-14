@@ -252,24 +252,6 @@
         "type": "address"
       },
       {
-        "internalType": "address",
-        "name": "delegateKey",
-        "type": "address"
-      }
-    ],
-    "name": "updateDelegateKey",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
-      },
-      {
         "internalType": "bytes32",
         "name": "proposalId",
         "type": "bytes32"
