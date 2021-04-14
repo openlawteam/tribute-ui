@@ -144,6 +144,17 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
         proposalHasFlag(ProposalFlag.SPONSORED, p.daoProposal.flags) &&
         votesData?.OffchainVotingContract?.reporter === BURN_ADDRESS;
 
+      // @todo remove. @debug only
+      if (
+        proposalId ===
+        '0x20a3737e0a4da49bbf3e600035251fbe031291d2a8bd01af10154abb3973553e'
+      ) {
+        console.log('NotYetSubmitted:', offchainResultNotYetSubmitted);
+        console.log('voteState', voteState);
+        console.log('daoProposal.flags', p.daoProposal.flags);
+        console.log('reporter', votesData?.OffchainVotingContract?.reporter);
+      }
+
       // non-sponsored proposal
       if (
         proposalHasVotingState(VotingState.NOT_STARTED, voteState) &&
