@@ -39,7 +39,7 @@ export default function GovernanceProposalDetails() {
   if (proposalStatus === AsyncStatus.PENDING) {
     return (
       <RenderWrapper>
-        <div className="loader--emjoi-container">
+        <div className="loader--emoji-container">
           <LoaderWithEmoji />
         </div>
       </RenderWrapper>

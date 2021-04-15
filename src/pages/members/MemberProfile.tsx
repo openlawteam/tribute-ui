@@ -68,7 +68,7 @@ export default function MemberProfile() {
   if (isLoading && !isError) {
     return (
       <RenderWrapper>
-        <div className="loader--emjoi-container">
+        <div className="loader--emoji-container">
           <LoaderWithEmoji />
         </div>
       </RenderWrapper>

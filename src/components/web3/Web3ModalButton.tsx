@@ -214,7 +214,7 @@ function DisplayChainError({
         <small>{defaultChainError}</small>
       </div>
       <div>
-        <div className="loader--emjoi-container">
+        <div className="loader--emoji-container">
           <LoaderWithEmoji />
         </div>
         <div>

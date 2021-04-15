@@ -213,7 +213,7 @@ export default function GovernanceProposalsList(
   // Render loading
   if (isLoading && !isError) {
     return (
-      <div className="loader--emjoi-container">
+      <div className="loader--emoji-container">
         <LoaderWithEmoji />
       </div>
     );
