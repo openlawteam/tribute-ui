@@ -8,7 +8,7 @@ import {ProposalHeaderNames} from '../../util/enums';
 import {useGovernanceProposals} from './hooks';
 import {useOffchainVotingResults} from '../proposals/hooks';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
-import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
+import LoaderLarge from '../feedback/LoaderLarge';
 import ProposalCard from '../proposals/ProposalCard';
 
 type GovernanceProposalsListProps = {
@@ -213,8 +213,8 @@ export default function GovernanceProposalsList(
   // Render loading
   if (isLoading && !isError) {
     return (
-      <div className="loader--emoji-container">
-        <LoaderWithEmoji />
+      <div className="loader--large-container">
+        <LoaderLarge />
       </div>
     );
   }

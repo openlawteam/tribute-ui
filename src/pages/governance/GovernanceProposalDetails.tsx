@@ -7,7 +7,7 @@ import {GovernanceActions} from '../../components/governance';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
-import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
+import LoaderLarge from '../../components/feedback/LoaderLarge';
 import NotFound from '../subpages/NotFound';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
 import Wrap from '../../components/common/Wrap';
@@ -39,8 +39,8 @@ export default function GovernanceProposalDetails() {
   if (proposalStatus === AsyncStatus.PENDING) {
     return (
       <RenderWrapper>
-        <div className="loader--emoji-container">
-          <LoaderWithEmoji />
+        <div className="loader--large-container">
+          <LoaderLarge />
         </div>
       </RenderWrapper>
     );

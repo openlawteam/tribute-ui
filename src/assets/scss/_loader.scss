@@ -43,31 +43,14 @@
   text-align: left;
 }
 
-.loader--emoji {
-  font-size: 3rem;
-  animation: rotateScaleEffect 1s ease infinite;
-  margin: 1rem 0;
-}
-@keyframes rotateScaleEffect {
-  30% {
-    transform: scale(1.2);
-  }
-  40%,
-  60% {
-    transform: rotate(-20deg) scale(1.2);
-  }
-  50% {
-    transform: rotate(20deg) scale(1.2);
-  }
-  70% {
-    transform: rotate(0deg) scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
+.loader--large {
+  @extend .loader;
+
+  height: 25px;
+  width: 25px;
 }
 
-.loader--emoji-container {
+.loader--large-container {
   width: 3rem;
-  margin: 0 auto;
+  margin: 1rem auto;
 }

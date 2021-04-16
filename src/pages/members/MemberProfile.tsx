@@ -5,7 +5,7 @@ import {AsyncStatus} from '../../util/types';
 import {truncateEthAddress, normalizeString} from '../../util/helpers';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
-import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
+import LoaderLarge from '../../components/feedback/LoaderLarge';
 import NotFound from '../subpages/NotFound';
 import useMembers from './hooks/useMembers';
 import {Member} from './types';
@@ -68,8 +68,8 @@ export default function MemberProfile() {
   if (isLoading && !isError) {
     return (
       <RenderWrapper>
-        <div className="loader--emoji-container">
-          <LoaderWithEmoji />
+        <div className="loader--large-container">
+          <LoaderLarge />
         </div>
       </RenderWrapper>
     );

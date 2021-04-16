@@ -6,7 +6,7 @@ import {ContractAdapterNames} from '../../components/web3/types';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
-import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
+import LoaderLarge from '../../components/feedback/LoaderLarge';
 import NotFound from '../subpages/NotFound';
 import ProposalActions from '../../components/proposals/ProposalActions';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
@@ -58,8 +58,8 @@ export default function TransferDetails() {
   if (proposalStatus === AsyncStatus.PENDING) {
     return (
       <RenderWrapper>
-        <div className="loader--emoji-container">
-          <LoaderWithEmoji />
+        <div className="loader--large-container">
+          <LoaderLarge />
         </div>
       </RenderWrapper>
     );

@@ -10,7 +10,7 @@ import {useProposals, useProposalsVotingState} from './hooks';
 import {useProposalsVotes} from './hooks/useProposalsVotes';
 import {VotingState} from './voting/types';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
-import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
+import LoaderLarge from '../feedback/LoaderLarge';
 import ProposalCard from './ProposalCard';
 
 type ProposalsProps = {
@@ -247,8 +247,8 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
   // Render loading
   if (isLoading && !isError) {
     return (
-      <div className="loader--emoji-container">
-        <LoaderWithEmoji />
+      <div className="loader--large-container">
+        <LoaderLarge />
       </div>
     );
   }
