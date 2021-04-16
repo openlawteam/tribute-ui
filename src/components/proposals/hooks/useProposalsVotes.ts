@@ -4,6 +4,7 @@ import {AbiItem} from 'web3-utils/types';
 
 import {AsyncStatus} from '../../../util/types';
 import {BURN_ADDRESS} from '../../../util/constants';
+import {getVotingAdapterABI} from '../helpers';
 import {multicall, MulticallTuple} from '../../web3/helpers';
 import {OffchainVotingAdapterVotes, VotingAdapterVotes} from '../types';
 import {StoreState} from '../../../store/types';
@@ -229,13 +230,11 @@ export function useProposalsVotes(
     votingAdapterName: VotingAdapterName
   ): Promise<AbiItem> {
     try {
+      const votingAdapterABI = await getVotingAdapterABI(votingAdapterName);
+
       switch (votingAdapterName) {
         case VotingAdapterName.OffchainVotingContract:
-          const {default: lazyOffchainVotingABI} = await import(
-            '../../../truffle-contracts/OffchainVotingContract.json'
-          );
-
-          const offchainVotesDataABI = (lazyOffchainVotingABI as AbiItem[]).find(
+          const offchainVotesDataABI = votingAdapterABI.find(
             (ai) => ai.name === 'votes'
           );
 
@@ -248,11 +247,7 @@ export function useProposalsVotes(
           return offchainVotesDataABI;
 
         case VotingAdapterName.VotingContract:
-          const {default: lazyVotingABI} = await import(
-            '../../../truffle-contracts/VotingContract.json'
-          );
-
-          const votingVotesDataABI = (lazyVotingABI as AbiItem[]).find(
+          const votingVotesDataABI = votingAdapterABI.find(
             (ai) => ai.name === 'votes'
           );
 
