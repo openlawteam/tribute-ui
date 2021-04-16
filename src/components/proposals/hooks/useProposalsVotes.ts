@@ -93,6 +93,7 @@ export function useProposalsVotes(
 
     if (!safeProposalIds.length) {
       setProposalsVotesStatus(AsyncStatus.FULFILLED);
+      setProposalsVotes([]);
 
       return;
     }
