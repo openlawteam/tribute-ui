@@ -8,7 +8,7 @@ import {VotingAdapterName} from '../../adapters-extensions/enums';
  * Gets the ABI for a voting adapter by the adapter's adapter name.
  *
  * @param {VotingAdapterName} votingAdapterName
- * @returns {Promise<AbiItem>}
+ * @returns {Promise<AbiItem[]>}
  */
 export async function getVotingAdapterABI(
   votingAdapterName: VotingAdapterName
