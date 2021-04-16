@@ -6,7 +6,7 @@ import {svgWalletIcon} from './WalletIcons';
 import {truncateEthAddress} from '../../util/helpers';
 import {useIsDefaultChain} from './hooks';
 import {useWeb3Modal} from './hooks';
-import LoaderWithEmoji from '../feedback/LoaderWithEmoji';
+import LoaderLarge from '../feedback/LoaderLarge';
 import Modal from '../common/Modal';
 
 import TimesSVG from '../../assets/svg/TimesSVG';
@@ -214,8 +214,8 @@ function DisplayChainError({
         <small>{defaultChainError}</small>
       </div>
       <div>
-        <div className="loader--emjoi-container">
-          <LoaderWithEmoji />
+        <div className="loader--large-container">
+          <LoaderLarge />
         </div>
         <div>
           <small>Waiting for the right network&hellip;</small>

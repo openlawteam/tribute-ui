@@ -6,7 +6,7 @@ import FadeIn from '../../components/common/FadeIn';
 import MemberCard from './MemberCard';
 import useMembers from './hooks/useMembers';
 import {Member} from './types';
-import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
+import LoaderLarge from '../../components/feedback/LoaderLarge';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 
 export default function Members() {
@@ -64,8 +64,8 @@ export default function Members() {
   if (isLoading && !isError) {
     return (
       <RenderWrapper>
-        <div className="loader--emjoi-container">
-          <LoaderWithEmoji />
+        <div className="loader--large-container">
+          <LoaderLarge />
         </div>
       </RenderWrapper>
     );
