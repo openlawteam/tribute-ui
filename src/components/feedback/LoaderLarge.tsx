@@ -21,6 +21,6 @@ export default function LoaderLarge(props: LoaderLargeProps) {
   }, [showAfterMs]);
 
   return !showAfterMs || (showAfterMs && showLoaderAfterMs) ? (
-    <div className="loader--large" />
+    <div className="loader--large" aria-label="Loading content..." />
   ) : null;
 }
