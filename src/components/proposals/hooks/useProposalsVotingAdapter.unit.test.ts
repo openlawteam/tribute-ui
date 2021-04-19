@@ -100,7 +100,7 @@ describe('useProposalsVotingAdapter unit tests', () => {
       expect(result.current.proposalsVotingAdapters[0][0]).toBe(proposalIds[0]);
 
       expect(
-        result.current.proposalsVotingAdapters[0][1].votingAdapterABI
+        result.current.proposalsVotingAdapters[0][1].getVotingAdapterABI()
       ).toMatchObject(OffchainVotingContractABI);
 
       expect(
@@ -112,16 +112,16 @@ describe('useProposalsVotingAdapter unit tests', () => {
       ).toBe(VotingAdapterName.OffchainVotingContract);
 
       expect(
-        result.current.proposalsVotingAdapters[0][1]
-          .getWeb3VotingAdapterContract
-      ).toBeInstanceOf(Function);
+        result.current.proposalsVotingAdapters[0][1].getWeb3VotingAdapterContract()
+          .methods.submitVoteResult
+      ).toBeDefined();
 
       // Assert second tuple result
 
       expect(result.current.proposalsVotingAdapters[1][0]).toBe(proposalIds[1]);
 
       expect(
-        result.current.proposalsVotingAdapters[1][1].votingAdapterABI
+        result.current.proposalsVotingAdapters[1][1].getVotingAdapterABI()
       ).toMatchObject(OffchainVotingContractABI);
 
       expect(
@@ -133,16 +133,16 @@ describe('useProposalsVotingAdapter unit tests', () => {
       ).toBe(VotingAdapterName.OffchainVotingContract);
 
       expect(
-        result.current.proposalsVotingAdapters[1][1]
-          .getWeb3VotingAdapterContract
-      ).toBeInstanceOf(Function);
+        result.current.proposalsVotingAdapters[1][1].getWeb3VotingAdapterContract()
+          .methods.submitVoteResult
+      ).toBeDefined();
 
       // Assert third tuple result
 
       expect(result.current.proposalsVotingAdapters[2][0]).toBe(proposalIds[2]);
 
       expect(
-        result.current.proposalsVotingAdapters[2][1].votingAdapterABI
+        result.current.proposalsVotingAdapters[2][1].getVotingAdapterABI()
       ).toMatchObject(VotingContractABI);
 
       expect(
@@ -154,28 +154,14 @@ describe('useProposalsVotingAdapter unit tests', () => {
       ).toBe(VotingAdapterName.VotingContract);
 
       expect(
-        result.current.proposalsVotingAdapters[2][1]
-          .getWeb3VotingAdapterContract
-      ).toBeInstanceOf(Function);
+        result.current.proposalsVotingAdapters[2][1].getWeb3VotingAdapterContract()
+          .methods.submitVote
+      ).toBeDefined();
 
       expect(result.current.proposalsVotingAdaptersError).toBe(undefined);
       expect(result.current.proposalsVotingAdaptersStatus).toBe(
         AsyncStatus.FULFILLED
       );
-
-      // Test off-chain `getWeb3VotingAdapterContract` function return result
-
-      expect(
-        result.current.proposalsVotingAdapters[0][1].getWeb3VotingAdapterContract()
-          .methods.submitVoteResult
-      ).toBeDefined();
-
-      // Test on-chain `getWeb3VotingAdapterContract` function return result
-
-      expect(
-        result.current.proposalsVotingAdapters[2][1].getWeb3VotingAdapterContract()
-          .methods.submitVote
-      ).toBeDefined();
     });
   });
 

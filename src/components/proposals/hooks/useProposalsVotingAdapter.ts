@@ -14,7 +14,12 @@ import {VotingAdapterName} from '../../adapters-extensions/enums';
 type VotingAdapterData = {
   votingAdapterName: VotingAdapterName;
   votingAdapterAddress: string;
-  votingAdapterABI: AbiItem[];
+  /**
+   * Get the ABI for the proposal.
+   * The object is not included inline to
+   * save from repetitive data (some ABIs can be large).
+   */
+  getVotingAdapterABI: () => AbiItem[];
   // Helper to use the Web3 Contract directly
   getWeb3VotingAdapterContract: () => Contract;
 };
@@ -199,8 +204,8 @@ export function useProposalsVotingAdapter(
                 id,
                 {
                   votingAdapterName: adapterNameResults[i],
-                  votingAdapterABI,
                   votingAdapterAddress,
+                  getVotingAdapterABI: () => votingAdapterABI,
                   getWeb3VotingAdapterContract: () =>
                     new web3Instance.eth.Contract(
                       votingAdapterABI,
