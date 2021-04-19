@@ -253,7 +253,7 @@ describe('useProposalsVotes unit tests', () => {
     });
   });
 
-  test('should return correct data on bad voting adapter name', async () => {
+  test('should return error on bad voting adapter name', async () => {
     const proposalIds = [DEFAULT_PROPOSAL_HASH];
 
     await act(async () => {
