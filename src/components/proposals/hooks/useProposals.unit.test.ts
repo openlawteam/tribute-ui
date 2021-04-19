@@ -5,7 +5,10 @@ import {
   snapshotAPIProposalResponse,
 } from '../../../test/restResponses';
 import {AsyncStatus} from '../../../util/types';
-import {DaoAdapterConstants} from '../../adapters-extensions/enums';
+import {
+  DaoAdapterConstants,
+  VotingAdapterName,
+} from '../../adapters-extensions/enums';
 import {DEFAULT_ETH_ADDRESS} from '../../../test/helpers';
 import {rest, server} from '../../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../../config';
@@ -28,7 +31,7 @@ describe('useProposals unit tests', () => {
         ]
       );
 
-      const {result, waitForNextUpdate} = await renderHook(
+      const {result, waitForValueToChange} = await renderHook(
         () => useProposals({adapterName: DaoAdapterConstants.ONBOARDING}),
         {
           wrapper: Wrapper,
@@ -73,6 +76,51 @@ describe('useProposals unit tests', () => {
                   ]
                 )
               );
+
+              /**
+               * Mock results for `useProposalsVotingAdapter`
+               */
+
+              const offchainVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
+                'address',
+                DEFAULT_ETH_ADDRESS
+              );
+              const votingAdapterResponse = web3Instance.eth.abi.encodeParameter(
+                'address',
+                '0xa8ED02b24B4E9912e39337322885b65b23CdF188'
+              );
+
+              const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
+                'string',
+                VotingAdapterName.OffchainVotingContract
+              );
+
+              const votingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
+                'string',
+                VotingAdapterName.VotingContract
+              );
+
+              // Mock `dao.votingAdapter` responses
+              mockWeb3Provider.injectResult(
+                web3Instance.eth.abi.encodeParameters(
+                  ['uint256', 'bytes[]'],
+                  [0, [offchainVotingAdapterResponse, votingAdapterResponse]]
+                )
+              );
+
+              // Mock `IVoting.getAdapterName` responses
+              mockWeb3Provider.injectResult(
+                web3Instance.eth.abi.encodeParameters(
+                  ['uint256', 'bytes[]'],
+                  [
+                    0,
+                    [
+                      offchainVotingAdapterNameResponse,
+                      votingAdapterNameResponse,
+                    ],
+                  ]
+                )
+              );
             },
           },
         }
@@ -82,73 +130,13 @@ describe('useProposals unit tests', () => {
       expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
 
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
-
-      await waitForNextUpdate();
+      await waitForValueToChange(() => result.current.proposalsStatus);
 
       expect(result.current.proposals).toMatchObject([]);
       expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
 
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
-
-      await waitForNextUpdate();
+      await waitForValueToChange(() => result.current.proposalsStatus);
 
       expect(result.current.proposalsStatus).toBe(AsyncStatus.FULFILLED);
       expect(result.current.proposalsError).toBe(undefined);
@@ -195,7 +183,11 @@ describe('useProposals unit tests', () => {
         ]
       );
 
-      const {result, waitForNextUpdate} = await renderHook(
+      const {
+        result,
+        waitForNextUpdate,
+        waitForValueToChange,
+      } = await renderHook(
         () => useProposals({adapterName: DaoAdapterConstants.ONBOARDING}),
         {
           wrapper: Wrapper,
@@ -240,6 +232,51 @@ describe('useProposals unit tests', () => {
                   ]
                 )
               );
+
+              /**
+               * Mock results for `useProposalsVotingAdapter`
+               */
+
+              const offchainVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
+                'address',
+                DEFAULT_ETH_ADDRESS
+              );
+              const votingAdapterResponse = web3Instance.eth.abi.encodeParameter(
+                'address',
+                '0xa8ED02b24B4E9912e39337322885b65b23CdF188'
+              );
+
+              const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
+                'string',
+                VotingAdapterName.OffchainVotingContract
+              );
+
+              const votingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
+                'string',
+                VotingAdapterName.VotingContract
+              );
+
+              // Mock `dao.votingAdapter` responses
+              mockWeb3Provider.injectResult(
+                web3Instance.eth.abi.encodeParameters(
+                  ['uint256', 'bytes[]'],
+                  [0, [offchainVotingAdapterResponse, votingAdapterResponse]]
+                )
+              );
+
+              // Mock `IVoting.getAdapterName` responses
+              mockWeb3Provider.injectResult(
+                web3Instance.eth.abi.encodeParameters(
+                  ['uint256', 'bytes[]'],
+                  [
+                    0,
+                    [
+                      offchainVotingAdapterNameResponse,
+                      votingAdapterNameResponse,
+                    ],
+                  ]
+                )
+              );
             },
           },
         }
@@ -249,75 +286,18 @@ describe('useProposals unit tests', () => {
       expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
 
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
-
-      await waitForNextUpdate();
+      await waitForValueToChange(() => result.current.proposalsStatus);
 
       expect(result.current.proposals).toMatchObject([]);
       expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
 
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
-
-      await waitForNextUpdate();
-
-      expect(result.current.proposals).toMatchObject([]);
-      expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
-
-      await waitForNextUpdate();
+      await waitForValueToChange(() => result.current.proposalsStatus);
 
       expect(result.current.proposalsStatus).toBe(AsyncStatus.REJECTED);
+
+      await waitForValueToChange(() => result.current.proposalsError);
+
       expect(result.current.proposalsError?.message).toMatch(
         /something went wrong while fetching the/i
       );
