@@ -214,6 +214,30 @@
   {
     "inputs": [
       {
+        "internalType": "contract DaoRegistry",
+        "name": "dao",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_addr",
+        "type": "address"
+      }
+    ],
+    "name": "isActiveMember",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "addr",
         "type": "address"
@@ -840,138 +864,6 @@
       }
     ],
     "name": "challengeWrongSignature",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "proposalId",
-        "type": "bytes32"
-      },
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "timestamp",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "nbNo",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "nbYes",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes",
-            "name": "sig",
-            "type": "bytes"
-          },
-          {
-            "internalType": "bytes",
-            "name": "rootSig",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256",
-            "name": "index",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "choice",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "proposalHash",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "bytes32[]",
-            "name": "proof",
-            "type": "bytes32[]"
-          }
-        ],
-        "internalType": "struct OffchainVotingContract.VoteResultNode",
-        "name": "node1",
-        "type": "tuple"
-      },
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "timestamp",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "nbNo",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "nbYes",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes",
-            "name": "sig",
-            "type": "bytes"
-          },
-          {
-            "internalType": "bytes",
-            "name": "rootSig",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256",
-            "name": "index",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "choice",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "proposalHash",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "bytes32[]",
-            "name": "proof",
-            "type": "bytes32[]"
-          }
-        ],
-        "internalType": "struct OffchainVotingContract.VoteResultNode",
-        "name": "node2",
-        "type": "tuple"
-      }
-    ],
-    "name": "challengeDuplicate",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
