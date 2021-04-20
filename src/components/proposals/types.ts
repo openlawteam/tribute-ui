@@ -6,6 +6,10 @@ import {
   SnapshotType,
   VoteChoices,
 } from '@openlaw/snapshot-js-erc712';
+import {AbiItem} from 'web3-utils/types';
+import {Contract} from 'web3-eth-contract/types';
+
+import {VotingAdapterName} from '../adapters-extensions/enums';
 
 /**
  * ENUMS
@@ -105,6 +109,10 @@ export type SnapshotProposal = {
 export type SnapshotProposalCommon = SnapshotDraft | SnapshotProposal;
 
 export type ProposalData = {
+  // @todo Make non-nullable
+  idInDAO?: string;
+  // @todo Make non-nullable
+  daoProposalVotingAdapter?: ProposalVotingAdapterData;
   daoProposal: Proposal | undefined;
   /**
    * Data for either a Draft or Proposal which is shared between the two types.
@@ -185,4 +193,20 @@ export type VotingResult = {
   [VoteChoices.Yes]: VoteChoiceResult;
   [VoteChoices.No]: VoteChoiceResult;
   totalShares: number;
+};
+
+/**
+ * Proposal's voting adapter data
+ */
+export type ProposalVotingAdapterData = {
+  votingAdapterName: VotingAdapterName;
+  votingAdapterAddress: string;
+  /**
+   * Get the ABI for the proposal.
+   * The object is not included inline to
+   * save from repetitive data (some ABIs can be large).
+   */
+  getVotingAdapterABI: () => AbiItem[];
+  // Helper to use the Web3 Contract directly
+  getWeb3VotingAdapterContract: () => Contract;
 };
