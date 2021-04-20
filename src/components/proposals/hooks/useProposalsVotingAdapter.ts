@@ -1,32 +1,18 @@
-import {AbiItem} from 'web3-utils/types';
-import {Contract} from 'web3-eth-contract/types';
+import {useCallback, useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
 
 import {AsyncStatus} from '../../../util/types';
 import {BURN_ADDRESS} from '../../../util/constants';
 import {getVotingAdapterABI} from '../helpers';
 import {multicall, MulticallTuple} from '../../web3/helpers';
+import {ProposalVotingAdapterData} from '../types';
 import {StoreState} from '../../../store/types';
-import {useCallback, useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
 
-type VotingAdapterData = {
-  votingAdapterName: VotingAdapterName;
-  votingAdapterAddress: string;
-  /**
-   * Get the ABI for the proposal.
-   * The object is not included inline to
-   * save from repetitive data (some ABIs can be large).
-   */
-  getVotingAdapterABI: () => AbiItem[];
-  // Helper to use the Web3 Contract directly
-  getWeb3VotingAdapterContract: () => Contract;
-};
-
 type ProposalVotingAdapterTuple = [
   proposalId: string,
-  votingAdapterData: VotingAdapterData
+  votingAdapterData: ProposalVotingAdapterData
 ];
 
 type UseProposalsVotingAdapterReturn = {
