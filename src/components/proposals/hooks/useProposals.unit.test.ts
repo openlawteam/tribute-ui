@@ -15,6 +15,7 @@ import {rest, server} from '../../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../../config';
 import {useProposals} from './useProposals';
 import Wrapper from '../../../test/Wrapper';
+import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 
 describe('useProposals unit tests', () => {
   test('should return correct hook state', async () => {
@@ -215,6 +216,10 @@ describe('useProposals unit tests', () => {
         flags: '1',
       });
 
+      expect(result.current.proposals[0].idInDAO).toBe(DEFAULT_DRAFT_HASH);
+
+      expect(result.current.proposals[0].snapshotType).toBe(SnapshotType.draft);
+
       expect(result.current.proposals[0].daoProposalVotingAdapter).toBe(
         undefined
       );
@@ -234,6 +239,14 @@ describe('useProposals unit tests', () => {
         adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '3',
       });
+
+      expect(result.current.proposals[1].idInDAO).toBe(
+        '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca69'
+      );
+
+      expect(result.current.proposals[1].snapshotType).toBe(
+        SnapshotType.proposal
+      );
 
       await waitForValueToChange(
         () => result.current.proposals[1].daoProposalVotingAdapter
@@ -273,6 +286,14 @@ describe('useProposals unit tests', () => {
         adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '3',
       });
+
+      expect(result.current.proposals[2].idInDAO).toBe(
+        '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca52'
+      );
+
+      expect(result.current.proposals[2].snapshotType).toBe(
+        SnapshotType.proposal
+      );
 
       expect(
         result.current.proposals[2].daoProposalVotingAdapter
