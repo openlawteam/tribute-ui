@@ -4,12 +4,13 @@ import {
   snapshotAPIDraftResponse,
   snapshotAPIProposalResponse,
 } from '../../../test/restResponses';
-import {AsyncStatus} from '../../../util/types';
 import {
   DaoAdapterConstants,
   VotingAdapterName,
 } from '../../adapters-extensions/enums';
-import {DEFAULT_ETH_ADDRESS} from '../../../test/helpers';
+import {AsyncStatus} from '../../../util/types';
+import {BURN_ADDRESS} from '../../../util/constants';
+import {DEFAULT_DRAFT_HASH, DEFAULT_ETH_ADDRESS} from '../../../test/helpers';
 import {rest, server} from '../../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../../config';
 import {useProposals} from './useProposals';
@@ -17,7 +18,38 @@ import Wrapper from '../../../test/Wrapper';
 
 describe('useProposals unit tests', () => {
   test('should return correct hook state', async () => {
+    const proposal1 = {
+      // Proposal 1
+      '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca70': {
+        ...Object.values(snapshotAPIProposalResponse)[0],
+        data: {
+          authorIpfsHash:
+            '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca70',
+          erc712DraftHash:
+            '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca69',
+        },
+        authorIpfsHash:
+          '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca70',
+      },
+    };
+
+    const proposal2 = {
+      // Proposal 2
+      '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca53': {
+        ...Object.values(snapshotAPIProposalResponse)[0],
+        data: {
+          authorIpfsHash:
+            '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca53',
+          erc712DraftHash:
+            '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca52',
+        },
+        authorIpfsHash:
+          '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca53',
+      },
+    };
+
     await act(async () => {
+      // Return 1 Draft and 2 Proposals
       server.use(
         ...[
           rest.get(
@@ -26,7 +58,8 @@ describe('useProposals unit tests', () => {
           ),
           rest.get(
             `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
-            async (_req, res, ctx) => res(ctx.json(snapshotAPIProposalResponse))
+            async (_req, res, ctx) =>
+              res(ctx.json({...proposal1, ...proposal2}))
           ),
         ]
       );
@@ -46,6 +79,21 @@ describe('useProposals unit tests', () => {
                   [
                     0,
                     [
+                      // For Draft
+                      web3Instance.eth.abi.encodeParameter(
+                        {
+                          Proposal: {
+                            adapterAddress: 'address',
+                            flags: 'uint256',
+                          },
+                        },
+                        {
+                          adapterAddress: DEFAULT_ETH_ADDRESS,
+                          // ProposalFlag.EXISTS
+                          flags: '1',
+                        }
+                      ),
+                      // For Proposal 1
                       web3Instance.eth.abi.encodeParameter(
                         {
                           Proposal: {
@@ -59,6 +107,7 @@ describe('useProposals unit tests', () => {
                           flags: '3',
                         }
                       ),
+                      // For Proposal 2
                       web3Instance.eth.abi.encodeParameter(
                         {
                           Proposal: {
@@ -68,8 +117,8 @@ describe('useProposals unit tests', () => {
                         },
                         {
                           adapterAddress: DEFAULT_ETH_ADDRESS,
-                          // ProposalFlag.EXISTS
-                          flags: '1',
+                          // ProposalFlag.SPONSORED
+                          flags: '3',
                         }
                       ),
                     ],
@@ -84,6 +133,10 @@ describe('useProposals unit tests', () => {
               const offchainVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
                 'address',
                 DEFAULT_ETH_ADDRESS
+              );
+              const noVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
+                'address',
+                BURN_ADDRESS
               );
               const votingAdapterResponse = web3Instance.eth.abi.encodeParameter(
                 'address',
@@ -104,7 +157,15 @@ describe('useProposals unit tests', () => {
               mockWeb3Provider.injectResult(
                 web3Instance.eth.abi.encodeParameters(
                   ['uint256', 'bytes[]'],
-                  [0, [offchainVotingAdapterResponse, votingAdapterResponse]]
+                  [
+                    0,
+                    [
+                      // For Draft; not sponsored, yet.
+                      noVotingAdapterResponse,
+                      offchainVotingAdapterResponse,
+                      votingAdapterResponse,
+                    ],
+                  ]
                 )
               );
 
@@ -115,7 +176,9 @@ describe('useProposals unit tests', () => {
                   [
                     0,
                     [
+                      // For Proposal 1
                       offchainVotingAdapterNameResponse,
+                      // For Proposal 2
                       votingAdapterNameResponse,
                     ],
                   ]
@@ -140,31 +203,101 @@ describe('useProposals unit tests', () => {
 
       expect(result.current.proposalsStatus).toBe(AsyncStatus.FULFILLED);
       expect(result.current.proposalsError).toBe(undefined);
-      expect(result.current.proposals.length).toBe(2);
+      expect(result.current.proposals.length).toBe(3);
+
+      // Assert Draft
 
       expect(result.current.proposals[0].daoProposal).toMatchObject({
-        '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
-        '1': '3',
-        __length__: 2,
-        adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
-        flags: '3',
-      });
-
-      expect(result.current.proposals[0].snapshotProposal).toMatchObject(
-        Object.values(snapshotAPIProposalResponse)[0]
-      );
-
-      expect(result.current.proposals[1].daoProposal).toMatchObject({
-        '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '1',
         __length__: 2,
-        adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '1',
       });
 
-      expect(result.current.proposals[1].snapshotDraft).toMatchObject(
-        Object.values(snapshotAPIDraftResponse)[0]
+      expect(result.current.proposals[0].daoProposalVotingAdapter).toBe(
+        undefined
       );
+
+      expect(result.current.proposals[0].snapshotDraft).toMatchObject({
+        ...Object.values(snapshotAPIDraftResponse)[0],
+        idInDAO: DEFAULT_DRAFT_HASH,
+        idInSnapshot: DEFAULT_DRAFT_HASH,
+      });
+
+      // Assert Proposal 1
+
+      expect(result.current.proposals[1].daoProposal).toMatchObject({
+        '0': DEFAULT_ETH_ADDRESS,
+        '1': '3',
+        __length__: 2,
+        adapterAddress: DEFAULT_ETH_ADDRESS,
+        flags: '3',
+      });
+
+      await waitForValueToChange(
+        () => result.current.proposals[1].daoProposalVotingAdapter
+      );
+
+      expect(
+        result.current.proposals[1].daoProposalVotingAdapter
+          ?.getVotingAdapterABI
+      ).toBeInstanceOf(Function);
+      expect(
+        result.current.proposals[1].daoProposalVotingAdapter
+          ?.getWeb3VotingAdapterContract
+      ).toBeInstanceOf(Function);
+      expect(
+        result.current.proposals[1].daoProposalVotingAdapter
+          ?.votingAdapterAddress
+      ).toBe(DEFAULT_ETH_ADDRESS);
+
+      expect(
+        result.current.proposals[1].daoProposalVotingAdapter?.votingAdapterName
+      ).toBe(VotingAdapterName.OffchainVotingContract);
+
+      expect(result.current.proposals[1].snapshotProposal).toMatchObject({
+        ...Object.values(proposal1)[0],
+        idInDAO:
+          '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca69',
+        idInSnapshot:
+          '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca69',
+      });
+
+      // Assert Proposal 2
+
+      expect(result.current.proposals[2].daoProposal).toMatchObject({
+        '0': DEFAULT_ETH_ADDRESS,
+        '1': '3',
+        __length__: 2,
+        adapterAddress: DEFAULT_ETH_ADDRESS,
+        flags: '3',
+      });
+
+      expect(
+        result.current.proposals[2].daoProposalVotingAdapter
+          ?.getVotingAdapterABI
+      ).toBeInstanceOf(Function);
+      expect(
+        result.current.proposals[2].daoProposalVotingAdapter
+          ?.getWeb3VotingAdapterContract
+      ).toBeInstanceOf(Function);
+      expect(
+        result.current.proposals[2].daoProposalVotingAdapter
+          ?.votingAdapterAddress
+      ).toBe('0xa8ED02b24B4E9912e39337322885b65b23CdF188');
+
+      expect(
+        result.current.proposals[2].daoProposalVotingAdapter?.votingAdapterName
+      ).toBe(VotingAdapterName.VotingContract);
+
+      expect(result.current.proposals[2].snapshotProposal).toMatchObject({
+        ...Object.values(proposal2)[0],
+        idInDAO:
+          '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca52',
+        idInSnapshot:
+          '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca52',
+      });
     });
   });
 
@@ -183,11 +316,7 @@ describe('useProposals unit tests', () => {
         ]
       );
 
-      const {
-        result,
-        waitForNextUpdate,
-        waitForValueToChange,
-      } = await renderHook(
+      const {result, waitForValueToChange} = await renderHook(
         () => useProposals({adapterName: DaoAdapterConstants.ONBOARDING}),
         {
           wrapper: Wrapper,
