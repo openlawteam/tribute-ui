@@ -21,6 +21,13 @@ type UseProposalsVotingAdapterReturn = {
   proposalsVotingAdaptersStatus: AsyncStatus;
 };
 
+/**
+ * Fetch voting adapter data for proposals by DAO proposal id.
+ * Only returns data for proposals of which voting adapters have been assigned (i.e. sponsored).
+ *
+ * @param {string[]}
+ * @returns {UseProposalsVotingAdapterReturn}
+ */
 export function useProposalsVotingAdapter(
   proposalIds: string[]
 ): UseProposalsVotingAdapterReturn {
