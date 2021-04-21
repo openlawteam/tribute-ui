@@ -15,6 +15,7 @@ import {normalizeString} from '../../../util/helpers';
 import {Proposal, ProposalData} from '../types';
 import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
 import {StoreState} from '../../../store/types';
+import {useProposalsVotes} from './useProposalsVotes';
 import {useProposalsVotingAdapter} from './useProposalsVotingAdapter';
 import {useProposalsVotingState} from '.';
 import {useWeb3Modal} from '../../web3/hooks';
@@ -92,6 +93,12 @@ export function useProposals({
     proposalsVotingStateStatus,
   } = useProposalsVotingState(proposalsVotingAdapters);
 
+  const {
+    proposalsVotes,
+    proposalsVotesError,
+    proposalsVotesStatus,
+  } = useProposalsVotes(proposalsVotingAdapters);
+
   /**
    * Their hooks
    */
@@ -163,6 +170,22 @@ export function useProposals({
     );
   }, [proposalsVotingState]);
 
+  // Set `daoProposalVotes` data on the proposal
+  useEffect(() => {
+    if (!proposalsVotes.length) return;
+
+    setProposals((prevState) =>
+      prevState.map(
+        (p): ProposalData => ({
+          ...p,
+          daoProposalVotes: proposalsVotes.find(
+            ([id]) => normalizeString(id) === normalizeString(p.idInDAO || '')
+          )?.[1],
+        })
+      )
+    );
+  }, [proposalsVotes]);
+
   // Set overall async status
   useEffect(() => {
     const {STANDBY, PENDING, FULFILLED, REJECTED} = AsyncStatus;
@@ -170,6 +193,7 @@ export function useProposals({
       proposalsStatus,
       proposalsVotingAdaptersStatus,
       proposalsVotingStateStatus,
+      proposalsVotesStatus,
     ];
 
     /**
@@ -207,6 +231,7 @@ export function useProposals({
     }
   }, [
     proposalsStatus,
+    proposalsVotesStatus,
     proposalsVotingAdaptersStatus,
     proposalsVotingStateStatus,
   ]);
@@ -217,10 +242,16 @@ export function useProposals({
       proposalsError,
       proposalsVotingAdaptersError,
       proposalsVotingStateError,
+      proposalsVotesError,
     ];
 
     setProposalsInclusiveError(errors.find((e) => e));
-  }, [proposalsError, proposalsVotingAdaptersError, proposalsVotingStateError]);
+  }, [
+    proposalsError,
+    proposalsVotesError,
+    proposalsVotingAdaptersError,
+    proposalsVotingStateError,
+  ]);
 
   /**
    * Functions
