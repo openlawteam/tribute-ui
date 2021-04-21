@@ -328,4 +328,101 @@ describe('useProposalsVotingAdapter unit tests', () => {
       );
     });
   });
+
+  test('should return correct data when only some bytes32[] proposal ids', async () => {
+    await act(async () => {
+      const proposalIds = [
+        'abc123',
+        'abc456',
+        '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca77',
+      ];
+
+      const {result, waitForValueToChange} = await renderHook(
+        () => useProposalsVotingAdapter(proposalIds),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: ({mockWeb3Provider, web3Instance}) => {
+              const offchainVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
+                'address',
+                DEFAULT_ETH_ADDRESS
+              );
+
+              const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
+                'string',
+                VotingAdapterName.OffchainVotingContract
+              );
+
+              // Mock `dao.votingAdapter` responses
+              mockWeb3Provider.injectResult(
+                web3Instance.eth.abi.encodeParameters(
+                  ['uint256', 'bytes[]'],
+                  [0, [offchainVotingAdapterResponse]]
+                )
+              );
+
+              // Mock `IVoting.getAdapterName` responses
+              mockWeb3Provider.injectResult(
+                web3Instance.eth.abi.encodeParameters(
+                  ['uint256', 'bytes[]'],
+                  [0, [offchainVotingAdapterNameResponse]]
+                )
+              );
+            },
+          },
+        }
+      );
+
+      // Assert initial state
+
+      expect(result.current.proposalsVotingAdaptersStatus).toBe(
+        AsyncStatus.STANDBY
+      );
+      expect(result.current.proposalsVotingAdapters).toMatchObject([]);
+      expect(result.current.proposalsVotingAdaptersError).toBe(undefined);
+
+      await waitForValueToChange(
+        () => result.current.proposalsVotingAdaptersStatus
+      );
+
+      expect(result.current.proposalsVotingAdaptersStatus).toBe(
+        AsyncStatus.PENDING
+      );
+      expect(result.current.proposalsVotingAdapters).toMatchObject([]);
+      expect(result.current.proposalsVotingAdaptersError).toBe(undefined);
+
+      await waitForValueToChange(
+        () => result.current.proposalsVotingAdaptersStatus
+      );
+
+      // Assert only tuple result
+
+      expect(result.current.proposalsVotingAdaptersStatus).toBe(
+        AsyncStatus.FULFILLED
+      );
+
+      expect(result.current.proposalsVotingAdapters[0][0]).toBe(proposalIds[2]);
+
+      expect(
+        result.current.proposalsVotingAdapters[0][1].getVotingAdapterABI()
+      ).toMatchObject(OffchainVotingContractABI);
+
+      expect(
+        result.current.proposalsVotingAdapters[0][1].votingAdapterAddress
+      ).toBe(DEFAULT_ETH_ADDRESS);
+
+      expect(
+        result.current.proposalsVotingAdapters[0][1].votingAdapterName
+      ).toBe(VotingAdapterName.OffchainVotingContract);
+
+      expect(
+        result.current.proposalsVotingAdapters[0][1].getWeb3VotingAdapterContract()
+          .methods.submitVoteResult
+      ).toBeDefined();
+
+      expect(result.current.proposalsVotingAdaptersError).toBe(undefined);
+    });
+  });
 });
