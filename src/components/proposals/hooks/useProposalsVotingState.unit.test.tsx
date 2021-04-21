@@ -14,7 +14,7 @@ import Wrapper from '../../../test/Wrapper';
 describe('useProposalsVotingState unit tests', () => {
   /**
    * `useProposalsVotingState` uses the `IVoting` contract interally,
-   * so we don't need to be concered anbout setting an ABI in the test data.
+   * so we don't need to be concerned about setting an ABI in the test data.
    * We just need to make sure we can pass different addresses for `votingAdapterAddress`.
    */
   const defaultVotingAdapterData: ProposalVotingAdapterData = {
