@@ -10,6 +10,7 @@ import {AbiItem} from 'web3-utils/types';
 import {Contract} from 'web3-eth-contract/types';
 
 import {VotingAdapterName} from '../adapters-extensions/enums';
+import {VotingState} from './voting/types';
 
 /**
  * ENUMS
@@ -109,10 +110,12 @@ export type SnapshotProposal = {
 export type SnapshotProposalCommon = SnapshotDraft | SnapshotProposal;
 
 export type ProposalData = {
-  // @todo Make non-nullable
+  // @todo Make non-nullable?
   idInDAO?: string;
-  // @todo Make non-nullable
+  // @todo Make non-nullable?
   daoProposalVotingAdapter?: ProposalVotingAdapterData;
+  // @todo Make non-nullable?
+  daoProposalVotingState?: VotingState;
   daoProposal: Proposal | undefined;
   /**
    * Data for either a Draft or Proposal which is shared between the two types.
@@ -210,3 +213,8 @@ export type ProposalVotingAdapterData = {
   // Helper to use the Web3 Contract directly
   getWeb3VotingAdapterContract: () => Contract;
 };
+
+export type ProposalVotingAdapterTuple = [
+  proposalId: string,
+  votingAdapterData: ProposalVotingAdapterData
+];
