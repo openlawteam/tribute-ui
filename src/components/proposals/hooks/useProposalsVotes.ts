@@ -2,30 +2,23 @@ import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
 
-import {
-  OffchainVotingAdapterVotes,
-  ProposalVotingAdapterTuple,
-  VotingAdapterVotes,
-} from '../types';
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
+import {ProposalVotesData, ProposalVotingAdapterTuple} from '../types';
 import {StoreState} from '../../../store/types';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
 
-type ProposalsVotesTuples = [
+type ProposalsVotesTuple = [
   proposalId: string,
   /**
    * For each proposal, each result is stored under its adapter name.
    */
-  adapterData: {
-    [VotingAdapterName.OffchainVotingContract]?: OffchainVotingAdapterVotes;
-    [VotingAdapterName.VotingContract]?: VotingAdapterVotes;
-  }
-][];
+  adapterData: ProposalVotesData
+];
 
 type UseProposalsVotesReturn = {
-  proposalsVotes: ProposalsVotesTuples;
+  proposalsVotes: ProposalsVotesTuple[];
   proposalsVotesError: Error | undefined;
   proposalsVotesStatus: AsyncStatus;
 };
@@ -58,7 +51,7 @@ export function useProposalsVotes(
    * State
    */
 
-  const [proposalsVotes, setProposalsVotes] = useState<ProposalsVotesTuples>(
+  const [proposalsVotes, setProposalsVotes] = useState<ProposalsVotesTuple[]>(
     []
   );
   const [proposalsVotesError, setProposalsVotesError] = useState<Error>();
