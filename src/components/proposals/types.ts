@@ -115,6 +115,8 @@ export type ProposalData = {
   // @todo Make non-nullable?
   daoProposalVotingAdapter?: ProposalVotingAdapterData;
   // @todo Make non-nullable?
+  daoProposalVotes?: ProposalVotesData;
+  // @todo Make non-nullable?
   daoProposalVotingState?: VotingState;
   daoProposal: Proposal | undefined;
   /**
@@ -218,3 +220,13 @@ export type ProposalVotingAdapterTuple = [
   proposalId: string,
   votingAdapterData: ProposalVotingAdapterData
 ];
+
+/**
+ * Proposal on-chain votes data
+ *
+ * @see `useProposalsVotes`
+ */
+export type ProposalVotesData = {
+  [VotingAdapterName.OffchainVotingContract]?: OffchainVotingAdapterVotes;
+  [VotingAdapterName.VotingContract]?: VotingAdapterVotes;
+};
