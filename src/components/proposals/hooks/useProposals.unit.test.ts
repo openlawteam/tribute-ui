@@ -485,6 +485,53 @@ describe('useProposals unit tests', () => {
     });
   });
 
+  test('should return correct hook state if no proposals returned from Snapshot Hub', async () => {
+    const props = {adapterName: DaoAdapterConstants.ONBOARDING};
+
+    // Return 1 Draft and 2 Proposals
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/drafts/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json({}))
+        ),
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json({}))
+        ),
+      ]
+    );
+
+    await act(async () => {
+      const {result, waitForValueToChange} = await renderHook(
+        () => useProposals(props),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useWallet: true,
+            useInit: true,
+          },
+        }
+      );
+
+      expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
+
+      await waitForValueToChange(() => result.current.proposalsStatus);
+
+      expect(result.current.proposals).toMatchObject([]);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
+
+      await waitForValueToChange(() => result.current.proposalsStatus);
+
+      expect(result.current.proposalsStatus).toBe(AsyncStatus.FULFILLED);
+      expect(result.current.proposalsError).toBe(undefined);
+      expect(result.current.proposals.length).toBe(0);
+    });
+  });
+
   test('should return error', async () => {
     await act(async () => {
       server.use(
