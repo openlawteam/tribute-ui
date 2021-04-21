@@ -16,9 +16,150 @@ import {SNAPSHOT_HUB_API_URL} from '../../../config';
 import {useProposals} from './useProposals';
 import Wrapper from '../../../test/Wrapper';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
+import {VotingState} from '../voting/types';
+import {proposalHasVotingState} from '../helpers';
+
+const mockWeb3Responses: Parameters<typeof Wrapper>[0]['getProps'] = ({
+  mockWeb3Provider,
+  web3Instance,
+}) => {
+  // Mock the proposals' multicall response
+  mockWeb3Provider.injectResult(
+    web3Instance.eth.abi.encodeParameters(
+      ['uint256', 'bytes[]'],
+      [
+        0,
+        [
+          // For Draft
+          web3Instance.eth.abi.encodeParameter(
+            {
+              Proposal: {
+                adapterAddress: 'address',
+                flags: 'uint256',
+              },
+            },
+            {
+              adapterAddress: DEFAULT_ETH_ADDRESS,
+              // ProposalFlag.EXISTS
+              flags: '1',
+            }
+          ),
+          // For Proposal 1
+          web3Instance.eth.abi.encodeParameter(
+            {
+              Proposal: {
+                adapterAddress: 'address',
+                flags: 'uint256',
+              },
+            },
+            {
+              adapterAddress: DEFAULT_ETH_ADDRESS,
+              // ProposalFlag.SPONSORED
+              flags: '3',
+            }
+          ),
+          // For Proposal 2
+          web3Instance.eth.abi.encodeParameter(
+            {
+              Proposal: {
+                adapterAddress: 'address',
+                flags: 'uint256',
+              },
+            },
+            {
+              adapterAddress: DEFAULT_ETH_ADDRESS,
+              // ProposalFlag.SPONSORED
+              flags: '3',
+            }
+          ),
+        ],
+      ]
+    )
+  );
+
+  /**
+   * Mock results for `useProposalsVotingAdapter`
+   */
+
+  const offchainVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
+    'address',
+    DEFAULT_ETH_ADDRESS
+  );
+  const noVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
+    'address',
+    BURN_ADDRESS
+  );
+  const votingAdapterResponse = web3Instance.eth.abi.encodeParameter(
+    'address',
+    '0xa8ED02b24B4E9912e39337322885b65b23CdF188'
+  );
+
+  const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
+    'string',
+    VotingAdapterName.OffchainVotingContract
+  );
+
+  const votingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
+    'string',
+    VotingAdapterName.VotingContract
+  );
+
+  // Mock `dao.votingAdapter` responses
+  mockWeb3Provider.injectResult(
+    web3Instance.eth.abi.encodeParameters(
+      ['uint256', 'bytes[]'],
+      [
+        0,
+        [
+          // For Draft; not sponsored, yet.
+          noVotingAdapterResponse,
+          offchainVotingAdapterResponse,
+          votingAdapterResponse,
+        ],
+      ]
+    )
+  );
+
+  // Mock `IVoting.getAdapterName` responses
+  mockWeb3Provider.injectResult(
+    web3Instance.eth.abi.encodeParameters(
+      ['uint256', 'bytes[]'],
+      [
+        0,
+        [
+          // For Proposal 1
+          offchainVotingAdapterNameResponse,
+          // For Proposal 2
+          votingAdapterNameResponse,
+        ],
+      ]
+    )
+  );
+
+  /**
+   * Mock results for `useProposalsVotingState`
+   */
+
+  mockWeb3Provider.injectResult(
+    web3Instance.eth.abi.encodeParameters(
+      ['uint256', 'bytes[]'],
+      [
+        0,
+        [
+          // VotingState.IN_PROGRESS
+          web3Instance.eth.abi.encodeParameter('uint8', '4'),
+          // VotingState.IN_PROGRESS
+          web3Instance.eth.abi.encodeParameter('uint8', '4'),
+        ],
+      ]
+    )
+  );
+};
 
 describe('useProposals unit tests', () => {
   test('should return correct hook state', async () => {
+    const props = {adapterName: DaoAdapterConstants.ONBOARDING};
+
     const proposal1 = {
       // Proposal 1
       '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca70': {
@@ -49,143 +190,29 @@ describe('useProposals unit tests', () => {
       },
     };
 
-    await act(async () => {
-      // Return 1 Draft and 2 Proposals
-      server.use(
-        ...[
-          rest.get(
-            `${SNAPSHOT_HUB_API_URL}/api/:spaceName/drafts/:adapterAddress`,
-            async (_req, res, ctx) => res(ctx.json(snapshotAPIDraftResponse))
-          ),
-          rest.get(
-            `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
-            async (_req, res, ctx) =>
-              res(ctx.json({...proposal1, ...proposal2}))
-          ),
-        ]
-      );
+    // Return 1 Draft and 2 Proposals
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/drafts/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json(snapshotAPIDraftResponse))
+        ),
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json({...proposal1, ...proposal2}))
+        ),
+      ]
+    );
 
+    await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useProposals({adapterName: DaoAdapterConstants.ONBOARDING}),
+        () => useProposals(props),
         {
           wrapper: Wrapper,
           initialProps: {
             useWallet: true,
             useInit: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              // Mock the proposals' multicall response
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [
-                    0,
-                    [
-                      // For Draft
-                      web3Instance.eth.abi.encodeParameter(
-                        {
-                          Proposal: {
-                            adapterAddress: 'address',
-                            flags: 'uint256',
-                          },
-                        },
-                        {
-                          adapterAddress: DEFAULT_ETH_ADDRESS,
-                          // ProposalFlag.EXISTS
-                          flags: '1',
-                        }
-                      ),
-                      // For Proposal 1
-                      web3Instance.eth.abi.encodeParameter(
-                        {
-                          Proposal: {
-                            adapterAddress: 'address',
-                            flags: 'uint256',
-                          },
-                        },
-                        {
-                          adapterAddress: DEFAULT_ETH_ADDRESS,
-                          // ProposalFlag.SPONSORED
-                          flags: '3',
-                        }
-                      ),
-                      // For Proposal 2
-                      web3Instance.eth.abi.encodeParameter(
-                        {
-                          Proposal: {
-                            adapterAddress: 'address',
-                            flags: 'uint256',
-                          },
-                        },
-                        {
-                          adapterAddress: DEFAULT_ETH_ADDRESS,
-                          // ProposalFlag.SPONSORED
-                          flags: '3',
-                        }
-                      ),
-                    ],
-                  ]
-                )
-              );
-
-              /**
-               * Mock results for `useProposalsVotingAdapter`
-               */
-
-              const offchainVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
-                'address',
-                DEFAULT_ETH_ADDRESS
-              );
-              const noVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
-                'address',
-                BURN_ADDRESS
-              );
-              const votingAdapterResponse = web3Instance.eth.abi.encodeParameter(
-                'address',
-                '0xa8ED02b24B4E9912e39337322885b65b23CdF188'
-              );
-
-              const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
-                'string',
-                VotingAdapterName.OffchainVotingContract
-              );
-
-              const votingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
-                'string',
-                VotingAdapterName.VotingContract
-              );
-
-              // Mock `dao.votingAdapter` responses
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [
-                    0,
-                    [
-                      // For Draft; not sponsored, yet.
-                      noVotingAdapterResponse,
-                      offchainVotingAdapterResponse,
-                      votingAdapterResponse,
-                    ],
-                  ]
-                )
-              );
-
-              // Mock `IVoting.getAdapterName` responses
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [
-                    0,
-                    [
-                      // For Proposal 1
-                      offchainVotingAdapterNameResponse,
-                      // For Proposal 2
-                      votingAdapterNameResponse,
-                    ],
-                  ]
-                )
-              );
-            },
+            getProps: mockWeb3Responses,
           },
         }
       );
@@ -248,10 +275,6 @@ describe('useProposals unit tests', () => {
         SnapshotType.proposal
       );
 
-      await waitForValueToChange(
-        () => result.current.proposals[1].daoProposalVotingAdapter
-      );
-
       expect(
         result.current.proposals[1].daoProposalVotingAdapter
           ?.getVotingAdapterABI
@@ -268,6 +291,17 @@ describe('useProposals unit tests', () => {
       expect(
         result.current.proposals[1].daoProposalVotingAdapter?.votingAdapterName
       ).toBe(VotingAdapterName.OffchainVotingContract);
+
+      await waitForValueToChange(
+        () => result.current.proposals[1].daoProposalVotingState
+      );
+
+      expect(
+        proposalHasVotingState(
+          VotingState.IN_PROGRESS,
+          result.current.proposals[1].daoProposalVotingState || ''
+        )
+      ).toBe(true);
 
       expect(result.current.proposals[1].snapshotProposal).toMatchObject({
         ...Object.values(proposal1)[0],
@@ -312,6 +346,13 @@ describe('useProposals unit tests', () => {
         result.current.proposals[2].daoProposalVotingAdapter?.votingAdapterName
       ).toBe(VotingAdapterName.VotingContract);
 
+      expect(
+        proposalHasVotingState(
+          VotingState.IN_PROGRESS,
+          result.current.proposals[2].daoProposalVotingState || ''
+        )
+      ).toBe(true);
+
       expect(result.current.proposals[2].snapshotProposal).toMatchObject({
         ...Object.values(proposal2)[0],
         idInDAO:
@@ -344,90 +385,7 @@ describe('useProposals unit tests', () => {
           initialProps: {
             useWallet: true,
             useInit: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              // Mock the proposals' multicall response
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [
-                    0,
-                    [
-                      web3Instance.eth.abi.encodeParameter(
-                        {
-                          Proposal: {
-                            adapterAddress: 'address',
-                            flags: 'uint256',
-                          },
-                        },
-                        {
-                          adapterAddress: DEFAULT_ETH_ADDRESS,
-                          // ProposalFlag.SPONSORED
-                          flags: '3',
-                        }
-                      ),
-                      web3Instance.eth.abi.encodeParameter(
-                        {
-                          Proposal: {
-                            adapterAddress: 'address',
-                            flags: 'uint256',
-                          },
-                        },
-                        {
-                          adapterAddress: DEFAULT_ETH_ADDRESS,
-                          // ProposalFlag.EXISTS
-                          flags: '1',
-                        }
-                      ),
-                    ],
-                  ]
-                )
-              );
-
-              /**
-               * Mock results for `useProposalsVotingAdapter`
-               */
-
-              const offchainVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
-                'address',
-                DEFAULT_ETH_ADDRESS
-              );
-              const votingAdapterResponse = web3Instance.eth.abi.encodeParameter(
-                'address',
-                '0xa8ED02b24B4E9912e39337322885b65b23CdF188'
-              );
-
-              const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
-                'string',
-                VotingAdapterName.OffchainVotingContract
-              );
-
-              const votingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
-                'string',
-                VotingAdapterName.VotingContract
-              );
-
-              // Mock `dao.votingAdapter` responses
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [0, [offchainVotingAdapterResponse, votingAdapterResponse]]
-                )
-              );
-
-              // Mock `IVoting.getAdapterName` responses
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [
-                    0,
-                    [
-                      offchainVotingAdapterNameResponse,
-                      votingAdapterNameResponse,
-                    ],
-                  ]
-                )
-              );
-            },
+            getProps: mockWeb3Responses,
           },
         }
       );

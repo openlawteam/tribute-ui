@@ -16,6 +16,7 @@ import {Proposal, ProposalData} from '../types';
 import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
 import {StoreState} from '../../../store/types';
 import {useProposalsVotingAdapter} from './useProposalsVotingAdapter';
+import {useProposalsVotingState} from '.';
 import {useWeb3Modal} from '../../web3/hooks';
 
 type UseProposalsReturn = {
@@ -85,6 +86,12 @@ export function useProposals({
     proposalsVotingAdaptersStatus,
   } = useProposalsVotingAdapter(daoProposalIds);
 
+  const {
+    proposalsVotingState,
+    proposalsVotingStateError,
+    proposalsVotingStateStatus,
+  } = useProposalsVotingState(proposalsVotingAdapters);
+
   /**
    * Their hooks
    */
@@ -140,10 +147,30 @@ export function useProposals({
     );
   }, [proposalsVotingAdapters]);
 
+  // Set `daoProposalVotingState` data on the proposal
+  useEffect(() => {
+    if (!proposalsVotingState.length) return;
+
+    setProposals((prevState) =>
+      prevState.map(
+        (p): ProposalData => ({
+          ...p,
+          daoProposalVotingState: proposalsVotingState.find(
+            ([id]) => normalizeString(id) === normalizeString(p.idInDAO || '')
+          )?.[1],
+        })
+      )
+    );
+  }, [proposalsVotingState]);
+
   // Set overall async status
   useEffect(() => {
     const {STANDBY, PENDING, FULFILLED, REJECTED} = AsyncStatus;
-    const statuses = [proposalsStatus, proposalsVotingAdaptersStatus];
+    const statuses = [
+      proposalsStatus,
+      proposalsVotingAdaptersStatus,
+      proposalsVotingStateStatus,
+    ];
 
     /**
      * Standby
@@ -178,14 +205,22 @@ export function useProposals({
 
       return;
     }
-  }, [proposalsStatus, proposalsVotingAdaptersStatus]);
+  }, [
+    proposalsStatus,
+    proposalsVotingAdaptersStatus,
+    proposalsVotingStateStatus,
+  ]);
 
   // Set any error from async calls
   useEffect(() => {
-    const errors = [proposalsError, proposalsVotingAdaptersError];
+    const errors = [
+      proposalsError,
+      proposalsVotingAdaptersError,
+      proposalsVotingStateError,
+    ];
 
     setProposalsInclusiveError(errors.find((e) => e));
-  }, [proposalsError, proposalsVotingAdaptersError]);
+  }, [proposalsError, proposalsVotingAdaptersError, proposalsVotingStateError]);
 
   /**
    * Functions
@@ -364,6 +399,8 @@ export function useProposals({
               daoProposal: p,
               // To be set later in a `useEffect` above
               daoProposalVotingAdapter: undefined,
+              // To be set later in a `useEffect` above
+              daoProposalVotingState: undefined,
               snapshotDraft,
               getCommonSnapshotProposalData: () => undefined,
               refetchProposalOrDraft: () => {},
