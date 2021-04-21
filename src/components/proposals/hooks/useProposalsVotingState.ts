@@ -64,25 +64,24 @@ export function useProposalsVotingState(
    * Cached callbacks
    */
 
-  const getProposalsVotingStateCached = useCallback(getProposalsVotingState, [
-    proposalVotingAdapters,
-    registryAddress,
-    web3Instance,
-  ]);
+  const getProposalsVotingStateOnchainCached = useCallback(
+    getProposalsVotingStateOnchain,
+    [proposalVotingAdapters, registryAddress, web3Instance]
+  );
 
   /**
    * Effects
    */
 
   useEffect(() => {
-    getProposalsVotingStateCached();
-  }, [getProposalsVotingStateCached]);
+    getProposalsVotingStateOnchainCached();
+  }, [getProposalsVotingStateOnchainCached]);
 
   /**
    * Functions
    */
 
-  async function getProposalsVotingState() {
+  async function getProposalsVotingStateOnchain() {
     if (!registryAddress || !proposalVotingAdapters.length) {
       return;
     }
