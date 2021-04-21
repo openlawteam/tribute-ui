@@ -2,6 +2,7 @@ import {render, screen, waitFor} from '@testing-library/react';
 import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 import userEvent from '@testing-library/user-event';
 
+import {OffchainVotingStatus} from './voting';
 import {ProposalData} from './types';
 import ProposalCard from './ProposalCard';
 import Wrapper from '../../test/Wrapper';
@@ -35,14 +36,16 @@ describe('ProposalCard unit tests', () => {
     fakeProposal.snapshotProposal?.msg.payload.name ||
     '';
 
-  test('should render a proposal card', async () => {
+  test('should render a proposal card with a status', async () => {
     render(
       <Wrapper useInit useWallet>
         <ProposalCard
           name={name}
-          proposal={fakeProposal as ProposalData}
           proposalOnClickId={fakeProposal.snapshotProposal?.idInDAO as string}
           onClick={() => {}}
+          renderStatus={() => (
+            <OffchainVotingStatus proposal={fakeProposal as ProposalData} />
+          )}
         />
       </Wrapper>
     );
@@ -54,6 +57,23 @@ describe('ProposalCard unit tests', () => {
     });
   });
 
+  test('should render a proposal card without a status', async () => {
+    render(
+      <Wrapper useInit useWallet>
+        <ProposalCard
+          name={name}
+          proposalOnClickId={fakeProposal.snapshotProposal?.idInDAO as string}
+          onClick={() => {}}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/such a great proposal/i)).toBeInTheDocument();
+      expect(screen.getByText(/view proposal/i)).toBeInTheDocument();
+    });
+  });
+
   test('can click a proposal card', async () => {
     const spy = jest.fn();
 
@@ -61,9 +81,11 @@ describe('ProposalCard unit tests', () => {
       <Wrapper useInit useWallet>
         <ProposalCard
           name={name}
-          proposal={fakeProposal as ProposalData}
           proposalOnClickId={fakeProposal.snapshotProposal?.idInDAO as string}
           onClick={spy}
+          renderStatus={() => (
+            <OffchainVotingStatus proposal={fakeProposal as ProposalData} />
+          )}
         />
       </Wrapper>
     );
@@ -88,9 +110,11 @@ describe('ProposalCard unit tests', () => {
         <ProposalCard
           buttonText="Sponsor proposal"
           name={name}
-          proposal={fakeProposal as ProposalData}
           proposalOnClickId={fakeProposal.snapshotProposal?.idInDAO as string}
           onClick={spy}
+          renderStatus={() => (
+            <OffchainVotingStatus proposal={fakeProposal as ProposalData} />
+          )}
         />
       </Wrapper>
     );
@@ -112,9 +136,11 @@ describe('ProposalCard unit tests', () => {
           // Test when empty string
           buttonText=""
           name={name}
-          proposal={fakeProposal as ProposalData}
           proposalOnClickId={fakeProposal.snapshotProposal?.idInDAO as string}
           onClick={spy}
+          renderStatus={() => (
+            <OffchainVotingStatus proposal={fakeProposal as ProposalData} />
+          )}
         />
       </Wrapper>
     );

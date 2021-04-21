@@ -1,18 +1,12 @@
-import {useSelector} from 'react-redux';
 import LinesEllipsis from 'react-lines-ellipsis';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 
-import {OffchainVotingStatus} from './voting';
-import {ProposalData, VotingResult} from './types';
-import {StoreState} from '../../store/types';
-import {VotingAdapterName} from '../adapters-extensions/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {truncateEthAddress} from '../../util/helpers';
 
 type ProposalCardProps = {
   buttonText?: string;
   onClick: (proposalOnClickId: string) => void;
-  proposal: ProposalData;
   /**
    * The ID for the proposal to be used for navigation.
    * As there can be a few different options, it's best to provide it
@@ -21,13 +15,9 @@ type ProposalCardProps = {
   proposalOnClickId: string;
   name: string;
   /**
-   * If a fetched `VotingResult` is provided
-   * it will save the need to fetch inside of `OffchainVotingStatus`.
-   *
-   * e.g. Governance proposals listing may fetch all voting results
-   *   in order to filter the `ProposalCard`s and be able to provide the results.
+   * Render a custom status via render prop
    */
-  votingResult?: VotingResult;
+  renderStatus?: () => React.ReactNode;
 };
 
 const DEFAULT_BUTTON_TEXT: string = 'View Proposal';
@@ -43,20 +33,11 @@ const ResponsiveEllipsis = responsiveHOC()(LinesEllipsis);
 export default function ProposalCard(props: ProposalCardProps): JSX.Element {
   const {
     buttonText = DEFAULT_BUTTON_TEXT,
-    proposal,
     proposalOnClickId,
     onClick,
     name,
-    votingResult,
+    renderStatus,
   } = props;
-
-  /**
-   * Selectors
-   */
-
-  const votingAdapterName = useSelector(
-    (s: StoreState) => s.contracts.VotingContract?.adapterOrExtensionName
-  );
 
   /**
    * Functions
@@ -64,29 +45,6 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
 
   function handleClick() {
     onClick(proposalOnClickId);
-  }
-
-  /**
-   * Change status component based on voting adapter.
-   *
-   * @todo It's currently not possible to get the voting adapter used for a DAO proposal,
-   *   so until then we need to use the currently registered voting adapter for the DAO.
-   */
-  function renderStatus(proposal: ProposalData) {
-    switch (votingAdapterName) {
-      case VotingAdapterName.OffchainVotingContract:
-        return (
-          <OffchainVotingStatus
-            proposal={proposal}
-            votingResult={votingResult}
-          />
-        );
-      // @todo On-chain Voting
-      // case VotingAdapterName.VotingContract:
-      //   return <></>
-      default:
-        return <></>;
-    }
   }
 
   function renderName(name: string) {
@@ -114,8 +72,8 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
       {/* TITLE */}
       <h3 className="proposalcard__title">{renderName(name)}</h3>
 
-      {/* VOTING PROGRESS STATUS AND BAR */}
-      {renderStatus(proposal)}
+      {/* E.G. VOTING PROGRESS STATUS AND BAR */}
+      {renderStatus && renderStatus()}
 
       {/* BUTTON (no click handler) */}
       <button className="proposalcard__button">
