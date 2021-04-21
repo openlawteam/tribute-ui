@@ -345,6 +345,10 @@ describe('useProposals unit tests', () => {
         SnapshotType.proposal
       );
 
+      await waitForValueToChange(
+        () => result.current.proposals[1].daoProposalVotingAdapter
+      );
+
       expect(
         result.current.proposals[1].daoProposalVotingAdapter
           ?.getVotingAdapterABI
@@ -361,6 +365,10 @@ describe('useProposals unit tests', () => {
       expect(
         result.current.proposals[1].daoProposalVotingAdapter?.votingAdapterName
       ).toBe(VotingAdapterName.OffchainVotingContract);
+
+      await waitForValueToChange(
+        () => result.current.proposals[1].daoProposalVotingState
+      );
 
       expect(
         proposalHasVotingState(

@@ -81,18 +81,24 @@ export function useProposals({
    * Our hooks
    */
 
+  /**
+   * Fetch voting adapter data for proposals.
+   * Only returns data for proposals of which voting adapters have been assigned (i.e. sponsored).
+   */
   const {
     proposalsVotingAdapters,
     proposalsVotingAdaptersError,
     proposalsVotingAdaptersStatus,
   } = useProposalsVotingAdapter(daoProposalIds);
 
+  // Fetch voting state for proposals of which voting adapters have been assigned (i.e. sponsored)
   const {
     proposalsVotingState,
     proposalsVotingStateError,
     proposalsVotingStateStatus,
   } = useProposalsVotingState(proposalsVotingAdapters);
 
+  // Fetch votes data for proposals of which voting adapters have been assigned (i.e. sponsored)
   const {
     proposalsVotes,
     proposalsVotesError,
@@ -223,6 +229,25 @@ export function useProposals({
       return;
     }
 
+    // Fulfilled: checked for DAO proposals and none were returned
+    if (proposalsStatus === FULFILLED && !daoProposalIds.length) {
+      setProposalsInclusiveStatus(FULFILLED);
+
+      return;
+    }
+
+    // Fulfilled: checked for DAO proposals' voting adapters and none were returned - not sponsored
+    if (
+      proposalsStatus === FULFILLED &&
+      proposalsVotingAdaptersStatus === FULFILLED &&
+      daoProposalIds.length &&
+      !proposalsVotingAdapters.length
+    ) {
+      setProposalsInclusiveStatus(FULFILLED);
+
+      return;
+    }
+
     // Rejected
     if (statuses.some((s) => s === REJECTED)) {
       setProposalsInclusiveStatus(REJECTED);
@@ -230,8 +255,10 @@ export function useProposals({
       return;
     }
   }, [
+    daoProposalIds.length,
     proposalsStatus,
     proposalsVotesStatus,
+    proposalsVotingAdapters.length,
     proposalsVotingAdaptersStatus,
     proposalsVotingStateStatus,
   ]);
