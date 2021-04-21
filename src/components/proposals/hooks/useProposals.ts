@@ -429,6 +429,8 @@ export function useProposals({
               idInDAO,
               daoProposal: p,
               // To be set later in a `useEffect` above
+              daoProposalVotes: undefined,
+              // To be set later in a `useEffect` above
               daoProposalVotingAdapter: undefined,
               // To be set later in a `useEffect` above
               daoProposalVotingState: undefined,
