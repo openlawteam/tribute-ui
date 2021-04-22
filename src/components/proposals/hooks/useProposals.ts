@@ -82,7 +82,7 @@ export function useProposals({
    */
 
   /**
-   * Fetch voting adapter data for proposals.
+   * Fetch on-chain voting adapter data for proposals.
    * Only returns data for proposals of which voting adapters have been assigned (i.e. sponsored).
    */
   const {
@@ -91,14 +91,14 @@ export function useProposals({
     proposalsVotingAdaptersStatus,
   } = useProposalsVotingAdapter(daoProposalIds);
 
-  // Fetch voting state for proposals of which voting adapters have been assigned (i.e. sponsored)
+  // Fetch on-chain voting state for proposals of which voting adapters have been assigned (i.e. sponsored)
   const {
     proposalsVotingState,
     proposalsVotingStateError,
     proposalsVotingStateStatus,
   } = useProposalsVotingState(proposalsVotingAdapters);
 
-  // Fetch votes data for proposals of which voting adapters have been assigned (i.e. sponsored)
+  // Fetch on-chain votes data for proposals of which voting adapters have been assigned (i.e. sponsored)
   const {
     proposalsVotes,
     proposalsVotesError,
