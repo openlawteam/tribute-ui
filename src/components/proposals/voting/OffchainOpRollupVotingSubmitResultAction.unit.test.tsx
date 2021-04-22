@@ -1,0 +1,387 @@
+import {
+  SnapshotProposalResponseData,
+  SnapshotType,
+} from '@openlaw/snapshot-js-erc712';
+import {screen, waitFor} from '@testing-library/react';
+import {render} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import Web3 from 'web3';
+
+import {
+  ethEstimateGas,
+  ethGasPrice,
+  getTransactionReceipt,
+  sendTransaction,
+  signTypedDataV4,
+} from '../../../test/web3Responses';
+import {ContractAdapterNames} from '../../web3/types';
+import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../../test/helpers';
+import {OffchainOpRollupVotingSubmitResultAction} from '.';
+import {ProposalData, SnapshotProposal} from '../types';
+import {setConnectedMember} from '../../../store/actions';
+import {snapshotAPIProposalResponse} from '../../../test/restResponses';
+import {TX_CYCLE_MESSAGES} from '../../web3/config';
+import OffchainVotingABI from '../../../truffle-contracts/OffchainVotingContract.json';
+import Wrapper from '../../../test/Wrapper';
+
+const defaultProposalVotes: SnapshotProposalResponseData['votes'] = [
+  {
+    DEFAULT_ETH_ADDRESS: {
+      address: DEFAULT_ETH_ADDRESS,
+      msg: {
+        version: '0.2.0',
+        timestamp: '1614264732',
+        token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
+        type: SnapshotType.vote,
+        payload: {
+          choice: 1, // Yes
+          proposalHash:
+            '0x1679cac3f54777f5d9c95efd83beff9f87ac55487311ecacd95827d267a15c4e',
+          metadata: {
+            memberAddress: DEFAULT_ETH_ADDRESS,
+          },
+        },
+      },
+      sig:
+        '0xdbdbf122734b34ed5b10542551636e4250e98f443e35bf5d625f284fe54dcaf80c5bc44be04fefed1e9e5f25a7c13809a5266fcdbdcd0b94c885f2128544e79a1b',
+      authorIpfsHash:
+        '0xfe8f864ef475f60c7e01d5425df332199c5ae7ab712b8545f07433c68f06c644',
+      relayerIpfsHash: '',
+      actionId: '0xFCB86F90bd7b30cDB8A2c43FB15bf5B33A70Ea4f',
+    },
+  },
+  {
+    '0xc0437e11094275376defbe51dc6e04598403d276': {
+      address: '0xc0437e11094275376defbe51dc6e04598403d276',
+      msg: {
+        version: '0.2.0',
+        timestamp: '1614264732',
+        token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
+        type: SnapshotType.vote,
+        payload: {
+          choice: 2, // No
+          proposalHash:
+            '0x1679cac3f54777f5d9c95efd83beff9f87ac55487311ecacd95827d267a15c4e',
+          metadata: {
+            memberAddress: '0xc0437e11094275376defbe51dc6e04598403d276',
+          },
+        },
+      },
+      sig:
+        '0xdbdbf122734b34ed5b10542551636e4250e98f443e35bf5d625f284fe54dcaf80c5bc44be04fefed1e9e5f25a7c13809a5266fcdbdcd0b94c885f2128544e79a1b',
+      authorIpfsHash:
+        '0xfe8f864ef475f60c7e01d5425df332199c5ae7ab712b8545f07433c68f06c644',
+      relayerIpfsHash: '',
+      actionId: '0xFCB86F90bd7b30cDB8A2c43FB15bf5B33A70Ea4f',
+    },
+  },
+];
+
+const defaultProposalBody = Object.values(snapshotAPIProposalResponse)[0];
+
+const proposalData: Partial<ProposalData> = {
+  snapshotProposal: {
+    ...defaultProposalBody,
+    msg: {
+      ...defaultProposalBody.msg,
+      payload: {
+        ...defaultProposalBody.msg.payload,
+        name: 'Another cool one',
+      },
+    },
+    data: {
+      erc712DraftHash:
+        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434',
+      authorIpfsHash: '',
+    },
+    votes: defaultProposalVotes,
+    idInDAO:
+      '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434',
+    idInSnapshot:
+      '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333',
+  } as SnapshotProposal,
+};
+
+describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
+  test('should submit a vote result', async () => {
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    const {rerender} = render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposalData as ProposalData}
+        />
+      </Wrapper>
+    );
+
+    // Set the `daoProposalVotingAdapter.getWeb3VotingAdapterContract`
+    rerender(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={
+            {
+              ...proposalData,
+              daoProposalVotingAdapter: {
+                getWeb3VotingAdapterContract: () =>
+                  new web3Instance.eth.Contract(
+                    OffchainVotingABI as any,
+                    DEFAULT_ETH_ADDRESS
+                  ),
+              },
+            } as ProposalData
+          }
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeEnabled();
+    });
+
+    // Setup: Mock RPC calls for `processProposal`
+    await waitFor(() => {
+      // Mock signature
+      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+
+      // Mock RPC calls for estimating gas before the tx
+      mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
+    });
+
+    userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/awaiting your confirmation/i)
+      ).toBeInTheDocument();
+    });
+
+    // Mock RPC calls for `submitVoteResult`
+    await waitFor(() => {
+      mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
+      mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
+    });
+
+    await waitFor(() => {
+      // The component start `useFirstItemStart = true` for `<CycleMessage />`
+      expect(screen.getByText(TX_CYCLE_MESSAGES[0])).toBeInTheDocument();
+      expect(screen.getByText(/view progress/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/result submitted!/i)).toBeInTheDocument();
+      expect(screen.getByText(/view transaction/i)).toBeInTheDocument();
+    });
+  });
+
+  test('should show an error when submitting vote result fails', async () => {
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    const {rerender} = render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposalData as ProposalData}
+        />
+      </Wrapper>
+    );
+
+    // Set the `daoProposalVotingAdapter.getWeb3VotingAdapterContract`
+    rerender(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={
+            {
+              ...proposalData,
+              daoProposalVotingAdapter: {
+                getWeb3VotingAdapterContract: () =>
+                  new web3Instance.eth.Contract(
+                    OffchainVotingABI as any,
+                    DEFAULT_ETH_ADDRESS
+                  ),
+              },
+            } as ProposalData
+          }
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeEnabled();
+    });
+
+    // Setup: Mock RPC calls for `processProposal`
+    await waitFor(() => {
+      // Mock signature
+      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+
+      // Mock RPC error for estimating gas before the tx
+      mockWeb3Provider.injectError({code: 1234, message: 'Bad stuff!'});
+    });
+
+    userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
+
+    await waitFor(() => {
+      expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
+      expect(screen.getByText(/bad stuff!/i)).toBeInTheDocument();
+    });
+  });
+
+  test('should disable the submit button if not a member', async () => {
+    let wrapperStore: any;
+
+    const {rerender} = render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={({store}) => {
+          wrapperStore = store;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposalData as ProposalData}
+        />
+      </Wrapper>
+    );
+
+    wrapperStore.dispatch(
+      setConnectedMember({
+        isActiveMember: false,
+        delegateKey: DEFAULT_ETH_ADDRESS,
+        memberAddress: DEFAULT_ETH_ADDRESS,
+      })
+    );
+
+    rerender(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={({store}) => {
+          wrapperStore = store;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposalData as ProposalData}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeDisabled();
+
+      expect(
+        screen.getByRole('button', {name: /why is submitting disabled\?/i})
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('should disable the submit button if not connected to a wallet', async () => {
+    render(
+      <Wrapper useInit>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposalData as ProposalData}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeDisabled();
+    });
+
+    // check again after any component updates
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeDisabled();
+
+      expect(
+        screen.getByRole('button', {name: /why is submitting disabled\?/i})
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('should show the <WhyDisabledModal />', async () => {
+    render(
+      <Wrapper useInit>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposalData as ProposalData}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeDisabled();
+    });
+
+    // check again after any component updates
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeDisabled();
+
+      expect(
+        screen.getByRole('button', {name: /why is submitting disabled\?/i})
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('button', {name: /why is submitting disabled\?/i})
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/why is this disabled\?/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/your wallet is not connected\./i)
+      ).toBeInTheDocument();
+    });
+  });
+});
