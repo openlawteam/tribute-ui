@@ -1,4 +1,3 @@
-import React from 'react';
 import {screen, render, waitFor} from '@testing-library/react';
 import {useHistory} from 'react-router-dom';
 
