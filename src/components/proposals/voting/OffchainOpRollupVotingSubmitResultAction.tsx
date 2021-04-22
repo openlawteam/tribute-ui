@@ -53,7 +53,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
 ) {
   const {
     adapterName,
-    proposal: {snapshotProposal},
+    proposal: {daoProposalVotingAdapter, snapshotProposal},
   } = props;
 
   /**
@@ -71,9 +71,6 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
   const bankExtensionMethods = useSelector(
     (s: StoreState) => s.contracts.BankExtensionContract?.instance.methods
-  );
-  const offchainVotingMethods = useSelector(
-    (s: StoreState) => s.contracts.VotingContract?.instance.methods
   );
   const daoRegistryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
@@ -99,6 +96,9 @@ export function OffchainOpRollupVotingSubmitResultAction(
   /**
    * Variables
    */
+
+  const votingAdapterMethods = daoProposalVotingAdapter?.getWeb3VotingAdapterContract()
+    .methods;
 
   const isInProcess =
     signatureStatus === Web3TxStatus.AWAITING_CONFIRM ||
@@ -128,6 +128,10 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
       if (!snapshotProposal.votes) {
         throw new Error('No Snapshot proposal votes were found.');
+      }
+
+      if (!votingAdapterMethods) {
+        throw new Error('No "OffchainVotingContract" methods were found.');
       }
 
       setSignatureStatus(Web3TxStatus.AWAITING_CONFIRM);
@@ -214,7 +218,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
       // 4. Send the tx
       await txSend(
         'submitVoteResult',
-        offchainVotingMethods,
+        votingAdapterMethods,
         submitVoteResultArguments,
         txArguments
       );
