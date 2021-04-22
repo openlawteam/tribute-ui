@@ -280,6 +280,8 @@ export function useProposalOrDraft(
 
       return draft;
     } catch (error) {
+      if (!isMountedRef.current) return;
+
       setProposalStatus(AsyncStatus.REJECTED);
       setProposalError(error);
     }
@@ -345,6 +347,8 @@ export function useProposalOrDraft(
 
       return proposal;
     } catch (error) {
+      if (!isMountedRef.current) return;
+
       setProposalStatus(AsyncStatus.REJECTED);
       setProposalError(error);
     }
