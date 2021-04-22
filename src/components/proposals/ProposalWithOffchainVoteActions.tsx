@@ -79,7 +79,7 @@ export default function ProposalWithOffchainVoteActions(
         )}
 
         {/* OFF-CHAIN VOTING SUBMIT VOTE RESULT */}
-        {/* @todo A wrapping component to get the correct off-chain voting component */}
+        {/* @todo Perhaps use a wrapping component to get the correct off-chain voting component (e.g. op-rollup, batch) */}
         {status === ProposalFlowStatus.OffchainVotingSubmitResult && (
           <OffchainOpRollupVotingSubmitResultAction
             adapterName={adapterName}
