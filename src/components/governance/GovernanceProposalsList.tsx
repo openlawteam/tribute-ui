@@ -38,7 +38,6 @@ type FilteredProposals = {
   votingProposals: ProposalData[];
 };
 
-// @todo Pass `VotingResult` down to `OffchainVotingStatus` via `ProposalCard`
 export default function GovernanceProposalsList(
   props: GovernanceProposalsListProps
 ): JSX.Element {
