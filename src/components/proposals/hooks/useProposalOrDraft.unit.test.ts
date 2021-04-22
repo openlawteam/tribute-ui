@@ -6,31 +6,100 @@ import {
   snapshotAPIDraftResponse,
   snapshotAPIProposalResponse,
 } from '../../../test/restResponses';
+import {
+  DEFAULT_DRAFT_HASH,
+  DEFAULT_ETH_ADDRESS,
+  DEFAULT_PROPOSAL_HASH,
+} from '../../../test/helpers';
 import {AsyncStatus} from '../../../util/types';
+import {BURN_ADDRESS} from '../../../util/constants';
 import {rest, server} from '../../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../../config';
 import {useProposalOrDraft} from '.';
+import {VotingAdapterName} from '../../adapters-extensions/enums';
+import Wrapper from '../../../test/Wrapper';
+
+const mockWeb3ResponsesDraft: Parameters<typeof Wrapper>[0]['getProps'] = ({
+  mockWeb3Provider,
+  web3Instance,
+}) => {
+  /**
+   * Mock results for `useProposalsVotingAdapter`
+   */
+
+  // Mock `dao.votingAdapter` responses
+  mockWeb3Provider.injectResult(
+    web3Instance.eth.abi.encodeParameters(
+      ['uint256', 'bytes[]'],
+      [0, [web3Instance.eth.abi.encodeParameter('address', BURN_ADDRESS)]]
+    )
+  );
+};
+
+const mockWeb3ResponsesProposal: Parameters<typeof Wrapper>[0]['getProps'] = ({
+  mockWeb3Provider,
+  web3Instance,
+}) => {
+  /**
+   * Mock results for `useProposalsVotingAdapter`
+   */
+
+  // Mock `dao.votingAdapter` responses
+  mockWeb3Provider.injectResult(
+    web3Instance.eth.abi.encodeParameters(
+      ['uint256', 'bytes[]'],
+      [
+        0,
+        [web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)],
+      ]
+    )
+  );
+
+  // Mock `IVoting.getAdapterName` responses
+  mockWeb3Provider.injectResult(
+    web3Instance.eth.abi.encodeParameters(
+      ['uint256', 'bytes[]'],
+      [
+        0,
+        [
+          web3Instance.eth.abi.encodeParameter(
+            'string',
+            VotingAdapterName.OffchainVotingContract
+          ),
+        ],
+      ]
+    )
+  );
+};
 
 describe('useProposalOrDraft unit tests', () => {
-  test('no type: should return correct data when searching', async () => {
+  test('no snapshot type: should return correct data when searching', async () => {
     await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456')
+      const {result} = await renderHook(
+        () => useProposalOrDraft(DEFAULT_PROPOSAL_HASH),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: mockWeb3ResponsesProposal,
+          },
+        }
       );
 
       const idKey = Object.keys(snapshotAPIProposalResponse)[0];
       const proposal = snapshotAPIProposalResponse[idKey];
 
+      // Assert initial state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
       });
 
+      // Assert fulfilled state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData?.snapshotProposal).toStrictEqual({
           ...proposal,
           idInDAO: proposal.data.erc712DraftHash,
@@ -39,11 +108,29 @@ describe('useProposalOrDraft unit tests', () => {
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
+
+        // Assert `daoProposalVotingAdapter` data
+        expect(
+          result.current.proposalData?.daoProposalVotingAdapter
+            ?.votingAdapterAddress
+        ).toBe(DEFAULT_ETH_ADDRESS);
+        expect(
+          result.current.proposalData?.daoProposalVotingAdapter
+            ?.votingAdapterName
+        ).toBe(VotingAdapterName.OffchainVotingContract);
+        expect(
+          result.current.proposalData?.daoProposalVotingAdapter
+            ?.getVotingAdapterABI
+        ).toBeInstanceOf(Function);
+        expect(
+          result.current.proposalData?.daoProposalVotingAdapter
+            ?.getWeb3VotingAdapterContract
+        ).toBeInstanceOf(Function);
       });
     });
   });
 
-  test('no type: should return correct data for draft if proposal returns no data', async () => {
+  test('no snapshot type: should return correct data for draft if proposal returns no data', async () => {
     server.use(
       ...[
         rest.get(
@@ -58,23 +145,31 @@ describe('useProposalOrDraft unit tests', () => {
     );
 
     await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456')
+      const {result} = await renderHook(
+        () => useProposalOrDraft(DEFAULT_DRAFT_HASH),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: mockWeb3ResponsesDraft,
+          },
+        }
       );
 
       const draftIdkey = Object.keys(snapshotAPIDraftResponse)[0];
       const draft = snapshotAPIDraftResponse[draftIdkey];
 
+      // Assert initial state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData?.snapshotDraft).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
       });
 
+      // Assert fulfilled state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData?.snapshotDraft).toStrictEqual({
           ...draft,
           idInDAO: draftIdkey,
@@ -83,11 +178,16 @@ describe('useProposalOrDraft unit tests', () => {
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
+
+        // Assert `daoProposalVotingAdapter` data
+        expect(result.current.proposalData?.daoProposalVotingAdapter).toBe(
+          undefined
+        );
       });
     });
   });
 
-  test('no type: should return correct data if draft and proposal return no data', async () => {
+  test('no snapshot type: should return correct data if draft and proposal return no data', async () => {
     server.use(
       ...[
         rest.get(
@@ -102,12 +202,20 @@ describe('useProposalOrDraft unit tests', () => {
     );
 
     await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456')
+      const {result} = await renderHook(
+        () => useProposalOrDraft(DEFAULT_PROPOSAL_HASH),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: mockWeb3ResponsesDraft,
+          },
+        }
       );
 
+      // Assert initial state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData?.snapshotDraft).toBe(undefined);
         expect(result.current.proposalData?.snapshotProposal).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
@@ -115,13 +223,16 @@ describe('useProposalOrDraft unit tests', () => {
         expect(result.current.proposalNotFound).toBe(false);
       });
 
+      // Assert rejected state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData?.snapshotDraft).toBe(undefined);
         expect(result.current.proposalData?.snapshotProposal).toBe(undefined);
         expect(result.current.proposalError).toBeInstanceOf(Error);
         expect(result.current.proposalStatus).toBe(AsyncStatus.REJECTED);
         expect(result.current.proposalNotFound).toBe(true);
+        expect(result.current.proposalData?.daoProposalVotingAdapter).toBe(
+          undefined
+        );
       });
 
       const data = result.current.proposalData?.getCommonSnapshotProposalData();
@@ -130,7 +241,7 @@ describe('useProposalOrDraft unit tests', () => {
     });
   });
 
-  test('no type: should return correct data for draft if proposal errors', async () => {
+  test('no snapshot type: should return correct data for draft if proposal errors', async () => {
     server.use(
       ...[
         rest.get(
@@ -145,23 +256,31 @@ describe('useProposalOrDraft unit tests', () => {
     );
 
     await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456')
+      const {result} = await renderHook(
+        () => useProposalOrDraft(DEFAULT_DRAFT_HASH),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: mockWeb3ResponsesDraft,
+          },
+        }
       );
 
       const draftIdkey = Object.keys(snapshotAPIDraftResponse)[0];
       const draft = snapshotAPIDraftResponse[draftIdkey];
 
+      // Assert initial state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData?.snapshotDraft).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
       });
 
+      // Assert fulfilled state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData?.snapshotDraft).toStrictEqual({
           ...draft,
           idInDAO: draftIdkey,
@@ -170,11 +289,14 @@ describe('useProposalOrDraft unit tests', () => {
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
+        expect(result.current.proposalData?.daoProposalVotingAdapter).toBe(
+          undefined
+        );
       });
     });
   });
 
-  test('no type: should return correct data if draft and proposal errors', async () => {
+  test('no snapshot type: should return correct data if draft and proposal errors', async () => {
     server.use(
       ...[
         rest.get(
@@ -189,24 +311,35 @@ describe('useProposalOrDraft unit tests', () => {
     );
 
     await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456')
+      const {result} = await renderHook(
+        () => useProposalOrDraft(DEFAULT_PROPOSAL_HASH),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: mockWeb3ResponsesDraft,
+          },
+        }
       );
 
+      // Assert initial state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
       });
 
+      // Assert rejected state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBeInstanceOf(Error);
         expect(result.current.proposalStatus).toBe(AsyncStatus.REJECTED);
         expect(result.current.proposalNotFound).toBe(false);
+        expect(result.current.proposalData?.daoProposalVotingAdapter).toBe(
+          undefined
+        );
       });
 
       const data = result.current.proposalData?.getCommonSnapshotProposalData();
@@ -221,23 +354,31 @@ describe('useProposalOrDraft unit tests', () => {
 
   test('draft: should return correct data when searching', async () => {
     await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456', SnapshotType.draft)
+      const {result} = await renderHook(
+        () => useProposalOrDraft(DEFAULT_DRAFT_HASH, SnapshotType.draft),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: mockWeb3ResponsesDraft,
+          },
+        }
       );
 
       const draftIdkey = Object.keys(snapshotAPIDraftResponse)[0];
       const draft = snapshotAPIDraftResponse[draftIdkey];
 
+      // Assert initial state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData?.snapshotDraft).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
       });
 
+      // Assert fulfilled state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData?.snapshotDraft).toStrictEqual({
           ...draft,
           idInDAO: draftIdkey,
@@ -246,6 +387,17 @@ describe('useProposalOrDraft unit tests', () => {
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
+        expect(result.current.proposalData?.daoProposalVotingAdapter).toBe(
+          undefined
+        );
+
+        expect(
+          result.current.proposalData?.getCommonSnapshotProposalData()
+        ).toStrictEqual({
+          ...draft,
+          idInDAO: draftIdkey,
+          idInSnapshot: draftIdkey,
+        });
       });
     });
   });
@@ -261,24 +413,35 @@ describe('useProposalOrDraft unit tests', () => {
     );
 
     await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456', SnapshotType.draft)
+      const {result} = await renderHook(
+        () => useProposalOrDraft(DEFAULT_DRAFT_HASH, SnapshotType.draft),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: mockWeb3ResponsesDraft,
+          },
+        }
       );
 
+      // Assert initial state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
       });
 
+      // Assert rejected state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBeInstanceOf(Error);
         expect(result.current.proposalStatus).toBe(AsyncStatus.REJECTED);
         expect(result.current.proposalNotFound).toBe(true);
+        expect(result.current.proposalData?.daoProposalVotingAdapter).toBe(
+          undefined
+        );
       });
     });
   });
@@ -294,47 +457,35 @@ describe('useProposalOrDraft unit tests', () => {
     );
 
     await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456', SnapshotType.draft)
+      const {result} = await renderHook(
+        () => useProposalOrDraft(DEFAULT_DRAFT_HASH, SnapshotType.draft),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: mockWeb3ResponsesDraft,
+          },
+        }
       );
 
+      // Assert initial state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
       });
 
+      // Assert rejected state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBeInstanceOf(Error);
         expect(result.current.proposalStatus).toBe(AsyncStatus.REJECTED);
         expect(result.current.proposalNotFound).toBe(false);
-      });
-    });
-  });
-
-  test('draft: getCommonSnapshotProposalData should return correct data when called', async () => {
-    await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456', SnapshotType.draft)
-      );
-
-      const draftIdkey = Object.keys(snapshotAPIDraftResponse)[0];
-      const draft = snapshotAPIDraftResponse[draftIdkey];
-
-      await waitFor(() => {
-        expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
-      });
-
-      const data = result.current.proposalData?.getCommonSnapshotProposalData();
-
-      expect(data).toStrictEqual({
-        ...draft,
-        idInDAO: draftIdkey,
-        idInSnapshot: draftIdkey,
+        expect(result.current.proposalData?.daoProposalVotingAdapter).toBe(
+          undefined
+        );
       });
     });
   });
@@ -345,23 +496,31 @@ describe('useProposalOrDraft unit tests', () => {
 
   test('proposal: should return correct data when searching', async () => {
     await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456', SnapshotType.proposal)
+      const {result} = await renderHook(
+        () => useProposalOrDraft(DEFAULT_PROPOSAL_HASH, SnapshotType.proposal),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: mockWeb3ResponsesProposal,
+          },
+        }
       );
 
       const idKey = Object.keys(snapshotAPIProposalResponse)[0];
       const proposal = snapshotAPIProposalResponse[idKey];
 
+      // Assert initial state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData?.snapshotProposal).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
       });
 
+      // Assert fulfilled state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData?.snapshotProposal).toStrictEqual({
           ...proposal,
           idInDAO: proposal.data.erc712DraftHash,
@@ -370,6 +529,32 @@ describe('useProposalOrDraft unit tests', () => {
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.proposalNotFound).toBe(false);
+
+        expect(
+          result.current.proposalData?.getCommonSnapshotProposalData()
+        ).toStrictEqual({
+          ...proposal,
+          idInDAO: proposal.data.erc712DraftHash,
+          idInSnapshot: idKey,
+        });
+
+        // Assert `daoProposalVotingAdapter` data
+        expect(
+          result.current.proposalData?.daoProposalVotingAdapter
+            ?.votingAdapterAddress
+        ).toBe(DEFAULT_ETH_ADDRESS);
+        expect(
+          result.current.proposalData?.daoProposalVotingAdapter
+            ?.votingAdapterName
+        ).toBe(VotingAdapterName.OffchainVotingContract);
+        expect(
+          result.current.proposalData?.daoProposalVotingAdapter
+            ?.getVotingAdapterABI
+        ).toBeInstanceOf(Function);
+        expect(
+          result.current.proposalData?.daoProposalVotingAdapter
+            ?.getWeb3VotingAdapterContract
+        ).toBeInstanceOf(Function);
       });
     });
   });
@@ -385,24 +570,35 @@ describe('useProposalOrDraft unit tests', () => {
     );
 
     await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456', SnapshotType.proposal)
+      const {result} = await renderHook(
+        () => useProposalOrDraft(DEFAULT_PROPOSAL_HASH, SnapshotType.proposal),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: mockWeb3ResponsesProposal,
+          },
+        }
       );
 
+      // Assert initial state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
       });
 
+      // Assert rejected state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBeInstanceOf(Error);
         expect(result.current.proposalStatus).toBe(AsyncStatus.REJECTED);
         expect(result.current.proposalNotFound).toBe(true);
+        expect(result.current.proposalData?.daoProposalVotingAdapter).toBe(
+          undefined
+        );
       });
     });
   });
@@ -418,50 +614,42 @@ describe('useProposalOrDraft unit tests', () => {
     );
 
     await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456', SnapshotType.proposal)
+      const {result} = await renderHook(
+        () => useProposalOrDraft(DEFAULT_PROPOSAL_HASH, SnapshotType.proposal),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: mockWeb3ResponsesProposal,
+          },
+        }
       );
 
+      // Assert initial state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBe(undefined);
         expect(result.current.proposalStatus).toBe(AsyncStatus.STANDBY);
         expect(result.current.proposalNotFound).toBe(false);
       });
 
+      // Assert rejected state
       await waitFor(() => {
-        // Assert initial state
         expect(result.current.proposalData).toBe(undefined);
         expect(result.current.proposalError).toBeInstanceOf(Error);
         expect(result.current.proposalStatus).toBe(AsyncStatus.REJECTED);
         expect(result.current.proposalNotFound).toBe(false);
+        expect(result.current.proposalData?.daoProposalVotingAdapter).toBe(
+          undefined
+        );
       });
     });
   });
 
-  test('proposal: getCommonSnapshotProposalData should return correct data when called', async () => {
-    await act(async () => {
-      const {result} = await renderHook(() =>
-        useProposalOrDraft('abc123def456', SnapshotType.proposal)
-      );
-
-      const idKey = Object.keys(snapshotAPIProposalResponse)[0];
-      const proposal = snapshotAPIProposalResponse[idKey];
-
-      await waitFor(() => {
-        expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
-      });
-
-      const data = result.current.proposalData?.getCommonSnapshotProposalData();
-
-      expect(data).toStrictEqual({
-        ...proposal,
-        idInDAO: proposal.data.erc712DraftHash,
-        idInSnapshot: idKey,
-      });
-    });
-  });
+  /**
+   * Refetch
+   */
 
   test('can refetch', async () => {
     await act(async () => {
@@ -478,8 +666,16 @@ describe('useProposalOrDraft unit tests', () => {
         ]
       );
 
-      const {result, waitForNextUpdate} = await renderHook(() =>
-        useProposalOrDraft('abc123def456')
+      const {result, waitForNextUpdate} = await renderHook(
+        () => useProposalOrDraft(DEFAULT_DRAFT_HASH),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: mockWeb3ResponsesDraft,
+          },
+        }
       );
 
       const draftIdKey = Object.keys(snapshotAPIDraftResponse)[0];
