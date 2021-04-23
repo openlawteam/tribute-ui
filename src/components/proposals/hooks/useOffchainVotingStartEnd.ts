@@ -39,9 +39,11 @@ export function useOffchainVotingStartEnd(
     hasOffchainVotingStarted,
     setHasOffchainVotingStarted,
   ] = useState<boolean>(false);
+
   const [hasOffchainVotingEnded, setHasOffchainVotingEnded] = useState<boolean>(
     false
   );
+
   const [
     offchainVotingStartEndInitReady,
     setOffchainVotingStartEndInitReady,
