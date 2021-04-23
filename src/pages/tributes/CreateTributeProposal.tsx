@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import {useState, useCallback, useEffect} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
@@ -86,7 +86,7 @@ export default function CreateTributeProposal() {
   );
 
   /**
-   * Hooks
+   * Our hooks
    */
 
   const {defaultChainError} = useIsDefaultChain();
@@ -308,7 +308,7 @@ export default function CreateTributeProposal() {
     try {
       if (!isConnected) {
         throw new Error(
-          'No user account was found. Please makes sure your wallet is connected.'
+          'No user account was found. Please make sure your wallet is connected.'
         );
       }
 
@@ -681,8 +681,8 @@ export default function CreateTributeProposal() {
             />
 
             <div className="form__input-description">
-              This is the amount of DAO tokens you are requesting be sent to the
-              Applicant Address in exchange for your tribute.
+              This is the amount of DAO membership units you are requesting be
+              sent to the Applicant Address in exchange for your tribute.
             </div>
           </div>
         </div>

@@ -202,7 +202,7 @@ export default function ConfigurationForm({
 
       if (!isConnected) {
         throw new Error(
-          'No user account was found. Please makes sure your wallet is connected.'
+          'No user account was found. Please make sure your wallet is connected.'
         );
       }
 
