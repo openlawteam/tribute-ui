@@ -17,7 +17,6 @@ import Transfers from './pages/transfers/Transfers';
 import TributeDetails from './pages/tributes/TributeDetails';
 import Tributes from './pages/tributes/Tributes';
 import AdapterOrExtensionManager from './components/adapters-extensions/AdapterOrExtensionManager';
-import CouponOnboarding from './pages/membership/CouponOnboarding';
 
 const proposalIdParameter: string = ':proposalId';
 
@@ -115,12 +114,6 @@ export default function Routes() {
           exact
           path="/dao-manager"
           render={() => <AdapterOrExtensionManager />}
-        />,
-        <Route
-          key="coupon-onboarding"
-          exact
-          path="/onboard"
-          render={() => <CouponOnboarding />}
         />,
         <Route key="no-match" component={NotFound} />,
       ]}
