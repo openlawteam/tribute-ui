@@ -8,6 +8,7 @@ import {
 import {
   balanceOfMember,
   getCurrentDelegateKey,
+  getMemberAddress,
   memberAddressesByDelegatedKey,
 } from '../../test/web3Responses';
 import {BURN_ADDRESS} from '../../util/constants';
@@ -36,6 +37,7 @@ describe('connectedMember actions unit tests', () => {
     mockWeb3Provider.injectResult(
       ...getCurrentDelegateKey({web3Instance: web3})
     );
+    mockWeb3Provider.injectResult(...getMemberAddress({web3Instance: web3}));
 
     // Dispatch `getConnectedMember`
     store.dispatch(getConnectedMember(DEFAULT_ETH_ADDRESS));
@@ -45,6 +47,7 @@ describe('connectedMember actions unit tests', () => {
         delegateKey: DEFAULT_ETH_ADDRESS,
         isActiveMember: true,
         memberAddress: DEFAULT_ETH_ADDRESS,
+        isDAOCreator: true,
       });
     });
   });
@@ -75,6 +78,7 @@ describe('connectedMember actions unit tests', () => {
     mockWeb3Provider.injectResult(
       ...getCurrentDelegateKey({web3Instance: web3})
     );
+    mockWeb3Provider.injectResult(...getMemberAddress({web3Instance: web3}));
 
     // Dispatch `getConnectedMember`
     store.dispatch(getConnectedMember(DEFAULT_ETH_ADDRESS));
@@ -84,6 +88,7 @@ describe('connectedMember actions unit tests', () => {
         delegateKey: DEFAULT_ETH_ADDRESS,
         isActiveMember: false,
         memberAddress: DEFAULT_ETH_ADDRESS,
+        isDAOCreator: true,
       });
     });
   });
@@ -159,6 +164,7 @@ describe('connectedMember actions unit tests', () => {
     mockWeb3Provider.injectResult(
       ...getCurrentDelegateKey({web3Instance: web3})
     );
+    mockWeb3Provider.injectResult(...getMemberAddress({web3Instance: web3}));
 
     await waitFor(() => {
       expect(store.getState().connectedMember).toBe(null);
@@ -172,6 +178,7 @@ describe('connectedMember actions unit tests', () => {
         delegateKey: DEFAULT_ETH_ADDRESS,
         isActiveMember: true,
         memberAddress: DEFAULT_ETH_ADDRESS,
+        isDAOCreator: true,
       });
     });
 

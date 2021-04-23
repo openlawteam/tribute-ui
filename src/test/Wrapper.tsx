@@ -15,6 +15,7 @@ import {
 import {
   balanceOfMember,
   getCurrentDelegateKey,
+  getMemberAddress,
   memberAddressesByDelegatedKey,
 } from './web3Responses';
 import {CHAINS as mockChains} from '../config';
@@ -175,6 +176,7 @@ export default function Wrapper(
       // Defaults to `100`
       mockWeb3Provider.injectResult(...balanceOfMember({web3Instance}));
       mockWeb3Provider.injectResult(...getCurrentDelegateKey({web3Instance}));
+      mockWeb3Provider.injectResult(...getMemberAddress({web3Instance}));
     }
   }, [mockWeb3Provider, useInit, useWallet, web3Instance]);
 
