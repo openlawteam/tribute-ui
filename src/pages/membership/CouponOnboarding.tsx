@@ -18,7 +18,6 @@ import {
 import {Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
-import {COUPON_CREATOR_KEY} from '../../config';
 import {StoreState} from '../../store/types';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
@@ -31,26 +30,16 @@ import EtherscanURL from '../../components/web3/EtherscanURL';
 enum Fields {
   applicantAddress = 'applicantAddress',
   issueAmount = 'issueAmount',
+  privateKey = 'privateKey',
 }
 
 type FormInputs = {
   applicantAddress: string;
   issueAmount: string;
+  privateKey: string;
 };
 
 type CouponType = 'coupon';
-
-type CouponData = {
-  type: CouponType;
-  authorizedMember: string;
-  amount: string;
-  nonce: number;
-};
-
-type HashCouponMessageArguments = [
-  string, // `dao`
-  CouponData // `coupon`
-];
 
 type RedeemCouponArguments = [
   string, // `dao`
@@ -89,13 +78,6 @@ export default function CouponOnboarding() {
     txSend,
     txStatus,
   } = useContractSend();
-  const {
-    txError: txErrorHashCouponMessage,
-    txEtherscanURL: txEtherscanURLHashCouponMessage,
-    txIsPromptOpen: txIsPromptOpenHashCouponMessage,
-    txSend: txSendHashCouponMessage,
-    txStatus: txStatusHashCouponMessage,
-  } = useContractSend();
 
   /**
    * Their hooks
@@ -118,60 +100,20 @@ export default function CouponOnboarding() {
 
   const {errors, getValues, setValue, register, trigger} = form;
 
-  const couponOnboardingError =
-    submitError || txError || txErrorHashCouponMessage;
+  const couponOnboardingError = submitError || txError;
   const isConnected = connected && account;
 
   const isInProcess =
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-    txStatus === Web3TxStatus.PENDING ||
-    txStatusHashCouponMessage === Web3TxStatus.AWAITING_CONFIRM ||
-    txStatusHashCouponMessage === Web3TxStatus.PENDING;
+    txStatus === Web3TxStatus.PENDING;
 
   const isDone = txStatus === Web3TxStatus.FULFILLED;
 
-  const isInProcessOrDone =
-    isInProcess || isDone || txIsPromptOpen || txIsPromptOpenHashCouponMessage;
+  const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
 
   /**
    * Functions
    */
-
-  async function handleSubmitHashCouponMessage(couponData: CouponData) {
-    try {
-      if (!CouponOnboardingContract) {
-        throw new Error('No CouponOnboardingContract found.');
-      }
-
-      if (!DaoRegistryContract) {
-        throw new Error('No DaoRegistryContract found.');
-      }
-
-      if (!account) {
-        throw new Error('No account found.');
-      }
-
-      const hashCouponMessageArguments: HashCouponMessageArguments = [
-        DaoRegistryContract.contractAddress,
-        couponData,
-      ];
-      const txArguments = {
-        from: account || '',
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
-      };
-
-      // Execute contract call for `hashCouponMessage`
-      await txSendHashCouponMessage(
-        'hashCouponMessage',
-        CouponOnboardingContract.instance.methods,
-        hashCouponMessageArguments,
-        txArguments
-      );
-    } catch (error) {
-      throw error;
-    }
-  }
 
   async function handleSubmit(values: FormInputs) {
     try {
@@ -193,13 +135,7 @@ export default function CouponOnboarding() {
         throw new Error('No account found.');
       }
 
-      if (!COUPON_CREATOR_KEY) {
-        throw new Error(
-          'No signer data was found. The coupon cannot be validated.'
-        );
-      }
-
-      const {applicantAddress, issueAmount} = values;
+      const {applicantAddress, issueAmount, privateKey} = values;
 
       const applicantAddressToChecksum = toChecksumAddress(applicantAddress);
       const issueAmountArg = stripFormatNumber(issueAmount);
@@ -212,10 +148,7 @@ export default function CouponOnboarding() {
         nonce,
       };
 
-      // Hash coupon message
-      await handleSubmitHashCouponMessage(couponData);
-
-      const signerUtil = SigUtilSigner(COUPON_CREATOR_KEY);
+      const signerUtil = SigUtilSigner(privateKey);
       const signature = signerUtil(
         couponData,
         DaoRegistryContract.contractAddress,
@@ -252,22 +185,8 @@ export default function CouponOnboarding() {
 
   function renderSubmitStatus(): React.ReactNode {
     // chain tx
-    if (
-      txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-      txStatusHashCouponMessage === Web3TxStatus.AWAITING_CONFIRM
-    ) {
+    if (txStatus === Web3TxStatus.AWAITING_CONFIRM) {
       return 'Awaiting your confirmation\u2026';
-    }
-
-    // If hash coupon message transaction is confirmed
-    if (txStatusHashCouponMessage === Web3TxStatus.PENDING) {
-      return (
-        <>
-          <div>{'Creating the onboarding coupon\u2026'}</div>
-
-          <EtherscanURL url={txEtherscanURLHashCouponMessage} isPending />
-        </>
-      );
     }
 
     // Only for chain tx
@@ -407,6 +326,28 @@ export default function CouponOnboarding() {
               This is the amount of DAO membership units that will be issued to
               the Applicant Address.
             </div>
+          </div>
+        </div>
+
+        {/* PRIVATE KEY */}
+        <div className="form__input-row">
+          <label className="form__input-row-label">Private Key</label>
+          <div className="form__input-row-fieldwrap">
+            <input
+              aria-describedby={`error-${Fields.privateKey}`}
+              aria-invalid={errors.privateKey ? 'true' : 'false'}
+              name={Fields.privateKey}
+              ref={register({
+                required: FormFieldErrors.REQUIRED,
+              })}
+              type="text"
+              disabled={isInProcessOrDone}
+            />
+
+            <InputError
+              error={getValidationError(Fields.privateKey, errors)}
+              id={`error-${Fields.privateKey}`}
+            />
           </div>
         </div>
 

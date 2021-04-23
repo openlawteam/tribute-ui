@@ -44,7 +44,6 @@ jobs:
           REACT_APP_SNAPSHOT_HUB_API_URL: https://snapshot-hub-erc712.dev.thelao.io
           REACT_APP_SNAPSHOT_SPACE: tribute
           REACT_APP_GRAPH_API_URL: https://api.thegraph.com/subgraphs/name/openlawteam/tribute-dev
-          REACT_APP_COUPON_CREATOR_KEY: ${{ secrets.REACT_APP_COUPON_CREATOR_KEY }}
         run: npm run build
 
       - name: Deploy to GitHub Pages site
