@@ -53,19 +53,11 @@ export function getConnectedMember(account: string) {
         isActiveMember &&
         normalizeString(memberAddressByDelegateKey) !== BURN_ADDRESS;
 
-      const isDAOCreator: boolean =
-        normalizeString(
-          // Creator address is the second address added to the members mapping
-          // when the DAO is created (DAO factory address is first).
-          await daoRegistryMethods.getMemberAddress(1).call({from: account})
-        ) === normalizeString(account);
-
       dispatch(
         setConnectedMember({
           delegateKey: currentDelegateKey,
           isActiveMember: isActiveMemberChecks,
           memberAddress: memberAddressByDelegateKey,
-          isDAOCreator,
         })
       );
     } catch (error) {
