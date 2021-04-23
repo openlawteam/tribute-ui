@@ -18,7 +18,6 @@ const {
   REACT_APP_MULTICALL_CONTRACT_ADDRESS,
   REACT_APP_SNAPSHOT_HUB_API_URL,
   REACT_APP_SNAPSHOT_SPACE,
-  REACT_APP_COUPON_CREATOR_KEY,
 } = process.env;
 
 export const ENVIRONMENT = REACT_APP_ENVIRONMENT as EnvironmentName | undefined;
@@ -327,8 +326,3 @@ export const SPACE: string | undefined = REACT_APP_SNAPSHOT_SPACE;
  */
 export const GQL_QUERY_POLLING_INTERVAL: number =
   REACT_APP_ENVIRONMENT === 'production' ? 10000 : 5000;
-
-// Used for Coupon Onboarding
-export const COUPON_CREATOR_KEY:
-  | string
-  | undefined = REACT_APP_COUPON_CREATOR_KEY;
