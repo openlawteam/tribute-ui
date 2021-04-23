@@ -39,3 +39,21 @@ export const balanceOfMember = ({
     {abiMethodName: 'balanceOf', abi: BankExtensionABI},
   ];
 };
+
+/**
+ * getMemberAddress
+ *
+ * @param web3Instance
+ * @returns {TestWeb3ResponseReturn<string>}
+ * @link https://github.com/openlawteam/molochv3-contracts/blob/master/contracts/core/DaoRegistry.sol
+ */
+export const getMemberAddress = ({
+  result,
+  web3Instance,
+}: TestWeb3ResponseArgs): TestWeb3ResponseReturn<string> => {
+  return [
+    result ??
+      web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
+    {abiMethodName: 'getMemberAddress', abi: DAORegistryABI},
+  ];
+};

@@ -70,6 +70,9 @@ export function NavHamburger() {
   const isActiveMember = useSelector(
     (s: StoreState) => s.connectedMember?.isActiveMember
   );
+  const isDAOCreator = useSelector(
+    (s: StoreState) => s.connectedMember?.isDAOCreator
+  );
 
   /**
    * State
@@ -227,6 +230,16 @@ export function NavHamburger() {
                         </NavLink>
                       </li>
                     </>
+                  )}
+                  {account && isDAOCreator && (
+                    <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to="/onboard">
+                        <span>Onboard</span>
+                      </NavLink>
+                    </li>
                   )}
                 </ul>
               </div>

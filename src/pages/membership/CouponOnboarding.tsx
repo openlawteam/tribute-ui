@@ -71,6 +71,9 @@ export default function CouponOnboarding() {
   const DaoRegistryContract = useSelector(
     (state: StoreState) => state.contracts?.DaoRegistryContract
   );
+  const isDAOCreator = useSelector(
+    (s: StoreState) => s.connectedMember?.isDAOCreator
+  );
 
   /**
    * Our hooks
@@ -308,6 +311,10 @@ export default function CouponOnboarding() {
       return 'Connect your wallet to process an onboarding coupon.';
     }
 
+    if (!isDAOCreator) {
+      return 'You are not authorized to use this feature.';
+    }
+
     // user is on wrong network
     if (defaultChainError) {
       return defaultChainError.message;
@@ -319,7 +326,7 @@ export default function CouponOnboarding() {
    */
 
   // Render unauthorized message
-  if (!isConnected || defaultChainError) {
+  if (!isConnected || !isDAOCreator || defaultChainError) {
     return (
       <RenderWrapper>
         <div className="form__description--unauthorized">
