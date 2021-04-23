@@ -40,6 +40,7 @@ export default function ProposalWithOffchainVoteActions(
     daoProposalVotes && status === ProposalFlowStatus.OffchainVotingGracePeriod
       ? Number(daoProposalVotes.gracePeriodStartingTime) * 1000
       : 0;
+
   //  Currently, only Distribute adapter has an action that occurs after the
   //  proposal is processed.
   const showPostProcessAction =
