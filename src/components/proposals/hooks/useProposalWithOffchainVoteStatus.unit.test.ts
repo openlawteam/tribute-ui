@@ -75,6 +75,126 @@ const fakeSnapshotDraft: SnapshotDraft = {
   sig: '',
 };
 
+const defaultVotesMock = [
+  {
+    Voting: {
+      snapshot: 'uint256',
+      proposalHash: 'bytes32',
+      reporter: 'address',
+      resultRoot: 'bytes32',
+      nbYes: 'uint256',
+      nbNo: 'uint256',
+      index: 'uint256',
+      startingTime: 'uint256',
+      gracePeriodStartingTime: 'uint256',
+      isChallenged: 'bool',
+      fallbackVotesCount: 'uint256',
+    },
+  },
+  {
+    fallbackVotesCount: '0',
+    gracePeriodStartingTime: '1617964640',
+    index: '0',
+    isChallenged: false,
+    nbNo: '0',
+    nbYes: '1',
+    proposalHash: DEFAULT_PROPOSAL_HASH,
+    reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
+    resultRoot:
+      '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
+    snapshot: '8376297',
+    startingTime: '1617878162',
+  },
+];
+
+const defaultVotesResult = {
+  '0': '8376297',
+  '1': DEFAULT_PROPOSAL_HASH,
+  '10': '0',
+  '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
+  '3': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
+  '4': '1',
+  '5': '0',
+  '6': '0',
+  '7': '1617878162',
+  '8': '1617964640',
+  '9': false,
+  __length__: 11,
+  fallbackVotesCount: '0',
+  gracePeriodStartingTime: '1617964640',
+  index: '0',
+  isChallenged: false,
+  nbNo: '0',
+  nbYes: '1',
+  proposalHash: DEFAULT_PROPOSAL_HASH,
+  reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
+  resultRoot:
+    '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
+  snapshot: '8376297',
+  startingTime: '1617878162',
+};
+
+const defaultNoVotesMock = [
+  {
+    Voting: {
+      snapshot: 'uint256',
+      proposalHash: 'bytes32',
+      reporter: 'address',
+      resultRoot: 'bytes32',
+      nbYes: 'uint256',
+      nbNo: 'uint256',
+      index: 'uint256',
+      startingTime: 'uint256',
+      gracePeriodStartingTime: 'uint256',
+      isChallenged: 'bool',
+      fallbackVotesCount: 'uint256',
+    },
+  },
+  {
+    snapshot: '0',
+    proposalHash:
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    reporter: BURN_ADDRESS,
+    resultRoot:
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    nbYes: '0',
+    nbNo: '0',
+    index: '0',
+    startingTime: '0',
+    gracePeriodStartingTime: '0',
+    isChallenged: false,
+    fallbackVotesCount: '0',
+  },
+];
+
+const defaultNoVotesResult = {
+  '0': '0',
+  '1': '0x0000000000000000000000000000000000000000000000000000000000000000',
+  '10': '0',
+  '2': BURN_ADDRESS,
+  '3': '0x0000000000000000000000000000000000000000000000000000000000000000',
+  '4': '0',
+  '5': '0',
+  '6': '0',
+  '7': '0',
+  '8': '0',
+  '9': false,
+  __length__: 11,
+  fallbackVotesCount: '0',
+  gracePeriodStartingTime: '0',
+  index: '0',
+  isChallenged: false,
+  nbNo: '0',
+  nbYes: '0',
+  proposalHash:
+    '0x0000000000000000000000000000000000000000000000000000000000000000',
+  reporter: BURN_ADDRESS,
+  resultRoot:
+    '0x0000000000000000000000000000000000000000000000000000000000000000',
+  snapshot: '0',
+  startingTime: '0',
+};
+
 describe('useProposalWithOffchainVoteStatus unit tests', () => {
   test('should return correct data from hook when status is `ProposalFlowStatus.Sponsor`', async () => {
     const proposalData: Partial<ProposalData> = {
@@ -192,36 +312,8 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
                       ),
                       // For `votes` call
                       web3Instance.eth.abi.encodeParameter(
-                        {
-                          Voting: {
-                            snapshot: 'uint256',
-                            proposalHash: 'bytes32',
-                            reporter: 'address',
-                            resultRoot: 'bytes32',
-                            nbYes: 'uint256',
-                            nbNo: 'uint256',
-                            index: 'uint256',
-                            startingTime: 'uint256',
-                            gracePeriodStartingTime: 'uint256',
-                            isChallenged: 'bool',
-                            fallbackVotesCount: 'uint256',
-                          },
-                        },
-                        {
-                          snapshot: '0',
-                          proposalHash:
-                            '0x0000000000000000000000000000000000000000000000000000000000000000',
-                          reporter: BURN_ADDRESS,
-                          resultRoot:
-                            '0x0000000000000000000000000000000000000000000000000000000000000000',
-                          nbYes: '0',
-                          nbNo: '0',
-                          index: '0',
-                          startingTime: '0',
-                          gracePeriodStartingTime: '0',
-                          isChallenged: false,
-                          fallbackVotesCount: '0',
-                        }
+                        defaultNoVotesMock[0],
+                        defaultNoVotesMock[1]
                       ),
                       // For `voteResult` call (VotingState.IN_PROGRESS)
                       web3Instance.eth.abi.encodeParameter('uint8', '4'),
@@ -257,35 +349,9 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject({
-        '0': '0',
-        '1':
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-        '10': '0',
-        '2': BURN_ADDRESS,
-        '3':
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-        '4': '0',
-        '5': '0',
-        '6': '0',
-        '7': '0',
-        '8': '0',
-        '9': false,
-        __length__: 11,
-        fallbackVotesCount: '0',
-        gracePeriodStartingTime: '0',
-        index: '0',
-        isChallenged: false,
-        nbNo: '0',
-        nbYes: '0',
-        proposalHash:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-        reporter: BURN_ADDRESS,
-        resultRoot:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-        snapshot: '0',
-        startingTime: '0',
-      });
+      expect(result.current.daoProposalVotes).toMatchObject(
+        defaultNoVotesResult
+      );
 
       expect(result.current.status).toBe(undefined);
 
@@ -348,36 +414,8 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
                       ),
                       // For `votes` call
                       web3Instance.eth.abi.encodeParameter(
-                        {
-                          Voting: {
-                            snapshot: 'uint256',
-                            proposalHash: 'bytes32',
-                            reporter: 'address',
-                            resultRoot: 'bytes32',
-                            nbYes: 'uint256',
-                            nbNo: 'uint256',
-                            index: 'uint256',
-                            startingTime: 'uint256',
-                            gracePeriodStartingTime: 'uint256',
-                            isChallenged: 'bool',
-                            fallbackVotesCount: 'uint256',
-                          },
-                        },
-                        {
-                          snapshot: '0',
-                          proposalHash:
-                            '0x0000000000000000000000000000000000000000000000000000000000000000',
-                          reporter: BURN_ADDRESS,
-                          resultRoot:
-                            '0x0000000000000000000000000000000000000000000000000000000000000000',
-                          nbYes: '0',
-                          nbNo: '0',
-                          index: '0',
-                          startingTime: '0',
-                          gracePeriodStartingTime: '0',
-                          isChallenged: false,
-                          fallbackVotesCount: '0',
-                        }
+                        defaultNoVotesMock[0],
+                        defaultNoVotesMock[1]
                       ),
                       // For `voteResult` call (VotingState.GRACE_PERIOD)
                       web3Instance.eth.abi.encodeParameter('uint8', '5'),
@@ -413,35 +451,9 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject({
-        '0': '0',
-        '1':
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-        '10': '0',
-        '2': BURN_ADDRESS,
-        '3':
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-        '4': '0',
-        '5': '0',
-        '6': '0',
-        '7': '0',
-        '8': '0',
-        '9': false,
-        __length__: 11,
-        fallbackVotesCount: '0',
-        gracePeriodStartingTime: '0',
-        index: '0',
-        isChallenged: false,
-        nbNo: '0',
-        nbYes: '0',
-        proposalHash:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-        reporter: BURN_ADDRESS,
-        resultRoot:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-        snapshot: '0',
-        startingTime: '0',
-      });
+      expect(result.current.daoProposalVotes).toMatchObject(
+        defaultNoVotesResult
+      );
 
       expect(result.current.status).toBe(undefined);
 
@@ -506,36 +518,8 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
                       ),
                       // For `votes` call
                       web3Instance.eth.abi.encodeParameter(
-                        {
-                          Voting: {
-                            snapshot: 'uint256',
-                            proposalHash: 'bytes32',
-                            reporter: 'address',
-                            resultRoot: 'bytes32',
-                            nbYes: 'uint256',
-                            nbNo: 'uint256',
-                            index: 'uint256',
-                            startingTime: 'uint256',
-                            gracePeriodStartingTime: 'uint256',
-                            isChallenged: 'bool',
-                            fallbackVotesCount: 'uint256',
-                          },
-                        },
-                        {
-                          fallbackVotesCount: '0',
-                          gracePeriodStartingTime: '1617964640',
-                          index: '0',
-                          isChallenged: false,
-                          nbNo: '0',
-                          nbYes: '1',
-                          proposalHash: DEFAULT_PROPOSAL_HASH,
-                          reporter:
-                            '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-                          resultRoot:
-                            '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                          snapshot: '8376297',
-                          startingTime: '1617878162',
-                        }
+                        defaultVotesMock[0],
+                        defaultVotesMock[1]
                       ),
                       // For `voteResult` call (VotingState.GRACE_PERIOD)
                       web3Instance.eth.abi.encodeParameter('uint8', '5'),
@@ -571,33 +555,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject({
-        '0': '8376297',
-        '1': DEFAULT_PROPOSAL_HASH,
-        '10': '0',
-        '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-        '3':
-          '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-        '4': '1',
-        '5': '0',
-        '6': '0',
-        '7': '1617878162',
-        '8': '1617964640',
-        '9': false,
-        __length__: 11,
-        fallbackVotesCount: '0',
-        gracePeriodStartingTime: '1617964640',
-        index: '0',
-        isChallenged: false,
-        nbNo: '0',
-        nbYes: '1',
-        proposalHash: DEFAULT_PROPOSAL_HASH,
-        reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-        resultRoot:
-          '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-        snapshot: '8376297',
-        startingTime: '1617878162',
-      });
+      expect(result.current.daoProposalVotes).toMatchObject(defaultVotesResult);
 
       expect(result.current.status).toBe(undefined);
 
@@ -662,36 +620,8 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
                       ),
                       // For `votes` call
                       web3Instance.eth.abi.encodeParameter(
-                        {
-                          Voting: {
-                            snapshot: 'uint256',
-                            proposalHash: 'bytes32',
-                            reporter: 'address',
-                            resultRoot: 'bytes32',
-                            nbYes: 'uint256',
-                            nbNo: 'uint256',
-                            index: 'uint256',
-                            startingTime: 'uint256',
-                            gracePeriodStartingTime: 'uint256',
-                            isChallenged: 'bool',
-                            fallbackVotesCount: 'uint256',
-                          },
-                        },
-                        {
-                          fallbackVotesCount: '0',
-                          gracePeriodStartingTime: '1617964640',
-                          index: '0',
-                          isChallenged: false,
-                          nbNo: '0',
-                          nbYes: '1',
-                          proposalHash: DEFAULT_PROPOSAL_HASH,
-                          reporter:
-                            '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-                          resultRoot:
-                            '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                          snapshot: '8376297',
-                          startingTime: '1617878162',
-                        }
+                        defaultVotesMock[0],
+                        defaultVotesMock[1]
                       ),
                       // For `voteResult` call (VotingState.PASS)
                       web3Instance.eth.abi.encodeParameter('uint8', '2'),
@@ -727,33 +657,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject({
-        '0': '8376297',
-        '1': DEFAULT_PROPOSAL_HASH,
-        '10': '0',
-        '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-        '3':
-          '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-        '4': '1',
-        '5': '0',
-        '6': '0',
-        '7': '1617878162',
-        '8': '1617964640',
-        '9': false,
-        __length__: 11,
-        fallbackVotesCount: '0',
-        gracePeriodStartingTime: '1617964640',
-        index: '0',
-        isChallenged: false,
-        nbNo: '0',
-        nbYes: '1',
-        proposalHash: DEFAULT_PROPOSAL_HASH,
-        reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-        resultRoot:
-          '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-        snapshot: '8376297',
-        startingTime: '1617878162',
-      });
+      expect(result.current.daoProposalVotes).toMatchObject(defaultVotesResult);
 
       expect(result.current.status).toBe(undefined);
 
@@ -816,36 +720,8 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
                       ),
                       // For `votes` call
                       web3Instance.eth.abi.encodeParameter(
-                        {
-                          Voting: {
-                            snapshot: 'uint256',
-                            proposalHash: 'bytes32',
-                            reporter: 'address',
-                            resultRoot: 'bytes32',
-                            nbYes: 'uint256',
-                            nbNo: 'uint256',
-                            index: 'uint256',
-                            startingTime: 'uint256',
-                            gracePeriodStartingTime: 'uint256',
-                            isChallenged: 'bool',
-                            fallbackVotesCount: 'uint256',
-                          },
-                        },
-                        {
-                          fallbackVotesCount: '0',
-                          gracePeriodStartingTime: '1617964640',
-                          index: '0',
-                          isChallenged: false,
-                          nbNo: '0',
-                          nbYes: '1',
-                          proposalHash: DEFAULT_PROPOSAL_HASH,
-                          reporter:
-                            '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-                          resultRoot:
-                            '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                          snapshot: '8376297',
-                          startingTime: '1617878162',
-                        }
+                        defaultVotesMock[0],
+                        defaultVotesMock[1]
                       ),
                       // For `voteResult` call (VotingState.PASS)
                       web3Instance.eth.abi.encodeParameter('uint8', '2'),
@@ -881,33 +757,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject({
-        '0': '8376297',
-        '1': DEFAULT_PROPOSAL_HASH,
-        '10': '0',
-        '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-        '3':
-          '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-        '4': '1',
-        '5': '0',
-        '6': '0',
-        '7': '1617878162',
-        '8': '1617964640',
-        '9': false,
-        __length__: 11,
-        fallbackVotesCount: '0',
-        gracePeriodStartingTime: '1617964640',
-        index: '0',
-        isChallenged: false,
-        nbNo: '0',
-        nbYes: '1',
-        proposalHash: DEFAULT_PROPOSAL_HASH,
-        reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-        resultRoot:
-          '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-        snapshot: '8376297',
-        startingTime: '1617878162',
-      });
+      expect(result.current.daoProposalVotes).toMatchObject(defaultVotesResult);
 
       expect(result.current.status).toBe(ProposalFlowStatus.Completed);
     });
@@ -973,36 +823,8 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
                       ),
                       // For `votes` call
                       web3Instance.eth.abi.encodeParameter(
-                        {
-                          Voting: {
-                            snapshot: 'uint256',
-                            proposalHash: 'bytes32',
-                            reporter: 'address',
-                            resultRoot: 'bytes32',
-                            nbYes: 'uint256',
-                            nbNo: 'uint256',
-                            index: 'uint256',
-                            startingTime: 'uint256',
-                            gracePeriodStartingTime: 'uint256',
-                            isChallenged: 'bool',
-                            fallbackVotesCount: 'uint256',
-                          },
-                        },
-                        {
-                          fallbackVotesCount: '0',
-                          gracePeriodStartingTime: '1617964640',
-                          index: '0',
-                          isChallenged: false,
-                          nbNo: '0',
-                          nbYes: '1',
-                          proposalHash: DEFAULT_PROPOSAL_HASH,
-                          reporter:
-                            '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-                          resultRoot:
-                            '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                          snapshot: '8376297',
-                          startingTime: '1617878162',
-                        }
+                        defaultVotesMock[0],
+                        defaultVotesMock[1]
                       ),
                       // For `voteResult` call (VotingState.GRACE_PERIOD)
                       web3Instance.eth.abi.encodeParameter('uint8', '5'),
@@ -1038,33 +860,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject({
-        '0': '8376297',
-        '1': DEFAULT_PROPOSAL_HASH,
-        '10': '0',
-        '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-        '3':
-          '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-        '4': '1',
-        '5': '0',
-        '6': '0',
-        '7': '1617878162',
-        '8': '1617964640',
-        '9': false,
-        __length__: 11,
-        fallbackVotesCount: '0',
-        gracePeriodStartingTime: '1617964640',
-        index: '0',
-        isChallenged: false,
-        nbNo: '0',
-        nbYes: '1',
-        proposalHash: DEFAULT_PROPOSAL_HASH,
-        reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-        resultRoot:
-          '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-        snapshot: '8376297',
-        startingTime: '1617878162',
-      });
+      expect(result.current.daoProposalVotes).toMatchObject(defaultVotesResult);
 
       expect(result.current.status).toBe(undefined);
 
@@ -1098,35 +894,8 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
                 ),
                 // For `votes` call
                 web3Instance.eth.abi.encodeParameter(
-                  {
-                    Voting: {
-                      snapshot: 'uint256',
-                      proposalHash: 'bytes32',
-                      reporter: 'address',
-                      resultRoot: 'bytes32',
-                      nbYes: 'uint256',
-                      nbNo: 'uint256',
-                      index: 'uint256',
-                      startingTime: 'uint256',
-                      gracePeriodStartingTime: 'uint256',
-                      isChallenged: 'bool',
-                      fallbackVotesCount: 'uint256',
-                    },
-                  },
-                  {
-                    fallbackVotesCount: '0',
-                    gracePeriodStartingTime: '1617964640',
-                    index: '0',
-                    isChallenged: false,
-                    nbNo: '0',
-                    nbYes: '1',
-                    proposalHash: DEFAULT_PROPOSAL_HASH,
-                    reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-                    resultRoot:
-                      '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                    snapshot: '8376297',
-                    startingTime: '1617878162',
-                  }
+                  defaultVotesMock[0],
+                  defaultVotesMock[1]
                 ),
                 // For `voteResult` call (VotingState.PASS)
                 web3Instance.eth.abi.encodeParameter('uint8', '2'),
@@ -1269,36 +1038,8 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
                       ),
                       // For `votes` call
                       web3Instance.eth.abi.encodeParameter(
-                        {
-                          Voting: {
-                            snapshot: 'uint256',
-                            proposalHash: 'bytes32',
-                            reporter: 'address',
-                            resultRoot: 'bytes32',
-                            nbYes: 'uint256',
-                            nbNo: 'uint256',
-                            index: 'uint256',
-                            startingTime: 'uint256',
-                            gracePeriodStartingTime: 'uint256',
-                            isChallenged: 'bool',
-                            fallbackVotesCount: 'uint256',
-                          },
-                        },
-                        {
-                          fallbackVotesCount: '0',
-                          gracePeriodStartingTime: '1617964640',
-                          index: '0',
-                          isChallenged: false,
-                          nbNo: '0',
-                          nbYes: '1',
-                          proposalHash: DEFAULT_PROPOSAL_HASH,
-                          reporter:
-                            '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-                          resultRoot:
-                            '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                          snapshot: '8376297',
-                          startingTime: '1617878162',
-                        }
+                        defaultVotesMock[0],
+                        defaultVotesMock[1]
                       ),
                       // For `voteResult` call (VotingState.GRACE_PERIOD)
                       web3Instance.eth.abi.encodeParameter('uint8', '5'),
@@ -1334,33 +1075,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject({
-        '0': '8376297',
-        '1': DEFAULT_PROPOSAL_HASH,
-        '10': '0',
-        '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-        '3':
-          '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-        '4': '1',
-        '5': '0',
-        '6': '0',
-        '7': '1617878162',
-        '8': '1617964640',
-        '9': false,
-        __length__: 11,
-        fallbackVotesCount: '0',
-        gracePeriodStartingTime: '1617964640',
-        index: '0',
-        isChallenged: false,
-        nbNo: '0',
-        nbYes: '1',
-        proposalHash: DEFAULT_PROPOSAL_HASH,
-        reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-        resultRoot:
-          '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-        snapshot: '8376297',
-        startingTime: '1617878162',
-      });
+      expect(result.current.daoProposalVotes).toMatchObject(defaultVotesResult);
 
       expect(result.current.status).toBe(undefined);
 
@@ -1394,35 +1109,8 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
                 ),
                 // For `votes` call
                 web3Instance.eth.abi.encodeParameter(
-                  {
-                    Voting: {
-                      snapshot: 'uint256',
-                      proposalHash: 'bytes32',
-                      reporter: 'address',
-                      resultRoot: 'bytes32',
-                      nbYes: 'uint256',
-                      nbNo: 'uint256',
-                      index: 'uint256',
-                      startingTime: 'uint256',
-                      gracePeriodStartingTime: 'uint256',
-                      isChallenged: 'bool',
-                      fallbackVotesCount: 'uint256',
-                    },
-                  },
-                  {
-                    fallbackVotesCount: '0',
-                    gracePeriodStartingTime: '1617964640',
-                    index: '0',
-                    isChallenged: false,
-                    nbNo: '0',
-                    nbYes: '1',
-                    proposalHash: DEFAULT_PROPOSAL_HASH,
-                    reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-                    resultRoot:
-                      '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                    snapshot: '8376297',
-                    startingTime: '1617878162',
-                  }
+                  defaultVotesMock[0],
+                  defaultVotesMock[1]
                 ),
                 // For `voteResult` call (VotingState.PASS)
                 web3Instance.eth.abi.encodeParameter('uint8', '2'),
