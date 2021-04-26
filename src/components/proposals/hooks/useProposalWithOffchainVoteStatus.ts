@@ -13,7 +13,7 @@ import {multicall, MulticallTuple} from '../../web3/helpers';
 import {normalizeString} from '../../../util/helpers';
 import {proposalHasFlag} from '../helpers';
 import {StoreState} from '../../../store/types';
-import {useOffchainVotingStartEnd} from '.';
+import {useVotingTimeStartEnd} from '.';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VotingState} from '../voting/types';
 
@@ -80,10 +80,13 @@ export function useProposalWithOffchainVoteStatus(
    */
 
   const {
-    hasOffchainVotingStarted,
-    hasOffchainVotingEnded,
-    offchainVotingStartEndInitReady,
-  } = useOffchainVotingStartEnd(proposal);
+    hasVotingTimeStarted,
+    hasVotingTimeEnded,
+    votingTimeStartEndInitReady,
+  } = useVotingTimeStartEnd(
+    proposal.snapshotProposal?.msg.payload.start,
+    proposal.snapshotProposal?.msg.payload.end
+  );
 
   /**
    * Variables
@@ -253,19 +256,15 @@ export function useProposalWithOffchainVoteStatus(
   }
 
   // Status: Sponsor
-  if (
-    offchainVotingStartEndInitReady &&
-    !hasOffchainVotingStarted &&
-    atExistsInDAO
-  ) {
+  if (votingTimeStartEndInitReady && !hasVotingTimeStarted && atExistsInDAO) {
     return getReturnData(ProposalFlowStatus.Sponsor);
   }
 
   // Status: Off-chain Voting
   if (
-    offchainVotingStartEndInitReady &&
-    hasOffchainVotingStarted &&
-    !hasOffchainVotingEnded &&
+    votingTimeStartEndInitReady &&
+    hasVotingTimeStarted &&
+    !hasVotingTimeEnded &&
     atSponsoredInDAO
   ) {
     return getReturnData(ProposalFlowStatus.OffchainVoting);
@@ -273,8 +272,8 @@ export function useProposalWithOffchainVoteStatus(
 
   // Status: Ready to Submit Vote Result
   if (
-    offchainVotingStartEndInitReady &&
-    hasOffchainVotingEnded &&
+    votingTimeStartEndInitReady &&
+    hasVotingTimeEnded &&
     atSponsoredInDAO &&
     !offchainResultSubmitted
   ) {
@@ -283,8 +282,8 @@ export function useProposalWithOffchainVoteStatus(
 
   // Status: Grace period
   if (
-    offchainVotingStartEndInitReady &&
-    hasOffchainVotingEnded &&
+    votingTimeStartEndInitReady &&
+    hasVotingTimeEnded &&
     atSponsoredInDAO &&
     offchainResultSubmitted &&
     isInVotingGracePeriod
@@ -295,8 +294,8 @@ export function useProposalWithOffchainVoteStatus(
   // Status: Process
   if (
     atSponsoredInDAO &&
-    offchainVotingStartEndInitReady &&
-    hasOffchainVotingEnded &&
+    votingTimeStartEndInitReady &&
+    hasVotingTimeEnded &&
     offchainResultSubmitted &&
     !isInVotingGracePeriod
   ) {

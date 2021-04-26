@@ -1,27 +1,24 @@
 import {useEffect, useRef, useState} from 'react';
-import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 
-import {ProposalData} from '../types';
 import {AsyncStatus} from '../../../util/types';
 
-type UseOffchainVotingStartEndReturn = {
-  hasOffchainVotingEnded: boolean;
-  hasOffchainVotingStarted: boolean;
+type UseVotingTimeStartEndReturn = {
+  hasVotingTimeEnded: boolean;
+  hasVotingTimeStarted: boolean;
   /**
    * Informs if the initial async checks have run.
    * This helps to tame UI false-positives that can arise when
    * using only booleans to check status.
    */
-  offchainVotingStartEndInitReady: boolean;
+  votingTimeStartEndInitReady: boolean;
 };
 
 type StartEndStatus = {start: AsyncStatus; end: AsyncStatus};
 
-export function useOffchainVotingStartEnd(
-  proposal: ProposalData
-): UseOffchainVotingStartEndReturn {
-  const {snapshotProposal} = proposal;
-
+export function useVotingTimeStartEnd(
+  startSeconds: number | undefined,
+  endSeconds: number | undefined
+): UseVotingTimeStartEndReturn {
   /**
    * Refs
    */
@@ -35,18 +32,15 @@ export function useOffchainVotingStartEnd(
    * State
    */
 
-  const [
-    hasOffchainVotingStarted,
-    setHasOffchainVotingStarted,
-  ] = useState<boolean>(false);
-
-  const [hasOffchainVotingEnded, setHasOffchainVotingEnded] = useState<boolean>(
+  const [hasVotingTimeStarted, setHasVotingTimeStarted] = useState<boolean>(
     false
   );
 
+  const [hasVotingTimeEnded, setHasVotingTimeEnded] = useState<boolean>(false);
+
   const [
-    offchainVotingStartEndInitReady,
-    setOffchainVotingStartEndInitReady,
+    votingTimeStartEndInitReady,
+    setVotingTimeStartEndInitReady,
   ] = useState<boolean>(isInitReady(votingStartEndStatusRef.current));
 
   /**
@@ -56,10 +50,11 @@ export function useOffchainVotingStartEnd(
   // Actively check if voting has started
   useEffect(() => {
     if (
-      snapshotProposal?.msg.type !== SnapshotType.proposal ||
-      hasOffchainVotingStarted
+      hasVotingTimeStarted ||
+      startSeconds === undefined ||
+      endSeconds === undefined
     ) {
-      setOffchainVotingStartEndInitReady(() => {
+      setVotingTimeStartEndInitReady(() => {
         votingStartEndStatusRef.current.start = AsyncStatus.FULFILLED;
         return isInitReady(votingStartEndStatusRef.current);
       });
@@ -67,7 +62,7 @@ export function useOffchainVotingStartEnd(
       return;
     }
 
-    setOffchainVotingStartEndInitReady(() => {
+    setVotingTimeStartEndInitReady(() => {
       votingStartEndStatusRef.current.start = AsyncStatus.PENDING;
       return isInitReady(votingStartEndStatusRef.current);
     });
@@ -75,35 +70,31 @@ export function useOffchainVotingStartEnd(
     // Check if voting has started every 1 second
     const intervalID = setInterval(() => {
       // Async process ran
-      setOffchainVotingStartEndInitReady(() => {
+      setVotingTimeStartEndInitReady(() => {
         votingStartEndStatusRef.current.start = AsyncStatus.FULFILLED;
         return isInitReady(votingStartEndStatusRef.current);
       });
 
-      const hasStartedCheck =
-        Math.floor(Date.now() / 1000) > snapshotProposal.msg.payload.start;
+      const hasStartedCheck = Math.floor(Date.now() / 1000) > startSeconds;
 
       if (!hasStartedCheck) return;
 
-      setHasOffchainVotingStarted(hasStartedCheck);
+      setHasVotingTimeStarted(hasStartedCheck);
     }, 1000);
 
     return () => {
       clearInterval(intervalID);
     };
-  }, [
-    hasOffchainVotingStarted,
-    snapshotProposal?.msg.payload.start,
-    snapshotProposal?.msg.type,
-  ]);
+  }, [endSeconds, hasVotingTimeStarted, startSeconds]);
 
   // Actively check if voting has ended
   useEffect(() => {
     if (
-      snapshotProposal?.msg.type !== SnapshotType.proposal ||
-      hasOffchainVotingEnded
+      hasVotingTimeEnded ||
+      startSeconds === undefined ||
+      endSeconds === undefined
     ) {
-      setOffchainVotingStartEndInitReady(() => {
+      setVotingTimeStartEndInitReady(() => {
         votingStartEndStatusRef.current.end = AsyncStatus.FULFILLED;
         return isInitReady(votingStartEndStatusRef.current);
       });
@@ -111,7 +102,7 @@ export function useOffchainVotingStartEnd(
       return;
     }
 
-    setOffchainVotingStartEndInitReady(() => {
+    setVotingTimeStartEndInitReady(() => {
       votingStartEndStatusRef.current.end = AsyncStatus.PENDING;
       return isInitReady(votingStartEndStatusRef.current);
     });
@@ -119,41 +110,36 @@ export function useOffchainVotingStartEnd(
     // Check if voting has ended every 1 second
     const intervalID = setInterval(() => {
       // Async process ran
-      setOffchainVotingStartEndInitReady(() => {
+      setVotingTimeStartEndInitReady(() => {
         votingStartEndStatusRef.current.end = AsyncStatus.FULFILLED;
         return isInitReady(votingStartEndStatusRef.current);
       });
 
-      const hasEndedCheck =
-        Math.ceil(Date.now() / 1000) > snapshotProposal.msg.payload.end;
+      const hasEndedCheck = Math.ceil(Date.now() / 1000) > endSeconds;
 
       if (!hasEndedCheck) return;
 
-      setHasOffchainVotingEnded(hasEndedCheck);
+      setHasVotingTimeEnded(hasEndedCheck);
     }, 1000);
 
     return () => {
       clearInterval(intervalID);
     };
-  }, [
-    hasOffchainVotingEnded,
-    snapshotProposal?.msg.payload.end,
-    snapshotProposal?.msg.type,
-  ]);
+  }, [endSeconds, hasVotingTimeEnded, startSeconds]);
 
   /**
    * Functions
    */
 
-  function isInitReady(offchainVotingStartEndInitReady: StartEndStatus) {
-    return Object.values(offchainVotingStartEndInitReady).every(
+  function isInitReady(votingTimeStartEndInitReady: StartEndStatus) {
+    return Object.values(votingTimeStartEndInitReady).every(
       (s) => s === AsyncStatus.FULFILLED
     );
   }
 
   return {
-    hasOffchainVotingStarted,
-    hasOffchainVotingEnded,
-    offchainVotingStartEndInitReady,
+    hasVotingTimeStarted,
+    hasVotingTimeEnded,
+    votingTimeStartEndInitReady,
   };
 }
