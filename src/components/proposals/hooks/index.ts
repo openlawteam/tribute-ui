@@ -1,5 +1,5 @@
 export * from './useOffchainVotingResults';
-export * from './useOffchainVotingStartEnd';
+export * from './useVotingTimeStartEnd';
 export * from './useProposalOrDraft';
 export * from './useProposals';
 export * from './useProposalsVotingState';

@@ -6,7 +6,7 @@ import {CycleEllipsis} from '../../feedback';
 import {getDAOConfigEntry} from '../../web3/helpers';
 import {ProposalData, VotingResult} from '../types';
 import {StoreState} from '../../../store/types';
-import {useOffchainVotingResults, useOffchainVotingStartEnd} from '../hooks';
+import {useOffchainVotingResults, useVotingTimeStartEnd} from '../hooks';
 import {VotingStatus} from './VotingStatus';
 
 type OffchainVotingStatusProps = {
@@ -83,10 +83,13 @@ export function OffchainVotingStatus({
    */
 
   const {
-    hasOffchainVotingStarted,
-    hasOffchainVotingEnded,
-    offchainVotingStartEndInitReady,
-  } = useOffchainVotingStartEnd(proposal);
+    hasVotingTimeStarted,
+    hasVotingTimeEnded,
+    votingTimeStartEndInitReady,
+  } = useVotingTimeStartEnd(
+    proposal.snapshotProposal?.msg.payload.start,
+    proposal.snapshotProposal?.msg.payload.end
+  );
 
   const {offchainVotingResults} = useOffchainVotingResults(
     votingResult ? undefined : proposal.snapshotProposal
@@ -112,10 +115,10 @@ export function OffchainVotingStatus({
    */
 
   useEffect(() => {
-    if (!hasOffchainVotingEnded) return;
+    if (!hasVotingTimeEnded) return;
 
     setDidVotePass(yesShares > noShares);
-  }, [hasOffchainVotingEnded, noShares, yesShares]);
+  }, [hasVotingTimeEnded, noShares, yesShares]);
 
   // Determine grace period end
   useEffect(() => {
@@ -135,7 +138,7 @@ export function OffchainVotingStatus({
 
   function renderStatus() {
     // On loading
-    if (!offchainVotingStartEndInitReady) {
+    if (!votingTimeStartEndInitReady) {
       return (
         <CycleEllipsis
           ariaLabel="Getting off-chain voting status"
@@ -163,9 +166,9 @@ export function OffchainVotingStatus({
   ) {
     // Vote countdown timer
     if (
-      offchainVotingStartEndInitReady &&
-      hasOffchainVotingStarted &&
-      !hasOffchainVotingEnded
+      votingTimeStartEndInitReady &&
+      hasVotingTimeStarted &&
+      !hasVotingTimeEnded
     ) {
       return (
         <ProposalPeriodComponent
@@ -196,7 +199,7 @@ export function OffchainVotingStatus({
     <VotingStatus
       renderTimer={renderTimer}
       renderStatus={renderStatus}
-      hasVotingEnded={hasOffchainVotingEnded}
+      hasVotingEnded={hasVotingTimeEnded}
       noShares={noShares}
       totalShares={totalShares}
       yesShares={yesShares}
