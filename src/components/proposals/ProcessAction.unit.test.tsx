@@ -1,28 +1,24 @@
-import {getByRole, render, screen, waitFor} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import {Store} from 'redux';
 import Web3 from 'web3';
 
-import {
-  DEFAULT_ETH_ADDRESS,
-  DEFAULT_PROPOSAL_HASH,
-  FakeHttpProvider,
-} from '../../test/helpers';
 import {
   initContractOnboarding,
   setConnectedMember,
   SET_CONNECTED_MEMBER,
 } from '../../store/actions';
-import {ProposalData} from './types';
-import ProcessAction from './ProcessAction';
-import Wrapper from '../../test/Wrapper';
-import userEvent from '@testing-library/user-event';
-import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {
   ethEstimateGas,
   ethGasPrice,
   getTransactionReceipt,
   sendTransaction,
 } from '../../test/web3Responses';
+import {DEFAULT_PROPOSAL_HASH, FakeHttpProvider} from '../../test/helpers';
+import {ProposalData} from './types';
+import {TX_CYCLE_MESSAGES} from '../web3/config';
+import ProcessAction from './ProcessAction';
+import userEvent from '@testing-library/user-event';
+import Wrapper from '../../test/Wrapper';
 
 describe('ProcessAction unit tests', () => {
   const actionId: string = '0xa8ED02b24B4E9912e39337322885b65b23CdF188';

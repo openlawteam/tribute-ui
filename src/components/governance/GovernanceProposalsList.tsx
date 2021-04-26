@@ -3,6 +3,7 @@ import React, {Fragment, useEffect, useState} from 'react';
 import {AsyncStatus} from '../../util/types';
 import {BURN_ADDRESS} from '../../util/constants';
 import {normalizeString} from '../../util/helpers';
+import {OffchainVotingStatus} from '../proposals/voting';
 import {ProposalData, VotingResult} from '../proposals/types';
 import {ProposalHeaderNames} from '../../util/enums';
 import {useGovernanceProposals} from './hooks';
@@ -37,7 +38,6 @@ type FilteredProposals = {
   votingProposals: ProposalData[];
 };
 
-// @todo Pass `VotingResult` down to `OffchainVotingStatus` via `ProposalCard`
 export default function GovernanceProposalsList(
   props: GovernanceProposalsListProps
 ): JSX.Element {
@@ -198,9 +198,13 @@ export default function GovernanceProposalsList(
           key={proposalId}
           name={proposalName}
           onClick={onProposalClick}
-          proposal={proposal}
           proposalOnClickId={proposalId}
-          votingResult={offchainResult}
+          renderStatus={() => (
+            <OffchainVotingStatus
+              proposal={proposal}
+              votingResult={offchainResult}
+            />
+          )}
         />
       );
     });

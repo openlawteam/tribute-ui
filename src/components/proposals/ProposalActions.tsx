@@ -32,9 +32,26 @@ export default function ProposalActions(
 ): JSX.Element {
   const {adapterName, proposal} = props;
 
-  const votingAdapterName = useSelector(
+  /**
+   * Selectors
+   */
+
+  const daoVotingAdapterName = useSelector(
     (s: StoreState) => s.contracts.VotingContract?.adapterOrExtensionName
-  );
+  ) as VotingAdapterName | undefined;
+
+  /**
+   * Variables
+   */
+
+  // Use the proposal's voting adapter (has been sponsored), or fall back to the DAO's (not-yet-sponsored).
+  const votingAdapterName: VotingAdapterName | undefined =
+    proposal.daoProposalVotingAdapter?.votingAdapterName ||
+    daoVotingAdapterName;
+
+  /**
+   * Functions
+   */
 
   function renderActions() {
     if (!votingAdapterName) {
@@ -49,22 +66,28 @@ export default function ProposalActions(
             proposal={proposal}
           />
         );
-      // @todo On-chain Voting
-      // case VotingAdapterName.VotingContract:
-      //   return <></>
-      default:
-        const error = new Error(
-          `"${votingAdapterName}" is not a valid voting adapter name.`
-        );
 
+      // @todo On-chain Voting
+      case VotingAdapterName.VotingContract:
+        return <></>;
+
+      default:
         return (
           <ErrorMessageWithDetails
-            error={error}
+            error={
+              new Error(
+                `"${votingAdapterName}" is not a valid voting adapter name.`
+              )
+            }
             renderText="Something went wrong"
           />
         );
     }
   }
+
+  /**
+   * Render
+   */
 
   return (
     <Suspense

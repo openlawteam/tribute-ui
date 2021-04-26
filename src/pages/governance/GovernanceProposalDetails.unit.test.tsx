@@ -1,19 +1,51 @@
 import {render, screen, waitFor} from '@testing-library/react';
+import {useHistory} from 'react-router';
+import userEvent from '@testing-library/user-event';
 
+import {BURN_ADDRESS} from '../../util/constants';
+import {DEFAULT_PROPOSAL_HASH} from '../../test/helpers';
 import {rest, server} from '../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../config';
+import App from '../../App';
 import GovernanceProposalDetails from './GovernanceProposalDetails';
 import Wrapper from '../../test/Wrapper';
 
+const mockWeb3ResponsesDraft: Parameters<typeof Wrapper>[0]['getProps'] = ({
+  mockWeb3Provider,
+  web3Instance,
+}) => {
+  /**
+   * Mock results for `useProposalsVotingAdapter`
+   */
+
+  // Mock `dao.votingAdapter` responses
+  mockWeb3Provider.injectResult(
+    web3Instance.eth.abi.encodeParameters(
+      ['uint256', 'bytes[]'],
+      [0, [web3Instance.eth.abi.encodeParameter('address', BURN_ADDRESS)]]
+    )
+  );
+};
+
 describe('GovernanceProposalDetails unit tests', () => {
   test('should render proposal', async () => {
+    // Using the `<App />` let's the governance details page access the `proposalId` param from `useParams`.
+    function GoToGovernanceDetailsViaApp() {
+      const history = useHistory();
+
+      history.push(`/governance-proposals/${DEFAULT_PROPOSAL_HASH}`);
+
+      return <App />;
+    }
+
     render(
-      <Wrapper>
-        <GovernanceProposalDetails />
+      <Wrapper useInit useWallet getProps={mockWeb3ResponsesDraft}>
+        <GoToGovernanceDetailsViaApp />
       </Wrapper>
     );
 
-    expect(screen.getByText(/governance/i)).toBeInTheDocument();
+    // Menu item and title
+    expect(screen.getAllByText(/^governance$/i).length).toBe(2);
     expect(screen.getByRole('button', {name: /view all/i})).toBeInTheDocument();
 
     await waitFor(() => {
@@ -114,6 +146,40 @@ describe('GovernanceProposalDetails unit tests', () => {
       expect(
         screen.getByText(/something went wrong while getting the proposal/i)
       ).toBeInTheDocument();
+    });
+  });
+
+  test('can click "view all" button to go to /governance-proposals', async () => {
+    let accessHistory: any;
+
+    // Using the `<App />` let's the governance details page access the `proposalId` param from `useParams`.
+    function GoToGovernanceDetailsViaApp() {
+      const history = useHistory();
+
+      history.push(`/governance-proposals/${DEFAULT_PROPOSAL_HASH}`);
+
+      accessHistory = history;
+
+      return <App />;
+    }
+
+    render(
+      <Wrapper useInit useWallet getProps={mockWeb3ResponsesDraft}>
+        <GoToGovernanceDetailsViaApp />
+      </Wrapper>
+    );
+
+    // Temporarily disregard requests for the upcoming `/governance-proposals` page to - just return OK.
+    server.use(
+      ...[rest.get('*', async (_req, res, ctx) => res(ctx.status(200)))]
+    );
+
+    expect(screen.getByRole('button', {name: /view all/i})).toBeInTheDocument();
+
+    userEvent.click(screen.getByRole('button', {name: /view all/i}));
+
+    await waitFor(() => {
+      expect(accessHistory.location.pathname).toBe('/governance-proposals');
     });
   });
 });

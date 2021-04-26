@@ -11,9 +11,13 @@ import {
 import {AsyncStatus} from '../../../util/types';
 import {DaoAdapterConstants} from '../../adapters-extensions/enums';
 import {multicall, MulticallTuple} from '../../web3/helpers';
+import {normalizeString} from '../../../util/helpers';
 import {Proposal, ProposalData} from '../types';
 import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
 import {StoreState} from '../../../store/types';
+import {useProposalsVotes} from './useProposalsVotes';
+import {useProposalsVotingAdapter} from './useProposalsVotingAdapter';
+import {useProposalsVotingState} from '.';
 import {useWeb3Modal} from '../../web3/hooks';
 
 type UseProposalsReturn = {
@@ -42,11 +46,24 @@ export function useProposals({
    */
 
   const [adapterAddress, setAdapterAddress] = useState<string>();
+  const [daoProposalIds, setDAOProposalIds] = useState<string[]>([]);
   const [proposals, setProposals] = useState<ProposalData[]>([]);
   const [proposalsError, setProposalsError] = useState<Error>();
   const [proposalsStatus, setProposalsStatus] = useState<AsyncStatus>(
     AsyncStatus.STANDBY
   );
+
+  // The overall status of the async data being fetched
+  const [
+    proposalsInclusiveStatus,
+    setProposalsInclusiveStatus,
+  ] = useState<AsyncStatus>(AsyncStatus.STANDBY);
+
+  // Any error of the async data being fetched
+  const [
+    proposalsInclusiveError,
+    setProposalsInclusiveError,
+  ] = useState<Error>();
 
   /**
    * Selectors
@@ -59,6 +76,34 @@ export function useProposals({
   const registryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
   );
+
+  /**
+   * Our hooks
+   */
+
+  /**
+   * Fetch on-chain voting adapter data for proposals.
+   * Only returns data for proposals of which voting adapters have been assigned (i.e. sponsored).
+   */
+  const {
+    proposalsVotingAdapters,
+    proposalsVotingAdaptersError,
+    proposalsVotingAdaptersStatus,
+  } = useProposalsVotingAdapter(daoProposalIds);
+
+  // Fetch on-chain voting state for proposals of which voting adapters have been assigned (i.e. sponsored)
+  const {
+    proposalsVotingState,
+    proposalsVotingStateError,
+    proposalsVotingStateStatus,
+  } = useProposalsVotingState(proposalsVotingAdapters);
+
+  // Fetch on-chain votes data for proposals of which voting adapters have been assigned (i.e. sponsored)
+  const {
+    proposalsVotes,
+    proposalsVotesError,
+    proposalsVotesStatus,
+  } = useProposalsVotes(proposalsVotingAdapters);
 
   /**
    * Their hooks
@@ -94,9 +139,146 @@ export function useProposals({
     setAdapterAddress(address);
   }, [adapterAddress, adapterName, contracts]);
 
+  // Get proposals
   useEffect(() => {
     handleGetProposalsCached();
   }, [handleGetProposalsCached]);
+
+  // Set `daoProposalVotingAdapter` data on the proposal
+  useEffect(() => {
+    if (!proposalsVotingAdapters.length) return;
+
+    setProposals((prevState) =>
+      prevState.map(
+        (p): ProposalData => ({
+          ...p,
+          daoProposalVotingAdapter: proposalsVotingAdapters.find(
+            ([id]) => normalizeString(id) === normalizeString(p.idInDAO || '')
+          )?.[1],
+        })
+      )
+    );
+  }, [proposalsVotingAdapters]);
+
+  // Set `daoProposalVotingState` data on the proposal
+  useEffect(() => {
+    if (!proposalsVotingState.length) return;
+
+    setProposals((prevState) =>
+      prevState.map(
+        (p): ProposalData => ({
+          ...p,
+          daoProposalVotingState: proposalsVotingState.find(
+            ([id]) => normalizeString(id) === normalizeString(p.idInDAO || '')
+          )?.[1],
+        })
+      )
+    );
+  }, [proposalsVotingState]);
+
+  // Set `daoProposalVotes` data on the proposal
+  useEffect(() => {
+    if (!proposalsVotes.length) return;
+
+    setProposals((prevState) =>
+      prevState.map(
+        (p): ProposalData => ({
+          ...p,
+          daoProposalVotes: proposalsVotes.find(
+            ([id]) => normalizeString(id) === normalizeString(p.idInDAO || '')
+          )?.[1],
+        })
+      )
+    );
+  }, [proposalsVotes]);
+
+  // Set overall async status
+  useEffect(() => {
+    const {STANDBY, PENDING, FULFILLED, REJECTED} = AsyncStatus;
+    const statuses = [
+      proposalsStatus,
+      proposalsVotingAdaptersStatus,
+      proposalsVotingStateStatus,
+      proposalsVotesStatus,
+    ];
+
+    /**
+     * Standby
+     *
+     * The other statuses rely on `proposals` being fetched,
+     * so it's only in `STANDBY` at the point the proposals have
+     * not yet been fetched.
+     */
+    if (proposalsStatus === STANDBY) {
+      setProposalsInclusiveStatus(STANDBY);
+
+      return;
+    }
+
+    // Pending
+    if (statuses.some((s) => s === PENDING)) {
+      setProposalsInclusiveStatus(PENDING);
+
+      return;
+    }
+
+    // Fulfilled
+    if (statuses.every((s) => s === FULFILLED)) {
+      setProposalsInclusiveStatus(FULFILLED);
+
+      return;
+    }
+
+    // Fulfilled: checked for DAO proposals and none were returned
+    if (proposalsStatus === FULFILLED && !daoProposalIds.length) {
+      setProposalsInclusiveStatus(FULFILLED);
+
+      return;
+    }
+
+    // Fulfilled: checked for DAO proposals' voting adapters and none were returned - not sponsored
+    if (
+      proposalsStatus === FULFILLED &&
+      proposalsVotingAdaptersStatus === FULFILLED &&
+      daoProposalIds.length &&
+      !proposalsVotingAdapters.length
+    ) {
+      setProposalsInclusiveStatus(FULFILLED);
+
+      return;
+    }
+
+    // Rejected
+    if (statuses.some((s) => s === REJECTED)) {
+      setProposalsInclusiveStatus(REJECTED);
+
+      return;
+    }
+  }, [
+    daoProposalIds.length,
+    proposalsStatus,
+    proposalsVotesStatus,
+    proposalsVotingAdapters.length,
+    proposalsVotingAdaptersStatus,
+    proposalsVotingStateStatus,
+  ]);
+
+  // Set any error from async calls
+  useEffect(() => {
+    const errors = [
+      proposalsError,
+      proposalsVotingAdaptersError,
+      proposalsVotingStateError,
+      proposalsVotesError,
+    ];
+
+    setProposalsInclusiveError(errors.find((e) => e));
+  }, [
+    proposalsError,
+    proposalsVotesError,
+    proposalsVotingAdaptersError,
+    proposalsVotingStateError,
+  ]);
 
   /**
    * Functions
@@ -234,13 +416,15 @@ export function useProposals({
       }
 
       // @todo `daoProposals`: swich/case depending on subgraph up/down
-      // ...
 
       let daoProposals = await getProposalsOnchainCached({
         proposalIds,
         registryAbi,
         registryAddress,
       });
+
+      // Set the proposal IDs based on the DAO proposals' return data
+      setDAOProposalIds(daoProposals.map(([id]) => id));
 
       const proposalDataMap = daoProposals
         .map(
@@ -269,7 +453,14 @@ export function useProposals({
               : undefined;
 
             return {
+              idInDAO,
               daoProposal: p,
+              // To be set later in a `useEffect` above
+              daoProposalVotes: undefined,
+              // To be set later in a `useEffect` above
+              daoProposalVotingAdapter: undefined,
+              // To be set later in a `useEffect` above
+              daoProposalVotingState: undefined,
               snapshotDraft,
               getCommonSnapshotProposalData: () => undefined,
               refetchProposalOrDraft: () => {},
@@ -293,7 +484,7 @@ export function useProposals({
 
   return {
     proposals,
-    proposalsError,
-    proposalsStatus,
+    proposalsError: proposalsInclusiveError,
+    proposalsStatus: proposalsInclusiveStatus,
   };
 }

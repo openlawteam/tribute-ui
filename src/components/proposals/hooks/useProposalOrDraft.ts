@@ -1,12 +1,10 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
   SnapshotDraftResponse,
   SnapshotProposalResponse,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
 
-import {AsyncStatus} from '../../../util/types';
-import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
 import {
   Proposal,
   ProposalData,
@@ -15,7 +13,10 @@ import {
   SnapshotProposal,
   SnapshotProposalCommon,
 } from '../types';
+import {AsyncStatus} from '../../../util/types';
+import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
 import {useAbortController, useCounter} from '../../../hooks';
+import {useProposalsVotingAdapter} from './useProposalsVotingAdapter';
 
 type UseProposalReturn = {
   proposalData: ProposalData | undefined;
@@ -31,7 +32,7 @@ const ERROR_PROPOSAL_NOT_FOUND: string = 'Proposal was not found.';
 /**
  * useProposalOrDraft
  *
- * Ahook which fetches a snapshot-hub `proposal` or `draft` type by an ID string.
+ * Fetches a snapshot-hub `proposal` or `draft` type by an ID string.
  *
  * If no `type` argument is provided it will search first for a
  * `proposal`, then if not found, search for a `draft`.
@@ -46,6 +47,13 @@ export function useProposalOrDraft(
   id: string,
   type?: ProposalOrDraftSnapshotType
 ): UseProposalReturn {
+  /**
+   * Refs
+   */
+
+  // Prevents re-renders when passing the array to hooks
+  const idRef = useRef<typeof id[]>([id]);
+
   /**
    * State
    */
@@ -63,12 +71,32 @@ export function useProposalOrDraft(
     AsyncStatus.STANDBY
   );
 
+  // The overall status of the async data being fetched
+  const [
+    proposalInclusiveStatus,
+    setProposalInclusiveStatus,
+  ] = useState<AsyncStatus>(AsyncStatus.STANDBY);
+
+  // Any error of the async data being fetched
+  const [proposalInclusiveError, setProposalInclusiveError] = useState<Error>();
+
   /**
    * Our hooks
    */
 
   const {abortController, isMountedRef} = useAbortController();
+
   const [refetchCount, updateRefetchCount] = useCounter();
+
+  /**
+   * Fetch on-chain voting adapter data for proposals.
+   * Only returns data for proposals of which voting adapters have been assigned (i.e. sponsored).
+   */
+  const {
+    proposalsVotingAdapters,
+    proposalsVotingAdaptersError,
+    proposalsVotingAdaptersStatus,
+  } = useProposalsVotingAdapter(idRef.current);
 
   /**
    * Cached callbacks
@@ -80,6 +108,7 @@ export function useProposalOrDraft(
     isMountedRef,
     refetchCount,
   ]);
+
   const handleGetProposalCached = useCallback(handleGetProposal, [
     abortController?.signal,
     id,
@@ -87,6 +116,7 @@ export function useProposalOrDraft(
     refetchCount,
     type,
   ]);
+
   const handleGetProposalOrDraftCached = useCallback(handleGetProposalOrDraft, [
     handleGetDraftCached,
     handleGetProposalCached,
@@ -109,7 +139,9 @@ export function useProposalOrDraft(
   const proposalData: UseProposalReturn['proposalData'] =
     snapshotDraft || snapshotProposal
       ? {
+          // idInDAO: '',
           daoProposal,
+          daoProposalVotingAdapter: proposalsVotingAdapters[0]?.[1],
           getCommonSnapshotProposalData,
           refetchProposalOrDraft,
           snapshotDraft,
@@ -143,6 +175,68 @@ export function useProposalOrDraft(
     handleGetProposalOrDraftCached,
     type,
   ]);
+
+  // Set overall async status
+  useEffect(() => {
+    const {STANDBY, PENDING, FULFILLED, REJECTED} = AsyncStatus;
+    const statuses = [proposalStatus, proposalsVotingAdaptersStatus];
+
+    /**
+     * Standby
+     *
+     * The other statuses rely on a Snapshot Hub proposal or draft being fetched,
+     * so it's only in `STANDBY` at the point the proposals have
+     * not yet been fetched.
+     */
+    if (proposalStatus === STANDBY) {
+      setProposalInclusiveStatus(STANDBY);
+
+      return;
+    }
+
+    // Pending
+    if (statuses.some((s) => s === PENDING)) {
+      setProposalInclusiveStatus(PENDING);
+
+      return;
+    }
+
+    // Fulfilled
+    if (statuses.every((s) => s === FULFILLED)) {
+      setProposalInclusiveStatus(FULFILLED);
+
+      return;
+    }
+
+    // Fulfilled: checked for DAO proposals' voting adapters and none were returned - not sponsored
+    if (
+      proposalStatus === FULFILLED &&
+      proposalsVotingAdaptersStatus === FULFILLED &&
+      !proposalsVotingAdapters.length
+    ) {
+      setProposalInclusiveStatus(FULFILLED);
+
+      return;
+    }
+
+    // Rejected
+    if (statuses.some((s) => s === REJECTED)) {
+      setProposalInclusiveStatus(REJECTED);
+
+      return;
+    }
+  }, [
+    proposalStatus,
+    proposalsVotingAdapters.length,
+    proposalsVotingAdaptersStatus,
+  ]);
+
+  // Set any error from async calls
+  useEffect(() => {
+    const errors = [proposalError, proposalsVotingAdaptersError];
+
+    setProposalInclusiveError(errors.find((e) => e));
+  }, [proposalError, proposalsVotingAdaptersError]);
 
   /**
    * Functions
@@ -186,6 +280,8 @@ export function useProposalOrDraft(
 
       return draft;
     } catch (error) {
+      if (!isMountedRef.current) return;
+
       setProposalStatus(AsyncStatus.REJECTED);
       setProposalError(error);
     }
@@ -251,6 +347,8 @@ export function useProposalOrDraft(
 
       return proposal;
     } catch (error) {
+      if (!isMountedRef.current) return;
+
       setProposalStatus(AsyncStatus.REJECTED);
       setProposalError(error);
     }
@@ -300,8 +398,8 @@ export function useProposalOrDraft(
 
   return {
     proposalData,
-    proposalError,
+    proposalError: proposalInclusiveError,
     proposalNotFound,
-    proposalStatus,
+    proposalStatus: proposalInclusiveStatus,
   };
 }

@@ -1,8 +1,10 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
+import {AbiItem} from 'web3-utils/types';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
+import {ProposalVotingAdapterTuple} from '../types';
 import {StoreState} from '../../../store/types';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VotingState} from '../voting/types';
@@ -19,7 +21,11 @@ type UseProposalsVotingStateReturn = {
 };
 
 export function useProposalsVotingState(
-  proposalIds: string[]
+  /**
+   * A tuple of proposal id's and voting adapter data.
+   * This data is returned by `useProposalsVotingAdapter`.
+   */
+  proposalVotingAdapters: ProposalVotingAdapterTuple[]
 ): UseProposalsVotingStateReturn {
   /**
    * Selectors
@@ -27,12 +33,6 @@ export function useProposalsVotingState(
 
   const registryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
-  );
-  const votingAddress = useSelector(
-    (s: StoreState) => s.contracts.VotingContract?.contractAddress
-  );
-  const votingABI = useSelector(
-    (s: StoreState) => s.contracts.VotingContract?.abi
   );
 
   /**
@@ -64,59 +64,61 @@ export function useProposalsVotingState(
    * Cached callbacks
    */
 
-  const getProposalsVotingStateCached = useCallback(getProposalsVotingState, [
-    proposalIds,
-    registryAddress,
-    votingABI,
-    votingAddress,
-    web3Instance,
-  ]);
+  const getProposalsVotingStateOnchainCached = useCallback(
+    getProposalsVotingStateOnchain,
+    [proposalVotingAdapters, registryAddress, web3Instance]
+  );
 
   /**
    * Effects
    */
 
   useEffect(() => {
-    getProposalsVotingStateCached();
-  }, [getProposalsVotingStateCached]);
+    getProposalsVotingStateOnchainCached();
+  }, [getProposalsVotingStateOnchainCached]);
 
   /**
    * Functions
    */
 
-  async function getProposalsVotingState() {
-    if (
-      !registryAddress ||
-      !votingAddress ||
-      !votingABI ||
-      !proposalIds.length
-    ) {
+  async function getProposalsVotingStateOnchain() {
+    if (!registryAddress || !proposalVotingAdapters.length) {
       return;
     }
 
     // Only use hex (more specifically `bytes32`) id's
-    const safeProposalIds = proposalIds.filter(web3Instance.utils.isHexStrict);
+    const safeProposalVotingAdapters = proposalVotingAdapters.filter(([id]) =>
+      web3Instance.utils.isHexStrict(id)
+    );
 
-    if (!safeProposalIds.length) {
+    if (!safeProposalVotingAdapters.length) {
       setProposalsVotingStateStatus(AsyncStatus.FULFILLED);
 
       return;
     }
 
     try {
-      const votingResultAbi = votingABI.find((ai) => ai.name === 'voteResult');
+      const lazyIVotingABI = (
+        await import('../../../truffle-contracts/IVoting.json')
+      ).default as AbiItem[];
+
+      const votingResultAbi = lazyIVotingABI.find(
+        (ai) => ai.name === 'voteResult'
+      );
 
       if (!votingResultAbi) {
         throw new Error(
-          'No "voteResult" ABI function was found for the voting adapter.'
+          'No "voteResult" ABI function was found on the "IVoting" contract.'
         );
       }
 
-      const calls: MulticallTuple[] = safeProposalIds.map((id) => [
-        votingAddress,
-        votingResultAbi,
-        [registryAddress, id],
-      ]);
+      const calls: MulticallTuple[] = safeProposalVotingAdapters.map(
+        ([proposalId, {votingAdapterAddress}]) => [
+          votingAdapterAddress,
+          votingResultAbi,
+          [registryAddress, proposalId],
+        ]
+      );
 
       setProposalsVotingStateStatus(AsyncStatus.PENDING);
 
@@ -127,7 +129,10 @@ export function useProposalsVotingState(
 
       setProposalsVotingStateStatus(AsyncStatus.FULFILLED);
       setProposaslsVotingState(
-        safeProposalIds.map((id, i) => [id, proposalsVotingStateResult[i]])
+        safeProposalVotingAdapters.map(([proposalId], i) => [
+          proposalId,
+          proposalsVotingStateResult[i],
+        ])
       );
     } catch (error) {
       setProposalsVotingStateStatus(AsyncStatus.REJECTED);

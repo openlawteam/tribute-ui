@@ -3,32 +3,32 @@ import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
 
 import {AsyncStatus} from '../../../util/types';
-import {BURN_ADDRESS} from '../../../util/constants';
 import {multicall, MulticallTuple} from '../../web3/helpers';
-import {OffchainVotingAdapterVotes, VotingAdapterVotes} from '../types';
+import {ProposalVotesData, ProposalVotingAdapterTuple} from '../types';
 import {StoreState} from '../../../store/types';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
 
-type ProposalsVotesTuples = [
+type ProposalsVotesTuple = [
   proposalId: string,
   /**
    * For each proposal, each result is stored under its adapter name.
    */
-  adapterData: {
-    [VotingAdapterName.OffchainVotingContract]?: OffchainVotingAdapterVotes;
-    [VotingAdapterName.VotingContract]?: VotingAdapterVotes;
-  }
-][];
+  adapterData: ProposalVotesData
+];
 
 type UseProposalsVotesReturn = {
-  proposalsVotes: ProposalsVotesTuples;
+  proposalsVotes: ProposalsVotesTuple[];
   proposalsVotesError: Error | undefined;
   proposalsVotesStatus: AsyncStatus;
 };
 
 export function useProposalsVotes(
-  proposalIds: string[]
+  /**
+   * A tuple of proposal id's and voting adapter data.
+   * This data is returned by `useProposalsVotingAdapter`.
+   */
+  proposalVotingAdapters: ProposalVotingAdapterTuple[]
 ): UseProposalsVotesReturn {
   /**
    * Selectors
@@ -51,7 +51,7 @@ export function useProposalsVotes(
    * State
    */
 
-  const [proposalsVotes, setProposalsVotes] = useState<ProposalsVotesTuples>(
+  const [proposalsVotes, setProposalsVotes] = useState<ProposalsVotesTuple[]>(
     []
   );
   const [proposalsVotesError, setProposalsVotesError] = useState<Error>();
@@ -64,7 +64,7 @@ export function useProposalsVotes(
    */
 
   const getProposalsVotesOnchainCached = useCallback(getProposalsVotesOnchain, [
-    proposalIds,
+    proposalVotingAdapters,
     registryABI,
     registryAddress,
     web3Instance,
@@ -83,116 +83,40 @@ export function useProposalsVotes(
    */
 
   async function getProposalsVotesOnchain() {
-    if (!registryAddress || !registryABI || !proposalIds.length) {
+    if (!registryAddress || !registryABI || !proposalVotingAdapters.length) {
       return;
     }
 
     // Only use hex (more specifically `bytes32`) id's
-    const safeProposalIds = proposalIds.filter(web3Instance.utils.isHexStrict);
+    const safeProposalVotingAdapters = proposalVotingAdapters.filter(([id]) =>
+      web3Instance.utils.isHexStrict(id)
+    );
 
-    if (!safeProposalIds.length) {
+    if (!safeProposalVotingAdapters.length) {
       setProposalsVotesStatus(AsyncStatus.FULFILLED);
+      setProposalsVotes([]);
 
       return;
     }
 
     try {
-      const votingAdapterABI = registryABI.find(
-        (ai) => ai.name === 'votingAdapter'
-      );
-
-      if (!votingAdapterABI) {
-        throw new Error(
-          'No "votingAdapter" ABI function was found in the DAO registry ABI.'
-        );
-      }
-
-      // `DaoRegistry.votingAdapter` calls
-      const votingAdapterCalls: MulticallTuple[] = safeProposalIds.map((id) => [
-        registryAddress,
-        votingAdapterABI,
-        [id],
-      ]);
-
       setProposalsVotesStatus(AsyncStatus.PENDING);
-
-      const votingAdapterAddressResults: string[] = await multicall({
-        calls: votingAdapterCalls,
-        web3Instance,
-      });
-
-      const {default: lazyIVotingABI} = await import(
-        '../../../truffle-contracts/IVoting.json'
-      );
-
-      const getAdapterNameABI = (lazyIVotingABI as typeof registryABI).find(
-        (ai) => ai.name === 'getAdapterName'
-      );
-
-      if (!getAdapterNameABI) {
-        throw new Error(
-          'No "getAdapterName" ABI function was found in the IVoting ABI.'
-        );
-      }
-
-      /**
-       * Filter out `safeProposalIds` which are not sponsored (i.e. voting adapter address === `BURN_ADDRESS`).
-       * Filter out `votingAdapterAddressResults` which equal the `BURN_ADDRESS`.
-       *
-       * This ensures these two arrays maintain the same length as they rely on indexes for the
-       * proposals to match up to the array of `multicall` results.
-       */
-
-      const filteredProposalIds = safeProposalIds.filter(
-        (_id, i) => votingAdapterAddressResults[i] !== BURN_ADDRESS
-      );
-
-      const filteredVotingAdapterAddressResults = votingAdapterAddressResults.filter(
-        (a) => a !== BURN_ADDRESS
-      );
-
-      /**
-       * Exit early if there's no voting adapter addresses.
-       * It means no proposals were found to be sponsored
-       */
-      if (!filteredVotingAdapterAddressResults.length) {
-        setProposalsVotesStatus(AsyncStatus.FULFILLED);
-        setProposalsVotes([]);
-
-        return;
-      }
-
-      const votingAdapterNameCalls: MulticallTuple[] = filteredVotingAdapterAddressResults.map(
-        (votingAdapterAddress) => [votingAdapterAddress, getAdapterNameABI, []]
-      );
-
-      const adapterNameResults: VotingAdapterName[] = await multicall({
-        calls: votingAdapterNameCalls,
-        web3Instance,
-      });
-
-      let adapterNameMap: Record<string, VotingAdapterName>;
 
       // Build votes results
       const votesDataCalls: MulticallTuple[] = await Promise.all(
-        filteredProposalIds.map(
-          async (id, i): Promise<MulticallTuple> => {
-            // Set adapter name for setting the state later
-            adapterNameMap = {
-              ...adapterNameMap,
-              [id]: adapterNameResults[i],
-            };
-
-            return [
-              filteredVotingAdapterAddressResults[i],
-              await getVotesDataABI(adapterNameResults[i]),
-              /**
-               * We build the call arguments the same way for the different voting adapters
-               * (i.e. [dao, proposalId]). If we need to change this we can move it to another function.
-               */
-              [registryAddress, id],
-            ];
-          }
+        safeProposalVotingAdapters.map(
+          async ([
+            proposalId,
+            {votingAdapterAddress, getVotingAdapterABI, votingAdapterName},
+          ]): Promise<MulticallTuple> => [
+            votingAdapterAddress,
+            await getVotesDataABI(votingAdapterName, getVotingAdapterABI()),
+            /**
+             * We build the call arguments the same way for the different voting adapters
+             * (i.e. [dao, proposalId]). If we need to change this we can move it to another function.
+             */
+            [registryAddress, proposalId],
+          ]
         )
       );
 
@@ -203,12 +127,14 @@ export function useProposalsVotes(
 
       setProposalsVotesStatus(AsyncStatus.FULFILLED);
       setProposalsVotes(
-        safeProposalIds.map((id, i) => [
-          id,
-          {
-            [adapterNameMap[id]]: votesDataResults[i],
-          },
-        ])
+        safeProposalVotingAdapters.map(
+          ([proposalId, {votingAdapterName}], i) => [
+            proposalId,
+            {
+              [votingAdapterName]: votesDataResults[i],
+            },
+          ]
+        )
       );
     } catch (error) {
       setProposalsVotesStatus(AsyncStatus.REJECTED);
@@ -226,16 +152,13 @@ export function useProposalsVotes(
    * @returns {Promise<AbiItem>}
    */
   async function getVotesDataABI(
-    votingAdapterName: VotingAdapterName
+    votingAdapterName: VotingAdapterName,
+    votingAdapterABI: AbiItem[]
   ): Promise<AbiItem> {
     try {
       switch (votingAdapterName) {
         case VotingAdapterName.OffchainVotingContract:
-          const {default: lazyOffchainVotingABI} = await import(
-            '../../../truffle-contracts/OffchainVotingContract.json'
-          );
-
-          const offchainVotesDataABI = (lazyOffchainVotingABI as AbiItem[]).find(
+          const offchainVotesDataABI = votingAdapterABI.find(
             (ai) => ai.name === 'votes'
           );
 
@@ -248,11 +171,7 @@ export function useProposalsVotes(
           return offchainVotesDataABI;
 
         case VotingAdapterName.VotingContract:
-          const {default: lazyVotingABI} = await import(
-            '../../../truffle-contracts/VotingContract.json'
-          );
-
-          const votingVotesDataABI = (lazyVotingABI as AbiItem[]).find(
+          const votingVotesDataABI = votingAdapterABI.find(
             (ai) => ai.name === 'votes'
           );
 
