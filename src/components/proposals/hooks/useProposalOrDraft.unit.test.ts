@@ -666,7 +666,7 @@ describe('useProposalOrDraft unit tests', () => {
         ]
       );
 
-      const {result, waitForNextUpdate} = await renderHook(
+      const {result, waitForValueToChange} = await renderHook(
         () => useProposalOrDraft(DEFAULT_DRAFT_HASH),
         {
           wrapper: Wrapper,
@@ -706,7 +706,9 @@ describe('useProposalOrDraft unit tests', () => {
       // Request refetch
       result.current.proposalData?.refetchProposalOrDraft();
 
-      await waitForNextUpdate();
+      await waitForValueToChange(
+        () => result.current.proposalData?.snapshotProposal
+      );
 
       expect(result.current.proposalData?.snapshotProposal).toStrictEqual({
         ...proposal,
