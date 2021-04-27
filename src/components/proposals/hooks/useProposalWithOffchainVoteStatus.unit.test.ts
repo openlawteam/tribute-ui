@@ -914,6 +914,102 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
     });
   }, 15000); // Set jest timeout for this test to a higher value to detect polling
 
+  // @note This test uses higher timeouts
+  test('should stop polling for data when proposal processed', async () => {
+    // Mock multicall to keep track of calls during polling
+    const helpersToMock = require('../../web3/helpers/multicall');
+    const spy = jest.spyOn(helpersToMock, 'multicall');
+
+    const proposalData: Partial<ProposalData> = {
+      daoProposalVotingAdapter: {
+        votingAdapterAddress: DEFAULT_ETH_ADDRESS,
+        votingAdapterName: VotingAdapterName.OffchainVotingContract,
+        getVotingAdapterABI: () => OffchainVotingABI as AbiItem[],
+        getWeb3VotingAdapterContract: () => undefined as any,
+      },
+      snapshotProposal: {
+        ...fakeSnapshotProposal,
+        msg: {
+          ...fakeSnapshotProposal.msg,
+          payload: {
+            ...fakeSnapshotProposal.msg.payload,
+            // Set Snapshot offchain voting time as ended
+            start: nowSeconds - 100,
+            end: nowSeconds - 50,
+          },
+        },
+      },
+    };
+
+    await act(async () => {
+      const {result, waitForValueToChange} = await renderHook(
+        () => useProposalWithOffchainVoteStatus(proposalData as ProposalData),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: ({mockWeb3Provider, web3Instance}) => {
+              const defaultProcessedResult = web3Instance.eth.abi.encodeParameters(
+                ['uint256', 'bytes[]'],
+                [
+                  0,
+                  [
+                    // For `proposals` call
+                    web3Instance.eth.abi.encodeParameter(
+                      {
+                        Proposal: {
+                          adapterAddress: 'address',
+                          flags: 'uint256',
+                        },
+                      },
+                      {
+                        adapterAddress: DEFAULT_ETH_ADDRESS,
+                        // ProposalFlag.PROCESSED
+                        flags: '7',
+                      }
+                    ),
+                    // For `votes` call
+                    web3Instance.eth.abi.encodeParameter(
+                      defaultVotesMock[0],
+                      defaultVotesMock[1]
+                    ),
+                    // For `voteResult` call (VotingState.PASS)
+                    web3Instance.eth.abi.encodeParameter('uint8', '2'),
+                  ],
+                ]
+              );
+
+              mockWeb3Provider.injectResult(defaultProcessedResult);
+              mockWeb3Provider.injectResult(defaultProcessedResult);
+              mockWeb3Provider.injectResult(defaultProcessedResult);
+            },
+          },
+        }
+      );
+
+      // Assert initial state
+      expect(result.current.daoProposal).toBe(undefined);
+      expect(result.current.daoProposalVoteResult).toBe(undefined);
+      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.status).toBe(undefined);
+
+      await waitForValueToChange(() => result.current.daoProposal);
+
+      await new Promise((r) => setTimeout(r, 14000));
+
+      /**
+       * We expect only 3 calls (1 polled) after 15 seconds:
+       *
+       * - 2 for initial calls in useEffect
+       * - 1 for polled call after 5 seconds
+       */
+      expect(spy.mock.calls.length).toBe(3);
+
+      spy.mockRestore();
+    });
+  }, 15000); // Set jest timeout for this test to a higher value to detect polling
+
   test('should return error when async call throws on initial fetch', async () => {
     const proposalData: Partial<ProposalData> = {
       daoProposalVotingAdapter: undefined,
