@@ -69,6 +69,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
 
   const {proposals, proposalsError, proposalsStatus} = useProposals({
     adapterName,
+    includeProposalsExistingOnlyOffchain,
   });
 
   /**
