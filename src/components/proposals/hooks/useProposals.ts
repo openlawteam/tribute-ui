@@ -34,12 +34,15 @@ type UseProposalsReturn = {
  * @todo Clean up noop functions in setting ProposalData - need a cleaner way to fulfill type.
  *
  * @param {string} adapterName Name of the adapter contract to get proposals for.
+ * @param {string} includeProposalsExistingOnlyOffchain To handle proposal types where the first step is creating a snapshot draft/offchain proposal only (no onchain proposal exists).
  * @returns `UseProposalsReturn` An object with the proposals, and the current async status.
  */
 export function useProposals({
   adapterName,
+  includeProposalsExistingOnlyOffchain = false,
 }: {
   adapterName: DaoAdapterConstants;
+  includeProposalsExistingOnlyOffchain?: boolean;
 }): UseProposalsReturn {
   /**
    * State
@@ -116,6 +119,7 @@ export function useProposals({
    */
 
   const getProposalsOnchainCached = useCallback(getProposalsOnchain, [
+    includeProposalsExistingOnlyOffchain,
     web3Instance,
   ]);
   const handleGetProposalsCached = useCallback(handleGetProposals, [
@@ -382,8 +386,12 @@ export function useProposals({
         proposals[i],
       ]);
 
-      // Filter-out proposals which do not exist
-      return entries.filter(([_, p]) => p.flags !== '0');
+      if (includeProposalsExistingOnlyOffchain) {
+        return entries;
+      } else {
+        // Filter-out proposals which do not exist
+        return entries.filter(([_, p]) => p.flags !== '0');
+      }
     } catch (error) {
       throw error;
     }

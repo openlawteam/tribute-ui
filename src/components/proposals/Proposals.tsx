@@ -28,6 +28,11 @@ type ProposalsProps = {
    * Optionally render a custom proposal card.
    */
   renderProposalCard?: (data: {proposalData: ProposalData}) => React.ReactNode;
+  /**
+   * To handle proposal types where the first step is creating a snapshot
+   * draft/offchain proposal only (no onchain proposal exists)
+   */
+  includeProposalsExistingOnlyOffchain?: boolean;
 };
 
 type FilteredProposals = {
@@ -38,7 +43,12 @@ type FilteredProposals = {
 };
 
 export default function Proposals(props: ProposalsProps): JSX.Element {
-  const {adapterName, onProposalClick = () => {}, renderProposalCard} = props;
+  const {
+    adapterName,
+    onProposalClick = () => {},
+    renderProposalCard,
+    includeProposalsExistingOnlyOffchain = false,
+  } = props;
 
   /**
    * State
@@ -110,11 +120,12 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
         votesData?.OffchainVotingContract?.reporter === BURN_ADDRESS;
 
       // non-sponsored proposal
-      if (
-        voteState === undefined &&
-        proposalHasFlag(ProposalFlag.EXISTS, daoProposal.flags)
-      ) {
-        filteredProposalsToSet.nonsponsoredProposals.push(p);
+      if (voteState === undefined) {
+        if (includeProposalsExistingOnlyOffchain) {
+          filteredProposalsToSet.nonsponsoredProposals.push(p);
+        } else if (proposalHasFlag(ProposalFlag.EXISTS, daoProposal.flags)) {
+          filteredProposalsToSet.nonsponsoredProposals.push(p);
+        }
 
         return;
       }
@@ -162,7 +173,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
       ...prevState,
       ...filteredProposalsToSet,
     }));
-  }, [proposals, proposalsStatus]);
+  }, [includeProposalsExistingOnlyOffchain, proposals, proposalsStatus]);
 
   /**
    * Functions
