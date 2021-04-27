@@ -12,12 +12,12 @@ import {
   formatNumber,
   formatDecimal,
   normalizeString,
+  truncateEthAddress,
 } from '../../util/helpers';
 import {useIsDefaultChain} from '../../components/web3/hooks';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
-import {truncateEthAddress} from '../../util/helpers';
 import {SHARES_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
