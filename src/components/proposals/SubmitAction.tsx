@@ -19,17 +19,18 @@ import EtherscanURL from '../web3/EtherscanURL';
 import FadeIn from '../common/FadeIn';
 import Loader from '../feedback/Loader';
 
-type SponsorArguments = [
+type SubmitArguments = [
   string, // `dao`
   string, // `proposalId`
+  ...any[],
   string // `proposal data`
 ];
 
-type SponsorActionProps = {
+type SubmitActionProps = {
   proposal: ProposalData;
 };
 
-export default function SponsorAction(props: SponsorActionProps) {
+export default function SubmitAction(props: SubmitActionProps) {
   const {
     proposal: {snapshotDraft, refetchProposalOrDraft},
   } = props;
@@ -144,9 +145,10 @@ export default function SponsorAction(props: SponsorActionProps) {
         web3Instance
       );
 
-      const sponsorArguments: SponsorArguments = [
+      const submitArguments: SubmitArguments = [
         daoRegistryAddress,
         snapshotDraft.idInDAO,
+        ...(metadata.proposalArgs || []),
         preparedVoteVerificationBytes,
       ];
 
@@ -157,9 +159,9 @@ export default function SponsorAction(props: SponsorActionProps) {
       };
 
       await txSend(
-        'sponsorProposal',
+        'submitProposal',
         contract.instance.methods,
-        sponsorArguments,
+        submitArguments,
         txArguments
       );
 

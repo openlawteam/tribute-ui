@@ -7,6 +7,7 @@ import {VotingState} from './voting/types';
 import {ContractAdapterNames} from '../web3/types';
 import {ProposalData, ProposalFlowStatus} from './types';
 import {useProposalWithOffchainVoteStatus} from './hooks';
+import SubmitAction from './SubmitAction';
 import SponsorAction from './SponsorAction';
 import ProcessAction from './ProcessAction';
 import PostProcessAction from './PostProcessAction';
@@ -67,6 +68,11 @@ export default function ProposalWithOffchainVoteActions(
       )}
 
       <div className="proposaldetails__button-container">
+        {/* SUBMIT/SPONSOR BUTTON (for proposals that have not been submitted onchain yet) */}
+        {status === ProposalFlowStatus.Submit && (
+          <SubmitAction proposal={proposal} />
+        )}
+
         {/* SPONSOR BUTTON */}
         {status === ProposalFlowStatus.Sponsor && (
           <SponsorAction proposal={proposal} />

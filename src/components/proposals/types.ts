@@ -33,6 +33,7 @@ export enum ProposalFlag {
 
 // @todo Need more information about the vote challenge flow.
 export enum ProposalFlowStatus {
+  Submit = 'Submit',
   Sponsor = 'Sponsor',
   OffchainVoting = 'OffchainVoting',
   OffchainVotingSubmitResult = 'OffchainVotingSubmitResult',

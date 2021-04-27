@@ -309,7 +309,6 @@ export default function CreateTributeProposal() {
               tributeTokenDecimals: erc20Details.decimals,
               requestAmountUnit: 'SHARES',
               proposalArgs,
-              sponsorActionFunctionName: 'submitProposal',
               accountAuthorizedToProcessPassedProposal: proposerAddressToChecksum,
             },
           },
