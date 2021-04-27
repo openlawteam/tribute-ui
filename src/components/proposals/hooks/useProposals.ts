@@ -118,13 +118,13 @@ export function useProposals({
    * Cached callbacks
    */
 
-  const getProposalsOnchainCached = useCallback(getProposalsOnchain, [
+  const getProposalsCached = useCallback(getProposals, [
     includeProposalsExistingOnlyOffchain,
     web3Instance,
   ]);
   const handleGetProposalsCached = useCallback(handleGetProposals, [
     adapterAddress,
-    getProposalsOnchainCached,
+    getProposalsCached,
     registryAbi,
     registryAddress,
   ]);
@@ -347,16 +347,18 @@ export function useProposals({
   }
 
   /**
-   * getProposalsOnchain
+   * getProposals
    *
-   * Gets on-chain proposals based on Snapshot Draft/Proposal ids,
-   * while filtering out proposals which were not found.
+   * Gets proposals based on Snapshot Draft/Proposal ids, while filtering out
+   * proposals which were not found onchain. Optional
+   * `includeProposalsExistingOnlyOffchain` flag can be set to also include
+   * draft proposals that exist only offchain.
    *
    * @note Should be called as a fallback to the subgraph failing.
    *
    * @returns `Promise<[string, Proposal][]` An array of tuples of [id, Proposal]
    */
-  async function getProposalsOnchain({
+  async function getProposals({
     proposalIds,
     registryAbi,
     registryAddress,
@@ -389,7 +391,7 @@ export function useProposals({
       if (includeProposalsExistingOnlyOffchain) {
         return entries;
       } else {
-        // Filter-out proposals which do not exist
+        // Filter-out proposals which do not exist onchain
         return entries.filter(([_, p]) => p.flags !== '0');
       }
     } catch (error) {
@@ -425,7 +427,7 @@ export function useProposals({
 
       // @todo `daoProposals`: swich/case depending on subgraph up/down
 
-      let daoProposals = await getProposalsOnchainCached({
+      let daoProposals = await getProposalsCached({
         proposalIds,
         registryAbi,
         registryAddress,
