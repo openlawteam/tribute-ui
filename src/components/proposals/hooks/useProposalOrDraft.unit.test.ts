@@ -666,7 +666,7 @@ describe('useProposalOrDraft unit tests', () => {
         ]
       );
 
-      const {rerender, result} = await renderHook(
+      const {rerender, result, waitForNextUpdate} = await renderHook(
         () => useProposalOrDraft(DEFAULT_DRAFT_HASH),
         {
           wrapper: Wrapper,
@@ -698,6 +698,7 @@ describe('useProposalOrDraft unit tests', () => {
         undefined
       );
 
+      // Set up mock REST response for refetch
       server.use(
         ...[
           rest.get(
@@ -710,11 +711,19 @@ describe('useProposalOrDraft unit tests', () => {
       rerender({
         useInit: true,
         useWallet: true,
+        // Set up mock Web3 responses for refetch
         getProps: mockWeb3ResponsesProposal,
       });
 
+      expect(result.current.proposalData?.snapshotProposal).toBe(undefined);
+      expect(result.current.proposalData?.daoProposalVotingAdapter).toBe(
+        undefined
+      );
+
       // Request refetch
       result.current.proposalData?.refetchProposalOrDraft();
+
+      await waitForNextUpdate();
 
       // Should not be `AsyncStatus.PENDING` on refetch
       expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
