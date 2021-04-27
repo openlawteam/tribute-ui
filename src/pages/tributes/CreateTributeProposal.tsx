@@ -268,6 +268,7 @@ export default function CreateTributeProposal() {
       ).mul(multiplier);
       const requestAmountArg = stripFormatNumber(requestAmount);
       const applicantAddressToChecksum = toChecksumAddress(applicantAddress);
+      const proposerAddressToChecksum = toChecksumAddress(account);
 
       // Maybe set proposal ID from previous attempt
       let proposalId: string = proposalData?.uniqueId || '';
@@ -281,7 +282,7 @@ export default function CreateTributeProposal() {
                 7
               )}.`
             : `Tribute from ${truncateEthAddress(
-                toChecksumAddress(account),
+                proposerAddressToChecksum,
                 7
               )} for applicant ${truncateEthAddress(
                 applicantAddressToChecksum,
@@ -295,7 +296,7 @@ export default function CreateTributeProposal() {
           requestAmountArg,
           toChecksumAddress(erc20Address),
           tributeAmountWithDecimals.toString(),
-          toChecksumAddress(account),
+          proposerAddressToChecksum,
         ];
 
         // Sign and submit draft for snapshot-hub
@@ -309,6 +310,7 @@ export default function CreateTributeProposal() {
               requestAmountUnit: 'SHARES',
               proposalArgs,
               sponsorActionFunctionName: 'submitProposal',
+              accountAuthorizedToProcessPassedProposal: proposerAddressToChecksum,
             },
           },
           adapterName: ContractAdapterNames.tribute,
