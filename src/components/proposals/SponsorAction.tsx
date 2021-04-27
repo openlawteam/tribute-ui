@@ -159,6 +159,8 @@ export default function SponsorAction(props: SponsorActionProps) {
       };
 
       await txSend(
+        // @todo Remove the need for the custom function name when all the smart
+        // contracts are standardized with 'submitProposal'.
         metadata.sponsorActionFunctionName || 'sponsorProposal',
         contract.instance.methods,
         sponsorArguments,
