@@ -22,6 +22,7 @@ import Loader from '../feedback/Loader';
 type SponsorArguments = [
   string, // `dao`
   string, // `proposalId`
+  ...any[],
   string // `proposal data`
 ];
 
@@ -147,6 +148,7 @@ export default function SponsorAction(props: SponsorActionProps) {
       const sponsorArguments: SponsorArguments = [
         daoRegistryAddress,
         snapshotDraft.idInDAO,
+        ...(metadata.proposalArgs || []),
         preparedVoteVerificationBytes,
       ];
 
@@ -157,7 +159,7 @@ export default function SponsorAction(props: SponsorActionProps) {
       };
 
       await txSend(
-        'sponsorProposal',
+        metadata.sponsorActionFunctionName || 'sponsorProposal',
         contract.instance.methods,
         sponsorArguments,
         txArguments

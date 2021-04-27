@@ -133,6 +133,7 @@ export function useProposalWithOffchainVoteStatus(
     offchainVotingABI,
     offchainVotingAddress,
     proposalId,
+    // snapshotDraft,
     web3Instance,
   ]);
 
@@ -220,13 +221,19 @@ export function useProposalWithOffchainVoteStatus(
        * then only call the DAO for the proposal data and exit early.
        */
       if (!daoProposalVotingAdapter) {
-        const [proposal] = await multicall({
+        let [proposal] = await multicall({
           calls: [
             // DAO proposals call
             [daoRegistryAddress, proposalsABI, [proposalId]],
           ],
           web3Instance,
         });
+
+        // If proposal was not submitted onchain yet but there is snapshotDraft
+        // data then we set the initial daoProposal here.
+        if (proposal[0] === BURN_ADDRESS && snapshotDraft) {
+          proposal = {adapterAddress: snapshotDraft.actionId, flags: 1};
+        }
 
         setDAOProposal(proposal);
 

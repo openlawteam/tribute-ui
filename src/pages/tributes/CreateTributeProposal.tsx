@@ -13,27 +13,21 @@ import {
   formatDecimal,
   normalizeString,
 } from '../../util/helpers';
-import {
-  useContractSend,
-  useETHGasPrice,
-  useIsDefaultChain,
-} from '../../components/web3/hooks';
+import {useIsDefaultChain} from '../../components/web3/hooks';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {truncateEthAddress} from '../../util/helpers';
 import {SHARES_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
-import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
-import CycleMessage from '../../components/feedback/CycleMessage';
+import {CycleEllipsis} from '../../components/feedback';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
 import Wrap from '../../components/common/Wrap';
-import EtherscanURL from '../../components/web3/EtherscanURL';
 
 enum Fields {
   applicantAddress = 'applicantAddress',
@@ -51,27 +45,19 @@ type FormInputs = {
   description: string;
 };
 
-type TributeArguments = [
-  string, // `dao`
-  string, // `proposalId`
+type ProposalArguments = [
   string, // `applicant`
   string, // `tokenToMint`
   string, // `requestAmount`
   string, // `tokenAddr`
-  string // `tributeAmount`
-];
-
-type TokenApproveArguments = [
-  string, // `spender`
-  string // `value`
+  string, // `tributeAmount`
+  string // `tributeTokenOwner`
 ];
 
 type ERC20Details = {
   symbol: string;
   decimals: number;
 };
-
-type BN = ReturnType<typeof toBN>;
 
 export default function CreateTributeProposal() {
   /**
@@ -91,24 +77,9 @@ export default function CreateTributeProposal() {
 
   const {defaultChainError} = useIsDefaultChain();
   const {connected, account, web3Instance} = useWeb3Modal();
-  const gasPrices = useETHGasPrice();
-  const {
-    txError,
-    txEtherscanURL,
-    txIsPromptOpen,
-    txSend,
-    txStatus,
-  } = useContractSend();
-  const {
-    txError: txErrorTokenApprove,
-    txEtherscanURL: txEtherscanURLTokenApprove,
-    txIsPromptOpen: txIsPromptOpenTokenApprove,
-    txSend: txSendTokenApprove,
-    txStatus: txStatusTokenApprove,
-  } = useContractSend();
-
   const {
     proposalData,
+    proposalSignAndSendError,
     proposalSignAndSendStatus,
     signAndSendProposal,
   } = useSignAndSubmitProposal<SnapshotType.draft>();
@@ -139,23 +110,16 @@ export default function CreateTributeProposal() {
   const {errors, getValues, setValue, register, trigger, watch} = form;
   const erc20AddressValue = watch('erc20Address');
 
-  const createTributeError = submitError || txError || txErrorTokenApprove;
+  const createTributeError = submitError || proposalSignAndSendError;
   const isConnected = connected && account;
 
   const isInProcess =
-    txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-    txStatus === Web3TxStatus.PENDING ||
-    txStatusTokenApprove === Web3TxStatus.AWAITING_CONFIRM ||
-    txStatusTokenApprove === Web3TxStatus.PENDING ||
     proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM ||
     proposalSignAndSendStatus === Web3TxStatus.PENDING;
 
-  const isDone =
-    txStatus === Web3TxStatus.FULFILLED &&
-    proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
+  const isDone = proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
 
-  const isInProcessOrDone =
-    isInProcess || isDone || txIsPromptOpen || txIsPromptOpenTokenApprove;
+  const isInProcessOrDone = isInProcess || isDone;
 
   /**
    * Cached callbacks
@@ -263,47 +227,6 @@ export default function CreateTributeProposal() {
     }
   }
 
-  async function handleSubmitTokenApprove(
-    tributeAmountWithDecimals: BN,
-    allowanceBN: BN
-  ) {
-    try {
-      if (!erc20Contract) {
-        throw new Error('No ERC20Contract found.');
-      }
-
-      if (!TributeContract) {
-        throw new Error('No TributeContract found.');
-      }
-
-      if (!account) {
-        throw new Error('No account found.');
-      }
-
-      const difference = tributeAmountWithDecimals.sub(allowanceBN);
-      const approveValue = allowanceBN.add(difference);
-      const tokenApproveArguments: TokenApproveArguments = [
-        TributeContract.contractAddress,
-        approveValue.toString(),
-      ];
-      const txArguments = {
-        from: account || '',
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
-      };
-
-      // Execute contract call for `approve`
-      await txSendTokenApprove(
-        'approve',
-        erc20Contract.methods,
-        tokenApproveArguments,
-        txArguments
-      );
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async function handleSubmit(values: FormInputs) {
     try {
       if (!isConnected) {
@@ -346,29 +269,6 @@ export default function CreateTributeProposal() {
       const requestAmountArg = stripFormatNumber(requestAmount);
       const applicantAddressToChecksum = toChecksumAddress(applicantAddress);
 
-      // Check if adapter is allowed to spend amount of tribute tokens on behalf
-      // of user. If allowance is not sufficient, approve the adapter to spend
-      // the amount of tokens needed for the user to provide the full tribute
-      // amount.
-      const allowance = await erc20Contract.methods
-        .allowance(account, TributeContract.contractAddress)
-        .call();
-      const allowanceBN = toBN(allowance);
-
-      if (tributeAmountWithDecimals.gt(allowanceBN)) {
-        try {
-          await handleSubmitTokenApprove(
-            tributeAmountWithDecimals,
-            allowanceBN
-          );
-        } catch (error) {
-          console.error(error);
-          throw new Error(
-            'Your ERC20 tokens could not be approved for transfer.'
-          );
-        }
-      }
-
       // Maybe set proposal ID from previous attempt
       let proposalId: string = proposalData?.uniqueId || '';
 
@@ -376,7 +276,10 @@ export default function CreateTributeProposal() {
       if (!proposalId) {
         const bodyIntro =
           normalizeString(applicantAddress) === normalizeString(account)
-            ? `Tribute from ${applicantAddressToChecksum}.`
+            ? `Tribute from ${truncateEthAddress(
+                applicantAddressToChecksum,
+                7
+              )}.`
             : `Tribute from ${truncateEthAddress(
                 toChecksumAddress(account),
                 7
@@ -385,6 +288,15 @@ export default function CreateTributeProposal() {
                 7
               )}.`;
         const body = description ? `${bodyIntro}\n${description}` : bodyIntro;
+
+        const proposalArgs: ProposalArguments = [
+          applicantAddressToChecksum,
+          SHARES_ADDRESS,
+          requestAmountArg,
+          toChecksumAddress(erc20Address),
+          tributeAmountWithDecimals.toString(),
+          toChecksumAddress(account),
+        ];
 
         // Sign and submit draft for snapshot-hub
         const {uniqueId} = await signAndSendProposal({
@@ -395,6 +307,8 @@ export default function CreateTributeProposal() {
               tributeAmountUnit: erc20Details.symbol,
               tributeTokenDecimals: erc20Details.decimals,
               requestAmountUnit: 'SHARES',
+              proposalArgs,
+              sponsorActionFunctionName: 'submitProposal',
             },
           },
           adapterName: ContractAdapterNames.tribute,
@@ -403,30 +317,6 @@ export default function CreateTributeProposal() {
 
         proposalId = uniqueId;
       }
-
-      const tributeArguments: TributeArguments = [
-        DaoRegistryContract.contractAddress,
-        proposalId,
-        applicantAddressToChecksum,
-        SHARES_ADDRESS,
-        requestAmountArg,
-        erc20Address,
-        tributeAmountWithDecimals.toString(),
-      ];
-
-      const txArguments = {
-        from: account || '',
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
-      };
-
-      // Execute contract call for `provideTribute`
-      await txSend(
-        'provideTribute',
-        TributeContract.instance.methods,
-        tributeArguments,
-        txArguments
-      );
 
       // go to TributeDetails page for newly created tribute proposal
       history.push(`/tributes/${proposalId}`);
@@ -437,53 +327,25 @@ export default function CreateTributeProposal() {
   }
 
   function renderSubmitStatus(): React.ReactNode {
-    // Either Snapshot or chain tx
-    if (
-      txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-      txStatusTokenApprove === Web3TxStatus.AWAITING_CONFIRM ||
-      proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM
-    ) {
-      return 'Awaiting your confirmation\u2026';
-    }
-
-    // If token approve transaction is confirmed
-    if (txStatusTokenApprove === Web3TxStatus.PENDING) {
-      return (
-        <>
-          <div>{'Approving your tokens for transfer\u2026'}</div>
-
-          <EtherscanURL url={txEtherscanURLTokenApprove} isPending />
-        </>
-      );
-    }
-
-    // Only for chain tx
-    switch (txStatus) {
+    switch (proposalSignAndSendStatus) {
+      case Web3TxStatus.AWAITING_CONFIRM:
+        return (
+          <>
+            Awaiting your confirmation
+            <CycleEllipsis intervalMs={500} />
+          </>
+        );
       case Web3TxStatus.PENDING:
         return (
           <>
-            <CycleMessage
-              intervalMs={2000}
-              messages={TX_CYCLE_MESSAGES}
-              useFirstItemStart
-              render={(message) => {
-                return <FadeIn key={message}>{message}</FadeIn>;
-              }}
-            />
-
-            <EtherscanURL url={txEtherscanURL} isPending />
+            Submitting
+            <CycleEllipsis intervalMs={500} />
           </>
         );
       case Web3TxStatus.FULFILLED:
-        return (
-          <>
-            <div>Proposal submitted!</div>
-
-            <EtherscanURL url={txEtherscanURL} />
-          </>
-        );
+        return 'Done!';
       default:
-        return null;
+        return '';
     }
   }
 
