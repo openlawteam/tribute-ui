@@ -133,7 +133,7 @@ export function useProposalWithOffchainVoteStatus(
     offchainVotingABI,
     offchainVotingAddress,
     proposalId,
-    // snapshotDraft,
+    snapshotDraft,
     web3Instance,
   ]);
 
