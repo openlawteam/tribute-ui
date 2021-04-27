@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {
   SnapshotDraftResponse,
   SnapshotProposalResponse,
@@ -48,13 +48,6 @@ export function useProposalOrDraft(
   type?: ProposalOrDraftSnapshotType
 ): UseProposalReturn {
   /**
-   * Refs
-   */
-
-  // Prevents re-renders when passing the array to hooks
-  const idRef = useRef<typeof id[]>([id]);
-
-  /**
    * State
    */
 
@@ -62,6 +55,7 @@ export function useProposalOrDraft(
    * @todo Get subgraph data using useLazyQuery
    * @link https://www.apollographql.com/docs/react/data/queries/#executing-queries-manually
    */
+
   const [daoProposal /* setDAOProposal */] = useState<Proposal>();
   const [snapshotDraft, setSnapshotDraft] = useState<SnapshotDraft>();
   const [snapshotProposal, setSnapshotProposal] = useState<SnapshotProposal>();
@@ -70,6 +64,9 @@ export function useProposalOrDraft(
   const [proposalStatus, setProposalStatus] = useState<AsyncStatus>(
     AsyncStatus.STANDBY
   );
+  const [proposalVotingAdapterId, setProposalVotingAdapterId] = useState<
+    string[]
+  >([id]);
 
   // The overall status of the async data being fetched
   const [
@@ -96,7 +93,7 @@ export function useProposalOrDraft(
     proposalsVotingAdapters,
     proposalsVotingAdaptersError,
     proposalsVotingAdaptersStatus,
-  } = useProposalsVotingAdapter(idRef.current);
+  } = useProposalsVotingAdapter(proposalVotingAdapterId);
 
   /**
    * Cached callbacks
@@ -106,14 +103,12 @@ export function useProposalOrDraft(
     abortController?.signal,
     id,
     isMountedRef,
-    refetchCount,
   ]);
 
   const handleGetProposalCached = useCallback(handleGetProposal, [
     abortController?.signal,
     id,
     isMountedRef,
-    refetchCount,
     type,
   ]);
 
@@ -173,8 +168,21 @@ export function useProposalOrDraft(
     handleGetDraftCached,
     handleGetProposalCached,
     handleGetProposalOrDraftCached,
+    // Required in order to refetch
+    refetchCount,
     type,
   ]);
+
+  useEffect(() => {
+    if (refetchCount === 0) return;
+
+    /**
+     * Provide a different Array reference to force a re-render
+     * of the `useProposalsVotingAdapter` hook. If the `id` argument changes,
+     * that's fine as well, but it's unlikely.
+     */
+    setProposalVotingAdapterId([id]);
+  }, [id, refetchCount]);
 
   // Set overall async status
   useEffect(() => {
@@ -194,8 +202,12 @@ export function useProposalOrDraft(
       return;
     }
 
-    // Pending
-    if (statuses.some((s) => s === PENDING)) {
+    /**
+     * Pending
+     *
+     * Do not trigger pending requests (UI may show loader) for refetches (meant to be silent).
+     */
+    if (statuses.some((s) => s === PENDING) && refetchCount === 0) {
       setProposalInclusiveStatus(PENDING);
 
       return;
@@ -229,6 +241,7 @@ export function useProposalOrDraft(
     proposalStatus,
     proposalsVotingAdapters.length,
     proposalsVotingAdaptersStatus,
+    refetchCount,
   ]);
 
   // Set any error from async calls
@@ -244,8 +257,7 @@ export function useProposalOrDraft(
 
   async function handleGetDraft(): Promise<SnapshotDraft | undefined> {
     try {
-      // Do not trigger pending requests (UI will show loader) for refetches (meant to be silent).
-      if (refetchCount === 0) setProposalStatus(AsyncStatus.PENDING);
+      setProposalStatus(AsyncStatus.PENDING);
 
       const response = await fetch(
         `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/draft/${id}`,
@@ -289,8 +301,7 @@ export function useProposalOrDraft(
 
   async function handleGetProposal(): Promise<SnapshotProposal | undefined> {
     try {
-      // Do not trigger pending requests (UI will show loader) for refetches (meant to be silent).
-      if (refetchCount === 0) setProposalStatus(AsyncStatus.PENDING);
+      setProposalStatus(AsyncStatus.PENDING);
 
       /**
        * @note `searchUniqueDraftId` includes the draft id in the search for the proposal
