@@ -74,6 +74,7 @@ export function useProposalWithOffchainVoteStatus(
    */
 
   const pollingIntervalIdRef = useRef<NodeJS.Timeout>();
+  const stopPollingRef = useRef<boolean>(false);
 
   /**
    * Our hooks
@@ -136,6 +137,14 @@ export function useProposalWithOffchainVoteStatus(
   ]);
 
   useEffect(() => {
+    /**
+     * Stop polling if processed:
+     * Set our ref to be accessed inside of the polling interval callback
+     */
+    if (atProcessedInDAO) {
+      stopPollingRef.current = true;
+    }
+
     // Call as soon as possible.
     pollStatusFromContractCached()
       .then(() => {
@@ -147,6 +156,10 @@ export function useProposalWithOffchainVoteStatus(
         // Then, poll every `x` Ms
         const intervalId = setInterval(async () => {
           try {
+            if (stopPollingRef.current && pollingIntervalIdRef.current) {
+              clearInterval(pollingIntervalIdRef.current);
+            }
+
             await pollStatusFromContractCached();
           } catch (error) {
             pollingIntervalIdRef.current &&
@@ -161,7 +174,7 @@ export function useProposalWithOffchainVoteStatus(
       .catch((error) => {
         setProposalFlowStatusError(error);
       });
-  }, [pollStatusFromContractCached]);
+  }, [atProcessedInDAO, pollStatusFromContractCached]);
 
   // Stop polling if propsal is processed
   useEffect(() => {
