@@ -98,6 +98,13 @@ export default function ProposalWithOffchainVoteActions(
             // Show during DAO proposal grace period, but set to disabled
             disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
             proposal={proposal}
+            isProposalPassed={
+              !!(
+                daoProposalVoteResult &&
+                VotingState[daoProposalVoteResult] ===
+                  VotingState[VotingState.PASS]
+              )
+            }
           />
         )}
 
