@@ -666,7 +666,7 @@ describe('useProposalOrDraft unit tests', () => {
         ]
       );
 
-      const {result, waitForValueToChange} = await renderHook(
+      const {rerender, result} = await renderHook(
         () => useProposalOrDraft(DEFAULT_DRAFT_HASH),
         {
           wrapper: Wrapper,
@@ -694,6 +694,10 @@ describe('useProposalOrDraft unit tests', () => {
         idInSnapshot: draftIdKey,
       });
 
+      expect(result.current.proposalData?.daoProposalVotingAdapter).toBe(
+        undefined
+      );
+
       server.use(
         ...[
           rest.get(
@@ -703,17 +707,49 @@ describe('useProposalOrDraft unit tests', () => {
         ]
       );
 
+      rerender({
+        useInit: true,
+        useWallet: true,
+        getProps: mockWeb3ResponsesProposal,
+      });
+
       // Request refetch
       result.current.proposalData?.refetchProposalOrDraft();
 
-      await waitForValueToChange(
-        () => result.current.proposalData?.snapshotProposal
-      );
+      // Should not be `AsyncStatus.PENDING` on refetch
+      expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
 
-      expect(result.current.proposalData?.snapshotProposal).toStrictEqual({
-        ...proposal,
-        idInDAO: proposal.data.erc712DraftHash,
-        idInSnapshot: idKey,
+      await waitFor(() => {
+        // Should not be `AsyncStatus.PENDING` on refetch
+        expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
+
+        expect(result.current.proposalData?.snapshotProposal).toStrictEqual({
+          ...proposal,
+          idInDAO: proposal.data.erc712DraftHash,
+          idInSnapshot: idKey,
+        });
+      });
+
+      await waitFor(() => {
+        // Should not be `AsyncStatus.PENDING` on refetch
+        expect(result.current.proposalStatus).toBe(AsyncStatus.FULFILLED);
+
+        expect(
+          result.current.proposalData?.daoProposalVotingAdapter
+            ?.getVotingAdapterABI
+        ).toBeInstanceOf(Function);
+        expect(
+          result.current.proposalData?.daoProposalVotingAdapter
+            ?.getWeb3VotingAdapterContract
+        ).toBeInstanceOf(Function);
+        expect(
+          result.current.proposalData?.daoProposalVotingAdapter
+            ?.votingAdapterAddress
+        ).toBe(DEFAULT_ETH_ADDRESS);
+        expect(
+          result.current.proposalData?.daoProposalVotingAdapter
+            ?.votingAdapterName
+        ).toBe(VotingAdapterName.OffchainVotingContract);
       });
     });
   });
