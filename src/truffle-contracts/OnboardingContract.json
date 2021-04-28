@@ -1,24 +1,5 @@
 [
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "applicant",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes32",
-        "name": "cause",
-        "type": "bytes32"
-      }
-    ],
-    "name": "FailedOnboarding",
-    "type": "event"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -107,7 +88,7 @@
       },
       {
         "internalType": "address",
-        "name": "tokenToMint",
+        "name": "unitsToMint",
         "type": "address"
       },
       {
@@ -117,7 +98,7 @@
       },
       {
         "internalType": "uint88",
-        "name": "sharesRequested",
+        "name": "unitsRequested",
         "type": "uint88"
       },
       {
@@ -128,11 +109,6 @@
       {
         "internalType": "address payable",
         "name": "applicant",
-        "type": "address"
-      },
-      {
-        "internalType": "address payable",
-        "name": "proposer",
         "type": "address"
       }
     ],
@@ -186,7 +162,7 @@
         "type": "address"
       }
     ],
-    "name": "shares",
+    "name": "units",
     "outputs": [
       {
         "internalType": "uint88",
@@ -206,7 +182,7 @@
       },
       {
         "internalType": "address",
-        "name": "tokenAddrToMint",
+        "name": "unitsToMint",
         "type": "address"
       },
       {
@@ -216,7 +192,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "sharesPerChunk",
+        "name": "unitsPerChunk",
         "type": "uint256"
       },
       {
@@ -261,24 +237,6 @@
         "internalType": "uint256",
         "name": "tokenAmount",
         "type": "uint256"
-      }
-    ],
-    "name": "onboard",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "proposalId",
-        "type": "bytes32"
       },
       {
         "internalType": "bytes",
@@ -286,25 +244,7 @@
         "type": "bytes"
       }
     ],
-    "name": "sponsorProposal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "proposalId",
-        "type": "bytes32"
-      }
-    ],
-    "name": "cancelProposal",
+    "name": "submitProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -324,7 +264,7 @@
     ],
     "name": "processProposal",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   }
 ]

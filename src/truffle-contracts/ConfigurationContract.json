@@ -120,24 +120,6 @@
         "internalType": "uint256[]",
         "name": "values",
         "type": "uint256[]"
-      }
-    ],
-    "name": "submitConfigurationProposal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "proposalId",
-        "type": "bytes32"
       },
       {
         "internalType": "bytes",
@@ -145,7 +127,7 @@
         "type": "bytes"
       }
     ],
-    "name": "sponsorProposal",
+    "name": "submitProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

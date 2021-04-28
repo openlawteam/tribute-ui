@@ -17,7 +17,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "shareHolder",
+        "name": "unitHolder",
         "type": "address"
       }
     ],
@@ -51,7 +51,7 @@
       },
       {
         "internalType": "address",
-        "name": "shareHolderAddr",
+        "name": "unitHolderAddr",
         "type": "address"
       },
       {
@@ -206,7 +206,7 @@
       },
       {
         "internalType": "address",
-        "name": "shareHolderAddr",
+        "name": "unitHolderAddr",
         "type": "address"
       },
       {

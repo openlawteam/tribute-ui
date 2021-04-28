@@ -95,11 +95,6 @@
         "internalType": "address",
         "name": "token",
         "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "details",
-        "type": "bytes32"
       }
     ],
     "stateMutability": "view",
@@ -166,35 +161,12 @@
         "type": "uint256"
       },
       {
-        "internalType": "bytes32",
-        "name": "details",
-        "type": "bytes32"
-      }
-    ],
-    "name": "createFinancingRequest",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "proposalId",
-        "type": "bytes32"
-      },
-      {
         "internalType": "bytes",
         "name": "data",
         "type": "bytes"
       }
     ],
-    "name": "sponsorProposal",
+    "name": "submitProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
