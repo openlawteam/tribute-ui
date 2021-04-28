@@ -196,14 +196,11 @@ const defaultNoVotesResult = {
 };
 
 describe('useProposalWithOffchainVoteStatus unit tests', () => {
-  test('should return correct data from hook when status is `ProposalFlowStatus.Sponsor`', async () => {
+  test('should return correct data from hook when status is `ProposalFlowStatus.Submit`', async () => {
     const proposalData: Partial<ProposalData> = {
       daoProposalVotingAdapter: undefined,
       snapshotDraft: fakeSnapshotDraft,
     };
-
-    let mockWeb3Provider: FakeHttpProvider;
-    let web3Instance: Web3;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
@@ -213,40 +210,37 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
           initialProps: {
             useInit: true,
             useWallet: true,
-            getProps: (p) => {
-              mockWeb3Provider = p.mockWeb3Provider;
-              web3Instance = p.web3Instance;
+            getProps: ({mockWeb3Provider, web3Instance}) => {
+              mockWeb3Provider.injectResult(
+                web3Instance.eth.abi.encodeParameters(
+                  ['uint256', 'bytes[]'],
+                  [
+                    0,
+                    [
+                      // For `proposals` call
+                      web3Instance.eth.abi.encodeParameter(
+                        {
+                          Proposal: {
+                            adapterAddress: 'address',
+                            flags: 'uint256',
+                          },
+                        },
+                        // Does not exit in DAO. Defaults to initial `address`, `uint8` values.
+                        {
+                          adapterAddress: BURN_ADDRESS,
+                          flags: '0',
+                        }
+                      ),
+                    ],
+                  ]
+                )
+              );
             },
           },
         }
       );
 
-      await waitFor(() => {
-        mockWeb3Provider.injectResult(
-          web3Instance.eth.abi.encodeParameters(
-            ['uint256', 'bytes[]'],
-            [
-              0,
-              [
-                // For `proposals` call
-                web3Instance.eth.abi.encodeParameter(
-                  {
-                    Proposal: {
-                      adapterAddress: 'address',
-                      flags: 'uint256',
-                    },
-                  },
-                  {
-                    adapterAddress: DEFAULT_ETH_ADDRESS,
-                    // ProposalFlag.EXISTS
-                    flags: '1',
-                  }
-                ),
-              ],
-            ]
-          )
-        );
-      });
+      await waitFor(() => {});
 
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
@@ -257,10 +251,76 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       await waitForValueToChange(() => result.current.daoProposal);
 
       expect(result.current.daoProposal).toMatchObject({
-        '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        '0': BURN_ADDRESS,
+        '1': '0',
+        __length__: 2,
+        adapterAddress: BURN_ADDRESS,
+        flags: '0',
+      });
+
+      expect(result.current.daoProposalVoteResult).toBe(undefined);
+      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.status).toBe(ProposalFlowStatus.Submit);
+    });
+  });
+
+  test('should return correct data from hook when status is `ProposalFlowStatus.Sponsor`', async () => {
+    const proposalData: Partial<ProposalData> = {
+      daoProposalVotingAdapter: undefined,
+      snapshotDraft: fakeSnapshotDraft,
+    };
+
+    await act(async () => {
+      const {result, waitForValueToChange} = await renderHook(
+        () => useProposalWithOffchainVoteStatus(proposalData as ProposalData),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: ({mockWeb3Provider, web3Instance}) => {
+              mockWeb3Provider.injectResult(
+                web3Instance.eth.abi.encodeParameters(
+                  ['uint256', 'bytes[]'],
+                  [
+                    0,
+                    [
+                      // For `proposals` call
+                      web3Instance.eth.abi.encodeParameter(
+                        {
+                          Proposal: {
+                            adapterAddress: 'address',
+                            flags: 'uint256',
+                          },
+                        },
+                        {
+                          adapterAddress: DEFAULT_ETH_ADDRESS,
+                          // ProposalFlag.EXISTS
+                          flags: '1',
+                        }
+                      ),
+                    ],
+                  ]
+                )
+              );
+            },
+          },
+        }
+      );
+
+      // Assert initial state
+      expect(result.current.daoProposal).toBe(undefined);
+      expect(result.current.daoProposalVoteResult).toBe(undefined);
+      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.status).toBe(undefined);
+
+      await waitForValueToChange(() => result.current.daoProposal);
+
+      expect(result.current.daoProposal).toMatchObject({
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '1',
         __length__: 2,
-        adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '1',
       });
 
@@ -335,10 +395,10 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       await waitForValueToChange(() => result.current.daoProposal);
 
       expect(result.current.daoProposal).toMatchObject({
-        '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '3',
         __length__: 2,
-        adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '3',
       });
 
@@ -437,10 +497,10 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       await waitForValueToChange(() => result.current.daoProposal);
 
       expect(result.current.daoProposal).toMatchObject({
-        '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '3',
         __length__: 2,
-        adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '3',
       });
 
@@ -541,10 +601,10 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       await waitForValueToChange(() => result.current.daoProposal);
 
       expect(result.current.daoProposal).toMatchObject({
-        '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '3',
         __length__: 2,
-        adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '3',
       });
 
@@ -643,10 +703,10 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       await waitForValueToChange(() => result.current.daoProposal);
 
       expect(result.current.daoProposal).toMatchObject({
-        '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '3',
         __length__: 2,
-        adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '3',
       });
 
@@ -743,10 +803,10 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       await waitForValueToChange(() => result.current.daoProposal);
 
       expect(result.current.daoProposal).toMatchObject({
-        '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '7',
         __length__: 2,
-        adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '7',
       });
 
@@ -846,10 +906,10 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       await waitForValueToChange(() => result.current.daoProposal);
 
       expect(result.current.daoProposal).toMatchObject({
-        '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '3',
         __length__: 2,
-        adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '3',
       });
 
@@ -1157,10 +1217,10 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       await waitForValueToChange(() => result.current.daoProposal);
 
       expect(result.current.daoProposal).toMatchObject({
-        '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        '0': DEFAULT_ETH_ADDRESS,
         '1': '3',
         __length__: 2,
-        adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+        adapterAddress: DEFAULT_ETH_ADDRESS,
         flags: '3',
       });
 
