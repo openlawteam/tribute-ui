@@ -367,6 +367,536 @@ describe('ProposalCard unit tests', () => {
     });
   });
 
+  test('should render adapter proposal cards when `includeProposalsExistingOnlyOffchain={true}`', async () => {
+    const spy = jest.fn();
+
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/drafts/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json(draftsResponse))
+        ),
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json(proposalsResponse))
+        ),
+      ]
+    );
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={({
+          mockWeb3Provider,
+          web3Instance,
+        }: {
+          mockWeb3Provider: FakeHttpProvider;
+          web3Instance: Web3;
+        }) => {
+          /**
+           * Mock `useProposals` proposals response
+           */
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    // Does not exist
+                    {
+                      adapterAddress: BURN_ADDRESS,
+                      flags: '0',
+                    }
+                  ),
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    {
+                      adapterAddress: DEFAULT_ETH_ADDRESS,
+                      // ProposalFlag.EXISTS
+                      flags: '1',
+                    }
+                  ),
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    {
+                      adapterAddress: DEFAULT_ETH_ADDRESS,
+                      // ProposalFlag.PROCESSED
+                      flags: '7',
+                    }
+                  ),
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    {
+                      adapterAddress: DEFAULT_ETH_ADDRESS,
+                      // ProposalFlag.PROCESSED
+                      flags: '7',
+                    }
+                  ),
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    {
+                      adapterAddress: DEFAULT_ETH_ADDRESS,
+                      // ProposalFlag.SPONSORED
+                      flags: '3',
+                    }
+                  ),
+                ],
+              ]
+            )
+          );
+
+          /**
+           * Mock results for `useProposalsVotingAdapter`
+           */
+
+          const offchainVotingAdapterAddressResponse = web3Instance.eth.abi.encodeParameter(
+            'address',
+            DEFAULT_ETH_ADDRESS
+          );
+          const noVotingAdapterAddressResponse = web3Instance.eth.abi.encodeParameter(
+            'address',
+            BURN_ADDRESS
+          );
+
+          const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
+            'string',
+            VotingAdapterName.OffchainVotingContract
+          );
+
+          // Mock `dao.votingAdapter` responses
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  noVotingAdapterAddressResponse,
+                  noVotingAdapterAddressResponse,
+                  offchainVotingAdapterAddressResponse,
+                  offchainVotingAdapterAddressResponse,
+                  offchainVotingAdapterAddressResponse,
+                ],
+              ]
+            )
+          );
+
+          // Mock `IVoting.getAdapterName` responses
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  offchainVotingAdapterNameResponse,
+                  offchainVotingAdapterNameResponse,
+                  offchainVotingAdapterNameResponse,
+                ],
+              ]
+            )
+          );
+
+          /**
+           * Mock results for `useProposalsVotingState`
+           */
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  // VotingState.PASS
+                  web3Instance.eth.abi.encodeParameter('uint8', '2'),
+                  // VotingState.NOT_PASS
+                  web3Instance.eth.abi.encodeParameter('uint8', '3'),
+                  // VotingState.IN_PROGRESS
+                  web3Instance.eth.abi.encodeParameter('uint8', '4'),
+                ],
+              ]
+            )
+          );
+
+          /**
+           * Mock results for `useProposalsVotes`
+           */
+          const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
+            {
+              Voting: {
+                snapshot: 'uint256',
+                proposalHash: 'bytes32',
+                reporter: 'address',
+                resultRoot: 'bytes32',
+                nbVoters: 'uint256',
+                nbYes: 'uint256',
+                nbNo: 'uint256',
+                index: 'uint256',
+                startingTime: 'uint256',
+                gracePeriodStartingTime: 'uint256',
+                isChallenged: 'bool',
+                fallbackVotesCount: 'uint256',
+              },
+            },
+            {
+              snapshot: '8376297',
+              proposalHash: DEFAULT_PROPOSAL_HASH,
+              reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
+              resultRoot:
+                '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
+              nbVoters: '0',
+              nbYes: '1',
+              nbNo: '0',
+              index: '0',
+              startingTime: '1617878162',
+              gracePeriodStartingTime: '1617964640',
+              isChallenged: false,
+              fallbackVotesCount: '0',
+            }
+          );
+
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  offchainVotesDataResponse,
+                  offchainVotesDataResponse,
+                  offchainVotesDataResponse,
+                ],
+              ]
+            )
+          );
+        }}>
+        <Proposals
+          adapterName={DaoAdapterConstants.ONBOARDING}
+          includeProposalsExistingOnlyOffchain={true}
+          onProposalClick={spy}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Proposal headers
+      expect(screen.getByText(/^proposals$/i)).toBeInTheDocument();
+      expect(screen.getByText(/^passed$/i)).toBeInTheDocument();
+      expect(screen.getByText(/^failed$/i)).toBeInTheDocument();
+      expect(screen.getByText(/^voting$/i)).toBeInTheDocument();
+
+      // Proposal names
+      expect(screen.getByText(/another nice one/i)).toBeInTheDocument();
+      expect(screen.getByText(/another cool one/i)).toBeInTheDocument();
+      expect(screen.getByText(/another great one/i)).toBeInTheDocument();
+      expect(screen.getByText(/another rad one/i)).toBeInTheDocument();
+      expect(screen.getByText(/another awesome one/i)).toBeInTheDocument();
+    });
+
+    // Click on a proposal
+    userEvent.click(screen.getByText(/another nice one/i));
+
+    // Expect correct proposal id to come through in function args
+    await waitFor(() => {
+      expect(spy.mock.calls[0][0]).toBe(
+        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c1111'
+      );
+    });
+  });
+
+  test('should render correct adapter proposal cards when `includeProposalsExistingOnlyOffchain` is not defined or `false`', async () => {
+    const spy = jest.fn();
+
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/drafts/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json(draftsResponse))
+        ),
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json(proposalsResponse))
+        ),
+      ]
+    );
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={({
+          mockWeb3Provider,
+          web3Instance,
+        }: {
+          mockWeb3Provider: FakeHttpProvider;
+          web3Instance: Web3;
+        }) => {
+          /**
+           * Mock `useProposals` proposals response
+           */
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    // Does not exist
+                    {
+                      adapterAddress: BURN_ADDRESS,
+                      flags: '0',
+                    }
+                  ),
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    {
+                      adapterAddress: DEFAULT_ETH_ADDRESS,
+                      // ProposalFlag.EXISTS
+                      flags: '1',
+                    }
+                  ),
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    {
+                      adapterAddress: DEFAULT_ETH_ADDRESS,
+                      // ProposalFlag.PROCESSED
+                      flags: '7',
+                    }
+                  ),
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    {
+                      adapterAddress: DEFAULT_ETH_ADDRESS,
+                      // ProposalFlag.PROCESSED
+                      flags: '7',
+                    }
+                  ),
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    {
+                      adapterAddress: DEFAULT_ETH_ADDRESS,
+                      // ProposalFlag.SPONSORED
+                      flags: '3',
+                    }
+                  ),
+                ],
+              ]
+            )
+          );
+
+          /**
+           * Mock results for `useProposalsVotingAdapter`
+           */
+
+          const offchainVotingAdapterAddressResponse = web3Instance.eth.abi.encodeParameter(
+            'address',
+            DEFAULT_ETH_ADDRESS
+          );
+          const noVotingAdapterAddressResponse = web3Instance.eth.abi.encodeParameter(
+            'address',
+            BURN_ADDRESS
+          );
+
+          const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
+            'string',
+            VotingAdapterName.OffchainVotingContract
+          );
+
+          // Mock `dao.votingAdapter` responses
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  noVotingAdapterAddressResponse,
+                  offchainVotingAdapterAddressResponse,
+                  offchainVotingAdapterAddressResponse,
+                  offchainVotingAdapterAddressResponse,
+                ],
+              ]
+            )
+          );
+
+          // Mock `IVoting.getAdapterName` responses
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  offchainVotingAdapterNameResponse,
+                  offchainVotingAdapterNameResponse,
+                  offchainVotingAdapterNameResponse,
+                ],
+              ]
+            )
+          );
+
+          /**
+           * Mock results for `useProposalsVotingState`
+           */
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  // VotingState.PASS
+                  web3Instance.eth.abi.encodeParameter('uint8', '2'),
+                  // VotingState.NOT_PASS
+                  web3Instance.eth.abi.encodeParameter('uint8', '3'),
+                  // VotingState.IN_PROGRESS
+                  web3Instance.eth.abi.encodeParameter('uint8', '4'),
+                ],
+              ]
+            )
+          );
+
+          /**
+           * Mock results for `useProposalsVotes`
+           */
+          const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
+            {
+              Voting: {
+                snapshot: 'uint256',
+                proposalHash: 'bytes32',
+                reporter: 'address',
+                resultRoot: 'bytes32',
+                nbVoters: 'uint256',
+                nbYes: 'uint256',
+                nbNo: 'uint256',
+                index: 'uint256',
+                startingTime: 'uint256',
+                gracePeriodStartingTime: 'uint256',
+                isChallenged: 'bool',
+                fallbackVotesCount: 'uint256',
+              },
+            },
+            {
+              snapshot: '8376297',
+              proposalHash: DEFAULT_PROPOSAL_HASH,
+              reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
+              resultRoot:
+                '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
+              nbVoters: '0',
+              nbYes: '1',
+              nbNo: '0',
+              index: '0',
+              startingTime: '1617878162',
+              gracePeriodStartingTime: '1617964640',
+              isChallenged: false,
+              fallbackVotesCount: '0',
+            }
+          );
+
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  offchainVotesDataResponse,
+                  offchainVotesDataResponse,
+                  offchainVotesDataResponse,
+                ],
+              ]
+            )
+          );
+        }}>
+        <Proposals
+          adapterName={DaoAdapterConstants.ONBOARDING}
+          includeProposalsExistingOnlyOffchain={false}
+          onProposalClick={spy}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Proposal headers
+      expect(screen.getByText(/^proposals$/i)).toBeInTheDocument();
+      expect(screen.getByText(/^passed$/i)).toBeInTheDocument();
+      expect(screen.getByText(/^failed$/i)).toBeInTheDocument();
+      expect(screen.getByText(/^voting$/i)).toBeInTheDocument();
+
+      // Proposal names excluded
+      expect(() => screen.getByText(/another nice one/i)).toThrow();
+      // Proposal names
+      expect(screen.getByText(/another cool one/i)).toBeInTheDocument();
+      expect(screen.getByText(/another great one/i)).toBeInTheDocument();
+      expect(screen.getByText(/another rad one/i)).toBeInTheDocument();
+      expect(screen.getByText(/another awesome one/i)).toBeInTheDocument();
+    });
+
+    // Click on a proposal
+    userEvent.click(screen.getByText(/another cool one/i));
+
+    // Expect correct proposal id to come through in function args
+    await waitFor(() => {
+      expect(spy.mock.calls[0][0]).toBe(
+        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434'
+      );
+    });
+  });
+
   test('should render only non-sponsored proposals (e.g. first proposals in DAO; not sponsored)', async () => {
     const spy = jest.fn();
 

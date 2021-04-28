@@ -240,8 +240,6 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         }
       );
 
-      await waitFor(() => {});
-
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
