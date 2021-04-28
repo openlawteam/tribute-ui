@@ -30,6 +30,7 @@ export default function Tributes() {
       <Proposals
         adapterName={DaoAdapterConstants.TRIBUTE}
         onProposalClick={handleClickProposalDetails}
+        includeProposalsExistingOnlyOffchain={true}
       />
     </RenderWrapper>
   );

@@ -3,7 +3,6 @@ import {useHistory, useParams} from 'react-router-dom';
 
 import {AsyncStatus} from '../../util/types';
 import {ContractAdapterNames} from '../../components/web3/types';
-import {formatNumber} from '../../util/helpers';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
@@ -13,6 +12,8 @@ import ProposalActions from '../../components/proposals/ProposalActions';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
 import Wrap from '../../components/common/Wrap';
+
+const PLACEHOLDER = '\u2014'; /* em dash */
 
 export default function TributeDetails() {
   /**
@@ -93,30 +94,23 @@ export default function TributeDetails() {
   if (proposalData) {
     const commonData = proposalData.getCommonSnapshotProposalData();
 
-    let tributeAmount = '\u2026';
+    // Handle just in case metadata was not properly set
+    let tributeAmount = PLACEHOLDER;
+    let tributeAmountUnit = '';
+    let requestAmount = PLACEHOLDER;
+    let requestAmountUnit = '';
     try {
-      // @todo Get amount from adapter's proposal's details if subgraph down: `proposals(...)`
-      // const divisor = toBN(10).pow(
-      //   toBN(commonData?.msg.payload.metadata.tributeTokenDecimals)
-      // );
-      // const beforeDecimal = toBN(/* tributeAmount */ '').div(divisor);
-      // const afterDecimal = toBN(/* tributeAmount */ '').mod(divisor);
-      // const balanceReadable = afterDecimal.eq(toBN(0))
-      //   ? beforeDecimal.toString()
-      //   : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
-      // const isTributeAmountInt = Number.isInteger(Number(balanceReadable));
-      // tributeAmount = isTributeAmountInt
-      //   ? balanceReadable
-      //   : formatDecimal(Number(balanceReadable));
+      ({
+        tributeAmount,
+        tributeAmountUnit,
+        requestAmount,
+        requestAmountUnit,
+      } = commonData?.msg.payload.metadata.proposalAmountValues);
     } catch (error) {
-      tributeAmount = '\u2026';
-    }
-
-    let requestAmount = '\u2026';
-    try {
-      requestAmount = formatNumber(/* requestAmount */ '');
-    } catch (error) {
-      requestAmount = '\u2026';
+      tributeAmount = PLACEHOLDER;
+      tributeAmountUnit = '';
+      requestAmount = PLACEHOLDER;
+      requestAmountUnit = '';
     }
 
     return (
@@ -126,9 +120,9 @@ export default function TributeDetails() {
           renderAmountBadge={() => (
             <ProposalAmount
               amount={tributeAmount}
-              amountUnit={commonData?.msg.payload.metadata.tributeAmountUnit}
+              amountUnit={tributeAmountUnit}
               amount2={requestAmount}
-              amount2Unit={commonData?.msg.payload.metadata.requestAmountUnit}
+              amount2Unit={requestAmountUnit}
             />
           )}
           renderActions={() => (

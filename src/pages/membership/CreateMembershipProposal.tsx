@@ -2,13 +2,14 @@ import React, {useState, useCallback, useEffect} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
-import Web3 from 'web3';
+import {toWei, toChecksumAddress} from 'web3-utils';
 
 import {
   getValidationError,
   stripFormatNumber,
   formatNumber,
   formatDecimal,
+  truncateEthAddress,
 } from '../../util/helpers';
 import {
   useContractSend,
@@ -188,11 +189,17 @@ export default function CreateMembershipProposal() {
       let proposalId: string = proposalData?.uniqueId || '';
 
       const {ethAddress, ethAmount} = values;
-      const ethAddressToChecksum = Web3.utils.toChecksumAddress(ethAddress);
-      const ethAmountInWei = Web3.utils.toWei(
-        stripFormatNumber(ethAmount),
-        'ether'
-      );
+      const ethAddressToChecksum = toChecksumAddress(ethAddress);
+      const ethAmountInWei = toWei(stripFormatNumber(ethAmount), 'ether');
+
+      // Values needed to display relevant proposal amounts in the proposal
+      // details page are set in the snapshot draft metadata. (We can no longer
+      // rely on getting this data from onchain because the proposal may not
+      // exist there yet.)
+      const proposalAmountValues = {
+        tributeAmount: ethAmount,
+        tributeAmountUnit: 'ETH',
+      };
 
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
@@ -200,8 +207,11 @@ export default function CreateMembershipProposal() {
         const {uniqueId} = await signAndSendProposal({
           partialProposalData: {
             name: ethAddressToChecksum,
-            body: `Membership for ${ethAddressToChecksum}.`,
-            metadata: {amountUnit: 'ETH'},
+            body: `Membership for ${truncateEthAddress(
+              ethAddressToChecksum,
+              7
+            )}.`,
+            metadata: {proposalAmountValues},
           },
           adapterName: ContractAdapterNames.onboarding,
           type: SnapshotType.draft,

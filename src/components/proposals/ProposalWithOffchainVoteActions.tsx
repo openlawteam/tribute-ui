@@ -7,8 +7,10 @@ import {VotingState} from './voting/types';
 import {ContractAdapterNames} from '../web3/types';
 import {ProposalData, ProposalFlowStatus} from './types';
 import {useProposalWithOffchainVoteStatus} from './hooks';
+import SubmitAction from './SubmitAction';
 import SponsorAction from './SponsorAction';
 import ProcessAction from './ProcessAction';
+import ProcessActionTribute from './ProcessActionTribute';
 import PostProcessAction from './PostProcessAction';
 
 type ProposalWithOffchainActionsProps = {
@@ -50,6 +52,38 @@ export default function ProposalWithOffchainVoteActions(
     VotingState[daoProposalVoteResult] === VotingState[VotingState.PASS];
 
   /**
+   * Functions
+   */
+
+  function renderProcessAction() {
+    switch (adapterName) {
+      case ContractAdapterNames.tribute:
+        return (
+          <ProcessActionTribute
+            // Show during DAO proposal grace period, but set to disabled
+            disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
+            proposal={proposal}
+            isProposalPassed={
+              !!(
+                daoProposalVoteResult &&
+                VotingState[daoProposalVoteResult] ===
+                  VotingState[VotingState.PASS]
+              )
+            }
+          />
+        );
+      default:
+        return (
+          <ProcessAction
+            // Show during DAO proposal grace period, but set to disabled
+            disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
+            proposal={proposal}
+          />
+        );
+    }
+  }
+
+  /**
    * Render
    */
   return (
@@ -67,6 +101,11 @@ export default function ProposalWithOffchainVoteActions(
       )}
 
       <div className="proposaldetails__button-container">
+        {/* SUBMIT/SPONSOR BUTTON (for proposals that have not been submitted onchain yet) */}
+        {status === ProposalFlowStatus.Submit && (
+          <SubmitAction proposal={proposal} />
+        )}
+
         {/* SPONSOR BUTTON */}
         {status === ProposalFlowStatus.Sponsor && (
           <SponsorAction proposal={proposal} />
@@ -86,15 +125,12 @@ export default function ProposalWithOffchainVoteActions(
           />
         )}
 
+        {/* PROCESS BUTTON */}
         {(status === ProposalFlowStatus.OffchainVotingGracePeriod ||
-          status === ProposalFlowStatus.Process) && (
-          <ProcessAction
-            // Show during DAO proposal grace period, but set to disabled
-            disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
-            proposal={proposal}
-          />
-        )}
+          status === ProposalFlowStatus.Process) &&
+          renderProcessAction()}
 
+        {/* POST PROCESS BUTTON */}
         {showPostProcessAction && (
           <PostProcessAction adapterName={adapterName} proposal={proposal} />
         )}

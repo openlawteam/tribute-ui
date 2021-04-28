@@ -268,6 +268,11 @@ export function useProposalWithOffchainVoteStatus(
     }
   }
 
+  // Status: Submit
+  if (votingTimeStartEndInitReady && !hasVotingTimeStarted && !atExistsInDAO) {
+    return getReturnData(ProposalFlowStatus.Submit);
+  }
+
   // Status: Sponsor
   if (votingTimeStartEndInitReady && !hasVotingTimeStarted && atExistsInDAO) {
     return getReturnData(ProposalFlowStatus.Sponsor);

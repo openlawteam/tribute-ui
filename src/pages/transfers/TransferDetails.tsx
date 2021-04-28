@@ -13,6 +13,8 @@ import ProposalAmount from '../../components/proposals/ProposalAmount';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
 import Wrap from '../../components/common/Wrap';
 
+const PLACEHOLDER = '\u2014'; /* em dash */
+
 export default function TransferDetails() {
   /**
    * @todo
@@ -92,24 +94,17 @@ export default function TransferDetails() {
   if (proposalData) {
     const commonData = proposalData.getCommonSnapshotProposalData();
 
-    let transferAmount = '\u2026';
-
+    // Handle just in case metadata was not properly set
+    let transferAmount = PLACEHOLDER;
+    let transferAmountUnit = '';
     try {
-      // @todo Get amount from adapter's proposal's details: `distributions(...)`
-      // const divisor = toBN(10).pow(
-      //   toBN(commonData?.msg.payload.metadata.tokenDecimals)
-      // );
-      // const beforeDecimal = toBN(/* amount */ '').div(divisor);
-      // const afterDecimal = toBN(/* amount */ '').mod(divisor);
-      // const balanceReadable = afterDecimal.eq(toBN(0))
-      //   ? beforeDecimal.toString()
-      //   : `${beforeDecimal.toString()}.${afterDecimal.toString()}`;
-      // const isTransferAmountInt = Number.isInteger(Number(balanceReadable));
-      // transferAmount = isTransferAmountInt
-      //   ? balanceReadable
-      //   : formatDecimal(Number(balanceReadable));
+      ({
+        transferAmount,
+        transferAmountUnit,
+      } = commonData?.msg.payload.metadata.proposalAmountValues);
     } catch (error) {
-      transferAmount = '\u2026';
+      transferAmount = PLACEHOLDER;
+      transferAmountUnit = '';
     }
 
     return (
@@ -119,7 +114,7 @@ export default function TransferDetails() {
           renderAmountBadge={() => (
             <ProposalAmount
               amount={transferAmount}
-              amountUnit={commonData?.msg.payload.metadata.amountUnit}
+              amountUnit={transferAmountUnit}
             />
           )}
           renderActions={() => (

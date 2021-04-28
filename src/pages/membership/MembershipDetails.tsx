@@ -13,6 +13,8 @@ import ProposalAmount from '../../components/proposals/ProposalAmount';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
 import Wrap from '../../components/common/Wrap';
 
+const PLACEHOLDER = '\u2014'; /* em dash */
+
 export default function MembershipDetails() {
   /**
    * @todo
@@ -92,14 +94,17 @@ export default function MembershipDetails() {
   if (proposalData) {
     const commonData = proposalData.getCommonSnapshotProposalData();
 
-    let amount = '\u2026';
+    // Handle just in case metadata was not properly set
+    let tributeAmount = PLACEHOLDER;
+    let tributeAmountUnit = '';
     try {
-      // @todo Get amount from adapter's proposal's details if subgraph down: `proposals(...)`
-      // amount = formatDecimal(
-      //   Number(Web3.utils.fromWei(/* amount */ '', 'ether'))
-      // );
+      ({
+        tributeAmount,
+        tributeAmountUnit,
+      } = commonData?.msg.payload.metadata.proposalAmountValues);
     } catch (error) {
-      amount = '\u2026';
+      tributeAmount = PLACEHOLDER;
+      tributeAmountUnit = '';
     }
 
     return (
@@ -108,8 +113,8 @@ export default function MembershipDetails() {
           proposal={proposalData}
           renderAmountBadge={() => (
             <ProposalAmount
-              amount={amount}
-              amountUnit={commonData?.msg.payload.metadata.amountUnit}
+              amount={tributeAmount}
+              amountUnit={tributeAmountUnit}
             />
           )}
           renderActions={() => (

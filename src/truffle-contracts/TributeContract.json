@@ -1,24 +1,5 @@
 [
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "applicant",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes32",
-        "name": "cause",
-        "type": "bytes32"
-      }
-    ],
-    "name": "FailedOnboarding",
-    "type": "event"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -112,11 +93,6 @@
       },
       {
         "internalType": "address",
-        "name": "proposer",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "tokenToMint",
         "type": "address"
       },
@@ -134,6 +110,11 @@
         "internalType": "uint256",
         "name": "tributeAmount",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "tributeTokenOwner",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -171,39 +152,6 @@
   {
     "stateMutability": "payable",
     "type": "receive"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "provideTributeNFT",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
   },
   {
     "inputs": [
@@ -259,24 +207,11 @@
         "internalType": "uint256",
         "name": "tributeAmount",
         "type": "uint256"
-      }
-    ],
-    "name": "provideTribute",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
       },
       {
-        "internalType": "bytes32",
-        "name": "proposalId",
-        "type": "bytes32"
+        "internalType": "address",
+        "name": "tributeTokenOwner",
+        "type": "address"
       },
       {
         "internalType": "bytes",
@@ -284,25 +219,7 @@
         "type": "bytes"
       }
     ],
-    "name": "sponsorProposal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "proposalId",
-        "type": "bytes32"
-      }
-    ],
-    "name": "cancelProposal",
+    "name": "submitProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

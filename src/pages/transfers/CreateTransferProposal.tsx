@@ -15,6 +15,7 @@ import {
   stripFormatNumber,
   formatNumber,
   formatDecimal,
+  truncateEthAddress,
 } from '../../util/helpers';
 import {
   useContractSend,
@@ -94,7 +95,7 @@ export default function CreateTransferProposal() {
   );
 
   /**
-   * Hooks
+   * Our hooks
    */
 
   const {defaultChainError} = useIsDefaultChain();
@@ -107,7 +108,6 @@ export default function CreateTransferProposal() {
     txSend,
     txStatus,
   } = useContractSend();
-
   const {
     proposalData,
     proposalSignAndSendStatus,
@@ -395,7 +395,16 @@ export default function CreateTransferProposal() {
 
       const bodyIntro = isTypeAllMembers
         ? 'Transfer to all members pro rata.'
-        : `Transfer to ${memberAddressToChecksum}.`;
+        : `Transfer to ${truncateEthAddress(memberAddressToChecksum, 7)}.`;
+
+      // Values needed to display relevant proposal amounts in the proposal
+      // details page are set in the snapshot draft metadata. (We can no longer
+      // rely on getting this data from onchain because the proposal may not
+      // exist there yet.)
+      const proposalAmountValues = {
+        transferAmount: amount,
+        transferAmountUnit: symbol,
+      };
 
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
@@ -413,8 +422,7 @@ export default function CreateTransferProposal() {
             name,
             body,
             metadata: {
-              amountUnit: symbol,
-              tokenDecimals: decimals,
+              proposalAmountValues,
               isTypeAllMembers,
             },
             timestamp: now.toString(),

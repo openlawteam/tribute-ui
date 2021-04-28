@@ -34,12 +34,15 @@ type UseProposalsReturn = {
  * @todo Clean up noop functions in setting ProposalData - need a cleaner way to fulfill type.
  *
  * @param {string} adapterName Name of the adapter contract to get proposals for.
+ * @param {string} includeProposalsExistingOnlyOffchain To handle proposal types where the first step is creating a snapshot draft/offchain proposal only (no onchain proposal exists).
  * @returns `UseProposalsReturn` An object with the proposals, and the current async status.
  */
 export function useProposals({
   adapterName,
+  includeProposalsExistingOnlyOffchain = false,
 }: {
   adapterName: DaoAdapterConstants;
+  includeProposalsExistingOnlyOffchain?: boolean;
 }): UseProposalsReturn {
   /**
    * State
@@ -115,12 +118,13 @@ export function useProposals({
    * Cached callbacks
    */
 
-  const getProposalsOnchainCached = useCallback(getProposalsOnchain, [
+  const getProposalsCached = useCallback(getProposals, [
+    includeProposalsExistingOnlyOffchain,
     web3Instance,
   ]);
   const handleGetProposalsCached = useCallback(handleGetProposals, [
     adapterAddress,
-    getProposalsOnchainCached,
+    getProposalsCached,
     registryAbi,
     registryAddress,
   ]);
@@ -343,16 +347,18 @@ export function useProposals({
   }
 
   /**
-   * getProposalsOnchain
+   * getProposals
    *
-   * Gets on-chain proposals based on Snapshot Draft/Proposal ids,
-   * while filtering out proposals which were not found.
+   * Gets proposals based on Snapshot Draft/Proposal ids, while filtering out
+   * proposals which were not found onchain. Optional
+   * `includeProposalsExistingOnlyOffchain` flag can be set to also include
+   * draft proposals that exist only offchain.
    *
    * @note Should be called as a fallback to the subgraph failing.
    *
    * @returns `Promise<[string, Proposal][]` An array of tuples of [id, Proposal]
    */
-  async function getProposalsOnchain({
+  async function getProposals({
     proposalIds,
     registryAbi,
     registryAddress,
@@ -382,8 +388,12 @@ export function useProposals({
         proposals[i],
       ]);
 
-      // Filter-out proposals which do not exist
-      return entries.filter(([_, p]) => p.flags !== '0');
+      if (includeProposalsExistingOnlyOffchain) {
+        return entries;
+      } else {
+        // Filter-out proposals which do not exist onchain
+        return entries.filter(([_, p]) => p.flags !== '0');
+      }
     } catch (error) {
       throw error;
     }
@@ -417,7 +427,7 @@ export function useProposals({
 
       // @todo `daoProposals`: swich/case depending on subgraph up/down
 
-      let daoProposals = await getProposalsOnchainCached({
+      let daoProposals = await getProposalsCached({
         proposalIds,
         registryAbi,
         registryAddress,
