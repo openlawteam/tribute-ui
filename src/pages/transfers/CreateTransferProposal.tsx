@@ -397,6 +397,15 @@ export default function CreateTransferProposal() {
         ? 'Transfer to all members pro rata.'
         : `Transfer to ${truncateEthAddress(memberAddressToChecksum, 7)}.`;
 
+      // Values needed to display relevant proposal amounts in the proposal
+      // details page are set in the snapshot draft metadata. (We can no longer
+      // rely on getting this data from onchain because the proposal may not
+      // exist there yet.)
+      const proposalAmountValues = {
+        transferAmount: amount,
+        transferAmountUnit: symbol,
+      };
+
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
         const body = notes ? `${bodyIntro}\n${notes}` : bodyIntro;
@@ -413,8 +422,7 @@ export default function CreateTransferProposal() {
             name,
             body,
             metadata: {
-              amountUnit: symbol,
-              tokenDecimals: decimals,
+              proposalAmountValues,
               isTypeAllMembers,
             },
             timestamp: now.toString(),

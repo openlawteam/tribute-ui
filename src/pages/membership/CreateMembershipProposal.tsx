@@ -192,6 +192,15 @@ export default function CreateMembershipProposal() {
       const ethAddressToChecksum = toChecksumAddress(ethAddress);
       const ethAmountInWei = toWei(stripFormatNumber(ethAmount), 'ether');
 
+      // Values needed to display relevant proposal amounts in the proposal
+      // details page are set in the snapshot draft metadata. (We can no longer
+      // rely on getting this data from onchain because the proposal may not
+      // exist there yet.)
+      const proposalAmountValues = {
+        tributeAmount: ethAmount,
+        tributeAmountUnit: 'ETH',
+      };
+
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
         // Sign and submit draft for snapshot-hub
@@ -202,7 +211,7 @@ export default function CreateMembershipProposal() {
               ethAddressToChecksum,
               7
             )}.`,
-            metadata: {amountUnit: 'ETH'},
+            metadata: {proposalAmountValues},
           },
           adapterName: ContractAdapterNames.onboarding,
           type: SnapshotType.draft,

@@ -12,9 +12,8 @@ import ProposalActions from '../../components/proposals/ProposalActions';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
 import Wrap from '../../components/common/Wrap';
-import {SnapshotProposalCommon} from '../../components/proposals/types';
 
-const PLACEHOLDER = '\u2026';
+const PLACEHOLDER = '\u2014'; /* em dash */
 
 export default function TributeDetails() {
   /**
@@ -94,12 +93,25 @@ export default function TributeDetails() {
   // Render proposal
   if (proposalData) {
     const commonData = proposalData.getCommonSnapshotProposalData();
-    const {
-      requestAmount,
-      requestAmountUnit,
-      tributeAmount,
-      tributeAmountUnit,
-    } = (commonData as SnapshotProposalCommon).msg.payload.metadata.proposalAmountValues;
+
+    // Handle just in case metadata was not properly set
+    let tributeAmount = PLACEHOLDER;
+    let tributeAmountUnit = '';
+    let requestAmount = PLACEHOLDER;
+    let requestAmountUnit = '';
+    try {
+      ({
+        tributeAmount,
+        tributeAmountUnit,
+        requestAmount,
+        requestAmountUnit,
+      } = commonData?.msg.payload.metadata.proposalAmountValues);
+    } catch (error) {
+      tributeAmount = PLACEHOLDER;
+      tributeAmountUnit = '';
+      requestAmount = PLACEHOLDER;
+      requestAmountUnit = '';
+    }
 
     return (
       <RenderWrapper>
@@ -107,10 +119,10 @@ export default function TributeDetails() {
           proposal={proposalData}
           renderAmountBadge={() => (
             <ProposalAmount
-              amount={tributeAmount || PLACEHOLDER}
-              amountUnit={tributeAmountUnit || ''}
-              amount2={requestAmount || PLACEHOLDER}
-              amount2Unit={requestAmountUnit || ''}
+              amount={tributeAmount}
+              amountUnit={tributeAmountUnit}
+              amount2={requestAmount}
+              amount2Unit={requestAmountUnit}
             />
           )}
           renderActions={() => (
