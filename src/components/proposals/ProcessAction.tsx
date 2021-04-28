@@ -1,9 +1,9 @@
-import {useState, useRef, useEffect} from 'react';
+import {useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {CycleEllipsis} from '../feedback';
 import {getContractByAddress} from '../web3/helpers';
-import {ProposalData, SnapshotProposal} from './types';
+import {ProposalData} from './types';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
@@ -23,11 +23,6 @@ type ProcessArguments = [
 type ProcessActionProps = {
   disabled?: boolean;
   proposal: ProposalData;
-  isProposalPassed: boolean;
-};
-
-type ActionDisabledReasons = {
-  notProposerMessage: string;
 };
 
 /**
@@ -45,7 +40,6 @@ export default function ProcessAction(props: ProcessActionProps) {
   const {
     disabled: propsDisabled,
     proposal: {snapshotProposal},
-    isProposalPassed,
   } = props;
 
   /**
@@ -53,14 +47,6 @@ export default function ProcessAction(props: ProcessActionProps) {
    */
 
   const [submitError, setSubmitError] = useState<Error>();
-
-  /**
-   * Refs
-   */
-
-  const actionDisabledReasonsRef = useRef<ActionDisabledReasons>({
-    notProposerMessage: '',
-  });
 
   /**
    * Selectors
@@ -83,7 +69,6 @@ export default function ProcessAction(props: ProcessActionProps) {
     isDisabled,
     openWhyDisabledModal,
     WhyDisabledModal,
-    setOtherDisabledReasons,
   } = useMemberActionDisabled(useMemberActionDisabledProps);
 
   const gasPrices = useETHGasPrice();
@@ -99,42 +84,6 @@ export default function ProcessAction(props: ProcessActionProps) {
   const isDone = txStatus === Web3TxStatus.FULFILLED;
   const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
   const areSomeDisabled = isDisabled || isInProcessOrDone || propsDisabled;
-
-  /**
-   * Effects
-   */
-
-  useEffect(() => {
-    // 1. Determine and set reasons why action would be disabled
-
-    // Reason: For some proposal types, a passed proposal can only be
-    // processed by its original proposer (e.g., the owner of the asset to be
-    // transferred)
-
-    // Proposals with this restriction will have this value stored in its
-    // snapshot metadata.
-    const {
-      accountAuthorizedToProcessPassedProposal,
-    } = (snapshotProposal as SnapshotProposal).msg.payload.metadata;
-
-    if (
-      isProposalPassed &&
-      accountAuthorizedToProcessPassedProposal &&
-      account
-    ) {
-      actionDisabledReasonsRef.current = {
-        ...actionDisabledReasonsRef.current,
-        notProposerMessage:
-          accountAuthorizedToProcessPassedProposal.toLowerCase() !==
-          account.toLowerCase()
-            ? 'The passed proposal can be processed only by its original proposer.'
-            : '',
-      };
-    }
-
-    // 2. Set reasons
-    setOtherDisabledReasons(Object.values(actionDisabledReasonsRef.current));
-  }, [account, isProposalPassed, setOtherDisabledReasons, snapshotProposal]);
 
   /**
    * Functions

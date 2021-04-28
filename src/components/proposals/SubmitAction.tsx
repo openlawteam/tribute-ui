@@ -148,7 +148,7 @@ export default function SubmitAction(props: SubmitActionProps) {
       const submitArguments: SubmitArguments = [
         daoRegistryAddress,
         snapshotDraft.idInDAO,
-        ...(metadata.proposalArgs || []),
+        ...(metadata.submitActionArgs || []),
         preparedVoteVerificationBytes,
       ];
 

@@ -10,6 +10,7 @@ import {useProposalWithOffchainVoteStatus} from './hooks';
 import SubmitAction from './SubmitAction';
 import SponsorAction from './SponsorAction';
 import ProcessAction from './ProcessAction';
+import ProcessActionTribute from './ProcessActionTribute';
 import PostProcessAction from './PostProcessAction';
 
 type ProposalWithOffchainActionsProps = {
@@ -49,6 +50,38 @@ export default function ProposalWithOffchainVoteActions(
     status === ProposalFlowStatus.Completed &&
     daoProposalVoteResult &&
     VotingState[daoProposalVoteResult] === VotingState[VotingState.PASS];
+
+  /**
+   * Functions
+   */
+
+  function renderProcessAction() {
+    switch (adapterName) {
+      case ContractAdapterNames.tribute:
+        return (
+          <ProcessActionTribute
+            // Show during DAO proposal grace period, but set to disabled
+            disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
+            proposal={proposal}
+            isProposalPassed={
+              !!(
+                daoProposalVoteResult &&
+                VotingState[daoProposalVoteResult] ===
+                  VotingState[VotingState.PASS]
+              )
+            }
+          />
+        );
+      default:
+        return (
+          <ProcessAction
+            // Show during DAO proposal grace period, but set to disabled
+            disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
+            proposal={proposal}
+          />
+        );
+    }
+  }
 
   /**
    * Render
@@ -92,22 +125,12 @@ export default function ProposalWithOffchainVoteActions(
           />
         )}
 
+        {/* PROCESS BUTTON */}
         {(status === ProposalFlowStatus.OffchainVotingGracePeriod ||
-          status === ProposalFlowStatus.Process) && (
-          <ProcessAction
-            // Show during DAO proposal grace period, but set to disabled
-            disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
-            proposal={proposal}
-            isProposalPassed={
-              !!(
-                daoProposalVoteResult &&
-                VotingState[daoProposalVoteResult] ===
-                  VotingState[VotingState.PASS]
-              )
-            }
-          />
-        )}
+          status === ProposalFlowStatus.Process) &&
+          renderProcessAction()}
 
+        {/* POST PROCESS BUTTON */}
         {showPostProcessAction && (
           <PostProcessAction adapterName={adapterName} proposal={proposal} />
         )}

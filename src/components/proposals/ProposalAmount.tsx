@@ -1,7 +1,4 @@
 type ProposalAmountProps = {
-  /**
-   * Amount in WEI
-   */
   amount: string;
   amountUnit: string;
   amount2?: string;

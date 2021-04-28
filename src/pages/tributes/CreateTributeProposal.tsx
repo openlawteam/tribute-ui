@@ -45,7 +45,7 @@ type FormInputs = {
   description: string;
 };
 
-type ProposalArguments = [
+type SubmitActionArguments = [
   string, // `applicant`
   string, // `tokenToMint`
   string, // `requestAmount`
@@ -290,7 +290,20 @@ export default function CreateTributeProposal() {
               )}.`;
         const body = description ? `${bodyIntro}\n${description}` : bodyIntro;
 
-        const proposalArgs: ProposalArguments = [
+        // Values needed to display relevant proposal amounts in the proposal
+        // details page are set in the snapshot draft metadata. (We can no
+        // longer rely on getting this data from onchain because the proposal
+        // may not exist there yet.)
+        const proposalAmountValues = {
+          requestAmount,
+          requestAmountUnit: 'UNITS',
+          tributeAmount,
+          tributeAmountUnit: erc20Details.symbol,
+        };
+
+        // Arguments needed to submit the proposal onchain are set in the
+        // snapshot draft metadata.
+        const submitActionArgs: SubmitActionArguments = [
           applicantAddressToChecksum,
           SHARES_ADDRESS,
           requestAmountArg,
@@ -305,10 +318,8 @@ export default function CreateTributeProposal() {
             name: applicantAddressToChecksum,
             body,
             metadata: {
-              tributeAmountUnit: erc20Details.symbol,
-              tributeTokenDecimals: erc20Details.decimals,
-              requestAmountUnit: 'SHARES',
-              proposalArgs,
+              proposalAmountValues,
+              submitActionArgs,
               accountAuthorizedToProcessPassedProposal: proposerAddressToChecksum,
             },
           },
