@@ -6,7 +6,7 @@ export const GET_DAO = gql`
       id # dao address
       daoAddress
       name
-      totalShares
+      totalUnits
     }
   }
 `;

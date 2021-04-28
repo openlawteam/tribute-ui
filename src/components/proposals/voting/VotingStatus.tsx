@@ -24,20 +24,20 @@ type VotingStatusProps = {
    * Defaults to `true`.
    */
   showPercentages?: boolean;
-  noShares: Parameters<typeof SquareRootVotingBar>[0]['noShares'];
-  totalShares: Parameters<typeof SquareRootVotingBar>[0]['totalShares'];
-  yesShares: Parameters<typeof SquareRootVotingBar>[0]['yesShares'];
+  noUnits: Parameters<typeof SquareRootVotingBar>[0]['noUnits'];
+  totalUnits: Parameters<typeof SquareRootVotingBar>[0]['totalUnits'];
+  yesUnits: Parameters<typeof SquareRootVotingBar>[0]['yesUnits'];
 };
 
 export function VotingStatus(props: VotingStatusProps) {
   const {
     hasVotingEnded,
-    noShares,
+    noUnits,
     renderStatus,
     renderTimer,
     showPercentages = true,
-    totalShares,
-    yesShares,
+    totalUnits,
+    yesUnits,
   } = props;
 
   const renderedStatus = renderStatus();
@@ -56,9 +56,9 @@ export function VotingStatus(props: VotingStatusProps) {
 
       {/* VOTES */}
       <SquareRootVotingBar
-        yesShares={yesShares}
-        noShares={noShares}
-        totalShares={totalShares}
+        yesUnits={yesUnits}
+        noUnits={noUnits}
+        totalUnits={totalUnits}
         votingExpired={hasVotingEnded}
         showPercentages={showPercentages}
       />

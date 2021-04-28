@@ -19,7 +19,7 @@ import {
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
-import {SHARES_ADDRESS} from '../../config';
+import {UNITS_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 import {useHistory} from 'react-router-dom';
@@ -224,7 +224,7 @@ export default function CreateMembershipProposal() {
         DaoRegistryContract.contractAddress,
         proposalId,
         ethAddressToChecksum,
-        SHARES_ADDRESS,
+        UNITS_ADDRESS,
         ethAmountInWei,
       ];
 

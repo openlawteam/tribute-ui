@@ -110,7 +110,7 @@ describe('useOffchainVotingResults unit tests', () => {
           wrapper: Wrapper,
           initialProps: {
             getProps: ({mockWeb3Provider, web3Instance}) => {
-              // Inject mocked shares result 1
+              // Inject mocked units result 1
               mockWeb3Provider.injectResult(
                 web3Instance.eth.abi.encodeParameters(
                   ['uint256', 'bytes[]'],
@@ -129,7 +129,7 @@ describe('useOffchainVotingResults unit tests', () => {
                 {abi: MulticallABI, abiMethodName: 'aggregate'}
               );
 
-              // Inject mocked shares result 2
+              // Inject mocked units result 2
               mockWeb3Provider.injectResult(
                 web3Instance.eth.abi.encodeParameters(
                   ['uint256', 'bytes[]'],
@@ -175,17 +175,17 @@ describe('useOffchainVotingResults unit tests', () => {
           [
             '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
             {
-              No: {percentage: 1, shares: 100000},
-              Yes: {percentage: 2, shares: 200000},
-              totalShares: 10000000,
+              No: {percentage: 1, units: 100000},
+              Yes: {percentage: 2, units: 200000},
+              totalUnits: 10000000,
             },
           ],
           [
             '0x0000000000000000000000000000000000000000000000000000000000000000',
             {
-              No: {percentage: 1, shares: 200000},
-              Yes: {percentage: 2, shares: 400000},
-              totalShares: 20000000,
+              No: {percentage: 1, units: 200000},
+              Yes: {percentage: 2, units: 400000},
+              totalUnits: 20000000,
             },
           ],
         ],

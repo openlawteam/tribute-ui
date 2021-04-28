@@ -4,7 +4,7 @@ import {toBN} from 'web3-utils';
 import {BURN_ADDRESS} from '../../util/constants';
 import {ConnectedMemberState} from '../connectedMember/types';
 import {normalizeString} from '../../util/helpers';
-import {SHARES_ADDRESS} from '../../config';
+import {UNITS_ADDRESS} from '../../config';
 import {StoreState} from '../types';
 
 export const SET_CONNECTED_MEMBER = 'SET_CONNECTED_MEMBER';
@@ -41,7 +41,7 @@ export function getConnectedMember(account: string) {
 
       const isActiveMember: boolean = toBN(
         await bankExtensionMethods
-          .balanceOf(memberAddressByDelegateKey, SHARES_ADDRESS)
+          .balanceOf(memberAddressByDelegateKey, UNITS_ADDRESS)
           .call({from: account})
       ).gt(toBN(0));
 

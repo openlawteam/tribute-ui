@@ -8,7 +8,7 @@ export const GET_MEMBERS = gql`
         address: memberAddress
         delegateKey
         isDelegated
-        shares
+        units
         didFullyRagequit
       }
     }

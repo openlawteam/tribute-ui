@@ -4,27 +4,27 @@ type SquareRootVotingBarProps = {
   /**
    * Allow values to not be set as they may not be ready
    */
-  yesShares: number | undefined;
+  yesUnits: number | undefined;
   /**
    * Allow values to not be set as they may not be ready
    */
-  noShares: number | undefined;
+  noUnits: number | undefined;
   /**
    * Allow values to not be set as they may not be ready
    */
-  totalShares: number | undefined;
+  totalUnits: number | undefined;
   votingExpired: boolean;
   showPercentages: boolean;
 };
 
-function getSharesPercent(shares: number, totalShares: number) {
-  return ((shares / totalShares) * 100).toFixed(0);
+function getUnitsPercent(units: number, totalUnits: number) {
+  return ((units / totalUnits) * 100).toFixed(0);
 }
 
 export function SquareRootVotingBar({
-  yesShares = 0,
-  noShares = 0,
-  totalShares,
+  yesUnits = 0,
+  noUnits = 0,
+  totalUnits,
   votingExpired,
   showPercentages,
 }: SquareRootVotingBarProps) {
@@ -32,10 +32,8 @@ export function SquareRootVotingBar({
    * Variables
    */
 
-  const percentYes = totalShares
-    ? getSharesPercent(yesShares, totalShares)
-    : '0';
-  const percentNo = totalShares ? getSharesPercent(noShares, totalShares) : '0';
+  const percentYes = totalUnits ? getUnitsPercent(yesUnits, totalUnits) : '0';
+  const percentNo = totalUnits ? getUnitsPercent(noUnits, totalUnits) : '0';
 
   /**
    * Render
@@ -67,7 +65,7 @@ export function SquareRootVotingBar({
         {showPercentages && (
           <>
             {/* YES */}
-            {votingExpired && yesShares > noShares && (
+            {votingExpired && yesUnits > noUnits && (
               <span className="yes-check">
                 <CheckSVG aria-label="Vote has passed" />
               </span>
@@ -76,7 +74,7 @@ export function SquareRootVotingBar({
 
             {/* NO */}
             <span className="no-percent">{percentNo}%</span>
-            {votingExpired && yesShares <= noShares && (
+            {votingExpired && yesUnits <= noUnits && (
               <span className="no-check">
                 <CheckSVG aria-label="Vote has failed" />
               </span>

@@ -15,7 +15,7 @@ import {clearConnectedMember, getConnectedMember} from './actions';
 import {initContractBankExtension, initContractDaoRegistry} from '../actions';
 
 describe('connectedMember actions unit tests', () => {
-  test('"getConnectedMember" can set correct "connectedMember" state when shares > 0', async () => {
+  test('"getConnectedMember" can set correct "connectedMember" state when units > 0', async () => {
     const store = getNewStore();
     const {web3, mockWeb3Provider} = getWeb3Instance();
 
@@ -49,7 +49,7 @@ describe('connectedMember actions unit tests', () => {
     });
   });
 
-  test('"getConnectedMember" can set correct "connectedMember" state when shares === 0', async () => {
+  test('"getConnectedMember" can set correct "connectedMember" state when units === 0', async () => {
     const store = getNewStore();
     const {web3, mockWeb3Provider} = getWeb3Instance();
 

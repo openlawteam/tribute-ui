@@ -73,7 +73,7 @@ export type GuildKickArguments = [
 export type RagequitArguments = [
   // `dao`
   string,
-  // `sharesToBurn`
+  // `unitsToBurn`
   number,
   // `lootToBurn`
   number,

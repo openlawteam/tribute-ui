@@ -106,9 +106,9 @@ export function OffchainVotingStatus({
 
   const votingStartSeconds = snapshotProposal?.msg.payload.start || 0;
   const votingEndSeconds = snapshotProposal?.msg.payload.end || 0;
-  const yesShares = votingResultToUse?.Yes.shares || 0;
-  const noShares = votingResultToUse?.No.shares || 0;
-  const totalShares = votingResultToUse?.totalShares;
+  const yesUnits = votingResultToUse?.Yes.units || 0;
+  const noUnits = votingResultToUse?.No.units || 0;
+  const totalUnits = votingResultToUse?.totalUnits;
 
   /**
    * Effects
@@ -117,8 +117,8 @@ export function OffchainVotingStatus({
   useEffect(() => {
     if (!hasVotingTimeEnded) return;
 
-    setDidVotePass(yesShares > noShares);
-  }, [hasVotingTimeEnded, noShares, yesShares]);
+    setDidVotePass(yesUnits > noUnits);
+  }, [hasVotingTimeEnded, noUnits, yesUnits]);
 
   // Determine grace period end
   useEffect(() => {
@@ -200,9 +200,9 @@ export function OffchainVotingStatus({
       renderTimer={renderTimer}
       renderStatus={renderStatus}
       hasVotingEnded={hasVotingTimeEnded}
-      noShares={noShares}
-      totalShares={totalShares}
-      yesShares={yesShares}
+      noUnits={noUnits}
+      totalUnits={totalUnits}
+      yesUnits={yesUnits}
     />
   );
 }

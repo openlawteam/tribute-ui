@@ -50,7 +50,7 @@ export enum ContractDAOConfigKeys {
   offchainVotingVotingPeriod = 'offchainvoting.votingPeriod',
   onboardingChunkSize = 'onboarding.chunkSize',
   onboardingMaximumChunks = 'onboarding.maximumChunks',
-  onboardingSharesPerChunk = 'onboarding.sharesPerChunk',
+  onboardingUnitsPerChunk = 'onboarding.unitsPerChunk',
   onboardingTokenAddr = 'onboarding.tokenAddr',
   votingGracePeriod = 'voting.gracePeriod',
   votingStakingAmount = 'voting.stakingAmount',

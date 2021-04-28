@@ -393,8 +393,8 @@ describe('GovernanceProposalsList unit tests', () => {
           renderProposalCard={({proposalData, votingResult}) => (
             <div>
               <h2>{`custom card: ${proposalData.snapshotProposal?.msg.payload.name}`}</h2>
-              <p>Yes votes: {votingResult?.Yes.shares}</p>
-              <p>No votes: {votingResult?.No.shares}</p>
+              <p>Yes votes: {votingResult?.Yes.units}</p>
+              <p>No votes: {votingResult?.No.units}</p>
             </div>
           )}
         />

@@ -17,9 +17,9 @@ describe('VotingStatus unit tests', () => {
         )}
         renderStatus={() => 'You are in voting'}
         hasVotingEnded={false}
-        noShares={100000}
-        totalShares={10000000}
-        yesShares={500000}
+        noUnits={100000}
+        totalUnits={10000000}
+        yesUnits={500000}
       />
     );
 
@@ -52,9 +52,9 @@ describe('VotingStatus unit tests', () => {
         )}
         renderStatus={() => null}
         hasVotingEnded={true}
-        noShares={100000}
-        totalShares={10000000}
-        yesShares={500000}
+        noUnits={100000}
+        totalUnits={10000000}
+        yesUnits={500000}
       />
     );
 
@@ -75,9 +75,9 @@ describe('VotingStatus unit tests', () => {
         renderTimer={() => null}
         renderStatus={() => 'Approved'}
         hasVotingEnded={true}
-        noShares={100000}
-        totalShares={10000000}
-        yesShares={500000}
+        noUnits={100000}
+        totalUnits={10000000}
+        yesUnits={500000}
       />
     );
 

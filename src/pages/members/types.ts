@@ -7,5 +7,5 @@ export type Member = {
   address: string;
   delegateKey: string;
   isDelegated: boolean;
-  shares: string;
+  units: string;
 };

@@ -136,7 +136,7 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
     contractAddress: TRIBUTE_NFT_CONTRACT_ADDRESS[DEFAULT_CHAIN],
     abiFunctionName: 'provideTributeNFT',
     description:
-      'Allows potential DAO members to contribute a registered ERC-721 asset to the DAO in exchange for any amount of DAO shares.',
+      'Allows potential DAO members to contribute a registered ERC-721 asset to the DAO in exchange for any amount of DAO units.',
   },
   {
     options: [
