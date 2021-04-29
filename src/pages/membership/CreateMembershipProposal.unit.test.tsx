@@ -1,5 +1,4 @@
 import {render, screen, waitFor, act} from '@testing-library/react';
-import React from 'react';
 
 import {signTypedDataV4} from '../../test/web3Responses';
 import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
