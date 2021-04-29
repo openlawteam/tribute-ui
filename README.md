@@ -53,7 +53,7 @@ NOTE:
 
 #### Saving Ganache data
 
-If you want to use the same accounts and data from a previous Ganache chain, you can add the following arguments to the `ganache-cli` command. The `--db` path can be any path with any structure. Ganache creates many "loose" files, so it may be easiest to keep each chain in its own directory (e.g. `some/path/your-ganache-dbs/01-01-1999`).
+If you want to use the same accounts (`-d`) and data (`--db`) from a previous Ganache chain, you can add the below arguments to the `ganache-cli` command. The `--db` path can be any path with any structure. Ganache creates many "loose" files, so it may be easiest to keep each chain in its own directory (e.g. `some/path/your-ganache-dbs/01-01-1999`).
 
 `... -d --db some/path/your-ganache-dbs/[DIR_WHERE_CHAIN_DATA_WILL_BE_SAVED]`
 
