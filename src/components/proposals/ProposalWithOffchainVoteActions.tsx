@@ -171,7 +171,7 @@ export default function ProposalWithOffchainVoteActions(
       status === ProposalFlowStatus.Process ||
       status === ProposalFlowStatus.OffchainVotingGracePeriod
     ) {
-      renderProcessAction();
+      return renderProcessAction();
     }
 
     // Post-process button
