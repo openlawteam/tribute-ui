@@ -12,6 +12,7 @@ import {ContractAdapterNames} from '../web3/types';
 import {useProposalWithOffchainVoteStatus} from './hooks';
 import {VotingAdapterName} from '../adapters-extensions/enums';
 import {VotingState} from './voting/types';
+import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import PostProcessAction from './PostProcessAction';
 import ProcessAction from './ProcessAction';
 import ProcessActionMembership from './ProcessActionMembership';
@@ -204,6 +205,13 @@ export default function ProposalWithOffchainVoteActions(
       {/* ACTIONS */}
 
       <div className="proposaldetails__button-container">{renderActions()}</div>
+
+      {/* ERROR */}
+
+      <ErrorMessageWithDetails
+        error={proposalFlowStatusError}
+        renderText="Something went wrong while getting the proposal's status"
+      />
     </>
   );
 }
