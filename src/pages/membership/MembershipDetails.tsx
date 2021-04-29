@@ -72,18 +72,19 @@ export default function MembershipDetails() {
       status === ProposalFlowStatus.Process ||
       status === ProposalFlowStatus.OffchainVotingGracePeriod
     ) {
+      if (
+        daoProposalVoteResult &&
+        VotingState[daoProposalVoteResult] !== VotingState[VotingState.PASS]
+      ) {
+        // Return a React.Fragment to hide the process button if proposal failed.
+        return <></>;
+      }
+
       return (
         <ProcessActionMembership
           // Show during DAO proposal grace period, but set to disabled
           disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
           proposal={proposal}
-          isProposalPassed={
-            !!(
-              daoProposalVoteResult &&
-              VotingState[daoProposalVoteResult] ===
-                VotingState[VotingState.PASS]
-            )
-          }
         />
       );
     }
