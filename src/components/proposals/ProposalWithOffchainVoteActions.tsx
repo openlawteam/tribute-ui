@@ -11,11 +11,8 @@ import {
 import {ContractAdapterNames} from '../web3/types';
 import {useProposalWithOffchainVoteStatus} from './hooks';
 import {VotingAdapterName} from '../adapters-extensions/enums';
-import {VotingState} from './voting/types';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
-import PostProcessAction from './PostProcessAction';
 import ProcessAction from './ProcessAction';
-import ProcessActionTribute from './ProcessActionTribute';
 import SponsorAction from './SponsorAction';
 import SubmitAction from './SubmitAction';
 
@@ -58,14 +55,6 @@ export default function ProposalWithOffchainVoteActions(
     daoProposalVotes && status === ProposalFlowStatus.OffchainVotingGracePeriod
       ? Number(daoProposalVotes.gracePeriodStartingTime) * 1000
       : 0;
-
-  //  Currently, only Distribute adapter has an action that occurs after the
-  //  proposal is processed.
-  const showPostProcessAction =
-    adapterName === ContractAdapterNames.distribute &&
-    status === ProposalFlowStatus.Completed &&
-    daoProposalVoteResult &&
-    VotingState[daoProposalVoteResult] === VotingState[VotingState.PASS];
 
   /**
    * If a render prop was provided it will render it and pass
@@ -132,14 +121,6 @@ export default function ProposalWithOffchainVoteActions(
           disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
           proposal={proposal}
         />
-      );
-    }
-
-    // Post-process button
-    // @todo Remove and use render prop
-    if (showPostProcessAction) {
-      return (
-        <PostProcessAction adapterName={adapterName} proposal={proposal} />
       );
     }
   }
