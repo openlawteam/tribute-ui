@@ -59,7 +59,7 @@ describe('useContractSend unit tests', () => {
 
       // Call txSend
       result.current.txSend(
-        'onboard',
+        'submitProposal',
         store.getState().contracts.OnboardingContract?.instance.methods,
         [
           DEFAULT_ETH_ADDRESS,
@@ -67,10 +67,10 @@ describe('useContractSend unit tests', () => {
           DEFAULT_ETH_ADDRESS,
           DEFAULT_ETH_ADDRESS,
           Web3.utils.toWei('1', 'ether'),
+          [],
         ],
         {
           from: DEFAULT_ETH_ADDRESS,
-          value: Web3.utils.toWei('1', 'ether'),
         },
         spyOnProcess
       );

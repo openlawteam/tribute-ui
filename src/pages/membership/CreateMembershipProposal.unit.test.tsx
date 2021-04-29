@@ -78,14 +78,6 @@ describe('CreateMembershipProposal unit tests', () => {
 
           // Mock signature
           mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
-
-          // Mock RPC calls for `onboard`
-          mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
-          mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
-          mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
-          mockWeb3Provider.injectResult(
-            ...getTransactionReceipt({web3Instance})
-          );
         }}>
         <CreateMembershipProposal />
       </Wrapper>
@@ -108,7 +100,6 @@ describe('CreateMembershipProposal unit tests', () => {
         screen.getByRole('button', {name: /submitting your proposal/i})
       ).toBeDisabled();
       expect(screen.getByText(/submitting/i)).toBeInTheDocument();
-      expect(screen.getByText(/view progress/i)).toBeInTheDocument();
     });
 
     await waitFor(() => {
