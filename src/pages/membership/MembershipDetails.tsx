@@ -63,7 +63,7 @@ export default function MembershipDetails() {
    */
 
   // Render any adapter-specific actions
-  function renderAction(data: RenderActionPropArguments) {
+  function renderAction(data: RenderActionPropArguments): React.ReactNode {
     const {
       OffchainVotingContract: {daoProposalVoteResult, proposal, status},
     } = data;
