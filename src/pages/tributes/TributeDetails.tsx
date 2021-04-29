@@ -1,13 +1,19 @@
 import React from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
+import {
+  RenderActionPropArguments,
+  ProposalFlowStatus,
+} from '../../components/proposals/types';
 import {AsyncStatus} from '../../util/types';
 import {ContractAdapterNames} from '../../components/web3/types';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
+import {VotingState} from '../../components/proposals/voting/types';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderLarge from '../../components/feedback/LoaderLarge';
 import NotFound from '../subpages/NotFound';
+import ProcessActionTribute from '../../components/proposals/ProcessActionTribute';
 import ProposalActions from '../../components/proposals/ProposalActions';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
@@ -51,6 +57,40 @@ export default function TributeDetails() {
     proposalNotFound,
     proposalStatus,
   } = useProposalOrDraft(proposalId);
+
+  /**
+   * Functions
+   */
+
+  // Render any adapter-specific actions
+  function renderAction(data: RenderActionPropArguments): React.ReactNode {
+    const {
+      OffchainVotingContract: {daoProposalVoteResult, proposal, status},
+    } = data;
+
+    if (
+      status === ProposalFlowStatus.Process ||
+      status === ProposalFlowStatus.OffchainVotingGracePeriod
+    ) {
+      return (
+        <ProcessActionTribute
+          // Show during DAO proposal grace period, but set to disabled
+          disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
+          proposal={proposal}
+          isProposalPassed={
+            !!(
+              daoProposalVoteResult &&
+              VotingState[daoProposalVoteResult] ===
+                VotingState[VotingState.PASS]
+            )
+          }
+        />
+      );
+    }
+
+    // Return `null` to signal to use default actions
+    return null;
+  }
 
   /**
    * Render
@@ -129,6 +169,7 @@ export default function TributeDetails() {
             <ProposalActions
               adapterName={ContractAdapterNames.tribute}
               proposal={proposalData}
+              renderAction={renderAction}
             />
           )}
         />

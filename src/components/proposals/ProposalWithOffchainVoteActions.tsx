@@ -88,34 +88,6 @@ export default function ProposalWithOffchainVoteActions(
    * Functions
    */
 
-  function renderProcessAction() {
-    switch (adapterName) {
-      case ContractAdapterNames.tribute:
-        return (
-          <ProcessActionTribute
-            // Show during DAO proposal grace period, but set to disabled
-            disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
-            proposal={proposal}
-            isProposalPassed={
-              !!(
-                daoProposalVoteResult &&
-                VotingState[daoProposalVoteResult] ===
-                  VotingState[VotingState.PASS]
-              )
-            }
-          />
-        );
-      default:
-        return (
-          <ProcessAction
-            // Show during DAO proposal grace period, but set to disabled
-            disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
-            proposal={proposal}
-          />
-        );
-    }
-  }
-
   function renderActions(): React.ReactNode {
     // If render prop did not return `null` then render its content
     if (renderedActionFromProp) {
@@ -150,12 +122,17 @@ export default function ProposalWithOffchainVoteActions(
     }
 
     // Process button
-    // @todo Remove and use render prop
     if (
       status === ProposalFlowStatus.Process ||
       status === ProposalFlowStatus.OffchainVotingGracePeriod
     ) {
-      return renderProcessAction();
+      return (
+        <ProcessAction
+          // Show during DAO proposal grace period, but set to disabled
+          disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
+          proposal={proposal}
+        />
+      );
     }
 
     // Post-process button
