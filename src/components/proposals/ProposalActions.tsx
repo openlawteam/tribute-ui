@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 
 import {ContractAdapterNames} from '../web3/types';
 import {CycleEllipsis} from '../feedback';
-import {ProposalData} from './types';
+import {ProposalData, RenderActionPropArguments} from './types';
 import {StoreState} from '../../store/types';
 import {VotingAdapterName} from '../adapters-extensions/enums';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
@@ -11,6 +11,15 @@ import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 type ProposalActionsProps = {
   adapterName: ContractAdapterNames;
   proposal: ProposalData;
+  /**
+   * A render prop which can render any action desired.
+   * It is passed inner state and data from
+   * the child action wrapper component.
+   *
+   * - If it renders `null`, it will fall back to the component's actions.
+   * - If it renders `<></>` (`React.Fragment`) then nothing is shown in the UI.
+   */
+  renderAction?: (data: RenderActionPropArguments) => React.ReactNode;
 };
 
 /**
@@ -27,10 +36,20 @@ const cycleEllipsisStyles = {
   fontSize: '1.5rem',
 };
 
+/**
+ * ProposalActions
+ *
+ * A container for various propsal action flows.
+ * Which flow is chosen is determined by either the proposal's,
+ * or the DAO's, voting adapter name.
+ *
+ * @param {ProposalActionsProps} props
+ * @returns {JSX.Element}
+ */
 export default function ProposalActions(
   props: ProposalActionsProps
 ): JSX.Element {
-  const {adapterName, proposal} = props;
+  const {adapterName, proposal, renderAction} = props;
 
   /**
    * Selectors
@@ -64,6 +83,7 @@ export default function ProposalActions(
           <ProposalWithOffchainVoteActions
             adapterName={adapterName}
             proposal={proposal}
+            renderAction={renderAction}
           />
         );
 

@@ -11,6 +11,7 @@ import {Contract} from 'web3-eth-contract/types';
 
 import {VotingAdapterName} from '../adapters-extensions/enums';
 import {VotingState} from './voting/types';
+import {ContractAdapterNames} from '../web3/types';
 
 /**
  * ENUMS
@@ -71,6 +72,19 @@ export enum SnapshotMetadataType {
 export type Proposal = {
   adapterAddress: string;
   flags: string; // unint256 of Proposal's current flag
+};
+
+// Arguments for an optional render prop for `<ProposalActions />` and its child action wrapping components.
+export type RenderActionPropArguments = {
+  [VotingAdapterName.OffchainVotingContract]: {
+    adapterName: ContractAdapterNames;
+    // An enum name (`string`) of the DAO proposal's `VotingState` index
+    daoProposalVoteResult: typeof VotingState[any] | undefined;
+    daoProposalVotes: OffchainVotingAdapterVotes | undefined;
+    gracePeriodStartMs: number;
+    proposal: ProposalData;
+    status: ProposalFlowStatus | undefined;
+  };
 };
 
 // @todo Change the type to be precise

@@ -25,6 +25,7 @@ describe('ProposalActions component unit tests', () => {
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
         daoProposalVotes: undefined,
+        proposalFlowStatusError: undefined,
       }));
 
     render(
@@ -70,6 +71,7 @@ describe('ProposalActions component unit tests', () => {
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
         daoProposalVotes: undefined,
+        proposalFlowStatusError: undefined,
       }));
 
     render(
@@ -111,6 +113,63 @@ describe('ProposalActions component unit tests', () => {
     mock.mockRestore();
   });
 
+  test('should render off-chain action using `renderAction` prop', async () => {
+    const mock = jest
+      .spyOn(
+        useProposalWithOffchainVoteStatusToMock,
+        'useProposalWithOffchainVoteStatus'
+      )
+      .mockImplementation(() => ({
+        status: ProposalFlowStatus.OffchainVoting,
+        daoProposal: undefined,
+        daoProposalVoteResult: undefined,
+        daoProposalVotes: undefined,
+        proposalFlowStatusError: undefined,
+      }));
+
+    render(
+      <Wrapper useInit useWallet>
+        <ProposalActions
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={
+            {
+              snapshotProposal: {
+                msg: {
+                  payload: {
+                    name: 'Another Good Title',
+                    body: 'Coolness',
+                    metadata: {},
+                  },
+                  timestamp: Date.now().toString(),
+                },
+              },
+              daoProposalVotingAdapter: {
+                votingAdapterAddress: DEFAULT_ETH_ADDRESS,
+                votingAdapterName: VotingAdapterName.OffchainVotingContract,
+              },
+            } as ProposalData
+          }
+          renderAction={({OffchainVotingContract: {status}}) => {
+            if (status === ProposalFlowStatus.OffchainVoting) {
+              return <button>Some awesome action</button>;
+            }
+
+            return null;
+          }}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: /some awesome action/i})
+      ).toBeInTheDocument();
+    });
+
+    // Restore mock
+    mock.mockRestore();
+  });
+
   // @note Will use the dao's offchain voting adapter set via test suite <Wrapper />.
   test('should render error when bad voting adapter name', async () => {
     const mock = jest
@@ -123,6 +182,7 @@ describe('ProposalActions component unit tests', () => {
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
         daoProposalVotes: undefined,
+        proposalFlowStatusError: undefined,
       }));
 
     render(
