@@ -1,7 +1,6 @@
 import {useState, useCallback, useEffect} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
-import {useSelector} from 'react-redux';
 import {useHistory} from 'react-router-dom';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
 import {toBN, AbiItem, toChecksumAddress} from 'web3-utils';
@@ -19,7 +18,6 @@ import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {UNITS_ADDRESS} from '../../config';
-import {StoreState} from '../../store/types';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import {CycleEllipsis} from '../../components/feedback';
@@ -60,17 +58,6 @@ type ERC20Details = {
 };
 
 export default function CreateTributeProposal() {
-  /**
-   * Selectors
-   */
-
-  const TributeContract = useSelector(
-    (state: StoreState) => state.contracts?.TributeContract
-  );
-  const DaoRegistryContract = useSelector(
-    (state: StoreState) => state.contracts?.DaoRegistryContract
-  );
-
   /**
    * Our hooks
    */
@@ -233,14 +220,6 @@ export default function CreateTributeProposal() {
         throw new Error(
           'No user account was found. Please make sure your wallet is connected.'
         );
-      }
-
-      if (!TributeContract) {
-        throw new Error('No TributeContract found.');
-      }
-
-      if (!DaoRegistryContract) {
-        throw new Error('No DaoRegistryContract found.');
       }
 
       if (!account) {

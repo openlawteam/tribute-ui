@@ -1,7 +1,6 @@
 import React, {useState, useCallback, useEffect} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
-import {useSelector} from 'react-redux';
 import {toWei, toChecksumAddress} from 'web3-utils';
 import {useHistory} from 'react-router-dom';
 
@@ -18,7 +17,6 @@ import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {UNITS_ADDRESS} from '../../config';
-import {StoreState} from '../../store/types';
 import {CycleEllipsis} from '../../components/feedback';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
@@ -45,17 +43,6 @@ type SubmitActionArguments = [
 ];
 
 export default function CreateMembershipProposal() {
-  /**
-   * Selectors
-   */
-
-  const OnboardingContract = useSelector(
-    (state: StoreState) => state.contracts?.OnboardingContract
-  );
-  const DaoRegistryContract = useSelector(
-    (state: StoreState) => state.contracts?.DaoRegistryContract
-  );
-
   /**
    * Our hooks
    */
@@ -152,14 +139,6 @@ export default function CreateMembershipProposal() {
         throw new Error(
           'No user account was found. Please make sure your wallet is connected.'
         );
-      }
-
-      if (!OnboardingContract) {
-        throw new Error('No OnboardingContract found.');
-      }
-
-      if (!DaoRegistryContract) {
-        throw new Error('No DaoRegistryContract found.');
       }
 
       if (!account) {
