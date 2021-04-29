@@ -1,6 +1,5 @@
 import {useState, useRef, useEffect, useCallback} from 'react';
 import {useSelector} from 'react-redux';
-import {toBN, AbiItem} from 'web3-utils';
 
 import {CycleEllipsis} from '../feedback';
 import {ProposalData, SnapshotProposal} from './types';
@@ -20,17 +19,7 @@ type ProcessArguments = [
   string // `proposalId`
 ];
 
-type TokenApproveArguments = [
-  string, // `spender`
-  string // `value`
-];
-
-type TributeProposalDetails = {
-  tokenAddress: string;
-  tributeAmount: string;
-};
-
-type ProcessActionTributeProps = {
+type ProcessActionMembershipProps = {
   disabled?: boolean;
   proposal: ProposalData;
   isProposalPassed: boolean;
@@ -51,7 +40,9 @@ const useMemberActionDisabledProps = {
   skipIsActiveMemberCheck: true,
 };
 
-export default function ProcessActionTribute(props: ProcessActionTributeProps) {
+export default function ProcessActionMembership(
+  props: ProcessActionMembershipProps
+) {
   const {
     disabled: propsDisabled,
     proposal: {snapshotProposal},
@@ -64,9 +55,9 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
   const [submitError, setSubmitError] = useState<Error>();
   const [
-    tributeProposalDetails,
-    setTributeProposalDetails,
-  ] = useState<TributeProposalDetails>();
+    membershipProposalAmount,
+    setMembershipProposalAmount,
+  ] = useState<string>();
 
   /**
    * Refs
@@ -80,8 +71,8 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
    * Selectors
    */
 
-  const TributeContract = useSelector(
-    (state: StoreState) => state.contracts?.TributeContract
+  const OnboardingContract = useSelector(
+    (state: StoreState) => state.contracts?.OnboardingContract
   );
   const daoRegistryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
@@ -91,14 +82,8 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
    * Our hooks
    */
 
-  const {account, web3Instance} = useWeb3Modal();
+  const {account} = useWeb3Modal();
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
-  const {
-    txEtherscanURL: txEtherscanURLTokenApprove,
-    txIsPromptOpen: txIsPromptOpenTokenApprove,
-    txSend: txSendTokenApprove,
-    txStatus: txStatusTokenApprove,
-  } = useContractSend();
   const {
     isDisabled,
     openWhyDisabledModal,
@@ -113,21 +98,18 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
   const isInProcess =
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-    txStatus === Web3TxStatus.PENDING ||
-    txStatusTokenApprove === Web3TxStatus.AWAITING_CONFIRM ||
-    txStatusTokenApprove === Web3TxStatus.PENDING;
+    txStatus === Web3TxStatus.PENDING;
   const isDone = txStatus === Web3TxStatus.FULFILLED;
-  const isInProcessOrDone =
-    isInProcess || isDone || txIsPromptOpen || txIsPromptOpenTokenApprove;
+  const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
   const areSomeDisabled = isDisabled || isInProcessOrDone || propsDisabled;
 
   /**
    * Cached callbacks
    */
 
-  const getTributeProposalDetailsCached = useCallback(
-    getTributeProposalDetails,
-    [TributeContract, daoRegistryAddress, snapshotProposal]
+  const getMembershipProposalAmountCached = useCallback(
+    getMembershipProposalAmount,
+    [OnboardingContract, daoRegistryAddress, snapshotProposal]
   );
 
   /**
@@ -136,9 +118,9 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
   useEffect(() => {
     if (isProposalPassed) {
-      getTributeProposalDetailsCached();
+      getMembershipProposalAmountCached();
     }
-  }, [getTributeProposalDetailsCached, isProposalPassed]);
+  }, [getMembershipProposalAmountCached, isProposalPassed]);
 
   useEffect(() => {
     if (isProposalPassed) {
@@ -174,86 +156,18 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
    * Functions
    */
 
-  async function getTributeProposalDetails() {
+  async function getMembershipProposalAmount() {
     try {
-      if (!snapshotProposal || !TributeContract) return;
+      if (!snapshotProposal || !OnboardingContract) return;
 
-      const proposalDetails = await TributeContract.instance.methods
+      const proposalDetails = await OnboardingContract.instance.methods
         .proposals(daoRegistryAddress, snapshotProposal.idInDAO)
         .call();
-      const {token: tokenAddress, tributeAmount} = proposalDetails;
 
-      setTributeProposalDetails({tokenAddress, tributeAmount});
+      setMembershipProposalAmount(proposalDetails.amount);
     } catch (error) {
       console.error(error);
-      setTributeProposalDetails(undefined);
-    }
-  }
-
-  async function handleSubmitTokenApprove() {
-    try {
-      if (!tributeProposalDetails) {
-        throw new Error('No Tribute proposal details found.');
-      }
-
-      if (!TributeContract) {
-        throw new Error('No TributeContract found.');
-      }
-
-      if (!account) {
-        throw new Error('No account found.');
-      }
-
-      const {tokenAddress, tributeAmount} = tributeProposalDetails;
-
-      const {default: lazyERC20ABI} = await import(
-        '../../truffle-contracts/ERC20.json'
-      );
-      const erc20Contract: AbiItem[] = lazyERC20ABI as any;
-      const erc20Instance = new web3Instance.eth.Contract(
-        erc20Contract,
-        tokenAddress
-      );
-
-      // Value to check if adapter is allowed to spend amount of tribute tokens
-      // on behalf of owner. If allowance is not sufficient, the owner will approve the adapter to spend the amount of
-      // tokens needed for the owner to provide the full tribute amount.
-      const allowance = await erc20Instance.methods
-        .allowance(account, TributeContract.contractAddress)
-        .call();
-
-      const tributeAmountBN = toBN(tributeAmount);
-      const allowanceBN = toBN(allowance);
-
-      if (tributeAmountBN.gt(allowanceBN)) {
-        try {
-          const difference = tributeAmountBN.sub(allowanceBN);
-          const approveValue = allowanceBN.add(difference);
-          const tokenApproveArguments: TokenApproveArguments = [
-            TributeContract.contractAddress,
-            approveValue.toString(),
-          ];
-          const txArguments = {
-            from: account || '',
-            // Set a fast gas price
-            ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
-          };
-
-          // Execute contract call for `approve`
-          await txSendTokenApprove(
-            'approve',
-            erc20Instance.methods,
-            tokenApproveArguments,
-            txArguments
-          );
-        } catch (error) {
-          throw new Error(
-            'Your ERC20 tokens could not be approved for transfer.'
-          );
-        }
-      }
-    } catch (error) {
-      throw error;
+      setMembershipProposalAmount(undefined);
     }
   }
 
@@ -267,11 +181,9 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
         throw new Error('No Snapshot proposal was found.');
       }
 
-      if (!TributeContract) {
-        throw new Error('No TributeContract found.');
+      if (!OnboardingContract) {
+        throw new Error('No OnboardingContract found.');
       }
-
-      await handleSubmitTokenApprove();
 
       const processArguments: ProcessArguments = [
         daoRegistryAddress,
@@ -280,13 +192,14 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
       const txArguments = {
         from: account || '',
+        value: membershipProposalAmount,
         // Set a fast gas price
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
       await txSend(
         'processProposal',
-        TributeContract.instance.methods,
+        OnboardingContract.instance.methods,
         processArguments,
         txArguments
       );
@@ -300,28 +213,6 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
    */
 
   function renderSubmitStatus(): React.ReactNode {
-    // token approve transaction statuses
-    if (txStatusTokenApprove === Web3TxStatus.AWAITING_CONFIRM) {
-      return (
-        <>
-          Confirm to transfer your tokens
-          <CycleEllipsis />
-        </>
-      );
-    }
-
-    if (txStatusTokenApprove === Web3TxStatus.PENDING) {
-      return (
-        <>
-          <div>
-            Approving your tokens for transfer
-            <CycleEllipsis />
-          </div>
-          <EtherscanURL url={txEtherscanURLTokenApprove} isPending />
-        </>
-      );
-    }
-
     // process proposal transaction statuses
     switch (txStatus) {
       case Web3TxStatus.AWAITING_CONFIRM:

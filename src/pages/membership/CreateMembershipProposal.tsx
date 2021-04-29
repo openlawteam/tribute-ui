@@ -3,6 +3,7 @@ import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
 import {toWei, toChecksumAddress} from 'web3-utils';
+import {useHistory} from 'react-router-dom';
 
 import {
   getValidationError,
@@ -10,24 +11,18 @@ import {
   formatNumber,
   formatDecimal,
   truncateEthAddress,
+  normalizeString,
 } from '../../util/helpers';
-import {
-  useContractSend,
-  useETHGasPrice,
-  useIsDefaultChain,
-} from '../../components/web3/hooks';
+import {useIsDefaultChain} from '../../components/web3/hooks';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {UNITS_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
-import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
-import {useHistory} from 'react-router-dom';
+import {CycleEllipsis} from '../../components/feedback';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
-import CycleMessage from '../../components/feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
-import EtherscanURL from '../../components/web3/EtherscanURL';
 import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
@@ -43,9 +38,7 @@ type FormInputs = {
   ethAmount: string;
 };
 
-type OnboardArguments = [
-  string, // `dao`
-  string, // `proposalId`
+type SubmitActionArguments = [
   string, // `applicant`
   string, // `tokenToMint`
   string // `tokenAmount`
@@ -64,22 +57,14 @@ export default function CreateMembershipProposal() {
   );
 
   /**
-   * Hooks
+   * Our hooks
    */
 
   const {defaultChainError} = useIsDefaultChain();
   const {connected, account, web3Instance} = useWeb3Modal();
-  const gasPrices = useETHGasPrice();
-  const {
-    txError,
-    txEtherscanURL,
-    txIsPromptOpen,
-    txSend,
-    txStatus,
-  } = useContractSend();
-
   const {
     proposalData,
+    proposalSignAndSendError,
     proposalSignAndSendStatus,
     signAndSendProposal,
   } = useSignAndSubmitProposal<SnapshotType.draft>();
@@ -107,20 +92,16 @@ export default function CreateMembershipProposal() {
 
   const {errors, getValues, setValue, register, trigger} = form;
 
-  const createMemberError = submitError || txError;
+  const createMemberError = submitError || proposalSignAndSendError;
   const isConnected = connected && account;
 
   const isInProcess =
-    txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-    txStatus === Web3TxStatus.PENDING ||
     proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM ||
     proposalSignAndSendStatus === Web3TxStatus.PENDING;
 
-  const isDone =
-    txStatus === Web3TxStatus.FULFILLED &&
-    proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
+  const isDone = proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
 
-  const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
+  const isInProcessOrDone = isInProcess || isDone;
 
   /**
    * Cached callbacks
@@ -191,6 +172,7 @@ export default function CreateMembershipProposal() {
       const {ethAddress, ethAmount} = values;
       const ethAddressToChecksum = toChecksumAddress(ethAddress);
       const ethAmountInWei = toWei(stripFormatNumber(ethAmount), 'ether');
+      const proposerAddressToChecksum = toChecksumAddress(account);
 
       // Values needed to display relevant proposal amounts in the proposal
       // details page are set in the snapshot draft metadata. (We can no longer
@@ -201,17 +183,34 @@ export default function CreateMembershipProposal() {
         tributeAmountUnit: 'ETH',
       };
 
+      // Arguments needed to submit the proposal onchain are set in the snapshot
+      // draft metadata.
+      const submitActionArgs: SubmitActionArguments = [
+        ethAddressToChecksum,
+        UNITS_ADDRESS,
+        ethAmountInWei,
+      ];
+
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
       if (!proposalId) {
+        const body =
+          normalizeString(ethAddress) === normalizeString(account)
+            ? `Membership for ${truncateEthAddress(ethAddressToChecksum, 7)}.`
+            : `Membership proposal from ${truncateEthAddress(
+                proposerAddressToChecksum,
+                7
+              )} for applicant ${truncateEthAddress(ethAddressToChecksum, 7)}.`;
+
         // Sign and submit draft for snapshot-hub
         const {uniqueId} = await signAndSendProposal({
           partialProposalData: {
             name: ethAddressToChecksum,
-            body: `Membership for ${truncateEthAddress(
-              ethAddressToChecksum,
-              7
-            )}.`,
-            metadata: {proposalAmountValues},
+            body,
+            metadata: {
+              proposalAmountValues,
+              submitActionArgs,
+              accountAuthorizedToProcessPassedProposal: proposerAddressToChecksum,
+            },
           },
           adapterName: ContractAdapterNames.onboarding,
           type: SnapshotType.draft,
@@ -220,30 +219,7 @@ export default function CreateMembershipProposal() {
         proposalId = uniqueId;
       }
 
-      const onboardArguments: OnboardArguments = [
-        DaoRegistryContract.contractAddress,
-        proposalId,
-        ethAddressToChecksum,
-        UNITS_ADDRESS,
-        ethAmountInWei,
-      ];
-
-      const txArguments = {
-        from: account || '',
-        value: ethAmountInWei,
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
-      };
-
-      // Execute contract call for `onboard`
-      await txSend(
-        'onboard',
-        OnboardingContract.instance.methods,
-        onboardArguments,
-        txArguments
-      );
-
-      // go to MemberDetails page for newly created member proposal
+      // go to MembershipDetails page for newly created member proposal
       history.push(`/membership/${proposalId}`);
     } catch (error) {
       // Set any errors from Web3 utils or explicitly set above.
@@ -252,41 +228,25 @@ export default function CreateMembershipProposal() {
   }
 
   function renderSubmitStatus(): React.ReactNode {
-    // Either Snapshot or chain tx
-    if (
-      txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-      proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM
-    ) {
-      return 'Awaiting your confirmation\u2026';
-    }
-
-    // Only for chain tx
-    switch (txStatus) {
+    switch (proposalSignAndSendStatus) {
+      case Web3TxStatus.AWAITING_CONFIRM:
+        return (
+          <>
+            Awaiting your confirmation
+            <CycleEllipsis intervalMs={500} />
+          </>
+        );
       case Web3TxStatus.PENDING:
         return (
           <>
-            <CycleMessage
-              intervalMs={2000}
-              messages={TX_CYCLE_MESSAGES}
-              useFirstItemStart
-              render={(message) => {
-                return <FadeIn key={message}>{message}</FadeIn>;
-              }}
-            />
-
-            <EtherscanURL url={txEtherscanURL} isPending />
+            Submitting
+            <CycleEllipsis intervalMs={500} />
           </>
         );
       case Web3TxStatus.FULFILLED:
-        return (
-          <>
-            <div>Proposal submitted!</div>
-
-            <EtherscanURL url={txEtherscanURL} />
-          </>
-        );
+        return 'Done!';
       default:
-        return null;
+        return '';
     }
   }
 

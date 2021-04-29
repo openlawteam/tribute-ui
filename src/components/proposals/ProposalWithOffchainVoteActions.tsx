@@ -10,6 +10,7 @@ import {useProposalWithOffchainVoteStatus} from './hooks';
 import SubmitAction from './SubmitAction';
 import SponsorAction from './SponsorAction';
 import ProcessAction from './ProcessAction';
+import ProcessActionMembership from './ProcessActionMembership';
 import ProcessActionTribute from './ProcessActionTribute';
 import PostProcessAction from './PostProcessAction';
 
@@ -57,6 +58,21 @@ export default function ProposalWithOffchainVoteActions(
 
   function renderProcessAction() {
     switch (adapterName) {
+      case ContractAdapterNames.onboarding:
+        return (
+          <ProcessActionMembership
+            // Show during DAO proposal grace period, but set to disabled
+            disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
+            proposal={proposal}
+            isProposalPassed={
+              !!(
+                daoProposalVoteResult &&
+                VotingState[daoProposalVoteResult] ===
+                  VotingState[VotingState.PASS]
+              )
+            }
+          />
+        );
       case ContractAdapterNames.tribute:
         return (
           <ProcessActionTribute
