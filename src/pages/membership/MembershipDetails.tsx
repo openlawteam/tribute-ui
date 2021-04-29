@@ -12,6 +12,12 @@ import ProposalActions from '../../components/proposals/ProposalActions';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
 import Wrap from '../../components/common/Wrap';
+import {
+  ProposalFlowStatus,
+  RenderActionPropArguments,
+} from '../../components/proposals/types';
+import {VotingState} from '../../components/proposals/voting/types';
+import ProcessActionMembership from '../../components/proposals/ProcessActionMembership';
 
 const PLACEHOLDER = '\u2014'; /* em dash */
 
@@ -51,6 +57,40 @@ export default function MembershipDetails() {
     proposalNotFound,
     proposalStatus,
   } = useProposalOrDraft(proposalId);
+
+  /**
+   * Functions
+   */
+
+  // Render any adapter-specific actions
+  function renderAction(data: RenderActionPropArguments) {
+    const {
+      OffchainVotingContract: {daoProposalVoteResult, proposal, status},
+    } = data;
+
+    if (
+      status === ProposalFlowStatus.Process ||
+      status === ProposalFlowStatus.OffchainVotingGracePeriod
+    ) {
+      return (
+        <ProcessActionMembership
+          // Show during DAO proposal grace period, but set to disabled
+          disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
+          proposal={proposal}
+          isProposalPassed={
+            !!(
+              daoProposalVoteResult &&
+              VotingState[daoProposalVoteResult] ===
+                VotingState[VotingState.PASS]
+            )
+          }
+        />
+      );
+    }
+
+    // Return `null` to signal to use default actions
+    return null;
+  }
 
   /**
    * Render
@@ -121,6 +161,7 @@ export default function MembershipDetails() {
             <ProposalActions
               adapterName={ContractAdapterNames.onboarding}
               proposal={proposalData}
+              renderAction={renderAction}
             />
           )}
         />
