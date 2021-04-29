@@ -1,13 +1,19 @@
 import React from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
+import {
+  ProposalFlowStatus,
+  RenderActionPropArguments,
+} from '../../components/proposals/types';
 import {AsyncStatus} from '../../util/types';
 import {ContractAdapterNames} from '../../components/web3/types';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
+import {VotingState} from '../../components/proposals/voting/types';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderLarge from '../../components/feedback/LoaderLarge';
 import NotFound from '../subpages/NotFound';
+import PostProcessAction from '../../components/proposals/PostProcessAction';
 import ProposalActions from '../../components/proposals/ProposalActions';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
@@ -51,6 +57,39 @@ export default function TransferDetails() {
     proposalNotFound,
     proposalStatus,
   } = useProposalOrDraft(proposalId);
+
+  /**
+   * Functions
+   */
+
+  // Render any adapter-specific actions
+  function renderAction(data: RenderActionPropArguments): React.ReactNode {
+    const {
+      OffchainVotingContract: {
+        adapterName,
+        daoProposalVoteResult,
+        proposal,
+        status,
+      },
+    } = data;
+
+    //  Currently, only Distribute adapter has an action that occurs after the
+    //  proposal is processed.
+    const showPostProcessAction =
+      adapterName === ContractAdapterNames.distribute &&
+      status === ProposalFlowStatus.Completed &&
+      daoProposalVoteResult &&
+      VotingState[daoProposalVoteResult] === VotingState[VotingState.PASS];
+
+    if (showPostProcessAction) {
+      return (
+        <PostProcessAction adapterName={adapterName} proposal={proposal} />
+      );
+    }
+
+    // Return `null` to signal to use default actions
+    return null;
+  }
 
   /**
    * Render
@@ -121,6 +160,7 @@ export default function TransferDetails() {
             <ProposalActions
               adapterName={ContractAdapterNames.distribute}
               proposal={proposalData}
+              renderAction={renderAction}
             />
           )}
         />
