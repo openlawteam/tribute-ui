@@ -6,9 +6,9 @@ describe('SquareRootVotingBar unit tests', () => {
   test('should show correct percentages', () => {
     render(
       <SquareRootVotingBar
-        yesShares={400000}
-        noShares={200000}
-        totalShares={10000000}
+        yesUnits={400000}
+        noUnits={200000}
+        totalUnits={10000000}
         votingExpired={true}
         showPercentages={true}
       />
@@ -23,9 +23,9 @@ describe('SquareRootVotingBar unit tests', () => {
   test('should not show percentages if `showPercentages` is false', () => {
     render(
       <SquareRootVotingBar
-        yesShares={400000}
-        noShares={200000}
-        totalShares={10000000}
+        yesUnits={400000}
+        noUnits={200000}
+        totalUnits={10000000}
         votingExpired={true}
         showPercentages={false}
       />
@@ -37,12 +37,12 @@ describe('SquareRootVotingBar unit tests', () => {
     expect(screen.getByLabelText('2% no votes')).toBeInTheDocument();
   });
 
-  test('no results should display if shares values are not provided yet (i.e. async values)', () => {
+  test('no results should display if units values are not provided yet (i.e. async values)', () => {
     render(
       <SquareRootVotingBar
-        yesShares={undefined}
-        noShares={undefined}
-        totalShares={undefined}
+        yesUnits={undefined}
+        noUnits={undefined}
+        totalUnits={undefined}
         votingExpired={false}
         showPercentages={true}
       />

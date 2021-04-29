@@ -146,14 +146,26 @@
         "type": "bytes32"
       },
       {
-        "internalType": "bytes32",
-        "name": "adapterId",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "adapterAddress",
-        "type": "address"
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "adapterId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "adapterAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "flags",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct IManaging.ProposalInput",
+        "name": "proposal",
+        "type": "tuple"
       },
       {
         "internalType": "bytes32[]",
@@ -166,35 +178,12 @@
         "type": "uint256[]"
       },
       {
-        "internalType": "uint256",
-        "name": "_flags",
-        "type": "uint256"
-      }
-    ],
-    "name": "submitProposal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "proposalId",
-        "type": "bytes32"
-      },
-      {
         "internalType": "bytes",
         "name": "data",
         "type": "bytes"
       }
     ],
-    "name": "sponsorProposal",
+    "name": "submitProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

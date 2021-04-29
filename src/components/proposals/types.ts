@@ -192,13 +192,13 @@ export type OffchainVotingAdapterVotes = {
 
 export type VoteChoiceResult = {
   percentage: number;
-  shares: number;
+  units: number;
 };
 
 export type VotingResult = {
   [VoteChoices.Yes]: VoteChoiceResult;
   [VoteChoices.No]: VoteChoiceResult;
-  totalShares: number;
+  totalUnits: number;
 };
 
 /**

@@ -4,7 +4,7 @@ import {AbiItem, toBN} from 'web3-utils';
 import {useLazyQuery} from '@apollo/react-hooks';
 import Web3 from 'web3';
 
-import {SHARES_ADDRESS, GQL_QUERY_POLLING_INTERVAL} from '../../../config';
+import {UNITS_ADDRESS, GQL_QUERY_POLLING_INTERVAL} from '../../../config';
 import {AsyncStatus} from '../../../util/types';
 import {normalizeString} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
@@ -130,7 +130,7 @@ export default function useMembers(): UseMembersReturn {
         // extract members from gql data
         const {members} = data.tributeDaos[0] as Record<string, any>;
         // Filter out any member that has fully ragequit (no positive balance in
-        // SHARES)
+        // UNITS)
         const filteredMembers = members.filter(
           (member: Record<string, any>) => !member.didFullyRagequit
         );
@@ -213,22 +213,22 @@ export default function useMembers(): UseMembersReturn {
           web3Instance,
         });
 
-        // Build calls to get member balances in SHARES
+        // Build calls to get member balances in UNITS
         const {
           abi: bankABI,
           contractAddress: bankAddress,
         } = BankExtensionContract;
 
         const balanceOfABI = bankABI.find((item) => item.name === 'balanceOf');
-        const sharesBalanceOfCalls = memberAddressesByDelegatedKey.map(
+        const unitsBalanceOfCalls = memberAddressesByDelegatedKey.map(
           (address): MulticallTuple => [
             bankAddress,
             balanceOfABI as AbiItem,
-            [address, SHARES_ADDRESS],
+            [address, UNITS_ADDRESS],
           ]
         );
-        const sharesBalances: string[] = await multicall({
-          calls: sharesBalanceOfCalls,
+        const unitsBalances: string[] = await multicall({
+          calls: unitsBalanceOfCalls,
           web3Instance,
         });
 
@@ -238,13 +238,13 @@ export default function useMembers(): UseMembersReturn {
           isDelegated:
             normalizeString(address) !==
             normalizeString(memberAddressesByDelegatedKey[index]),
-          shares: sharesBalances[index],
+          units: unitsBalances[index],
         }));
 
         // Filter out any member addresses that don't have a positive balance in
-        // SHARES
+        // UNITS
         const filteredMembersWithDetails = membersWithDetails
-          .filter((member) => toBN(member.shares).gt(toBN(0)))
+          .filter((member) => toBN(member.units).gt(toBN(0)))
           // display in descending order of when the member joined (e.g., newest
           // member first)
           .reverse();

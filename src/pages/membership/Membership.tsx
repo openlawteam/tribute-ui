@@ -30,6 +30,7 @@ export default function Membership() {
       <Proposals
         adapterName={DaoAdapterConstants.ONBOARDING}
         onProposalClick={handleClickProposalDetails}
+        includeProposalsExistingOnlyOffchain={true}
       />
     </RenderWrapper>
   );

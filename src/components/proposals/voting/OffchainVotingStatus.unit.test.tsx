@@ -64,7 +64,7 @@ describe('OffchainVotingStatus unit tests', () => {
         useInit
         useWallet
         getProps={({mockWeb3Provider, web3Instance}) => {
-          // Inject mocked shares result 1
+          // Inject mocked units result 1
           mockWeb3Provider.injectResult(
             web3Instance.eth.abi.encodeParameters(
               ['uint256', 'bytes[]'],
@@ -108,9 +108,9 @@ describe('OffchainVotingStatus unit tests', () => {
         <OffchainVotingStatus
           proposal={fakeProposal as ProposalData}
           votingResult={{
-            Yes: {shares: 100000, percentage: 1},
-            No: {shares: 0, percentage: 0},
-            totalShares: 10000000,
+            Yes: {units: 100000, percentage: 1},
+            No: {units: 0, percentage: 0},
+            totalUnits: 10000000,
           }}
         />
       </Wrapper>
@@ -147,7 +147,7 @@ describe('OffchainVotingStatus unit tests', () => {
           ];
           mockWeb3Provider.injectResult(...result);
 
-          // Inject mocked results for total shares and single vote
+          // Inject mocked results for total units and single vote
           mockWeb3Provider.injectResult(
             web3Instance.eth.abi.encodeParameters(
               ['uint256', 'bytes[]'],

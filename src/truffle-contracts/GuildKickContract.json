@@ -146,7 +146,7 @@
         "type": "bytes"
       }
     ],
-    "name": "submitKickProposal",
+    "name": "submitProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

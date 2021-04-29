@@ -165,7 +165,7 @@ export default function GovernanceProposalsList(
    */
 
   function didPassSimpleMajority(offchainVoteResult: VotingResult): boolean {
-    return offchainVoteResult.Yes.shares > offchainVoteResult.No.shares;
+    return offchainVoteResult.Yes.units > offchainVoteResult.No.units;
   }
 
   function renderProposalCards(

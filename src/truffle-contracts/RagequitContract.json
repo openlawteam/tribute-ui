@@ -11,7 +11,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "burnedShares",
+        "name": "burnedUnits",
         "type": "uint256"
       },
       {
@@ -23,7 +23,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "initialTotalSharesAndLoot",
+        "name": "initialTotalUnitsAndLoot",
         "type": "uint256"
       }
     ],
@@ -115,7 +115,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "sharesToBurn",
+        "name": "unitsToBurn",
         "type": "uint256"
       },
       {

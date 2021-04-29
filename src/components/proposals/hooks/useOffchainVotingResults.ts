@@ -6,7 +6,7 @@ import Web3 from 'web3';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
-import {SHARES_ADDRESS, TOTAL_ADDRESS} from '../../../config';
+import {UNITS_ADDRESS, TOTAL_ADDRESS} from '../../../config';
 import {SnapshotProposal, VotingResult} from '../types';
 import {StoreState} from '../../../store/types';
 import {useIsMounted} from '../../../hooks';
@@ -82,8 +82,8 @@ export function useOffchainVotingResults(
    * Cached callbacks
    */
 
-  const getSharesPerChoiceCached = useCallback(
-    getSharesPerChoiceFromContract,
+  const getUnitsPerChoiceCached = useCallback(
+    getUnitsPerChoiceFromContract,
     []
   );
 
@@ -124,7 +124,7 @@ export function useOffchainVotingResults(
       );
 
       try {
-        const result = await getSharesPerChoiceCached({
+        const result = await getUnitsPerChoiceCached({
           bankAddress,
           getPriorAmountABI,
           snapshot,
@@ -157,7 +157,7 @@ export function useOffchainVotingResults(
   }, [
     bankAddress,
     getPriorAmountABI,
-    getSharesPerChoiceCached,
+    getUnitsPerChoiceCached,
     isMountedRef,
     proposals,
     web3Instance,
@@ -167,7 +167,7 @@ export function useOffchainVotingResults(
    * Functions
    */
 
-  async function getSharesPerChoiceFromContract({
+  async function getUnitsPerChoiceFromContract({
     bankAddress,
     getPriorAmountABI,
     snapshot,
@@ -185,65 +185,65 @@ export function useOffchainVotingResults(
       const results = {
         [VoteChoices.Yes]: {
           percentage: 0,
-          shares: 0,
+          units: 0,
         },
         [VoteChoices.No]: {
           percentage: 0,
-          shares: 0,
+          units: 0,
         },
-        totalShares: 0,
+        totalUnits: 0,
       };
 
-      // Build a call for total shares
-      const totalSharesCall: MulticallTuple = [
+      // Build a call for total units
+      const totalUnitsCall: MulticallTuple = [
         bankAddress,
         getPriorAmountABI,
         [
           TOTAL_ADDRESS, // account
-          SHARES_ADDRESS, // tokenAddr
+          UNITS_ADDRESS, // tokenAddr
           snapshot.toString(), // blockNumber
         ],
       ];
 
       // Build calls to Bank contract
-      const sharesCalls = voterAddressesAndChoices.map(
+      const unitsCalls = voterAddressesAndChoices.map(
         ([address]): MulticallTuple => [
           bankAddress,
           getPriorAmountABI,
           [
             address, // account
-            SHARES_ADDRESS, // tokenAddr
+            UNITS_ADDRESS, // tokenAddr
             snapshot.toString(), // blockNumber
           ],
         ]
       );
 
-      const calls = [totalSharesCall, ...sharesCalls];
+      const calls = [totalUnitsCall, ...unitsCalls];
 
-      const [totalSharesResult, ...votingResults]: string[] = await multicall({
+      const [totalUnitsResult, ...votingResults]: string[] = await multicall({
         calls,
         web3Instance,
       });
 
-      // Set shares values for choices
-      votingResults.forEach((shares, i) => {
+      // Set Units values for choices
+      votingResults.forEach((units, i) => {
         const isYes =
           VoteChoicesIndex[voterAddressesAndChoices[i][1]] ===
           VoteChoicesIndex[VoteChoicesIndex.Yes];
         const choice = isYes ? VoteChoices.Yes : VoteChoices.No;
 
-        results[choice].shares += Number(shares);
+        results[choice].units += Number(units);
       });
 
       // Set percentages
       results[VoteChoices.Yes].percentage =
-        (results[VoteChoices.Yes].shares / Number(totalSharesResult)) * 100;
+        (results[VoteChoices.Yes].units / Number(totalUnitsResult)) * 100;
 
       results[VoteChoices.No].percentage =
-        (results[VoteChoices.No].shares / Number(totalSharesResult)) * 100;
+        (results[VoteChoices.No].units / Number(totalUnitsResult)) * 100;
 
-      // Set total shares
-      results.totalShares = Number(totalSharesResult);
+      // Set total units
+      results.totalUnits = Number(totalUnitsResult);
 
       return results;
     } catch (error) {

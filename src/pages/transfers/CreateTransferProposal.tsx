@@ -9,7 +9,7 @@ import {useSelector} from 'react-redux';
 import {useHistory} from 'react-router-dom';
 import {toBN, AbiItem, toWei, toChecksumAddress} from 'web3-utils';
 
-import {ETH_TOKEN_ADDRESS, GUILD_ADDRESS, SHARES_ADDRESS} from '../../config';
+import {ETH_TOKEN_ADDRESS, GUILD_ADDRESS, UNITS_ADDRESS} from '../../config';
 import {
   getValidationError,
   stripFormatNumber,
@@ -59,7 +59,7 @@ type FormInputs = {
 type TransferArguments = [
   string, // `dao`
   string, // `proposalId`
-  string, // `shareHolderAddr`
+  string, // `unitHolderAddr`
   string, // `token`
   string, // `amount`
   string // `data`
@@ -562,17 +562,17 @@ export default function CreateTransferProposal() {
     }
   }
 
-  async function isActiveMemberWithShares(address: string) {
+  async function isActiveMemberWithUnits(address: string) {
     if (!BankExtensionContract) {
       console.error('No BankExtensionContract found.');
       return false;
     }
 
-    const sharesBalance = await BankExtensionContract.instance.methods
-      .balanceOf(address, SHARES_ADDRESS)
+    const unitsBalance = await BankExtensionContract.instance.methods
+      .balanceOf(address, UNITS_ADDRESS)
       .call();
 
-    return toBN(sharesBalance).gt(toBN(0));
+    return toBN(unitsBalance).gt(toBN(0));
   }
 
   /**
@@ -624,8 +624,8 @@ export default function CreateTransferProposal() {
                       ? FormFieldErrors.REQUIRED
                       : !isEthAddressValid(memberAddress)
                       ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
-                      : !(await isActiveMemberWithShares(memberAddress))
-                      ? 'The address is not an active member with SHARES.'
+                      : !(await isActiveMemberWithUnits(memberAddress))
+                      ? 'The address is not an active member with UNITS.'
                       : true;
                   },
                 })}
@@ -730,7 +730,7 @@ export default function CreateTransferProposal() {
 
             <div className="form__input-description">
               {isTypeAllMembers
-                ? "If the proposal passes, this total amount will be distributed pro rata to all members' internal accounts, based on the current number of shares held by each member."
+                ? "If the proposal passes, this total amount will be distributed pro rata to all members' internal accounts, based on the current number of units held by each member."
                 : "If the proposal passes, this amount will be distributed to the member's internal account."}
             </div>
           </div>

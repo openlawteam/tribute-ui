@@ -13,7 +13,7 @@ import {VoteEntry} from '@openlaw/snapshot-js-erc712/dist/types';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {getAdapterAddressFromContracts} from '../../web3/helpers';
-import {DEFAULT_CHAIN, SHARES_ADDRESS} from '../../../config';
+import {DEFAULT_CHAIN, UNITS_ADDRESS} from '../../../config';
 import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
@@ -157,7 +157,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
             weight: await bankExtensionMethods
               .getPriorAmount(
                 voteData.address,
-                SHARES_ADDRESS,
+                UNITS_ADDRESS,
                 snapshotProposal.msg.payload.snapshot
               )
               .call(),
