@@ -1,13 +1,19 @@
 import React from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
+import {
+  ProposalFlowStatus,
+  RenderActionPropArguments,
+} from '../../components/proposals/types';
 import {AsyncStatus} from '../../util/types';
 import {ContractAdapterNames} from '../../components/web3/types';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
+import {VotingState} from '../../components/proposals/voting/types';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderLarge from '../../components/feedback/LoaderLarge';
 import NotFound from '../subpages/NotFound';
+import PostProcessActionTransfer from '../../components/proposals/PostProcessActionTransfer';
 import ProposalActions from '../../components/proposals/ProposalActions';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
@@ -51,6 +57,30 @@ export default function TransferDetails() {
     proposalNotFound,
     proposalStatus,
   } = useProposalOrDraft(proposalId);
+
+  /**
+   * Functions
+   */
+
+  // Render any adapter-specific actions
+  function renderAction(data: RenderActionPropArguments): React.ReactNode {
+    const {
+      OffchainVotingContract: {daoProposalVoteResult, proposal, status},
+    } = data;
+
+    //  The Distribute adapter has an additional action after a passed proposal
+    //  is processed to handle the actual asset distribution.
+    if (
+      status === ProposalFlowStatus.Completed &&
+      daoProposalVoteResult &&
+      VotingState[daoProposalVoteResult] === VotingState[VotingState.PASS]
+    ) {
+      return <PostProcessActionTransfer proposal={proposal} />;
+    }
+
+    // Return `null` to signal to use default actions
+    return null;
+  }
 
   /**
    * Render
@@ -121,6 +151,7 @@ export default function TransferDetails() {
             <ProposalActions
               adapterName={ContractAdapterNames.distribute}
               proposal={proposalData}
+              renderAction={renderAction}
             />
           )}
         />

@@ -33,7 +33,6 @@ type TributeProposalDetails = {
 type ProcessActionTributeProps = {
   disabled?: boolean;
   proposal: ProposalData;
-  isProposalPassed: boolean;
 };
 
 type ActionDisabledReasons = {
@@ -55,7 +54,6 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
   const {
     disabled: propsDisabled,
     proposal: {snapshotProposal},
-    isProposalPassed,
   } = props;
 
   /**
@@ -135,40 +133,36 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
    */
 
   useEffect(() => {
-    if (isProposalPassed) {
-      getTributeProposalDetailsCached();
-    }
-  }, [getTributeProposalDetailsCached, isProposalPassed]);
+    getTributeProposalDetailsCached();
+  }, [getTributeProposalDetailsCached]);
 
   useEffect(() => {
-    if (isProposalPassed) {
-      // 1. Determine and set reasons why action would be disabled
+    // 1. Determine and set reasons why action would be disabled
 
-      // Reason: For some proposal types, a passed proposal can only be
-      // processed by its original proposer (e.g., the owner of the asset to be
-      // transferred)
+    // Reason: For some proposal types, a passed proposal can only be
+    // processed by its original proposer (e.g., the owner of the asset to be
+    // transferred)
 
-      // Proposals with this restriction will have this value stored in its
-      // snapshot metadata.
-      const {
-        accountAuthorizedToProcessPassedProposal,
-      } = (snapshotProposal as SnapshotProposal).msg.payload.metadata;
+    // Proposals with this restriction will have this value stored in its
+    // snapshot metadata.
+    const {
+      accountAuthorizedToProcessPassedProposal,
+    } = (snapshotProposal as SnapshotProposal).msg.payload.metadata;
 
-      if (accountAuthorizedToProcessPassedProposal && account) {
-        actionDisabledReasonsRef.current = {
-          ...actionDisabledReasonsRef.current,
-          notProposerMessage:
-            accountAuthorizedToProcessPassedProposal.toLowerCase() !==
-            account.toLowerCase()
-              ? 'Only the original proposer can process the proposal.'
-              : '',
-        };
-      }
-
-      // 2. Set reasons
-      setOtherDisabledReasons(Object.values(actionDisabledReasonsRef.current));
+    if (accountAuthorizedToProcessPassedProposal && account) {
+      actionDisabledReasonsRef.current = {
+        ...actionDisabledReasonsRef.current,
+        notProposerMessage:
+          accountAuthorizedToProcessPassedProposal.toLowerCase() !==
+          account.toLowerCase()
+            ? 'Only the original proposer can process the proposal.'
+            : '',
+      };
     }
-  }, [account, isProposalPassed, setOtherDisabledReasons, snapshotProposal]);
+
+    // 2. Set reasons
+    setOtherDisabledReasons(Object.values(actionDisabledReasonsRef.current));
+  }, [account, setOtherDisabledReasons, snapshotProposal]);
 
   /**
    * Functions
@@ -361,45 +355,37 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
   return (
     <>
-      {isProposalPassed ? (
-        <>
-          <div>
-            <button
-              className="proposaldetails__button"
-              disabled={areSomeDisabled}
-              onClick={areSomeDisabled ? () => {} : handleSubmit}>
-              {isInProcess ? <Loader /> : isDone ? 'Done' : 'Process'}
-            </button>
+      <div>
+        <button
+          className="proposaldetails__button"
+          disabled={areSomeDisabled}
+          onClick={areSomeDisabled ? () => {} : handleSubmit}>
+          {isInProcess ? <Loader /> : isDone ? 'Done' : 'Process'}
+        </button>
 
-            <ErrorMessageWithDetails
-              error={submitError}
-              renderText="Something went wrong"
-            />
+        <ErrorMessageWithDetails
+          error={submitError}
+          renderText="Something went wrong"
+        />
 
-            {/* SUBMIT STATUS */}
+        {/* SUBMIT STATUS */}
 
-            {isInProcessOrDone && (
-              <div className="form__submit-status-container">
-                {renderSubmitStatus()}
-              </div>
-            )}
-
-            {isDisabled && (
-              <button
-                className="button--help-centered"
-                onClick={openWhyDisabledModal}>
-                Why is processing disabled?
-              </button>
-            )}
+        {isInProcessOrDone && (
+          <div className="form__submit-status-container">
+            {renderSubmitStatus()}
           </div>
+        )}
 
-          <WhyDisabledModal title="Why is processing disabled?" />
-        </>
-      ) : (
-        // If proposal failed there is no reason to process it. So just show
-        // nothing.
-        <></>
-      )}
+        {isDisabled && (
+          <button
+            className="button--help-centered"
+            onClick={openWhyDisabledModal}>
+            Why is processing disabled?
+          </button>
+        )}
+      </div>
+
+      <WhyDisabledModal title="Why is processing disabled?" />
     </>
   );
 }
