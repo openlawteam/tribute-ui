@@ -22,6 +22,14 @@ import SubmitAction from './SubmitAction';
 type ProposalWithOffchainActionsProps = {
   adapterName: ContractAdapterNames;
   proposal: ProposalData;
+  /**
+   * A render prop which can render any action desired.
+   * It is passed inner state and data from
+   * the child action wrapper component.
+   *
+   * - If it renders `null`, it will fall back to the component's actions.
+   * - If it renders `<></>` (`React.Fragment`) then nothing is shown in the UI.
+   */
   renderAction?: (data: RenderActionPropArguments) => React.ReactNode;
 };
 
@@ -35,9 +43,10 @@ export default function ProposalWithOffchainVoteActions(
    */
 
   const {
-    daoProposalVotes,
-    status,
     daoProposalVoteResult,
+    daoProposalVotes,
+    proposalFlowStatusError,
+    status,
   } = useProposalWithOffchainVoteStatus(proposal);
 
   /**
@@ -122,7 +131,7 @@ export default function ProposalWithOffchainVoteActions(
     }
   }
 
-  function renderActions() {
+  function renderActions(): React.ReactNode {
     // If render prop did not return `null` then render its content
     if (renderedActionFromProp) {
       return renderedActionFromProp;
