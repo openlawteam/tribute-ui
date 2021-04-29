@@ -1,13 +1,7 @@
 import {render, screen, waitFor, act} from '@testing-library/react';
 import React from 'react';
 
-import {
-  ethEstimateGas,
-  ethGasPrice,
-  getTransactionReceipt,
-  sendTransaction,
-  signTypedDataV4,
-} from '../../test/web3Responses';
+import {signTypedDataV4} from '../../test/web3Responses';
 import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
 import CreateMembershipProposal from './CreateMembershipProposal';
 import userEvent from '@testing-library/user-event';
