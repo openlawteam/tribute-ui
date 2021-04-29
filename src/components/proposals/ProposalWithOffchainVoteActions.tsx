@@ -3,26 +3,32 @@ import {
   OffchainVotingAction,
   OffchainOpRollupVotingSubmitResultAction,
 } from './voting';
-import {VotingState} from './voting/types';
+import {
+  ProposalData,
+  ProposalFlowStatus,
+  RenderActionPropArguments,
+} from './types';
 import {ContractAdapterNames} from '../web3/types';
-import {ProposalData, ProposalFlowStatus} from './types';
 import {useProposalWithOffchainVoteStatus} from './hooks';
-import SubmitAction from './SubmitAction';
-import SponsorAction from './SponsorAction';
+import {VotingAdapterName} from '../adapters-extensions/enums';
+import {VotingState} from './voting/types';
+import PostProcessAction from './PostProcessAction';
 import ProcessAction from './ProcessAction';
 import ProcessActionMembership from './ProcessActionMembership';
 import ProcessActionTribute from './ProcessActionTribute';
-import PostProcessAction from './PostProcessAction';
+import SponsorAction from './SponsorAction';
+import SubmitAction from './SubmitAction';
 
 type ProposalWithOffchainActionsProps = {
   adapterName: ContractAdapterNames;
   proposal: ProposalData;
+  renderAction?: (data: RenderActionPropArguments) => React.ReactNode;
 };
 
 export default function ProposalWithOffchainVoteActions(
   props: ProposalWithOffchainActionsProps
 ) {
-  const {adapterName, proposal} = props;
+  const {adapterName, proposal, renderAction: renderActionProp} = props;
 
   /**
    * Our hooks
@@ -51,6 +57,23 @@ export default function ProposalWithOffchainVoteActions(
     status === ProposalFlowStatus.Completed &&
     daoProposalVoteResult &&
     VotingState[daoProposalVoteResult] === VotingState[VotingState.PASS];
+
+  /**
+   * If a render prop was provided it will render it and pass
+   * internal state and data up to the parent component.
+   */
+  const renderedActionFromProp =
+    renderActionProp &&
+    renderActionProp({
+      [VotingAdapterName.OffchainVotingContract]: {
+        adapterName,
+        daoProposalVoteResult,
+        daoProposalVotes,
+        gracePeriodStartMs,
+        proposal,
+        status,
+      },
+    });
 
   /**
    * Functions
@@ -99,12 +122,65 @@ export default function ProposalWithOffchainVoteActions(
     }
   }
 
+  function renderActions() {
+    // If render prop did not return `null` then render its content
+    if (renderedActionFromProp) {
+      return renderedActionFromProp;
+    }
+
+    // Submit/Sponsor button (for proposals that have not been submitted onchain yet)
+    if (status === ProposalFlowStatus.Submit) {
+      return <SubmitAction proposal={proposal} />;
+    }
+
+    // Sponsor button
+    if (status === ProposalFlowStatus.Sponsor) {
+      return <SponsorAction proposal={proposal} />;
+    }
+
+    // Off-chain voting buttons
+    if (status === ProposalFlowStatus.OffchainVoting) {
+      return (
+        <OffchainVotingAction adapterName={adapterName} proposal={proposal} />
+      );
+    }
+
+    // Off-chain voting submit vote result
+    if (status === ProposalFlowStatus.OffchainVotingSubmitResult) {
+      return (
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={adapterName}
+          proposal={proposal}
+        />
+      );
+    }
+
+    // Process button
+    // @todo Remove and use render prop
+    if (
+      status === ProposalFlowStatus.Process ||
+      status === ProposalFlowStatus.OffchainVotingGracePeriod
+    ) {
+      renderProcessAction();
+    }
+
+    // Post-process button
+    // @todo Remove and use render prop
+    if (showPostProcessAction) {
+      return (
+        <PostProcessAction adapterName={adapterName} proposal={proposal} />
+      );
+    }
+  }
+
   /**
    * Render
    */
+
   return (
     <>
-      {/* OFF-CHAIN VOTING STATUS */}
+      {/* STATUS */}
+
       {(status === ProposalFlowStatus.OffchainVoting ||
         status === ProposalFlowStatus.OffchainVotingSubmitResult ||
         status === ProposalFlowStatus.OffchainVotingGracePeriod ||
@@ -116,41 +192,9 @@ export default function ProposalWithOffchainVoteActions(
         />
       )}
 
-      <div className="proposaldetails__button-container">
-        {/* SUBMIT/SPONSOR BUTTON (for proposals that have not been submitted onchain yet) */}
-        {status === ProposalFlowStatus.Submit && (
-          <SubmitAction proposal={proposal} />
-        )}
+      {/* ACTIONS */}
 
-        {/* SPONSOR BUTTON */}
-        {status === ProposalFlowStatus.Sponsor && (
-          <SponsorAction proposal={proposal} />
-        )}
-
-        {/* OFF-CHAIN VOTING BUTTONS */}
-        {status === ProposalFlowStatus.OffchainVoting && (
-          <OffchainVotingAction adapterName={adapterName} proposal={proposal} />
-        )}
-
-        {/* OFF-CHAIN VOTING SUBMIT VOTE RESULT */}
-        {/* @todo Perhaps use a wrapping component to get the correct off-chain voting component (e.g. op-rollup, batch) */}
-        {status === ProposalFlowStatus.OffchainVotingSubmitResult && (
-          <OffchainOpRollupVotingSubmitResultAction
-            adapterName={adapterName}
-            proposal={proposal}
-          />
-        )}
-
-        {/* PROCESS BUTTON */}
-        {(status === ProposalFlowStatus.OffchainVotingGracePeriod ||
-          status === ProposalFlowStatus.Process) &&
-          renderProcessAction()}
-
-        {/* POST PROCESS BUTTON */}
-        {showPostProcessAction && (
-          <PostProcessAction adapterName={adapterName} proposal={proposal} />
-        )}
-      </div>
+      <div className="proposaldetails__button-container">{renderActions()}</div>
     </>
   );
 }

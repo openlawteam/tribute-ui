@@ -23,9 +23,9 @@ type UseProposalWithOffchainVoteStatusReturn = {
   daoProposal: {adapterAddress: string; flags: number} | undefined;
   daoProposalVotes: OffchainVotingAdapterVotes | undefined;
   /**
-   * An enum index (string) of the DAO proposal's `VotingState`
+   * An enum name (`string`) of the DAO proposal's `VotingState` index
    */
-  daoProposalVoteResult: string | undefined;
+  daoProposalVoteResult: typeof VotingState[any] | undefined;
   proposalFlowStatusError: Error | undefined;
   status: ProposalFlowStatus | undefined;
 };
