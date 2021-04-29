@@ -13,7 +13,7 @@ import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDet
 import FadeIn from '../../components/common/FadeIn';
 import LoaderLarge from '../../components/feedback/LoaderLarge';
 import NotFound from '../subpages/NotFound';
-import PostProcessAction from '../../components/proposals/PostProcessAction';
+import PostProcessActionTransfer from '../../components/proposals/PostProcessActionTransfer';
 import ProposalActions from '../../components/proposals/ProposalActions';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
@@ -65,26 +65,17 @@ export default function TransferDetails() {
   // Render any adapter-specific actions
   function renderAction(data: RenderActionPropArguments): React.ReactNode {
     const {
-      OffchainVotingContract: {
-        adapterName,
-        daoProposalVoteResult,
-        proposal,
-        status,
-      },
+      OffchainVotingContract: {daoProposalVoteResult, proposal, status},
     } = data;
 
-    //  Currently, only Distribute adapter has an action that occurs after the
-    //  proposal is processed.
-    const showPostProcessAction =
-      adapterName === ContractAdapterNames.distribute &&
+    //  The Distribute adapter has an additional action after a passed proposal
+    //  is processed to handle the actual asset distribution.
+    if (
       status === ProposalFlowStatus.Completed &&
       daoProposalVoteResult &&
-      VotingState[daoProposalVoteResult] === VotingState[VotingState.PASS];
-
-    if (showPostProcessAction) {
-      return (
-        <PostProcessAction adapterName={adapterName} proposal={proposal} />
-      );
+      VotingState[daoProposalVoteResult] === VotingState[VotingState.PASS]
+    ) {
+      return <PostProcessActionTransfer proposal={proposal} />;
     }
 
     // Return `null` to signal to use default actions
