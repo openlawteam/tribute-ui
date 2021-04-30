@@ -113,14 +113,15 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
 
       if (!daoProposal) return;
 
-      // @note Add more logic for other off-chain voting styles as needed (i.e. Batch)
+      const noSnapshotVotes: boolean = p.snapshotProposal?.votes?.length === 0;
+
       const offchainResultNotYetSubmitted: boolean =
         voteState !== undefined &&
         proposalHasVotingState(VotingState.TIE, voteState) &&
         proposalHasFlag(ProposalFlag.SPONSORED, daoProposal.flags) &&
         votesData?.OffchainVotingContract?.reporter === BURN_ADDRESS;
 
-      // non-sponsored proposal
+      // Non-sponsored proposal
       if (voteState === undefined) {
         if (includeProposalsExistingOnlyOffchain) {
           filteredProposalsToSet.nonsponsoredProposals.push(p);
@@ -131,20 +132,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
         return;
       }
 
-      // voting proposal
-      if (
-        (voteState !== undefined &&
-          (proposalHasVotingState(VotingState.GRACE_PERIOD, voteState) ||
-            proposalHasVotingState(VotingState.IN_PROGRESS, voteState)) &&
-          proposalHasFlag(ProposalFlag.SPONSORED, daoProposal.flags)) ||
-        offchainResultNotYetSubmitted
-      ) {
-        filteredProposalsToSet.votingProposals.push(p);
-
-        return;
-      }
-
-      // passed proposal
+      // Passed proposal
       if (
         voteState !== undefined &&
         proposalHasVotingState(VotingState.PASS, voteState) &&
@@ -156,7 +144,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
         return;
       }
 
-      // failed proposal
+      // Failed proposal
       if (
         voteState !== undefined &&
         (proposalHasVotingState(VotingState.NOT_PASS, voteState) ||
@@ -165,6 +153,33 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
           proposalHasFlag(ProposalFlag.PROCESSED, daoProposal.flags))
       ) {
         filteredProposalsToSet.failedProposals.push(p);
+
+        return;
+      }
+
+      // Failed proposal: no Snapshot votes
+      if (
+        voteState !== undefined &&
+        (proposalHasVotingState(VotingState.GRACE_PERIOD, voteState) ||
+          proposalHasVotingState(VotingState.TIE, voteState)) &&
+        proposalHasFlag(ProposalFlag.SPONSORED, daoProposal.flags) &&
+        offchainResultNotYetSubmitted &&
+        noSnapshotVotes
+      ) {
+        filteredProposalsToSet.failedProposals.push(p);
+
+        return;
+      }
+
+      // Voting proposal
+      if (
+        (voteState !== undefined &&
+          (proposalHasVotingState(VotingState.GRACE_PERIOD, voteState) ||
+            proposalHasVotingState(VotingState.IN_PROGRESS, voteState)) &&
+          proposalHasFlag(ProposalFlag.SPONSORED, daoProposal.flags)) ||
+        offchainResultNotYetSubmitted
+      ) {
+        filteredProposalsToSet.votingProposals.push(p);
 
         return;
       }
