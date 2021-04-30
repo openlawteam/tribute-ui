@@ -4,6 +4,7 @@ import {ContractAdapterNames} from '../web3/types';
 import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
 import {ProposalData, ProposalFlowStatus} from './types';
 import {VotingAdapterName} from '../adapters-extensions/enums';
+import * as getDAOConfigEntryToMock from '../web3/helpers/getDAOConfigEntry';
 import * as useProposalWithOffchainVoteStatusToMock from './hooks/useProposalWithOffchainVoteStatus';
 import ProposalWithOffchainVoteActions from './ProposalWithOffchainVoteActions';
 import Wrapper from '../../test/Wrapper';
@@ -128,7 +129,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
           adapterName={ContractAdapterNames.onboarding}
           proposal={
             {
-              snapshotDraft: {
+              snapshotProposal: {
                 msg: {
                   payload: {
                     name: 'Good Title',
@@ -180,7 +181,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
           adapterName={ContractAdapterNames.onboarding}
           proposal={
             {
-              snapshotDraft: {
+              snapshotProposal: {
                 msg: {
                   payload: {
                     name: 'Good Title',
@@ -210,7 +211,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
   });
 
   test('should render default process action when in grace period', async () => {
-    const mock = jest
+    const useHookMock = jest
       .spyOn(
         useProposalWithOffchainVoteStatusToMock,
         'useProposalWithOffchainVoteStatus'
@@ -219,18 +220,25 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: ProposalFlowStatus.OffchainVotingGracePeriod,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVotes: {
+          gracePeriodStartingTime: Math.floor(
+            (Date.now() - 1000) / 1000
+          ).toString(),
+        } as any,
         proposalFlowStatusError: undefined,
       }));
+
+    const gracePeriodLengthMock = jest
+      .spyOn(getDAOConfigEntryToMock, 'getDAOConfigEntry')
+      .mockImplementation(() => Promise.resolve('123'));
 
     render(
       <Wrapper useInit useWallet>
         <ProposalWithOffchainVoteActions
-          // Using a different name than `onboarding` as it has a custom process action
-          adapterName={ContractAdapterNames.managing}
+          adapterName={ContractAdapterNames.onboarding}
           proposal={
             {
-              snapshotDraft: {
+              snapshotProposal: {
                 msg: {
                   payload: {
                     name: 'Good Title',
@@ -247,16 +255,81 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     );
 
     await waitFor(() => {
-      // Status
-      expect(screen.getAllByText(/0%/i).length).toBe(2);
+      expect(
+        screen.getByRole('button', {name: /^process$/i})
+      ).toBeInTheDocument();
+    });
 
+    await waitFor(() => {
+      // Status
+      expect(screen.getByText(/grace period ends:/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/0%/i).length).toBe(2);
+    });
+
+    // Restore mocks
+    useHookMock.mockRestore();
+    gracePeriodLengthMock.mockRestore();
+  });
+
+  test('should render default process action when in grace period and vote result skipped (i.e. no votes)', async () => {
+    const useHookMock = jest
+      .spyOn(
+        useProposalWithOffchainVoteStatusToMock,
+        'useProposalWithOffchainVoteStatus'
+      )
+      .mockImplementation(() => ({
+        status: ProposalFlowStatus.OffchainVotingGracePeriod,
+        daoProposal: undefined,
+        daoProposalVoteResult: undefined,
+        daoProposalVotes: {
+          // Set to `"0"` to mimic on-chain response when no result submitted
+          gracePeriodStartingTime: '0',
+        } as any,
+        proposalFlowStatusError: undefined,
+      }));
+
+    const gracePeriodLengthMock = jest
+      .spyOn(getDAOConfigEntryToMock, 'getDAOConfigEntry')
+      .mockImplementation(() => Promise.resolve('123'));
+
+    render(
+      <Wrapper useInit useWallet>
+        <ProposalWithOffchainVoteActions
+          // Using a different name than `onboarding` as it has a custom process action
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={
+            {
+              snapshotProposal: {
+                msg: {
+                  payload: {
+                    name: 'Good Title',
+                    body: 'Coolness',
+                    metadata: {},
+                  },
+                  timestamp: Date.now().toString(),
+                },
+              },
+            } as ProposalData
+          }
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
       expect(
         screen.getByRole('button', {name: /process/i})
       ).toBeInTheDocument();
     });
 
-    // Restore mock
-    mock.mockRestore();
+    await waitFor(() => {
+      // Status
+      expect(screen.getByText(/grace period ends:/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/0%/i).length).toBe(2);
+    });
+
+    // Restore mocks
+    useHookMock.mockRestore();
+    gracePeriodLengthMock.mockRestore();
   });
 
   test('should render default process action', async () => {
@@ -276,11 +349,10 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     render(
       <Wrapper useInit useWallet>
         <ProposalWithOffchainVoteActions
-          // Using a different name than `onboarding` as it has a custom process action
-          adapterName={ContractAdapterNames.managing}
+          adapterName={ContractAdapterNames.onboarding}
           proposal={
             {
-              snapshotDraft: {
+              snapshotProposal: {
                 msg: {
                   payload: {
                     name: 'Good Title',
@@ -327,10 +399,10 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
       <Wrapper useInit useWallet>
         <ProposalWithOffchainVoteActions
           // Using a different name than `onboarding` as it has a custom process action
-          adapterName={ContractAdapterNames.managing}
+          adapterName={ContractAdapterNames.onboarding}
           proposal={
             {
-              snapshotDraft: {
+              snapshotProposal: {
                 msg: {
                   payload: {
                     name: 'Good Title',
@@ -546,6 +618,55 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
       expect(
         screen.getByRole('button', {name: /vote no/i})
       ).toBeInTheDocument();
+    });
+
+    // Restore mock
+    mock.mockRestore();
+  });
+
+  test('should render error', async () => {
+    const mock = jest
+      .spyOn(
+        useProposalWithOffchainVoteStatusToMock,
+        'useProposalWithOffchainVoteStatus'
+      )
+      .mockImplementation(() => ({
+        status: undefined,
+        daoProposal: undefined,
+        daoProposalVoteResult: undefined,
+        daoProposalVotes: undefined,
+        proposalFlowStatusError: new Error('Something bad happened.'),
+      }));
+
+    render(
+      <Wrapper useInit useWallet>
+        <ProposalWithOffchainVoteActions
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={
+            {
+              snapshotProposal: {
+                msg: {
+                  payload: {
+                    name: 'Good Title',
+                    body: 'Coolness',
+                    metadata: {},
+                  },
+                  timestamp: Date.now().toString(),
+                },
+              },
+            } as ProposalData
+          }
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /something went wrong while getting the proposal's status/i
+        )
+      ).toBeInTheDocument();
+      expect(screen.getByText(/something bad happened/i)).toBeInTheDocument();
     });
 
     // Restore mock
