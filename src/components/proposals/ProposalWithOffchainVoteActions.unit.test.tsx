@@ -46,6 +46,9 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     );
 
     await waitFor(() => {
+      // Status should not show
+      expect(() => screen.getAllByText(/0%/i)).toThrow();
+
       // @note The submit action uses the text "Sponsor" for its button
       expect(
         screen.getByRole('button', {name: /sponsor/i})
@@ -93,6 +96,9 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     );
 
     await waitFor(() => {
+      // Status should not show
+      expect(() => screen.getAllByText(/0%/i)).toThrow();
+
       expect(
         screen.getByRole('button', {name: /sponsor/i})
       ).toBeInTheDocument();
@@ -102,7 +108,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     mock.mockRestore();
   });
 
-  test('should render default off-chain action', async () => {
+  test('should render default off-chain voting action', async () => {
     const mock = jest
       .spyOn(
         useProposalWithOffchainVoteStatusToMock,
@@ -139,6 +145,9 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     );
 
     await waitFor(() => {
+      // Status
+      expect(screen.getAllByText(/0%/i).length).toBe(2);
+
       expect(
         screen.getByRole('button', {name: /vote yes/i})
       ).toBeInTheDocument();
@@ -188,6 +197,9 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     );
 
     await waitFor(() => {
+      // Status
+      expect(screen.getAllByText(/0%/i).length).toBe(2);
+
       expect(
         screen.getByRole('button', {name: /submit vote result/i})
       ).toBeInTheDocument();
@@ -235,6 +247,9 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     );
 
     await waitFor(() => {
+      // Status
+      expect(screen.getAllByText(/0%/i).length).toBe(2);
+
       expect(
         screen.getByRole('button', {name: /process/i})
       ).toBeInTheDocument();
@@ -282,6 +297,9 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     );
 
     await waitFor(() => {
+      // Status
+      expect(screen.getAllByText(/0%/i).length).toBe(2);
+
       expect(
         screen.getByRole('button', {name: /process/i})
       ).toBeInTheDocument();
@@ -329,6 +347,9 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     );
 
     await waitFor(() => {
+      // Status
+      expect(screen.getAllByText(/0%/i).length).toBe(2);
+
       expect(() => screen.getByRole('button', {name: /sponsor/i})).toThrow();
 
       expect(() =>
@@ -392,6 +413,9 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     );
 
     await waitFor(() => {
+      // Status
+      expect(screen.getAllByText(/0%/i).length).toBe(2);
+
       expect(
         screen.getByRole('button', {name: /some awesome action/i})
       ).toBeInTheDocument();
@@ -451,6 +475,9 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
 
     // Assert to render no actions
     await waitFor(() => {
+      // Status
+      expect(screen.getAllByText(/0%/i).length).toBe(2);
+
       expect(() =>
         screen.getByRole('button', {name: /some awesome action/i})
       ).toThrow();
@@ -510,6 +537,9 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
 
     // Assert to render default action
     await waitFor(() => {
+      // Status
+      expect(screen.getAllByText(/0%/i).length).toBe(2);
+
       expect(
         screen.getByRole('button', {name: /vote yes/i})
       ).toBeInTheDocument();
