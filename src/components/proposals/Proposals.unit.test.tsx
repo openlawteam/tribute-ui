@@ -897,6 +897,215 @@ describe('ProposalCard unit tests', () => {
     });
   });
 
+  test('should render failed adapter proposal cards when no Snapshot votes on proposal, and result not submitted', async () => {
+    const spy = jest.fn();
+
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/drafts/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json({}))
+        ),
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) =>
+            res(
+              ctx.json({
+                '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333': {
+                  ...defaultProposalBody,
+                  msg: {
+                    ...defaultProposalBody.msg,
+                    payload: {
+                      ...defaultProposalBody.msg.payload,
+                      name: 'A proposal with no snapshot votes',
+                    },
+                  },
+                  data: {
+                    erc712DraftHash:
+                      '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434',
+                    authorIpfsHash: '',
+                  },
+                  // Define empty votes
+                  votes: [],
+                },
+              })
+            )
+        ),
+      ]
+    );
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={({
+          mockWeb3Provider,
+          web3Instance,
+        }: {
+          mockWeb3Provider: FakeHttpProvider;
+          web3Instance: Web3;
+        }) => {
+          /**
+           * Mock `useProposals` proposals response
+           */
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Proposal: {
+                        adapterAddress: 'address',
+                        flags: 'uint256',
+                      },
+                    },
+                    {
+                      adapterAddress: DEFAULT_ETH_ADDRESS,
+                      // ProposalFlag.SPONSORED
+                      flags: '3',
+                    }
+                  ),
+                ],
+              ]
+            )
+          );
+
+          /**
+           * Mock results for `useProposalsVotingAdapter`
+           */
+
+          // Mock `dao.votingAdapter` responses
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter(
+                    'address',
+                    DEFAULT_ETH_ADDRESS
+                  ),
+                ],
+              ]
+            )
+          );
+
+          // Mock `IVoting.getAdapterName` responses
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter(
+                    'string',
+                    VotingAdapterName.OffchainVotingContract
+                  ),
+                ],
+              ]
+            )
+          );
+
+          /**
+           * Mock results for `useProposalsVotingState`
+           */
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  // VotingState.TIE
+                  web3Instance.eth.abi.encodeParameter('uint8', '1'),
+                ],
+              ]
+            )
+          );
+
+          /**
+           * Mock results for `useProposalsVotes`
+           */
+
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  web3Instance.eth.abi.encodeParameter(
+                    {
+                      Voting: {
+                        snapshot: 'uint256',
+                        proposalHash: 'bytes32',
+                        reporter: 'address',
+                        resultRoot: 'bytes32',
+                        nbVoters: 'uint256',
+                        nbYes: 'uint256',
+                        nbNo: 'uint256',
+                        index: 'uint256',
+                        startingTime: 'uint256',
+                        gracePeriodStartingTime: 'uint256',
+                        isChallenged: 'bool',
+                        fallbackVotesCount: 'uint256',
+                      },
+                    },
+                    {
+                      snapshot: '0',
+                      proposalHash:
+                        '0x0000000000000000000000000000000000000000000000000000000000000000',
+                      reporter: BURN_ADDRESS,
+                      resultRoot:
+                        '0x0000000000000000000000000000000000000000000000000000000000000000',
+                      nbVoters: '0',
+                      nbYes: '0',
+                      nbNo: '0',
+                      index: '0',
+                      startingTime: '0',
+                      gracePeriodStartingTime: '0',
+                      isChallenged: false,
+                      fallbackVotesCount: '0',
+                    }
+                  ),
+                ],
+              ]
+            )
+          );
+        }}>
+        <Proposals
+          adapterName={DaoAdapterConstants.ONBOARDING}
+          includeProposalsExistingOnlyOffchain={true}
+          onProposalClick={spy}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Proposal headers
+      expect(screen.getByText(/^failed$/i)).toBeInTheDocument();
+
+      // Proposal names
+      expect(
+        screen.getByText(/a proposal with no snapshot votes/i)
+      ).toBeInTheDocument();
+    });
+
+    // Click on a proposal
+    userEvent.click(screen.getByText(/a proposal with no snapshot votes/i));
+
+    // Expect correct proposal id to come through in function args
+    await waitFor(() => {
+      expect(spy.mock.calls[0][0]).toBe(
+        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434'
+      );
+    });
+  });
+
   test('should render only non-sponsored proposals (e.g. first proposals in DAO; not sponsored)', async () => {
     const spy = jest.fn();
 

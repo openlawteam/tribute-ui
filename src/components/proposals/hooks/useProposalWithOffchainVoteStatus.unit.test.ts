@@ -438,6 +438,37 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
             end: nowSeconds - 50,
           },
         },
+        // Just need something here to make the test pass
+        votes: [
+          {
+            DEFAULT_ETH_ADDRESS: {
+              address: '',
+              msg: {
+                version: '',
+                timestamp: '',
+                token: '',
+                type: SnapshotType.vote,
+                payload: {
+                  /**
+                   * Index of the vote chosen, i.e 1 = Yes, 2 = No
+                   */
+                  choice: 1,
+                  proposalHash: '',
+                  metadata: {
+                    /**
+                     * @see SnapshotVoteData
+                     */
+                    memberAddress: '',
+                  },
+                },
+              },
+              sig: '',
+              authorIpfsHash: '',
+              relayerIpfsHash: '',
+              actionId: '',
+            },
+          },
+        ],
       },
     };
 
@@ -818,6 +849,212 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       expect(result.current.daoProposalVotes).toMatchObject(defaultVotesResult);
 
       expect(result.current.status).toBe(ProposalFlowStatus.Completed);
+    });
+  });
+
+  test('should return correct data from hook when Snapshot proposal has no `votes` and in grace period', async () => {
+    const proposalData: Partial<ProposalData> = {
+      daoProposalVotingAdapter: {
+        votingAdapterAddress: DEFAULT_ETH_ADDRESS,
+        votingAdapterName: VotingAdapterName.OffchainVotingContract,
+        getVotingAdapterABI: () => OffchainVotingABI as AbiItem[],
+        getWeb3VotingAdapterContract: () => undefined as any,
+      },
+      snapshotProposal: {
+        ...fakeSnapshotProposal,
+        msg: {
+          ...fakeSnapshotProposal.msg,
+          payload: {
+            ...fakeSnapshotProposal.msg.payload,
+            // Set Snapshot offchain voting time as ended
+            start: nowSeconds - 100,
+            end: nowSeconds - 50,
+          },
+        },
+        // Set to empty array
+        votes: [],
+      },
+    };
+
+    await act(async () => {
+      const {result, waitForValueToChange} = await renderHook(
+        () => useProposalWithOffchainVoteStatus(proposalData as ProposalData),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: ({mockWeb3Provider, web3Instance}) => {
+              mockWeb3Provider.injectResult(
+                web3Instance.eth.abi.encodeParameters(
+                  ['uint256', 'bytes[]'],
+                  [
+                    0,
+                    [
+                      // For `proposals` call
+                      web3Instance.eth.abi.encodeParameter(
+                        {
+                          Proposal: {
+                            adapterAddress: 'address',
+                            flags: 'uint256',
+                          },
+                        },
+                        {
+                          adapterAddress: DEFAULT_ETH_ADDRESS,
+                          // ProposalFlag.SPONSORED
+                          flags: '3',
+                        }
+                      ),
+                      // For `votes` call
+                      web3Instance.eth.abi.encodeParameter(
+                        defaultNoVotesMock[0],
+                        defaultNoVotesMock[1]
+                      ),
+                      // For `voteResult` call (VotingState.GRACE_PERIOD)
+                      web3Instance.eth.abi.encodeParameter('uint8', '5'),
+                    ],
+                  ]
+                )
+              );
+            },
+          },
+        }
+      );
+
+      // Assert initial state
+      expect(result.current.daoProposal).toBe(undefined);
+      expect(result.current.daoProposalVoteResult).toBe(undefined);
+      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.status).toBe(undefined);
+
+      await waitForValueToChange(() => result.current.daoProposal);
+
+      expect(result.current.daoProposal).toMatchObject({
+        '0': DEFAULT_ETH_ADDRESS,
+        '1': '3',
+        __length__: 2,
+        adapterAddress: DEFAULT_ETH_ADDRESS,
+        flags: '3',
+      });
+
+      expect(
+        proposalHasVotingState(
+          VotingState.GRACE_PERIOD,
+          result.current.daoProposalVoteResult || ''
+        )
+      ).toBe(true);
+
+      expect(result.current.daoProposalVotes).toMatchObject(
+        defaultNoVotesResult
+      );
+
+      await waitForValueToChange(() => result.current.status);
+
+      expect(result.current.status).toBe(
+        ProposalFlowStatus.OffchainVotingGracePeriod
+      );
+    });
+  });
+
+  test('should return correct data from hook when Snapshot proposal has no `votes` and out of grace period', async () => {
+    const proposalData: Partial<ProposalData> = {
+      daoProposalVotingAdapter: {
+        votingAdapterAddress: DEFAULT_ETH_ADDRESS,
+        votingAdapterName: VotingAdapterName.OffchainVotingContract,
+        getVotingAdapterABI: () => OffchainVotingABI as AbiItem[],
+        getWeb3VotingAdapterContract: () => undefined as any,
+      },
+      snapshotProposal: {
+        ...fakeSnapshotProposal,
+        msg: {
+          ...fakeSnapshotProposal.msg,
+          payload: {
+            ...fakeSnapshotProposal.msg.payload,
+            // Set Snapshot offchain voting time as ended
+            start: nowSeconds - 100,
+            end: nowSeconds - 50,
+          },
+        },
+        // Set to empty array
+        votes: [],
+      },
+    };
+
+    await act(async () => {
+      const {result, waitForValueToChange} = await renderHook(
+        () => useProposalWithOffchainVoteStatus(proposalData as ProposalData),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+            getProps: ({mockWeb3Provider, web3Instance}) => {
+              mockWeb3Provider.injectResult(
+                web3Instance.eth.abi.encodeParameters(
+                  ['uint256', 'bytes[]'],
+                  [
+                    0,
+                    [
+                      // For `proposals` call
+                      web3Instance.eth.abi.encodeParameter(
+                        {
+                          Proposal: {
+                            adapterAddress: 'address',
+                            flags: 'uint256',
+                          },
+                        },
+                        {
+                          adapterAddress: DEFAULT_ETH_ADDRESS,
+                          // ProposalFlag.SPONSORED
+                          flags: '3',
+                        }
+                      ),
+                      // For `votes` call
+                      web3Instance.eth.abi.encodeParameter(
+                        defaultNoVotesMock[0],
+                        defaultNoVotesMock[1]
+                      ),
+                      // For `voteResult` call (VotingState.TIE)
+                      web3Instance.eth.abi.encodeParameter('uint8', '1'),
+                    ],
+                  ]
+                )
+              );
+            },
+          },
+        }
+      );
+
+      // Assert initial state
+      expect(result.current.daoProposal).toBe(undefined);
+      expect(result.current.daoProposalVoteResult).toBe(undefined);
+      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.status).toBe(undefined);
+
+      await waitForValueToChange(() => result.current.daoProposal);
+
+      expect(result.current.daoProposal).toMatchObject({
+        '0': DEFAULT_ETH_ADDRESS,
+        '1': '3',
+        __length__: 2,
+        adapterAddress: DEFAULT_ETH_ADDRESS,
+        flags: '3',
+      });
+
+      expect(
+        proposalHasVotingState(
+          VotingState.TIE,
+          result.current.daoProposalVoteResult || ''
+        )
+      ).toBe(true);
+
+      expect(result.current.daoProposalVotes).toMatchObject(
+        defaultNoVotesResult
+      );
+
+      await waitForValueToChange(() => result.current.status);
+
+      expect(result.current.status).toBe(ProposalFlowStatus.Process);
     });
   });
 
