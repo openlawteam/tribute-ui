@@ -59,6 +59,10 @@ If you want to use the same accounts (`-d`) and data (`--db`) from a previous Ga
 
 [Ganache CLI Options](https://github.com/trufflesuite/ganache-cli#options)
 
+#### Troubleshooting
+
+- **Nonce errors:** If you're developing on Ganache and receiving any errors from the app related to an incorrect nonce(s), resetting your Ganache account(s) in MetaMask should fix this. To reset your accounts click: _Settings->Advanced->Reset Account_.
+
 ## Running the local graph-node
 
 Clone the https://github.com/openlawteam/molochv3-contracts repo and from the root open up a terminal, `npm ci`.
