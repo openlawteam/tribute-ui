@@ -48,6 +48,8 @@ export function getAdapterAddressFromContracts(
         return '';
       case ContractAdapterNames.tribute:
         return getContractAddressOrThrow(contracts.TributeContract);
+      case ContractAdapterNames.tribute_nft:
+        return getContractAddressOrThrow(contracts.TributeNFTContract);
       case ContractAdapterNames.voting:
         return getContractAddressOrThrow(contracts.VotingContract);
       default:
