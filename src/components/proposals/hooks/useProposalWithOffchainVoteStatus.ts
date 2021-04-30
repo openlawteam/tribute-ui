@@ -36,6 +36,7 @@ export function useProposalWithOffchainVoteStatus(
   proposal: ProposalData
 ): UseProposalWithOffchainVoteStatusReturn {
   const {daoProposalVotingAdapter, snapshotDraft, snapshotProposal} = proposal;
+  const {votes: snapshotVotes} = snapshotProposal || {};
   const proposalId = snapshotDraft?.idInDAO || snapshotProposal?.idInDAO;
 
   /**
@@ -286,6 +287,21 @@ export function useProposalWithOffchainVoteStatus(
     atSponsoredInDAO
   ) {
     return getReturnData(ProposalFlowStatus.OffchainVoting);
+  }
+
+  // Status: If no votes, skip `OffchainVotingSubmitResult` and set to `OffchainVotingGracePeriod` or `Process`
+  if (
+    votingTimeStartEndInitReady &&
+    hasVotingTimeEnded &&
+    atSponsoredInDAO &&
+    !snapshotVotes?.length &&
+    !offchainResultSubmitted
+  ) {
+    return getReturnData(
+      isInVotingGracePeriod
+        ? ProposalFlowStatus.OffchainVotingGracePeriod
+        : ProposalFlowStatus.Process
+    );
   }
 
   // Status: Ready to Submit Vote Result
