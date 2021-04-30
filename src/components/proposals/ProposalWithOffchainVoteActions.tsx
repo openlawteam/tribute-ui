@@ -50,10 +50,18 @@ export default function ProposalWithOffchainVoteActions(
    * Variables
    */
 
-  // Set the grace period start (per the DAO's timestamp) if the status says we're in grace period.
+  /**
+   * Set the grace period start milliseconds either by
+   *
+   * 1) the DAO's grace period start timestamp,
+   * 2) or by `Date.now()` (i.e. no result was submitted).
+   *
+   * We fall back to case 2 so that the grace period timer will
+   * start, as it requires any `Number` above `0`.
+   */
   const gracePeriodStartMs: number =
     daoProposalVotes && status === ProposalFlowStatus.OffchainVotingGracePeriod
-      ? Number(daoProposalVotes.gracePeriodStartingTime) * 1000
+      ? Number(daoProposalVotes.gracePeriodStartingTime) * 1000 || Date.now()
       : 0;
 
   /**
