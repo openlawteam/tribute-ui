@@ -121,20 +121,6 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
         proposalHasFlag(ProposalFlag.SPONSORED, daoProposal.flags) &&
         votesData?.OffchainVotingContract?.reporter === BURN_ADDRESS;
 
-      // @DEBUG
-      if (
-        p.idInDAO ===
-        '0xf33753bb9656ca73c947c92f11990c7c60ba918ec03b66e93334292ec70e6efa'
-      ) {
-        console.log('daoProposal.flags', daoProposal.flags);
-        console.log('voteState', voteState);
-        console.log('votesData', votesData);
-        console.log(
-          'offchainResultNotYetSubmitted',
-          offchainResultNotYetSubmitted
-        );
-      }
-
       // Non-sponsored proposal
       if (voteState === undefined) {
         if (includeProposalsExistingOnlyOffchain) {
@@ -159,7 +145,9 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
       }
 
       /**
-       * Voting proposal: off-chain result was not submitted and there are votes
+       * Voting proposal: voting has ended and is not in grace period,
+       * off-chain result was not submitted, and there are votes (need to submit to get true result).
+       *
        * @note Should be placed before "failed" logic.
        */
       if (offchainResultNotYetSubmitted && noSnapshotVotes === false) {
