@@ -8,7 +8,7 @@ import BankExtensionABI from '../../truffle-contracts/BankExtension.json';
  *
  * @param web3Instance
  * @returns {TestWeb3ResponseReturn<string>}
- * @link https://github.com/openlawteam/molochv3-contracts/blob/master/contracts/core/DaoRegistry.sol
+ * @link https://github.com/openlawteam/tribute-contracts/blob/master/contracts/core/DaoRegistry.sol
  */
 export const memberAddressesByDelegatedKey = ({
   result,
@@ -28,7 +28,7 @@ export const memberAddressesByDelegatedKey = ({
  *
  * @param web3Instance
  * @returns {TestWeb3ResponseReturn<string>}
- * @link https://github.com/openlawteam/molochv3-contracts/blob/master/contracts/extensions/bank/Bank.sol
+ * @link https://github.com/openlawteam/tribute-contracts/blob/master/contracts/extensions/bank/Bank.sol
  */
 export const balanceOfMember = ({
   result,

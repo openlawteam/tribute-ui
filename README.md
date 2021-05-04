@@ -1,8 +1,8 @@
-# Moloch v3 DApp
+# Tribute DAO DApp
 
 Related supporting repositories:
 
-- [openlawteam/molochv3-contracts](https://github.com/openlawteam/molochv3-contracts)
+- [openlawteam/tribute-contracts](https://github.com/openlawteam/tribute-contracts)
 - [openlawteam/snapshot-hub (erc-712 branch)](https://github.com/openlawteam/snapshot-hub/tree/erc-712)
 - [openlawteam/snapshot-js-erc712](https://github.com/openlawteam/snapshot-js-erc712)
 
@@ -65,15 +65,15 @@ If you want to use the same accounts (`-d`) and data (`--db`) from a previous Ga
 
 ## Running the local graph-node
 
-Clone the https://github.com/openlawteam/molochv3-contracts repo and from the root open up a terminal, `npm ci`.
+Clone the https://github.com/openlawteam/tribute-contracts repo and from the root open up a terminal, `npm ci`.
 
-Follow the instructions [here](https://github.com/openlawteam/molochv3-contracts/tree/master/docker) to setup and run the local graph-node.
+Follow the instructions [here](https://github.com/openlawteam/tribute-contracts/tree/master/docker) to setup and run the local graph-node.
 
 ## GitHub Pages Deployments
 
 Deployments for the development environment are handled automatically with a GitHub Action:
 
-- `GitHub Pages development deployment`: push to `main` branch -> https://molochv3.org
+- `GitHub Pages development deployment`: push to `main` branch -> https://tributedao.com
 
 ---
 

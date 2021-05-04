@@ -1,5 +1,5 @@
 /**
- * @see `IVoting.sol` in molochv3-contracts
+ * @see `IVoting.sol` in tribute-contracts
  */
 export enum VotingState {
   NOT_STARTED,

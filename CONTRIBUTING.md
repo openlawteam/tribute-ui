@@ -1,6 +1,6 @@
-# Contributing to Moloch v3
+# Contributing to Tribute DAO
 
-:+1::tada: First off, thanks for being interested in contributing to Moloch v3! :tada::+1:
+:+1::tada: First off, thanks for being interested in contributing to Tribute DAO! :tada::+1:
 
 The following is a set of guidelines for contributing to OpenLaw's open-source repositories, which are hosted in the [OpenLaw
 Organization](https://github.com/openlawteam) on GitHub.
@@ -24,7 +24,7 @@ This project and everyone participating in it is governed by the [Code of Conduc
 
 ### Reporting Bugs
 
-This section guides you through submitting a bug report for molochv3-ui. Following these guidelines helps maintainers and the community understand your report, reproduce the behavior, and find related reports.
+This section guides you through submitting a bug report for tribute-ui. Following these guidelines helps maintainers and the community understand your report, reproduce the behavior, and find related reports.
 
 Before creating bug reports, please check [this list](#before-submitting-a-bug-report) as you might find out that you don't need to create one. When you are creating a bug report, please [include as many details as possible](#how-do-i-submit-a-good-bug-report).
 
@@ -32,7 +32,7 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
 
 #### Before Submitting A Bug Report
 
-- **Perform a [cursory search](https://github.com/openlawteam/molochv3-ui/issues)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
+- **Perform a [cursory search](https://github.com/openlawteam/tribute-ui/issues)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
 
 #### How Do I Submit A (Good) Bug Report?
 
@@ -41,7 +41,7 @@ Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/).
 When creating an issue, explain the problem and include additional details to help maintainers reproduce the problem:
 
 - **Use a clear and descriptive title** for the issue to identify the problem.
-- **Describe the exact steps which reproduce the problem** in as many details as possible. For example, start by explaining what you are trying to do with molochv3-ui. When listing steps, **don't just say what you did, but explain how you did it**.
+- **Describe the exact steps which reproduce the problem** in as many details as possible. For example, start by explaining what you are trying to do with tribute-ui. When listing steps, **don't just say what you did, but explain how you did it**.
 - **Provide specific examples to demonstrate the steps**. Include links to files or GitHub projects, or copy/pasteable snippets, which you use in those examples. If you're providing snippets in the issue, use [Markdown code blocks](https://help.github.com/articles/markdown-basics/#multiple-lines).
 - **Describe the behavior you observed after following the steps** and point out what exactly is the problem with that behavior.
 - **Explain which behavior you expected to see instead and why.**
@@ -58,13 +58,13 @@ If you think relevant, include details about your configuration and environment.
 
 ### Suggesting Enhancements
 
-This section guides you through submitting an enhancement suggestion for molochv3-ui, including completely new features and minor improvements to existing functionality. Following these guidelines helps maintainers and the community understand your suggestion and find related suggestions.
+This section guides you through submitting an enhancement suggestion for tribute-ui, including completely new features and minor improvements to existing functionality. Following these guidelines helps maintainers and the community understand your suggestion and find related suggestions.
 
 Before creating enhancement suggestions, please check [this list](#before-submitting-an-enhancement-suggestion) as you might find out that you don't need to create one. When you are creating an enhancement suggestion, please [include as many details as possible](#how-do-i-submit-a-good-enhancement-suggestion).
 
 #### Before Submitting An Enhancement Suggestion
 
-- **Perform a [cursory search](https://github.com/openlawteam/molochv3-ui/issues)** to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one.
+- **Perform a [cursory search](https://github.com/openlawteam/tribute-ui/issues)** to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one.
 
 #### How Do I Submit A (Good) Enhancement Suggestion?
 

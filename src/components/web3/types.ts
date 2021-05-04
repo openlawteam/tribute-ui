@@ -9,7 +9,7 @@
  */
 
 /**
- * Should match molochv3-contracts constants
+ * Should match tribute-contracts constants
  *
  * @todo Add other extensions as needs arise
  */
@@ -30,7 +30,7 @@ export enum ContractAdapterNames {
 }
 
 /**
- * Should match molochv3-contracts constants
+ * Should match tribute-contracts constants
  *
  * @todo Add other extensions as needs arise
  */
@@ -40,7 +40,7 @@ export enum ContractExtensionNames {
 }
 
 /**
- * Should match molochv3-contracts constants
+ * Should match tribute-contracts constants
  *
  * @todo Add other extensions as needs arise
  */

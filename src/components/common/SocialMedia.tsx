@@ -5,9 +5,9 @@ import MediumSVG from '../../assets/svg/MediumSVG';
 // @todo Add missing URLs when available
 enum SocialMediaLinks {
   DISCORD = '#',
-  // query params search sepcifically for openlawteam/molochv3-ui and
-  // openlawteam/molochv3-contracts
-  GITHUB = 'https://github.com/search?q=org%3Aopenlawteam+molochv3-ui+OR+molochv3-contracts+in%3Aname&type=repositories',
+  // query params search sepcifically for openlawteam/tribute-ui and
+  // openlawteam/tribute-contracts
+  GITHUB = 'https://github.com/search?q=org%3Aopenlawteam+tribute-ui+OR+tribute-contracts+in%3Aname&type=repositories',
   MEDIUM = '#',
 }
 

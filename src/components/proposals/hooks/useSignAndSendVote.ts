@@ -55,7 +55,7 @@ type SignAndSendVoteReturn = {
  * useSignAndSendVote
  *
  * React hook which prepares proposal data for submission
- * to Snapshot and Moloch v3 and signs it (ERC712)
+ * to Snapshot and Tribute and signs it (ERC712)
  *
  * @returns {Promise<BuildAndSignProposalDataReturn>} An object with the proposal data and the ERC712 signature string.
  */

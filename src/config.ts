@@ -107,7 +107,7 @@ export const ETHEREUM_PROVIDER_URL: string = INFURA_WS_URLS[DEFAULT_CHAIN]
 
 /**
  * CORE CONTRACTS
- * @note as per https://github.com/openlawteam/molochv3-contracts#architecture
+ * @note as per https://github.com/openlawteam/tribute-contracts#architecture
  *
  * - DAO Registry (@note uses dao address for the contract address)
  * - DAO Factory
@@ -146,7 +146,7 @@ export const NFT_COLLECTION_FACTORY_CONTRACT_ADDRESS = {
 
 /**
  * ADAPTER CONTRACTS
- * @note as per https://github.com/openlawteam/molochv3-contracts#architecture
+ * @note as per https://github.com/openlawteam/tribute-contracts#architecture
  *
  * - Configuration
  * - CouponOnboardingContract
@@ -298,7 +298,7 @@ export const MULTICALL_CONTRACT_ADDRESS = REACT_APP_MULTICALL_CONTRACT_ADDRESS;
  *
  * @todo Remove and get from the chain/subgraph?
  *
- * @see https://github.com/openlawteam/molochv3-contracts/blob/9e0e03616a00e41e666351e146ee109b9fe37fb2/utils/DaoFactory.js
+ * @see https://github.com/openlawteam/tribute-contracts/blob/9e0e03616a00e41e666351e146ee109b9fe37fb2/utils/DaoFactory.js
  */
 export const GUILD_ADDRESS: string =
   '0x000000000000000000000000000000000000dead';

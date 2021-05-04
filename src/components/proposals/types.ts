@@ -45,7 +45,7 @@ export enum ProposalFlowStatus {
 }
 
 /**
- * @see `Distribute.sol` in molochv3-contracts
+ * @see `Distribute.sol` in tribute-contracts
  */
 export enum DistributionStatus {
   NOT_STARTED,
@@ -169,7 +169,7 @@ export type ProposalOrDraftSignDataFromType<
 /**
  * Voting.sol->Voting
  *
- * @link https://github.com/openlawteam/molochv3-contracts/blob/master/contracts/adapters/voting/Voting.sol
+ * @link https://github.com/openlawteam/tribute-contracts/blob/master/contracts/adapters/voting/Voting.sol
  */
 export type VotingAdapterVotes = {
   blockNumber: string;
@@ -181,7 +181,7 @@ export type VotingAdapterVotes = {
 /**
  * OffchainVoting.sol->Voting
  *
- * @link https://github.com/openlawteam/molochv3-contracts/blob/master/contracts/adapters/voting/OffchainVoting.sol
+ * @link https://github.com/openlawteam/tribute-contracts/blob/master/contracts/adapters/voting/OffchainVoting.sol
  */
 export type OffchainVotingAdapterVotes = {
   fallbackVotesCount: string;

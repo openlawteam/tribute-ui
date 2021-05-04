@@ -52,4 +52,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
           commit_message: ${{ github.event.head_commit.message }}
-          cname: molochv3.org
+          cname: tributedao.com

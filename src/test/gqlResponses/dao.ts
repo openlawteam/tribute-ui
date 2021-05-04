@@ -11,7 +11,7 @@ export const daoResponse = {
         id: DEFAULT_ETH_ADDRESS,
         bankAddress: DEFAULT_ETH_ADDRESS,
       },
-      __typename: 'Molochv3S',
+      __typename: 'TributeDao',
     },
   ],
 };

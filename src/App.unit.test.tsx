@@ -16,7 +16,7 @@ describe('App unit tests', () => {
       // Header
       expect(screen.getByTestId(/header/)).toBeInTheDocument();
       // Logo
-      expect(screen.getByText(/MOLOCH v3/)).toBeInTheDocument();
+      expect(screen.getByText(/TRIBUTE/)).toBeInTheDocument();
       // Subtitle
       expect(
         screen.getByText(/a proposed evolution of the moloch dao framework/i)
@@ -44,7 +44,7 @@ describe('App unit tests', () => {
 
     await waitFor(() => {
       // Header
-      expect(screen.getByText(/MOLOCH v3/)).toBeInTheDocument();
+      expect(screen.getByText(/TRIBUTE/)).toBeInTheDocument();
       // Burger icon
       expect(screen.getByLabelText(/menu/i)).toBeInTheDocument();
       expect(
