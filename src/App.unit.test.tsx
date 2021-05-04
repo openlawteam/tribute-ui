@@ -19,7 +19,7 @@ describe('App unit tests', () => {
       expect(screen.getByText(/TRIBUTE/)).toBeInTheDocument();
       // Subtitle
       expect(
-        screen.getByText(/a proposed evolution of the moloch dao framework/i)
+        screen.getByText(/a next generation dao framework/i)
       ).toBeInTheDocument();
       // Cube image
       expect(screen.getByTestId('cube')).toBeInTheDocument();

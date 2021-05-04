@@ -66,7 +66,7 @@ export default function GetStarted() {
 
           <div className="landing">
             <div className="landing__subtitle">
-              A proposed evolution of the Moloch DAO framework
+              A next generation DAO framework
             </div>
 
             <div className="landing__img">
