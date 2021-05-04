@@ -185,12 +185,12 @@ export type VotingAdapterVotes = {
  */
 export type OffchainVotingAdapterVotes = {
   fallbackVotesCount: string;
+  forceFailed: boolean;
   gracePeriodStartingTime: string;
   index: string;
   isChallenged: boolean;
   nbNo: string;
   nbYes: string;
-  proposalHash: string;
   reporter: string;
   resultRoot: string;
   snapshot: string;

@@ -10,11 +10,7 @@ import {
   DaoAdapterConstants,
   VotingAdapterName,
 } from '../adapters-extensions/enums';
-import {
-  DEFAULT_ETH_ADDRESS,
-  DEFAULT_PROPOSAL_HASH,
-  FakeHttpProvider,
-} from '../../test/helpers';
+import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../test/helpers';
 import {BURN_ADDRESS} from '../../util/constants';
 import {rest, server} from '../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../config';
@@ -267,31 +263,29 @@ describe('ProposalCard unit tests', () => {
       {
         Voting: {
           snapshot: 'uint256',
-          proposalHash: 'bytes32',
           reporter: 'address',
           resultRoot: 'bytes32',
-          nbVoters: 'uint256',
           nbYes: 'uint256',
           nbNo: 'uint256',
           index: 'uint256',
           startingTime: 'uint256',
           gracePeriodStartingTime: 'uint256',
+          forceFailed: 'bool',
           isChallenged: 'bool',
           fallbackVotesCount: 'uint256',
         },
       },
       {
         snapshot: '8376297',
-        proposalHash: DEFAULT_PROPOSAL_HASH,
         reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
         resultRoot:
           '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-        nbVoters: '0',
         nbYes: '1',
         nbNo: '0',
         index: '0',
         startingTime: '1617878162',
         gracePeriodStartingTime: '1617964640',
+        forceFailed: false,
         isChallenged: false,
         fallbackVotesCount: '0',
       }
@@ -550,31 +544,29 @@ describe('ProposalCard unit tests', () => {
             {
               Voting: {
                 snapshot: 'uint256',
-                proposalHash: 'bytes32',
                 reporter: 'address',
                 resultRoot: 'bytes32',
-                nbVoters: 'uint256',
                 nbYes: 'uint256',
                 nbNo: 'uint256',
                 index: 'uint256',
                 startingTime: 'uint256',
                 gracePeriodStartingTime: 'uint256',
+                forceFailed: 'bool',
                 isChallenged: 'bool',
                 fallbackVotesCount: 'uint256',
               },
             },
             {
               snapshot: '8376297',
-              proposalHash: DEFAULT_PROPOSAL_HASH,
               reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
               resultRoot:
                 '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-              nbVoters: '0',
               nbYes: '1',
               nbNo: '0',
               index: '0',
               startingTime: '1617878162',
               gracePeriodStartingTime: '1617964640',
+              forceFailed: false,
               isChallenged: false,
               fallbackVotesCount: '0',
             }
@@ -814,31 +806,29 @@ describe('ProposalCard unit tests', () => {
             {
               Voting: {
                 snapshot: 'uint256',
-                proposalHash: 'bytes32',
                 reporter: 'address',
                 resultRoot: 'bytes32',
-                nbVoters: 'uint256',
                 nbYes: 'uint256',
                 nbNo: 'uint256',
                 index: 'uint256',
                 startingTime: 'uint256',
                 gracePeriodStartingTime: 'uint256',
+                forceFailed: 'bool',
                 isChallenged: 'bool',
                 fallbackVotesCount: 'uint256',
               },
             },
             {
               snapshot: '8376297',
-              proposalHash: DEFAULT_PROPOSAL_HASH,
               reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
               resultRoot:
                 '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-              nbVoters: '0',
               nbYes: '1',
               nbNo: '0',
               index: '0',
               startingTime: '1617878162',
               gracePeriodStartingTime: '1617964640',
+              forceFailed: false,
               isChallenged: false,
               fallbackVotesCount: '0',
             }

@@ -9,11 +9,7 @@ import {
   DaoAdapterConstants,
   VotingAdapterName,
 } from '../../adapters-extensions/enums';
-import {
-  DEFAULT_DRAFT_HASH,
-  DEFAULT_ETH_ADDRESS,
-  DEFAULT_PROPOSAL_HASH,
-} from '../../../test/helpers';
+import {DEFAULT_DRAFT_HASH, DEFAULT_ETH_ADDRESS} from '../../../test/helpers';
 import {AsyncStatus} from '../../../util/types';
 import {BURN_ADDRESS} from '../../../util/constants';
 import {proposalHasVotingState} from '../helpers';
@@ -169,7 +165,6 @@ const mockWeb3Responses: Parameters<typeof Wrapper>[0]['getProps'] = ({
     {
       Voting: {
         snapshot: 'uint256',
-        proposalHash: 'bytes32',
         reporter: 'address',
         resultRoot: 'bytes32',
         nbYes: 'uint256',
@@ -177,13 +172,13 @@ const mockWeb3Responses: Parameters<typeof Wrapper>[0]['getProps'] = ({
         index: 'uint256',
         startingTime: 'uint256',
         gracePeriodStartingTime: 'uint256',
+        forceFailed: 'bool',
         isChallenged: 'bool',
         fallbackVotesCount: 'uint256',
       },
     },
     {
       snapshot: '8376297',
-      proposalHash: DEFAULT_PROPOSAL_HASH,
       reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
       resultRoot:
         '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
@@ -192,6 +187,7 @@ const mockWeb3Responses: Parameters<typeof Wrapper>[0]['getProps'] = ({
       index: '0',
       startingTime: '1617878162',
       gracePeriodStartingTime: '1617964640',
+      forceFailed: false,
       isChallenged: false,
       fallbackVotesCount: '0',
     }
@@ -394,30 +390,30 @@ describe('useProposals unit tests', () => {
       expect(result.current.proposals[1].daoProposalVotes).toMatchObject({
         OffchainVotingContract: {
           '0': '8376297',
-          '1': DEFAULT_PROPOSAL_HASH,
-          '10': '0',
-          '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-          '3':
+          '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
+          '2':
             '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-          '4': '1',
+          '3': '1',
+          '4': '0',
           '5': '0',
-          '6': '0',
-          '7': '1617878162',
-          '8': '1617964640',
+          '6': '1617878162',
+          '7': '1617964640',
+          '8': false,
           '9': false,
+          '10': '0',
           __length__: 11,
-          fallbackVotesCount: '0',
-          gracePeriodStartingTime: '1617964640',
-          index: '0',
-          isChallenged: false,
-          nbNo: '0',
-          nbYes: '1',
-          proposalHash: DEFAULT_PROPOSAL_HASH,
+          snapshot: '8376297',
           reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
           resultRoot:
             '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-          snapshot: '8376297',
+          nbYes: '1',
+          nbNo: '0',
+          index: '0',
           startingTime: '1617878162',
+          gracePeriodStartingTime: '1617964640',
+          forceFailed: false,
+          isChallenged: false,
+          fallbackVotesCount: '0',
         },
       });
 
@@ -689,7 +685,6 @@ describe('useProposals unit tests', () => {
                 {
                   Voting: {
                     snapshot: 'uint256',
-                    proposalHash: 'bytes32',
                     reporter: 'address',
                     resultRoot: 'bytes32',
                     nbYes: 'uint256',
@@ -697,13 +692,13 @@ describe('useProposals unit tests', () => {
                     index: 'uint256',
                     startingTime: 'uint256',
                     gracePeriodStartingTime: 'uint256',
+                    forceFailed: 'bool',
                     isChallenged: 'bool',
                     fallbackVotesCount: 'uint256',
                   },
                 },
                 {
                   snapshot: '8376297',
-                  proposalHash: DEFAULT_PROPOSAL_HASH,
                   reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
                   resultRoot:
                     '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
@@ -712,6 +707,7 @@ describe('useProposals unit tests', () => {
                   index: '0',
                   startingTime: '1617878162',
                   gracePeriodStartingTime: '1617964640',
+                  forceFailed: false,
                   isChallenged: false,
                   fallbackVotesCount: '0',
                 }
@@ -854,30 +850,30 @@ describe('useProposals unit tests', () => {
       expect(result.current.proposals[1].daoProposalVotes).toMatchObject({
         OffchainVotingContract: {
           '0': '8376297',
-          '1': DEFAULT_PROPOSAL_HASH,
-          '10': '0',
-          '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-          '3':
+          '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
+          '2':
             '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-          '4': '1',
+          '3': '1',
+          '4': '0',
           '5': '0',
-          '6': '0',
-          '7': '1617878162',
-          '8': '1617964640',
+          '6': '1617878162',
+          '7': '1617964640',
+          '8': false,
           '9': false,
+          '10': '0',
           __length__: 11,
-          fallbackVotesCount: '0',
-          gracePeriodStartingTime: '1617964640',
-          index: '0',
-          isChallenged: false,
-          nbNo: '0',
-          nbYes: '1',
-          proposalHash: DEFAULT_PROPOSAL_HASH,
+          snapshot: '8376297',
           reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
           resultRoot:
             '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-          snapshot: '8376297',
+          nbYes: '1',
+          nbNo: '0',
+          index: '0',
           startingTime: '1617878162',
+          gracePeriodStartingTime: '1617964640',
+          forceFailed: false,
+          isChallenged: false,
+          fallbackVotesCount: '0',
         },
       });
 
@@ -1138,7 +1134,6 @@ describe('useProposals unit tests', () => {
                 {
                   Voting: {
                     snapshot: 'uint256',
-                    proposalHash: 'bytes32',
                     reporter: 'address',
                     resultRoot: 'bytes32',
                     nbYes: 'uint256',
@@ -1146,13 +1141,13 @@ describe('useProposals unit tests', () => {
                     index: 'uint256',
                     startingTime: 'uint256',
                     gracePeriodStartingTime: 'uint256',
+                    forceFailed: 'bool',
                     isChallenged: 'bool',
                     fallbackVotesCount: 'uint256',
                   },
                 },
                 {
                   snapshot: '8376297',
-                  proposalHash: DEFAULT_PROPOSAL_HASH,
                   reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
                   resultRoot:
                     '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
@@ -1161,6 +1156,7 @@ describe('useProposals unit tests', () => {
                   index: '0',
                   startingTime: '1617878162',
                   gracePeriodStartingTime: '1617964640',
+                  forceFailed: false,
                   isChallenged: false,
                   fallbackVotesCount: '0',
                 }
@@ -1279,30 +1275,30 @@ describe('useProposals unit tests', () => {
       expect(result.current.proposals[0].daoProposalVotes).toMatchObject({
         OffchainVotingContract: {
           '0': '8376297',
-          '1': DEFAULT_PROPOSAL_HASH,
-          '10': '0',
-          '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-          '3':
+          '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
+          '2':
             '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-          '4': '1',
+          '3': '1',
+          '4': '0',
           '5': '0',
-          '6': '0',
-          '7': '1617878162',
-          '8': '1617964640',
+          '6': '1617878162',
+          '7': '1617964640',
+          '8': false,
           '9': false,
+          '10': '0',
           __length__: 11,
-          fallbackVotesCount: '0',
-          gracePeriodStartingTime: '1617964640',
-          index: '0',
-          isChallenged: false,
-          nbNo: '0',
-          nbYes: '1',
-          proposalHash: DEFAULT_PROPOSAL_HASH,
+          snapshot: '8376297',
           reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
           resultRoot:
             '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-          snapshot: '8376297',
+          nbYes: '1',
+          nbNo: '0',
+          index: '0',
           startingTime: '1617878162',
+          gracePeriodStartingTime: '1617964640',
+          forceFailed: false,
+          isChallenged: false,
+          fallbackVotesCount: '0',
         },
       });
 

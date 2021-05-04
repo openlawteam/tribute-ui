@@ -15,10 +15,34 @@
         "internalType": "contract KickBadReporterAdapter",
         "name": "_hbra",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
   },
   {
     "inputs": [],
@@ -54,6 +78,19 @@
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "NB_CHOICES",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -255,6 +292,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "bytes32",
@@ -276,6 +326,13 @@
       }
     ],
     "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -311,6 +368,19 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       },
@@ -326,11 +396,6 @@
         "internalType": "uint256",
         "name": "snapshot",
         "type": "uint256"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "proposalHash",
-        "type": "bytes32"
       },
       {
         "internalType": "address",
@@ -373,12 +438,35 @@
         "type": "bool"
       },
       {
+        "internalType": "bool",
+        "name": "forceFailed",
+        "type": "bool"
+      },
+      {
         "internalType": "uint256",
         "name": "fallbackVotesCount",
         "type": "uint256"
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract DaoRegistry",
+        "name": "dao",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "proposalId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "adminFailProposal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -859,11 +947,86 @@
           }
         ],
         "internalType": "struct OffchainVotingContract.VoteResultNode",
-        "name": "nodeCurrent",
+        "name": "node",
         "type": "tuple"
       }
     ],
-    "name": "challengeWrongSignature",
+    "name": "challengeBadFirstNode",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract DaoRegistry",
+        "name": "dao",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "proposalId",
+        "type": "bytes32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "nbNo",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "nbYes",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "sig",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "rootSig",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "index",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "choice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "proposalHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32[]",
+            "name": "proof",
+            "type": "bytes32[]"
+          }
+        ],
+        "internalType": "struct OffchainVotingContract.VoteResultNode",
+        "name": "node",
+        "type": "tuple"
+      }
+    ],
+    "name": "challengeBadNode",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -995,7 +1158,7 @@
         "type": "tuple"
       }
     ],
-    "name": "challengeWrongStep",
+    "name": "challengeBadStep",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1117,35 +1280,6 @@
         "internalType": "address",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "root",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "leaf",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32[]",
-        "name": "proof",
-        "type": "bytes32[]"
-      }
-    ],
-    "name": "verify",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
       }
     ],
     "stateMutability": "pure",
