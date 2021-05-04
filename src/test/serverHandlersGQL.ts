@@ -1,12 +1,12 @@
 /**
- * molochv3
+ * tribute
  */
 
 import {graphql} from 'msw';
 
 import {daoResponse} from './gqlResponses';
 
-const dao = graphql.query('molochv3', (req, res, ctx) => {
+const dao = graphql.query('tribute', (req, res, ctx) => {
   const {id} = req.variables;
 
   return res(ctx.data({...daoResponse, id}));

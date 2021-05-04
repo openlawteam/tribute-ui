@@ -305,7 +305,7 @@ export function useProposalOrDraft(
 
       /**
        * @note `searchUniqueDraftId` includes the draft id in the search for the proposal
-       *   as a Moloch proposal's ID hash could be the Snapshot Draft's ID.
+       *   as a Tribute proposal's ID hash could be the Snapshot Draft's ID.
        */
       const response = await fetch(
         `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/proposal/${id}?searchUniqueDraftId=true&includeVotes=true`,

@@ -2,10 +2,10 @@ import {CoreProposalVoteChoices} from '@openlaw/snapshot-js-erc712';
 import {VoteChoices} from './types';
 
 /**
- * WEB3 CONFIG for MOLOCH v3
+ * WEB3 CONFIG for TRIBUTE
  */
 
-// Vote choices should be "yes", "no" unless Moloch v3 contracts change.
+// Vote choices should be "yes", "no" unless Tribute contracts change.
 export const VOTE_CHOICES: CoreProposalVoteChoices = [
   VoteChoices.Yes,
   VoteChoices.No,

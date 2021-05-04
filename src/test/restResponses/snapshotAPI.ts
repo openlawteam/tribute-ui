@@ -23,16 +23,16 @@ export const snapshotAPIRootResponse = {
 
 export const snapshotAPISpaceResponse = {
   token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
-  name: 'Moloch v3',
+  name: 'Tribute',
   network: '1',
-  symbol: 'MOLv3',
-  skin: 'molochv3',
+  symbol: 'TRIBUTE',
+  skin: 'tribute',
   strategies: [
     {
-      name: 'moloch',
+      name: 'tribute',
       params: {
         address: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
-        symbol: 'MOLv3',
+        symbol: 'TRIBUTE',
         decimals: 18,
       },
     },

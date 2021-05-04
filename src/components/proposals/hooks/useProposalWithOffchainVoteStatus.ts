@@ -111,7 +111,7 @@ export function useProposalWithOffchainVoteStatus(
    * Check if vote result was submitted.
    * We can do this by checking if `reporter` and `resultRoot` has been set.
    *
-   * @see `submitVoteResult` in molochv3-contracts off-chain voting adapters
+   * @see `submitVoteResult` in tribute-contracts off-chain voting adapters
    */
   const offchainResultSubmitted: boolean =
     daoProposalVotes !== undefined &&

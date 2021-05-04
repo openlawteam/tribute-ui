@@ -9,7 +9,7 @@ import FadeIn from '../../components/common/FadeIn';
 import Wrap from '../../components/common/Wrap';
 import SocialMedia from '../../components/common/SocialMedia';
 
-const MolochV3Cube = React.memo(() => {
+const TributeCube = React.memo(() => {
   return (
     <div
       className="cube"
@@ -70,7 +70,7 @@ export default function GetStarted() {
             </div>
 
             <div className="landing__img">
-              <MolochV3Cube />
+              <TributeCube />
             </div>
 
             <div className="landing__button">

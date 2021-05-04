@@ -74,7 +74,7 @@ type SignAndSendProposalReturn<T extends ProposalOrDraftSnapshotType> = {
  * useSignAndSubmitProposal
  *
  * React hook which prepares proposal data for submission
- * to Snapshot and Moloch v3 and signs it (ERC712)
+ * to Snapshot and Tribute and signs it (ERC712)
  *
  * @returns {Promise<UseSignAndSubmitProposalReturn>} An object with the proposal data and the ERC712 signature string.
  */
@@ -155,7 +155,7 @@ export function useSignAndSubmitProposal<
   /**
    * signAndSendProposal
    *
-   * Builds the proposal data for submission to Moloch v3 and Snapshot and signs it (ERC712).
+   * Builds the proposal data for submission to Tribute and Snapshot and signs it (ERC712).
    *
    * @returns {Promise<SignAndSendProposalReturn>} An object with the proposal data, signature string, and propsal hash(es) from snapshot-hub.
    */

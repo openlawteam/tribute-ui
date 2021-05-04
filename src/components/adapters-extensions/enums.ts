@@ -1,7 +1,7 @@
 /**
  * DaoConstants as defined in the solidity DaoConstants.sol contract
  * and the available adapters as detailed here:
- * https://github.com/openlawteam/molochv3-contracts
+ * https://github.com/openlawteam/tribute-contracts
  */
 export enum DaoAdapterConstants {
   BANK = 'bank',
@@ -31,7 +31,7 @@ export enum DaoExtensionConstants {
  * Voting adapter names as defined in the solidity voting adapter contracts
  * i.e. `string public constant ADAPTER_NAME = "VotingContract"`.
  *
- * @link https://github.com/openlawteam/molochv3-contracts/blob/master/contracts/adapters/voting
+ * @link https://github.com/openlawteam/tribute-contracts/blob/master/contracts/adapters/voting
  */
 export enum VotingAdapterName {
   OffchainVotingContract = 'OffchainVotingContract',
