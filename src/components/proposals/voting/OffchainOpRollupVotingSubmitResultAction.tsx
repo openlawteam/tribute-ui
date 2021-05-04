@@ -154,6 +154,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
             timestamp: Number(voteData.msg.timestamp),
             sig: voteData.sig,
             // @todo conditionally use subgraph weight data
+            // @todo Use multicall
             weight: await bankExtensionMethods
               .getPriorAmount(
                 voteData.address,
