@@ -79,7 +79,6 @@ const defaultVotesMock = [
   {
     Voting: {
       snapshot: 'uint256',
-      proposalHash: 'bytes32',
       reporter: 'address',
       resultRoot: 'bytes32',
       nbYes: 'uint256',
@@ -88,6 +87,7 @@ const defaultVotesMock = [
       startingTime: 'uint256',
       gracePeriodStartingTime: 'uint256',
       isChallenged: 'bool',
+      forceFailed: 'bool',
       fallbackVotesCount: 'uint256',
     },
   },
@@ -96,9 +96,9 @@ const defaultVotesMock = [
     gracePeriodStartingTime: '1617964640',
     index: '0',
     isChallenged: false,
+    forceFailed: false,
     nbNo: '0',
     nbYes: '1',
-    proposalHash: DEFAULT_PROPOSAL_HASH,
     reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
     resultRoot:
       '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
@@ -109,36 +109,35 @@ const defaultVotesMock = [
 
 const defaultVotesResult = {
   '0': '8376297',
-  '1': DEFAULT_PROPOSAL_HASH,
-  '10': '0',
-  '2': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-  '3': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-  '4': '1',
+  '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
+  '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
+  '3': '1',
+  '4': '0',
   '5': '0',
-  '6': '0',
-  '7': '1617878162',
-  '8': '1617964640',
+  '6': '1617878162',
+  '7': '1617964640',
+  '8': false,
   '9': false,
+  '10': '0',
   __length__: 11,
-  fallbackVotesCount: '0',
-  gracePeriodStartingTime: '1617964640',
-  index: '0',
-  isChallenged: false,
-  nbNo: '0',
-  nbYes: '1',
-  proposalHash: DEFAULT_PROPOSAL_HASH,
+  snapshot: '8376297',
   reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
   resultRoot:
     '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-  snapshot: '8376297',
+  nbYes: '1',
+  nbNo: '0',
+  index: '0',
   startingTime: '1617878162',
+  gracePeriodStartingTime: '1617964640',
+  forceFailed: false,
+  isChallenged: false,
+  fallbackVotesCount: '0',
 };
 
 const defaultNoVotesMock = [
   {
     Voting: {
       snapshot: 'uint256',
-      proposalHash: 'bytes32',
       reporter: 'address',
       resultRoot: 'bytes32',
       nbYes: 'uint256',
@@ -147,13 +146,12 @@ const defaultNoVotesMock = [
       startingTime: 'uint256',
       gracePeriodStartingTime: 'uint256',
       isChallenged: 'bool',
+      forceFailed: 'bool',
       fallbackVotesCount: 'uint256',
     },
   },
   {
     snapshot: '0',
-    proposalHash:
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
     reporter: BURN_ADDRESS,
     resultRoot:
       '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -163,36 +161,36 @@ const defaultNoVotesMock = [
     startingTime: '0',
     gracePeriodStartingTime: '0',
     isChallenged: false,
+    forceFailed: false,
     fallbackVotesCount: '0',
   },
 ];
 
 const defaultNoVotesResult = {
   '0': '0',
-  '1': '0x0000000000000000000000000000000000000000000000000000000000000000',
-  '10': '0',
-  '2': BURN_ADDRESS,
-  '3': '0x0000000000000000000000000000000000000000000000000000000000000000',
+  '1': BURN_ADDRESS,
+  '2': '0x0000000000000000000000000000000000000000000000000000000000000000',
+  '3': '0',
   '4': '0',
   '5': '0',
   '6': '0',
   '7': '0',
-  '8': '0',
+  '8': false,
   '9': false,
+  '10': '0',
   __length__: 11,
-  fallbackVotesCount: '0',
-  gracePeriodStartingTime: '0',
-  index: '0',
-  isChallenged: false,
-  nbNo: '0',
-  nbYes: '0',
-  proposalHash:
-    '0x0000000000000000000000000000000000000000000000000000000000000000',
+  snapshot: '0',
   reporter: BURN_ADDRESS,
   resultRoot:
     '0x0000000000000000000000000000000000000000000000000000000000000000',
-  snapshot: '0',
+  gracePeriodStartingTime: '0',
+  index: '0',
+  nbNo: '0',
+  nbYes: '0',
   startingTime: '0',
+  isChallenged: false,
+  forceFailed: false,
+  fallbackVotesCount: '0',
 };
 
 describe('useProposalWithOffchainVoteStatus unit tests', () => {
@@ -453,13 +451,13 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
                    * Index of the vote chosen, i.e 1 = Yes, 2 = No
                    */
                   choice: 1,
-                  proposalHash: '',
                   metadata: {
                     /**
                      * @see SnapshotVoteData
                      */
                     memberAddress: '',
                   },
+                  proposalHash: '',
                 },
               },
               sig: '',
