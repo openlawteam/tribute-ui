@@ -23,6 +23,8 @@ import {snapshotAPIProposalResponse} from '../../../test/restResponses';
 import {TX_CYCLE_MESSAGES} from '../../web3/config';
 import OffchainVotingABI from '../../../truffle-contracts/OffchainVotingContract.json';
 import Wrapper from '../../../test/Wrapper';
+import {SNAPSHOT_HUB_API_URL} from '../../../config';
+import {rest, server} from '../../../test/server';
 
 const defaultProposalVotes: SnapshotProposalResponseData['votes'] = [
   {
@@ -177,16 +179,16 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
       ).toBeInTheDocument();
     });
 
-    // Mock RPC calls for `submitVoteResult`
-    await waitFor(() => {
-      mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
-      mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
-    });
-
     await waitFor(() => {
       // The component start `useFirstItemStart = true` for `<CycleMessage />`
       expect(screen.getByText(TX_CYCLE_MESSAGES[0])).toBeInTheDocument();
       expect(screen.getByText(/view progress/i)).toBeInTheDocument();
+    });
+
+    // Mock RPC calls for `submitVoteResult`
+    await waitFor(() => {
+      mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
+      mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
     });
 
     await waitFor(() => {
@@ -263,8 +265,89 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
     userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
 
     await waitFor(() => {
-      expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
+      expect(screen.getByText(/^something went wrong$/i)).toBeInTheDocument();
       expect(screen.getByText(/bad stuff!/i)).toBeInTheDocument();
+    });
+  });
+
+  test('should show an error when submitting Snapshot off-chain proof fails', async () => {
+    server.use(
+      rest.post(
+        `${SNAPSHOT_HUB_API_URL}/api/:spaceName/offchain_proofs`,
+        (_req, res, ctx) => res(ctx.status(500))
+      )
+    );
+
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    const {rerender} = render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposalData as ProposalData}
+        />
+      </Wrapper>
+    );
+
+    // Set the `daoProposalVotingAdapter.getWeb3VotingAdapterContract`
+    rerender(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={
+            {
+              ...proposalData,
+              daoProposalVotingAdapter: {
+                getWeb3VotingAdapterContract: () =>
+                  new web3Instance.eth.Contract(
+                    OffchainVotingABI as any,
+                    DEFAULT_ETH_ADDRESS
+                  ),
+              },
+            } as ProposalData
+          }
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeEnabled();
+    });
+
+    // Setup: Mock RPC calls for `processProposal`
+    await waitFor(() => {
+      // Mock signature
+      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+    });
+
+    userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
+
+    await waitFor(() => {
+      expect(screen.getByText(/^something went wrong$/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /something went wrong while submitting the off-chain vote proof\./i
+        )
+      ).toBeInTheDocument();
     });
   });
 
