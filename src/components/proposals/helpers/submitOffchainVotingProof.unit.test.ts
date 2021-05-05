@@ -1,16 +1,9 @@
 import {rest, server} from '../../../test/server';
-import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
+import {SNAPSHOT_HUB_API_URL} from '../../../config';
 import {submitOffchainVotingProof} from './';
 
 describe('submitOffchainVotingProof unit tests', () => {
   test('can call `submitOffchainVotingProof` and return OK', async () => {
-    server.use(
-      rest.post(
-        `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/offchain_proofs`,
-        (_req, res, ctx) => res(ctx.status(201))
-      )
-    );
-
     let testError: any;
 
     try {
@@ -32,7 +25,7 @@ describe('submitOffchainVotingProof unit tests', () => {
   test('can throw error when server error', async () => {
     server.use(
       rest.post(
-        `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/offchain_proofs`,
+        `${SNAPSHOT_HUB_API_URL}/api/:spaceName/offchain_proofs`,
         (_req, res, ctx) => res(ctx.status(500))
       )
     );
@@ -60,7 +53,7 @@ describe('submitOffchainVotingProof unit tests', () => {
   test('can throw error when client error', async () => {
     server.use(
       rest.post(
-        `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/offchain_proofs`,
+        `${SNAPSHOT_HUB_API_URL}/api/:spaceName/offchain_proofs`,
         (_req, res, ctx) => res(ctx.status(400))
       )
     );
