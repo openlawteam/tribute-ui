@@ -174,7 +174,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         votes: await Promise.all(voteEntriesPromises),
       });
 
-      const voteResultTreeHexRoot = voteResultTree.getHexRoot();
+      const voteResultTreeHexRoot: string = voteResultTree.getHexRoot();
 
       const result = toStepNode({
         actionId: adapterAddress,
