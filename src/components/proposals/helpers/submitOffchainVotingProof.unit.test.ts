@@ -1,6 +1,6 @@
 import {rest, server} from '../../../test/server';
 import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
-import {submitOffchainVotingProof} from './submitOffchainVotingProof';
+import {submitOffchainVotingProof} from './';
 
 describe('submitOffchainVotingProof unit tests', () => {
   test('can call `submitOffchainVotingProof` and return OK', async () => {
