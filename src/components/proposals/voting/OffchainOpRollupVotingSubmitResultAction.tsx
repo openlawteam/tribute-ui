@@ -12,11 +12,12 @@ import {
 import {VoteEntry} from '@openlaw/snapshot-js-erc712/dist/types';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
-import {getAdapterAddressFromContracts} from '../../web3/helpers';
 import {DEFAULT_CHAIN, UNITS_ADDRESS} from '../../../config';
+import {getAdapterAddressFromContracts} from '../../web3/helpers';
 import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
+import {submitOffchainVotingProof} from '../helpers';
 import {useMemberActionDisabled} from '../../../hooks';
 import {useWeb3Modal, useContractSend, useETHGasPrice} from '../../web3/hooks';
 import CycleMessage from '../../feedback/CycleMessage';
@@ -154,6 +155,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
             timestamp: Number(voteData.msg.timestamp),
             sig: voteData.sig,
             // @todo conditionally use subgraph weight data
+            // @todo Use multicall
             weight: await bankExtensionMethods
               .getPriorAmount(
                 voteData.address,
@@ -173,7 +175,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         votes: await Promise.all(voteEntriesPromises),
       });
 
-      const voteResultTreeHexRoot = voteResultTree.getHexRoot();
+      const voteResultTreeHexRoot: string = voteResultTree.getHexRoot();
 
       const result = toStepNode({
         actionId: adapterAddress,
@@ -200,6 +202,21 @@ export function OffchainOpRollupVotingSubmitResultAction(
       // 3. Sign message
       const signature = await signMessage(provider, account, messageParams);
 
+      /**
+       * 4. Send off-chain vote proof to Snapshot Hub for storage and later use.
+       *
+       * @note We're piggy-backing on the signature async call, instead of setting another status.
+       *   It may confuse the user if we were to display text saying we're "submitting
+       *   off-chain proof", or something to this effect.
+       */
+      await submitOffchainVotingProof({
+        actionId: adapterAddress,
+        chainId: DEFAULT_CHAIN,
+        steps: votes,
+        merkleRoot: voteResultTreeHexRoot,
+        verifyingContract: daoRegistryAddress,
+      });
+
       setSignatureStatus(Web3TxStatus.FULFILLED);
 
       const submitVoteResultArguments: SubmitVoteResultArguments = [
@@ -215,7 +232,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      // 4. Send the tx
+      // 5. Send the tx
       await txSend(
         'submitVoteResult',
         votingAdapterMethods,

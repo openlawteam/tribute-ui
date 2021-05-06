@@ -38,6 +38,11 @@ const postSnapshotAPIMessage = rest.post(
   async (_req, res, ctx) => res(ctx.json(snapshotAPISubmitMessage))
 );
 
+const postSnapshotAPIOffchainProof = rest.post(
+  `${SNAPSHOT_HUB_API_URL}/api/:spaceName/offchain_proofs`,
+  (_req, res, ctx) => res(ctx.status(201))
+);
+
 /**
  * HANDLERS TO EXPORT
  */
@@ -48,6 +53,7 @@ const handlers = [
   getSnapshotAPIRoot,
   getSnapshotAPISpace,
   postSnapshotAPIMessage,
+  postSnapshotAPIOffchainProof,
 ];
 
 export {handlers};
