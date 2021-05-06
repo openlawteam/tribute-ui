@@ -39,7 +39,13 @@ export async function submitOffchainVotingProof(
     // Endpoint does not have any return data.
     const response = await fetch(
       `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/offchain_proofs`,
-      {method: 'POST', body: JSON.stringify(data)}
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
     );
 
     if (!response.ok) {
