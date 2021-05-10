@@ -111,6 +111,10 @@ export function useOffchainVotingResults(
         const vote = v[Object.keys(v)[0]];
 
         return [
+          /**
+           * Must be the true member's address for calculating voting power.
+           * This value is (or at least should be) derived from `OffchainVoting.memberAddressesByDelegatedKey`.
+           */
           vote.msg.payload.metadata.memberAddress,
           vote.msg.payload.choice,
         ];
