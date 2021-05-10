@@ -158,7 +158,11 @@ export function OffchainOpRollupVotingSubmitResultAction(
             // @todo Use multicall
             weight: await bankExtensionMethods
               .getPriorAmount(
-                voteData.address,
+                /**
+                 * Must be the true member's address for calculating voting power.
+                 * This value is (or at least should be) derived from `OffchainVoting.memberAddressesByDelegatedKey`.
+                 */
+                voteData.msg.payload.metadata.memberAddress,
                 UNITS_ADDRESS,
                 snapshotProposal.msg.payload.snapshot
               )
