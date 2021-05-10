@@ -30,13 +30,14 @@ type SubmitOffchainVotingProofArguments = {
  * Submits a Merkle hex root and its steps to Snapshot Hub
  * for verification and storage (if successful).
  *
+ * The API endpoint does not have any return data, only a `201` response.
+ *
  * @link https://github.com/openlawteam/snapshot-hub
  */
 export async function submitOffchainVotingProof(
   data: SubmitOffchainVotingProofArguments
 ): Promise<void> {
   try {
-    // Endpoint does not have any return data.
     const response = await fetch(
       `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/offchain_proofs`,
       {
