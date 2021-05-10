@@ -102,3 +102,31 @@ export const snapshotAPIProposalResponse: SnapshotProposalResponse = {
     relayerIpfsHash: 'QmPdW2zQm9yAqUSihD1TJHoSiQTsJHuWrn8n98qpeBGjzE',
   },
 };
+
+export const snapshotAPIOffchainProofResponse: any = {
+  merkle_root:
+    '0x2f6a1ec9f67c87e7956228a0838b0980748f2dda936a0ebaf3e929f192fa7b6c',
+  space: 'tribute',
+  steps: [
+    {
+      sig:
+        '0x2ec030f67e0655ad7cacc5625b535442f1075a8ee02acbd8a6b9a77c75fe3f8068b8a360276facfd4e87c022f2c6d15ada22f5fd40f53e2aba2021a40c6368981c',
+      nbNo: '1',
+      type: 'vote',
+      index: 0,
+      nbYes: '0',
+      choice: 2,
+      weight: '1',
+      account: '0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1',
+      payload: {
+        choice: 2,
+        account: '0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1',
+        proposalHash:
+          '0x946cb6d94b8c8082656af73149a514382b6ea6e87045129825b94266afcf229c',
+      },
+      timestamp: 1620652809,
+      proposalHash:
+        '0x946cb6d94b8c8082656af73149a514382b6ea6e87045129825b94266afcf229c',
+    },
+  ],
+};

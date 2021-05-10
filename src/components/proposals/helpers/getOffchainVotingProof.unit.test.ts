@@ -2,6 +2,9 @@ import {getOffchainVotingProof} from './';
 import {rest, server} from '../../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../../config';
 
+const DEFAULT_MERKLE_ROOT_HEX: string =
+  '0x2f6a1ec9f67c87e7956228a0838b0980748f2dda936a0ebaf3e929f192fa7b6c';
+
 describe('getOffchainVotingProof unit tests', () => {
   test('can throw error when server error', async () => {
     server.use(
@@ -14,8 +17,7 @@ describe('getOffchainVotingProof unit tests', () => {
     let testError: any;
 
     try {
-      // Using fake data
-      await getOffchainVotingProof('abc123');
+      await getOffchainVotingProof(DEFAULT_MERKLE_ROOT_HEX);
     } catch (error) {
       testError = error;
     }
@@ -37,7 +39,7 @@ describe('getOffchainVotingProof unit tests', () => {
 
     try {
       // Using fake data
-      await getOffchainVotingProof('abc123');
+      await getOffchainVotingProof(DEFAULT_MERKLE_ROOT_HEX);
     } catch (error) {
       testError = error;
     }
