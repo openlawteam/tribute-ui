@@ -3,7 +3,6 @@ export default function HamburgerSVG() {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
-      className="svg-inline--fa fa-bars fa-w-14 fa-3x"
       data-icon="bars"
       data-prefix="fal"
       viewBox="0 0 448 512">
