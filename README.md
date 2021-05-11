@@ -61,7 +61,7 @@ If you want to use the same accounts (`-d`) and data (`--db`) from a previous Ga
 
 #### Troubleshooting
 
-- **Nonce errors:** If you're developing on Ganache and receiving any errors from the app related to an incorrect nonce(s), resetting your Ganache account(s) in MetaMask should fix this. To reset your accounts click: _Settings->Advanced->Reset Account_.
+- **Invalid address, and/or nonce-related errors:** If you're developing on Ganache and the app will not start due to a vague error about an "invalid address", or you're receiving transaction errors from the app related to an incorrect nonce(s), then resetting your Ganache account(s) in MetaMask (or other wallet, if possible) should fix this. To reset your accounts in MetaMask (or other wallet) click: _Settings->Advanced->Reset Account_.
 
 ## Running the local graph-node
 

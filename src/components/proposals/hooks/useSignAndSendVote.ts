@@ -25,10 +25,6 @@ import {useWeb3Modal} from '../../web3/hooks/useWeb3Modal';
 
 type SignAndSendVoteDataParam = {
   choice: SnapshotMessageVote['choice'];
-  /**
-   * The address of a delegate voter for a member.
-   */
-  delegateAddress?: SnapshotMessageVote['metadata']['memberAddress'];
   metadata?: Record<string, any>;
 };
 
@@ -67,7 +63,12 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
   const daoRegistryAddress = useSelector(
     (state: StoreState) => state.contracts.DaoRegistryContract?.contractAddress
   );
-  const contracts = useSelector((state: StoreState) => state.contracts);
+
+  const contracts = useSelector((s: StoreState) => s.contracts);
+
+  const memberAddress = useSelector(
+    (s: StoreState) => s.connectedMember?.memberAddress
+  );
 
   /**
    * Our hooks
@@ -132,6 +133,10 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
         throw new Error('No account was found.');
       }
 
+      if (!memberAddress) {
+        throw new Error('No member address was found.');
+      }
+
       if (!daoRegistryAddress) {
         throw new Error('No "DaoRegistry" address was found.');
       }
@@ -150,7 +155,7 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
         ? getAdapterAddressFromContracts(adapterName, contracts)
         : BURN_ADDRESS;
 
-      const {choice, delegateAddress, metadata = {}} = partialVoteData;
+      const {choice, metadata = {}} = partialVoteData;
 
       const {data: snapshotSpace} = await getSpace(SNAPSHOT_HUB_API_URL, SPACE);
 
@@ -159,7 +164,12 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
         choice,
         metadata: {
           ...metadata,
-          memberAddress: delegateAddress || account,
+          /**
+           * Must be the true member's address for calculating voting power.
+           * It's safest to use our helper Redux value `memberAddress: string`,
+           * as it uses `OffchainVoting.memberAddressesByDelegatedKey`.
+           */
+          memberAddress,
         },
       };
 
