@@ -154,10 +154,9 @@ describe('CreateGovernanceProposal unit tests', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/done/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/title/i)).toBeDisabled();
       expect(screen.getByLabelText(/description/i)).toBeDisabled();
-      expect(screen.getByRole('button', {name: /submit/i})).toBeDisabled();
+      expect(screen.getByRole('button', {name: /done/i})).toBeDisabled();
     });
   });
 });
