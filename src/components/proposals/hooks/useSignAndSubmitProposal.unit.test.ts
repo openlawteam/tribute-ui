@@ -13,15 +13,18 @@ import Wrapper from '../../../test/Wrapper';
 describe('useSignAndSubmitProposal unit tests', () => {
   test('hook states should be correct when signing & sending (Draft)', async () => {
     await act(async () => {
-      const {result, waitForNextUpdate} = renderHook(
+      let mockWeb3Provider: any;
+      let web3Instance: any;
+
+      const {result, waitForValueToChange} = renderHook(
         () => useSignAndSubmitProposal(),
         {
           initialProps: {
             useInit: true,
             useWallet: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              // Mock signature
-              mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+            getProps: (p) => {
+              mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
           },
           wrapper: Wrapper,
@@ -36,6 +39,10 @@ describe('useSignAndSubmitProposal unit tests', () => {
         expect(result.current.proposalSignAndSendStatus).toBe(
           Web3TxStatus.STANDBY
         );
+      });
+
+      await waitFor(() => {
+        mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
       });
 
       // Call signAndSendProposal
@@ -57,7 +64,9 @@ describe('useSignAndSubmitProposal unit tests', () => {
         Web3TxStatus.AWAITING_CONFIRM
       );
 
-      await waitForNextUpdate();
+      await waitForValueToChange(
+        () => result.current.proposalSignAndSendStatus
+      );
 
       // assert pending submission state
       expect(result.current.signAndSendProposal).toBeInstanceOf(Function);
@@ -67,7 +76,9 @@ describe('useSignAndSubmitProposal unit tests', () => {
         Web3TxStatus.PENDING
       );
 
-      await waitForNextUpdate();
+      await waitForValueToChange(
+        () => result.current.proposalSignAndSendStatus
+      );
 
       // @note Set the timestamp by hand as dates will always be different
       const now = (Date.now() / 1000).toFixed();
@@ -122,21 +133,19 @@ describe('useSignAndSubmitProposal unit tests', () => {
       )
     );
 
+    let mockWeb3Provider: any;
+    let web3Instance: any;
+
     await act(async () => {
-      const {result, waitForNextUpdate} = renderHook(
+      const {result, waitForValueToChange} = renderHook(
         () => useSignAndSubmitProposal(),
         {
           initialProps: {
             useInit: true,
             useWallet: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              // Mock the RPC calls from `buildProposalMessageHelper`
-              mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameter('uint256', 123)
-              );
-              // Mock signature
-              mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+            getProps: (p) => {
+              mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
           },
           wrapper: Wrapper,
@@ -151,6 +160,16 @@ describe('useSignAndSubmitProposal unit tests', () => {
         expect(result.current.proposalSignAndSendStatus).toBe(
           Web3TxStatus.STANDBY
         );
+      });
+
+      await waitFor(() => {
+        // Mock the RPC calls from `buildProposalMessageHelper`
+        mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
+        mockWeb3Provider.injectResult(
+          web3Instance.eth.abi.encodeParameter('uint256', 123)
+        );
+        // Mock signature
+        mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
       });
 
       // Call signAndSendProposal
@@ -173,7 +192,9 @@ describe('useSignAndSubmitProposal unit tests', () => {
         Web3TxStatus.AWAITING_CONFIRM
       );
 
-      await waitForNextUpdate();
+      await waitForValueToChange(
+        () => result.current.proposalSignAndSendStatus
+      );
 
       // assert pending submission state
       expect(result.current.signAndSendProposal).toBeInstanceOf(Function);
@@ -183,7 +204,9 @@ describe('useSignAndSubmitProposal unit tests', () => {
         Web3TxStatus.PENDING
       );
 
-      await waitForNextUpdate();
+      await waitForValueToChange(
+        () => result.current.proposalSignAndSendStatus
+      );
 
       // @note Set the timestamp by hand as dates will always be different
       const now = Math.floor(Date.now() / 1000);
@@ -248,12 +271,10 @@ describe('useSignAndSubmitProposal unit tests', () => {
         wrapper: Wrapper,
       });
 
-      await new Promise((r) => {
-        setTimeout(r, 1000);
+      await waitFor(() => {
+        // Mock signature
+        provider.injectResult(...signTypedDataV4({web3Instance: web3}));
       });
-
-      // Mock signature
-      provider.injectResult(...signTypedDataV4({web3Instance: web3}));
 
       // Call signAndSendProposal
       const {
@@ -310,19 +331,17 @@ describe('useSignAndSubmitProposal unit tests', () => {
       )
     );
 
+    let mockWeb3Provider: any;
+    let web3Instance: any;
+
     await act(async () => {
       const {result} = await renderHook(() => useSignAndSubmitProposal(), {
         initialProps: {
           useInit: true,
           useWallet: true,
-          getProps: ({mockWeb3Provider, web3Instance}) => {
-            // Mock the RPC calls from `buildProposalMessageHelper`
-            mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
-            mockWeb3Provider.injectResult(
-              web3Instance.eth.abi.encodeParameter('uint256', 123)
-            );
-            // Mock signature
-            mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+          getProps: (p) => {
+            mockWeb3Provider = p.mockWeb3Provider;
+            web3Instance = p.web3Instance;
           },
         },
         wrapper: Wrapper,
@@ -336,6 +355,16 @@ describe('useSignAndSubmitProposal unit tests', () => {
         expect(result.current.proposalSignAndSendStatus).toBe(
           Web3TxStatus.STANDBY
         );
+      });
+
+      await waitFor(() => {
+        // Mock the RPC calls from `buildProposalMessageHelper`
+        mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
+        mockWeb3Provider.injectResult(
+          web3Instance.eth.abi.encodeParameter('uint256', 123)
+        );
+        // Mock signature
+        mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
       });
 
       // Call signAndSendProposal

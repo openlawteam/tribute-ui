@@ -59,9 +59,6 @@ export default function Init(props: InitProps) {
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
   );
-  const bankExtensionMethods = useSelector(
-    (s: StoreState) => s.contracts.BankExtensionContract?.instance.methods
-  );
 
   /**
    * State
@@ -80,7 +77,7 @@ export default function Init(props: InitProps) {
    */
 
   const initContracts = useInitContracts();
-  const {account, connected, web3Instance} = useWeb3Modal();
+  const {account, web3Instance} = useWeb3Modal();
   const {isMountedRef} = useIsMounted();
 
   /**
@@ -98,9 +95,10 @@ export default function Init(props: InitProps) {
   ]);
 
   const handleGetMemberCached = useCallback(handleGetMember, [
-    bankExtensionMethods,
+    account,
     daoRegistryContract,
     dispatch,
+    web3Instance,
   ]);
 
   const handleGetSnapshotAPIStatusCached = useCallback(
@@ -123,11 +121,8 @@ export default function Init(props: InitProps) {
   }, [handleInitContractsCached, web3Instance]);
 
   useEffect(() => {
-    connected &&
-      account &&
-      daoRegistryContract &&
-      handleGetMemberCached(account);
-  }, [account, connected, daoRegistryContract, handleGetMemberCached]);
+    handleGetMemberCached();
+  }, [handleGetMemberCached]);
 
   useEffect(() => {
     handleGetSnapshotAPIStatusCached();
@@ -171,13 +166,15 @@ export default function Init(props: InitProps) {
     }
   }
 
-  async function handleGetMember(account: string) {
+  async function handleGetMember() {
     try {
-      if (!bankExtensionMethods || !daoRegistryContract) {
+      if (!account || !daoRegistryContract || !web3Instance) {
         return;
       }
 
-      await dispatch(getConnectedMember(account));
+      await dispatch(
+        getConnectedMember({account, daoRegistryContract, web3Instance})
+      );
     } catch (error) {
       setError(error);
     }

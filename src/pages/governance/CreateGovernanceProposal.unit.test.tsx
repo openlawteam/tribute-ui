@@ -5,6 +5,8 @@ import {ethBlockNumber, signTypedDataV4} from '../../test/web3Responses';
 import {SET_CONNECTED_MEMBER} from '../../store/actions';
 import CreateGovernanceProposal from './CreateGovernanceProposal';
 import Wrapper from '../../test/Wrapper';
+import {FakeHttpProvider} from '../../test/helpers';
+import Web3 from 'web3';
 
 describe('CreateGovernanceProposal unit tests', () => {
   test('should not render form if not connected to a wallet', () => {
@@ -90,19 +92,16 @@ describe('CreateGovernanceProposal unit tests', () => {
   });
 
   test('should submit form', async () => {
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
     render(
       <Wrapper
         useWallet
         useInit
-        getProps={({mockWeb3Provider, web3Instance}) => {
-          // Mock the RPC calls from `buildProposalMessageHelper`
-          mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
-          // Mock offchain voting period call
-          mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameter('uint256', 123)
-          );
-          // Mock signature
-          mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
         }}>
         <CreateGovernanceProposal />
       </Wrapper>
@@ -130,6 +129,17 @@ describe('CreateGovernanceProposal unit tests', () => {
       expect(
         screen.getByDisplayValue(/great description!/i)
       ).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Mock the RPC calls from `buildProposalMessageHelper`
+      mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
+      // Mock offchain voting period call
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('uint256', 123)
+      );
+      // Mock signature
+      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
     });
 
     act(() => {

@@ -6,21 +6,14 @@ import React, {useEffect, useMemo, useState} from 'react';
 import Web3 from 'web3';
 
 import * as useWeb3ModalToMock from '../components/web3/hooks/useWeb3Modal';
-import * as getAdapterAddressToMock from '../components/web3/helpers/getAdapterAddress';
-import * as getExtensionAddressToMock from '../components/web3/helpers/getExtensionAddress';
 import {
   Web3ModalContext,
   Web3ModalContextValue,
 } from '../components/web3/Web3ModalManager';
-import {
-  balanceOfMember,
-  getCurrentDelegateKey,
-  memberAddressesByDelegatedKey,
-} from './web3Responses';
 import {CHAINS as mockChains} from '../config';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider, getNewStore} from './helpers';
+import {VotingAdapterName} from '../components/adapters-extensions/enums';
 import Init, {InitError} from '../Init';
-import IVotingABI from '../truffle-contracts/IVoting.json';
 
 export type WrapperReturnProps = {
   mockWeb3Provider: FakeHttpProvider;
@@ -105,20 +98,48 @@ export default function Wrapper(
   }, [mockWeb3, mockWeb3Provider, useWallet]);
 
   // If `useWallet` is enabled it will mock the `getAdapterAddress` response so we can init contracts.
-  const getAdapterAddressMock = useMemo(() => {
+  const getAdapterAddressMock = useMemo(async () => {
     if (!useWallet) return;
+
+    const getAdapterAddressToMock = await import(
+      '../components/web3/helpers/getAdapterAddress'
+    );
 
     return jest
       .spyOn(getAdapterAddressToMock, 'getAdapterAddress')
       .mockImplementation(() => Promise.resolve(DEFAULT_ETH_ADDRESS));
   }, [useWallet]);
 
-  const getExtensionAddressMock = useMemo(() => {
+  const getExtensionAddressMock = useMemo(async () => {
     if (!useWallet) return;
+
+    const getExtensionAddressToMock = await import(
+      '../components/web3/helpers/getExtensionAddress'
+    );
 
     return jest
       .spyOn(getExtensionAddressToMock, 'getExtensionAddress')
       .mockImplementation(() => Promise.resolve(DEFAULT_ETH_ADDRESS));
+  }, [useWallet]);
+
+  /**
+   * Mock RPC response for voting contract name:
+   *
+   * @see `<Init />`
+   * @see `initRegisteredVotingAdapter`
+   */
+  const getVotingAdapterNameMock = useMemo(async () => {
+    if (!useWallet) return;
+
+    const getVotingAdapterNameToMock = await import(
+      '../components/web3/helpers/getVotingAdapterName'
+    );
+
+    return jest
+      .spyOn(getVotingAdapterNameToMock, 'getVotingAdapterName')
+      .mockImplementation(() =>
+        Promise.resolve(VotingAdapterName.OffchainVotingContract)
+      );
   }, [useWallet]);
 
   /**
@@ -135,16 +156,23 @@ export default function Wrapper(
   useEffect(() => {
     return () => {
       // When `<Wrapper />` unmounts, restore the original function.
-      getAdapterAddressMock?.mockRestore();
+      getAdapterAddressMock.then((v) => v?.mockRestore());
     };
   }, [getAdapterAddressMock]);
 
   useEffect(() => {
     return () => {
       // When `<Wrapper />` unmounts, restore the original function.
-      getExtensionAddressMock?.mockRestore();
+      getExtensionAddressMock.then((v) => v?.mockRestore());
     };
   }, [getExtensionAddressMock]);
+
+  useEffect(() => {
+    return () => {
+      // When `<Wrapper />` unmounts, restore the original function.
+      getVotingAdapterNameMock.then((v) => v?.mockRestore());
+    };
+  }, [getVotingAdapterNameMock]);
 
   useEffect(() => {}, [
     mockWeb3Provider,
@@ -155,26 +183,34 @@ export default function Wrapper(
 
   useEffect(() => {
     /**
-     * Mock rpc response for voting contract name inside init
+     * Setup for `getConnectedMember` in `<Init />`
      * @note This should come first
      */
-    if (useInit) {
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameter(
-          'string',
-          'OffchainVotingContract'
-        ),
-        {abi: IVotingABI, abiMethodName: 'getAdapterName'}
-      );
-    }
-
     if (useWallet) {
       mockWeb3Provider.injectResult(
-        ...memberAddressesByDelegatedKey({web3Instance})
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              // For `getAddressIfDelegated` call
+              web3Instance.eth.abi.encodeParameter(
+                'address',
+                DEFAULT_ETH_ADDRESS
+              ),
+              // For `members` call
+              web3Instance.eth.abi.encodeParameter('uint8', '1'),
+              // For `isActiveMember` call
+              web3Instance.eth.abi.encodeParameter('bool', true),
+              // For `getCurrentDelegateKey` call
+              web3Instance.eth.abi.encodeParameter(
+                'address',
+                DEFAULT_ETH_ADDRESS
+              ),
+            ],
+          ]
+        )
       );
-      // Defaults to `100`
-      mockWeb3Provider.injectResult(...balanceOfMember({web3Instance}));
-      mockWeb3Provider.injectResult(...getCurrentDelegateKey({web3Instance}));
     }
   }, [mockWeb3Provider, useInit, useWallet, web3Instance]);
 

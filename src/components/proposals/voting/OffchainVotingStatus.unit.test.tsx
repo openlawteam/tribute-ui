@@ -1,10 +1,10 @@
-import {SnapshotType, VoteChoices} from '@openlaw/snapshot-js-erc712';
 import {render, screen, waitFor} from '@testing-library/react';
+import {SnapshotType, VoteChoices} from '@openlaw/snapshot-js-erc712';
+import Web3 from 'web3';
 
-import {DEFAULT_ETH_ADDRESS} from '../../../test/helpers';
+import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../../test/helpers';
 import {OffchainVotingStatus} from './OffchainVotingStatus';
 import {ProposalData} from '../types';
-import MulticallABI from '../../../truffle-contracts/Multicall.json';
 import Wrapper from '../../../test/Wrapper';
 
 describe('OffchainVotingStatus unit tests', () => {
@@ -59,29 +59,36 @@ describe('OffchainVotingStatus unit tests', () => {
   };
 
   test('should render correct content', async () => {
+    let web3Instance: Web3;
+    let mockWeb3Provider: FakeHttpProvider;
+
     render(
       <Wrapper
         useInit
         useWallet
-        getProps={({mockWeb3Provider, web3Instance}) => {
-          // Inject mocked units result 1
-          mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameters(
-              ['uint256', 'bytes[]'],
-              [
-                0,
-                [
-                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-                ],
-              ]
-            ),
-            {abi: MulticallABI, abiMethodName: 'aggregate'}
-          );
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
         }}>
         <OffchainVotingStatus proposal={fakeProposal as ProposalData} />
       </Wrapper>
     );
+
+    await waitFor(() => {
+      // Inject mocked units result 1
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+              web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+            ],
+          ]
+        )
+      );
+    });
 
     // Percentages
     await waitFor(() => {
@@ -136,30 +143,20 @@ describe('OffchainVotingStatus unit tests', () => {
   });
 
   test('should render correct content when "countdownGracePeriodStartMs" provided', async () => {
+    let web3Instance: Web3;
+    let mockWeb3Provider: FakeHttpProvider;
+
     render(
       <Wrapper
         useInit
         useWallet
-        getProps={({mockWeb3Provider, web3Instance}) => {
-          // Inject mocked result for grace period end
-          const result: [string] = [
-            web3Instance.eth.abi.encodeParameter('uint256', 3),
-          ];
-          mockWeb3Provider.injectResult(...result);
+        getProps={(p) => {
+          web3Instance = p.web3Instance;
+          mockWeb3Provider = p.mockWeb3Provider;
 
-          // Inject mocked results for total units and single vote
+          // Inject mocked result for grace period end
           mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameters(
-              ['uint256', 'bytes[]'],
-              [
-                0,
-                [
-                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-                ],
-              ]
-            ),
-            {abi: MulticallABI, abiMethodName: 'aggregate'}
+            web3Instance.eth.abi.encodeParameter('uint256', 3)
           );
         }}>
         <OffchainVotingStatus
@@ -169,10 +166,20 @@ describe('OffchainVotingStatus unit tests', () => {
       </Wrapper>
     );
 
-    // Percentages
+    // Inject mocked results for total units and single vote
     await waitFor(() => {
-      expect(screen.getByText(/1%/i)).toBeInTheDocument();
-      expect(screen.getByText(/0%/i)).toBeInTheDocument();
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+              web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+            ],
+          ]
+        )
+      );
     });
 
     // Status: loader
@@ -180,6 +187,12 @@ describe('OffchainVotingStatus unit tests', () => {
       expect(
         screen.getByLabelText(/getting off-chain voting status/i)
       ).toBeInTheDocument();
+    });
+
+    // Percentages
+    await waitFor(() => {
+      expect(screen.getByText(/1%/i)).toBeInTheDocument();
+      expect(screen.getByText(/0%/i)).toBeInTheDocument();
     });
 
     // Grace period label

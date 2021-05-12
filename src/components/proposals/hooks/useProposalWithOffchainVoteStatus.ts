@@ -138,6 +138,13 @@ export function useProposalWithOffchainVoteStatus(
   ]);
 
   useEffect(() => {
+    // Call as soon as possible.
+    pollStatusFromContractCached().catch((error) => {
+      setProposalFlowStatusError(error);
+    });
+  }, [pollStatusFromContractCached]);
+
+  useEffect(() => {
     /**
      * Stop polling if processed:
      * Set our ref to be accessed inside of the polling interval callback
@@ -146,35 +153,28 @@ export function useProposalWithOffchainVoteStatus(
       stopPollingRef.current = true;
     }
 
-    // Call as soon as possible.
-    pollStatusFromContractCached()
-      .then(() => {
-        // Clear any previous intervals
-        if (pollingIntervalIdRef.current) {
+    // Clear any previous intervals
+    if (pollingIntervalIdRef.current) {
+      clearInterval(pollingIntervalIdRef.current);
+    }
+
+    // Then, poll every `x` Ms
+    const intervalId = setInterval(async () => {
+      try {
+        if (stopPollingRef.current && pollingIntervalIdRef.current) {
           clearInterval(pollingIntervalIdRef.current);
         }
 
-        // Then, poll every `x` Ms
-        const intervalId = setInterval(async () => {
-          try {
-            if (stopPollingRef.current && pollingIntervalIdRef.current) {
-              clearInterval(pollingIntervalIdRef.current);
-            }
+        await pollStatusFromContractCached();
+      } catch (error) {
+        pollingIntervalIdRef.current &&
+          clearInterval(pollingIntervalIdRef.current);
 
-            await pollStatusFromContractCached();
-          } catch (error) {
-            pollingIntervalIdRef.current &&
-              clearInterval(pollingIntervalIdRef.current);
-
-            setProposalFlowStatusError(error);
-          }
-        }, POLL_INTERVAL_MS);
-
-        pollingIntervalIdRef.current = intervalId;
-      })
-      .catch((error) => {
         setProposalFlowStatusError(error);
-      });
+      }
+    }, POLL_INTERVAL_MS);
+
+    pollingIntervalIdRef.current = intervalId;
   }, [atProcessedInDAO, pollStatusFromContractCached]);
 
   // Stop polling if propsal is processed

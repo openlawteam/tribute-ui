@@ -13,7 +13,10 @@ import {
   DAO_REGISTRY_CONTRACT_ADDRESS,
 } from '../../config';
 import {ContractsStateEntry} from '../contracts/types';
-import {getAdapterAddress} from '../../components/web3/helpers';
+import {
+  getAdapterAddress,
+  getVotingAdapterName,
+} from '../../components/web3/helpers';
 import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
 import {StoreState} from '../types';
 import {
@@ -399,9 +402,6 @@ export function initRegisteredVotingAdapter(
     try {
       if (web3Instance) {
         const daoRegistryContract = getState().contracts.DaoRegistryContract;
-        const {default: lazyIVotingABI} = await import(
-          '../../truffle-contracts/IVoting.json'
-        );
 
         if (!daoRegistryContract) {
           console.warn(
@@ -413,16 +413,8 @@ export function initRegisteredVotingAdapter(
         let votingAdapterName: string = '';
         let address: string = contractAddress || '';
 
-        const getVotingAdapterName = async (a: string) =>
-          await new web3Instance.eth.Contract(
-            lazyIVotingABI as AbiItem[],
-            a
-          ).methods
-            .getAdapterName()
-            .call();
-
         if (address) {
-          votingAdapterName = await getVotingAdapterName(address);
+          votingAdapterName = await getVotingAdapterName(address, web3Instance);
         }
 
         if (!address && !votingAdapterName) {
@@ -431,7 +423,7 @@ export function initRegisteredVotingAdapter(
             getState().contracts.DaoRegistryContract?.instance
           );
 
-          votingAdapterName = await getVotingAdapterName(address);
+          votingAdapterName = await getVotingAdapterName(address, web3Instance);
         }
 
         /**

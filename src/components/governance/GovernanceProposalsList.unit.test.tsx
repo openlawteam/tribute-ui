@@ -1,4 +1,6 @@
 import {render, screen, waitFor} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import Web3 from 'web3';
 import {
   SnapshotProposalResponseData,
   SnapshotType,
@@ -11,9 +13,7 @@ import {SNAPSHOT_HUB_API_URL} from '../../config';
 import {snapshotAPIProposalResponse} from '../../test/restResponses';
 import GovernanceProposalsList from './GovernanceProposalsList';
 import MulticallABI from '../../truffle-contracts/Multicall.json';
-import userEvent from '@testing-library/user-event';
 import Wrapper from '../../test/Wrapper';
-import Web3 from 'web3';
 
 describe('GovernanceProposalsList unit tests', () => {
   const defaultProposalVotes: SnapshotProposalResponseData['votes'] = [
@@ -199,62 +199,16 @@ describe('GovernanceProposalsList unit tests', () => {
       ]
     );
 
+    let mockWeb3Provider: any;
+    let web3Instance: any;
+
     render(
       <Wrapper
         useInit
         useWallet
-        getProps={({mockWeb3Provider, web3Instance}) => {
-          /**
-           * Inject voting results. The order should align with the order above of fake responses.
-           */
-
-          // 1. Inject passed result
-          mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameters(
-              ['uint256', 'bytes[]'],
-              [
-                0,
-                [
-                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-                ],
-              ]
-            ),
-            {abi: MulticallABI, abiMethodName: 'aggregate'}
-          );
-
-          // 2. Inject failed result
-          mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameters(
-              ['uint256', 'bytes[]'],
-              [
-                0,
-                [
-                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '300000'),
-                ],
-              ]
-            ),
-            {abi: MulticallABI, abiMethodName: 'aggregate'}
-          );
-
-          // 3. Inject voting result
-          mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameters(
-              ['uint256', 'bytes[]'],
-              [
-                0,
-                [
-                  web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-                  web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-                ],
-              ]
-            ),
-            {abi: MulticallABI, abiMethodName: 'aggregate'}
-          );
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
         }}>
         <GovernanceProposalsList
           actionId={BURN_ADDRESS}
@@ -262,6 +216,10 @@ describe('GovernanceProposalsList unit tests', () => {
         />
       </Wrapper>
     );
+
+    await waitFor(() => {
+      getWeb3Results({mockWeb3Provider, web3Instance});
+    });
 
     await waitFor(() => {
       expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();
@@ -301,7 +259,7 @@ describe('GovernanceProposalsList unit tests', () => {
     );
 
     render(
-      <Wrapper useInit useWallet getProps={getWeb3Results}>
+      <Wrapper useInit useWallet>
         <GovernanceProposalsList
           actionId={BURN_ADDRESS}
           onProposalClick={() => {}}
@@ -330,7 +288,7 @@ describe('GovernanceProposalsList unit tests', () => {
     });
   });
 
-  test('should render error', async () => {
+  test('should render error on Snapshot Hub server error', async () => {
     server.use(
       ...[
         rest.get(
@@ -340,8 +298,17 @@ describe('GovernanceProposalsList unit tests', () => {
       ]
     );
 
+    let mockWeb3Provider: any;
+    let web3Instance: any;
+
     render(
-      <Wrapper useInit useWallet getProps={getWeb3Results}>
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
         <GovernanceProposalsList
           actionId={BURN_ADDRESS}
           onProposalClick={() => {}}
@@ -350,9 +317,68 @@ describe('GovernanceProposalsList unit tests', () => {
     );
 
     await waitFor(() => {
+      getWeb3Results({mockWeb3Provider, web3Instance});
+    });
+
+    await waitFor(() => {
       expect(
         screen.getByText(/something went wrong while getting the proposals/i)
       ).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/^details$/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Proposal headers
+      expect(() => screen.getByText(/^proposals$/i)).toThrow();
+      expect(() => screen.getByText(/^passed$/i)).toThrow();
+      expect(() => screen.getByText(/^failed$/i)).toThrow();
+      expect(() => screen.getByText(/^voting$/i)).toThrow();
+
+      // Proposal names
+      expect(() => screen.getByText(/another cool one/i)).toThrow();
+      expect(() => screen.getByText(/another rad one/i)).toThrow();
+      expect(() => screen.getByText(/another awesome one/i)).toThrow();
+    });
+  });
+
+  test('should render error on contract error', async () => {
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json(proposalsResponse))
+        ),
+      ]
+    );
+
+    let mockWeb3Provider: any;
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+        }}>
+        <GovernanceProposalsList
+          actionId={BURN_ADDRESS}
+          onProposalClick={() => {}}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      mockWeb3Provider.injectError({
+        code: 1234,
+        message: 'Some contract error',
+      });
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/some contract error/i)).toBeInTheDocument();
     });
 
     await waitFor(() => {
@@ -385,8 +411,17 @@ describe('GovernanceProposalsList unit tests', () => {
       ]
     );
 
+    let mockWeb3Provider: any;
+    let web3Instance: any;
+
     render(
-      <Wrapper useInit useWallet getProps={getWeb3Results}>
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
         <GovernanceProposalsList
           actionId={BURN_ADDRESS}
           onProposalClick={spy}
@@ -400,6 +435,10 @@ describe('GovernanceProposalsList unit tests', () => {
         />
       </Wrapper>
     );
+
+    await waitFor(() => {
+      getWeb3Results({mockWeb3Provider, web3Instance});
+    });
 
     await waitFor(() => {
       expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();

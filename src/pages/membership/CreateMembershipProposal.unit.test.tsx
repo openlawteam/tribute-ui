@@ -1,9 +1,10 @@
 import {render, screen, waitFor, act} from '@testing-library/react';
-
-import {signTypedDataV4} from '../../test/web3Responses';
-import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
-import CreateMembershipProposal from './CreateMembershipProposal';
 import userEvent from '@testing-library/user-event';
+import Web3 from 'web3';
+
+import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../test/helpers';
+import {signTypedDataV4} from '../../test/web3Responses';
+import CreateMembershipProposal from './CreateMembershipProposal';
 import Wrapper from '../../test/Wrapper';
 
 describe('CreateMembershipProposal unit tests', () => {
@@ -55,11 +56,17 @@ describe('CreateMembershipProposal unit tests', () => {
   });
 
   test('should submit form', async () => {
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
     render(
       <Wrapper
         useWallet
         useInit
-        getProps={({mockWeb3Provider, web3Instance}) => {
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+
           // Mock RPC call to `eth_getBalance`
           mockWeb3Provider.injectResult(
             web3Instance.eth.abi.encodeParameter(
@@ -68,9 +75,6 @@ describe('CreateMembershipProposal unit tests', () => {
             ),
             {abiMethodName: 'eth_getBalance'}
           );
-
-          // Mock signature
-          mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
         }}>
         <CreateMembershipProposal />
       </Wrapper>
@@ -83,6 +87,11 @@ describe('CreateMembershipProposal unit tests', () => {
     await userEvent.type(screen.getByLabelText(/amount/i), '12', {delay: 100});
 
     expect(screen.getByDisplayValue(/12/i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      // Mock signature
+      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+    });
 
     act(() => {
       userEvent.click(screen.getByRole('button', {name: /submit/i}));
