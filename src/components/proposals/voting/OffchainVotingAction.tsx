@@ -4,10 +4,10 @@ import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {getVoteChosen} from '../helpers';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
-import {useIsAddressDelegated, useWeb3Modal} from '../../web3/hooks';
 import {useMemberActionDisabled} from '../../../hooks';
 import {useSelector} from 'react-redux';
 import {useSignAndSendVote} from '../hooks';
+import {useWeb3Modal} from '../../web3/hooks';
 import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 import {VotingActionButtons} from '.';
 import ErrorMessageWithDetails from '../../common/ErrorMessageWithDetails';
@@ -61,13 +61,16 @@ export function OffchainVotingAction(
     (s: StoreState) => s.connectedMember?.delegateKey
   );
 
+  const isAddressDelegated = useSelector(
+    (s: StoreState) => s.connectedMember?.isAddressDelegated
+  );
+
   /**
    * Our hooks
    */
 
   const {account} = useWeb3Modal();
   const {signAndSendVote, voteDataStatus} = useSignAndSendVote();
-  const isAddressDelegated = useIsAddressDelegated();
   const voteChosen = getVoteChosen(
     proposal.snapshotProposal?.votes,
     account || ''
