@@ -504,11 +504,11 @@ export function initContractThunkFactory({
         contractAddress ||
         (isExtension
           ? await getExtensionAddress(
-              (adapterOrExtensionName as unknown) as ContractExtensionNames,
+              adapterOrExtensionName as unknown as ContractExtensionNames,
               getState().contracts.DaoRegistryContract?.instance
             )
           : await getAdapterAddress(
-              (adapterOrExtensionName as unknown) as ContractAdapterNames,
+              adapterOrExtensionName as unknown as ContractAdapterNames,
               getState().contracts.DaoRegistryContract?.instance
             ));
 

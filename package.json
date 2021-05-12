@@ -55,7 +55,7 @@
     "http-proxy-middleware": "^1.0.6",
     "msw": "^0.25.0",
     "np": "^7.2.0",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.0",
     "react-test-renderer": "^17.0.1",
     "redux-devtools-extension": "^2.13.8",
     "sass": "^1.32.0",

@@ -18,6 +18,6 @@ export function getWeb3Instance(): {
 
   return {
     mockWeb3Provider,
-    web3: new Web3((mockWeb3Provider as unknown) as Web3Provider),
+    web3: new Web3(mockWeb3Provider as unknown as Web3Provider),
   };
 }

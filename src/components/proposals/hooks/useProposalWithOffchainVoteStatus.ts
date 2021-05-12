@@ -55,20 +55,17 @@ export function useProposalWithOffchainVoteStatus(
    * State
    */
 
-  const [daoProposal, setDAOProposal] = useState<
-    UseProposalWithOffchainVoteStatusReturn['daoProposal']
-  >();
-  const [daoProposalVotes, setDAOProposalVotes] = useState<
-    UseProposalWithOffchainVoteStatusReturn['daoProposalVotes']
-  >();
-  const [daoProposalVoteResult, setDAOProposalVoteResult] = useState<
-    UseProposalWithOffchainVoteStatusReturn['daoProposalVoteResult']
-  >();
+  const [daoProposal, setDAOProposal] =
+    useState<UseProposalWithOffchainVoteStatusReturn['daoProposal']>();
+  const [daoProposalVotes, setDAOProposalVotes] =
+    useState<UseProposalWithOffchainVoteStatusReturn['daoProposalVotes']>();
+  const [daoProposalVoteResult, setDAOProposalVoteResult] =
+    useState<
+      UseProposalWithOffchainVoteStatusReturn['daoProposalVoteResult']
+    >();
 
-  const [
-    proposalFlowStatusError,
-    setProposalFlowStatusError,
-  ] = useState<Error>();
+  const [proposalFlowStatusError, setProposalFlowStatusError] =
+    useState<Error>();
 
   /**
    * Refs

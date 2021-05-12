@@ -239,7 +239,8 @@ describe('useProposalsVotingState unit tests', () => {
   });
 
   test('should not run if empty array of proposalIds', async () => {
-    const emptyProposalsVotingAdapterTuples = [] as ProposalVotingAdapterTuple[];
+    const emptyProposalsVotingAdapterTuples =
+      [] as ProposalVotingAdapterTuple[];
 
     const {result, waitForNextUpdate} = renderHook(
       () => useProposalsVotingState(emptyProposalsVotingAdapterTuples),

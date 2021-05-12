@@ -32,16 +32,13 @@ export function useVotingTimeStartEnd(
    * State
    */
 
-  const [hasVotingTimeStarted, setHasVotingTimeStarted] = useState<boolean>(
-    false
-  );
+  const [hasVotingTimeStarted, setHasVotingTimeStarted] =
+    useState<boolean>(false);
 
   const [hasVotingTimeEnded, setHasVotingTimeEnded] = useState<boolean>(false);
 
-  const [
-    votingTimeStartEndInitReady,
-    setVotingTimeStartEndInitReady,
-  ] = useState<boolean>(isInitReady(votingStartEndStatusRef.current));
+  const [votingTimeStartEndInitReady, setVotingTimeStartEndInitReady] =
+    useState<boolean>(isInitReady(votingStartEndStatusRef.current));
 
   /**
    * Effects

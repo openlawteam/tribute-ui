@@ -65,11 +65,8 @@ export default function ProcessAction(props: ProcessActionProps) {
 
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
 
-  const {
-    isDisabled,
-    openWhyDisabledModal,
-    WhyDisabledModal,
-  } = useMemberActionDisabled(useMemberActionDisabledProps);
+  const {isDisabled, openWhyDisabledModal, WhyDisabledModal} =
+    useMemberActionDisabled(useMemberActionDisabledProps);
 
   const gasPrices = useETHGasPrice();
 

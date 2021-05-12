@@ -47,15 +47,11 @@ export default function AdapterExtensionSelectTarget(
    * State
    */
 
-  const [
-    selectedTargetOption,
-    setSelectedTargetOption,
-  ] = useState<AdapterExtensionTarget>(defaultTarget || null);
+  const [selectedTargetOption, setSelectedTargetOption] =
+    useState<AdapterExtensionTarget>(defaultTarget || null);
 
-  const [
-    selectedTargetOptionProps,
-    setSelectedTargetOptionProps,
-  ] = useState<any>({});
+  const [selectedTargetOptionProps, setSelectedTargetOptionProps] =
+    useState<any>({});
 
   /**
    * Functions

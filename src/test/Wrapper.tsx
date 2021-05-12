@@ -68,7 +68,7 @@ export default function Wrapper(
   const [store] = useState<Store>(getNewStore());
   const [mockWeb3Provider] = useState<FakeHttpProvider>(new FakeHttpProvider());
   const [web3Instance] = useState<Web3>(
-    new Web3((mockWeb3Provider as unknown) as Web3Provider)
+    new Web3(mockWeb3Provider as unknown as Web3Provider)
   );
 
   /**

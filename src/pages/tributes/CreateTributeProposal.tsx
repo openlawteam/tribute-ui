@@ -299,7 +299,8 @@ export default function CreateTributeProposal() {
             metadata: {
               proposalAmountValues,
               submitActionArgs,
-              accountAuthorizedToProcessPassedProposal: proposerAddressToChecksum,
+              accountAuthorizedToProcessPassedProposal:
+                proposerAddressToChecksum,
             },
           },
           adapterName: ContractAdapterNames.tribute,

@@ -60,10 +60,8 @@ export default function ConfigurationForm({
    * State
    */
   const [submitError, setSubmitError] = useState<Error>();
-  const [
-    configureAdapterStatus,
-    setConfigureAdapterStatus,
-  ] = useState<Web3TxStatus>(Web3TxStatus.STANDBY);
+  const [configureAdapterStatus, setConfigureAdapterStatus] =
+    useState<Web3TxStatus>(Web3TxStatus.STANDBY);
   const [removeStatus, setRemoveStatus] = useState<Web3TxStatus>(
     Web3TxStatus.STANDBY
   );
@@ -80,11 +78,8 @@ export default function ConfigurationForm({
   } = useContractSend();
   const gasPrices = useETHGasPrice();
   const {connected, account} = useWeb3Modal();
-  const {
-    isParamInputValid,
-    getFormFieldError,
-    formatInputByType,
-  } = useValidation();
+  const {isParamInputValid, getFormFieldError, formatInputByType} =
+    useValidation();
   const {getAdapterOrExtensionFromRedux} = useAdaptersOrExtensions();
 
   /**

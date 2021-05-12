@@ -80,19 +80,14 @@ export default function AdapterOrExtensionManager() {
   const [openFinalizeModal, setOpenFinalizeModal] = useState<boolean>(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [selectionCount, setSelectionCount] = useState<number>(0);
-  const [selections, setSelections] = useState<
-    Record<string, boolean> | undefined
-  >();
-  const [
-    configureAdapterOrExtension,
-    setConfigureAdapterOrExtension,
-  ] = useState<AdaptersOrExtensions | undefined>();
-  const [isInProcess, setIsInProcess] = useState<
-    Record<string, boolean> | undefined
-  >();
-  const [whyDisabledReason, setWhyDisabledReason] = useState<
-    WhyDisableModalTitles | undefined
-  >();
+  const [selections, setSelections] =
+    useState<Record<string, boolean> | undefined>();
+  const [configureAdapterOrExtension, setConfigureAdapterOrExtension] =
+    useState<AdaptersOrExtensions | undefined>();
+  const [isInProcess, setIsInProcess] =
+    useState<Record<string, boolean> | undefined>();
+  const [whyDisabledReason, setWhyDisabledReason] =
+    useState<WhyDisableModalTitles | undefined>();
 
   /**
    * Hooks
@@ -404,12 +399,10 @@ export default function AdapterOrExtensionManager() {
       for (const adapterName in selections) {
         if (selections[adapterName]) {
           // Get adapterOrExtensionId from `defaultAdaptersAndExtensions`
-          const {
-            adapterId,
-            contractAddress,
-          }: AdaptersAndExtensionsType = defaultAdaptersAndExtensions.filter(
-            (a: AdaptersAndExtensionsType) => a.name === adapterName
-          )[0];
+          const {adapterId, contractAddress}: AdaptersAndExtensionsType =
+            defaultAdaptersAndExtensions.filter(
+              (a: AdaptersAndExtensionsType) => a.name === adapterName
+            )[0];
 
           let adapterContractAddress = contractAddress;
 

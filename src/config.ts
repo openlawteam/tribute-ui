@@ -114,7 +114,8 @@ export const ETHEREUM_PROVIDER_URL: string = INFURA_WS_URLS[DEFAULT_CHAIN]
  */
 
 // If developing locally, include your DaoRegistry contract address in your `.env` file.
-export const DAO_REGISTRY_CONTRACT_ADDRESS = REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS;
+export const DAO_REGISTRY_CONTRACT_ADDRESS =
+  REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS;
 
 export const DAO_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',

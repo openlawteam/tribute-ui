@@ -214,10 +214,8 @@ export default function useMembers(): UseMembersReturn {
         });
 
         // Build calls to get member balances in UNITS
-        const {
-          abi: bankABI,
-          contractAddress: bankAddress,
-        } = BankExtensionContract;
+        const {abi: bankABI, contractAddress: bankAddress} =
+          BankExtensionContract;
 
         const balanceOfABI = bankABI.find((item) => item.name === 'balanceOf');
         const unitsBalanceOfCalls = memberAddressesByDelegatedKey.map(

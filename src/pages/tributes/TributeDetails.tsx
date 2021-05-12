@@ -51,12 +51,8 @@ export default function TributeDetails() {
    */
 
   // @todo Use dynamic `SnapshotType` depending on subgraph data for `type` arg.
-  const {
-    proposalData,
-    proposalError,
-    proposalNotFound,
-    proposalStatus,
-  } = useProposalOrDraft(proposalId);
+  const {proposalData, proposalError, proposalNotFound, proposalStatus} =
+    useProposalOrDraft(proposalId);
 
   /**
    * Functions
@@ -141,12 +137,8 @@ export default function TributeDetails() {
     let requestAmount = PLACEHOLDER;
     let requestAmountUnit = '';
     try {
-      ({
-        tributeAmount,
-        tributeAmountUnit,
-        requestAmount,
-        requestAmountUnit,
-      } = commonData?.msg.payload.metadata.proposalAmountValues);
+      ({tributeAmount, tributeAmountUnit, requestAmount, requestAmountUnit} =
+        commonData?.msg.payload.metadata.proposalAmountValues);
     } catch (error) {
       tributeAmount = PLACEHOLDER;
       tributeAmountUnit = '';

@@ -69,10 +69,8 @@ export function useProposalOrDraft(
   >([id]);
 
   // The overall status of the async data being fetched
-  const [
-    proposalInclusiveStatus,
-    setProposalInclusiveStatus,
-  ] = useState<AsyncStatus>(AsyncStatus.STANDBY);
+  const [proposalInclusiveStatus, setProposalInclusiveStatus] =
+    useState<AsyncStatus>(AsyncStatus.STANDBY);
 
   // Any error of the async data being fetched
   const [proposalInclusiveError, setProposalInclusiveError] = useState<Error>();
