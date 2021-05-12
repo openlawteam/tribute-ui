@@ -57,16 +57,12 @@ export function useProposals({
   );
 
   // The overall status of the async data being fetched
-  const [
-    proposalsInclusiveStatus,
-    setProposalsInclusiveStatus,
-  ] = useState<AsyncStatus>(AsyncStatus.STANDBY);
+  const [proposalsInclusiveStatus, setProposalsInclusiveStatus] =
+    useState<AsyncStatus>(AsyncStatus.STANDBY);
 
   // Any error of the async data being fetched
-  const [
-    proposalsInclusiveError,
-    setProposalsInclusiveError,
-  ] = useState<Error>();
+  const [proposalsInclusiveError, setProposalsInclusiveError] =
+    useState<Error>();
 
   /**
    * Selectors
@@ -102,11 +98,8 @@ export function useProposals({
   } = useProposalsVotingState(proposalsVotingAdapters);
 
   // Fetch on-chain votes data for proposals of which voting adapters have been assigned (i.e. sponsored)
-  const {
-    proposalsVotes,
-    proposalsVotesError,
-    proposalsVotesStatus,
-  } = useProposalsVotes(proposalsVotingAdapters);
+  const {proposalsVotes, proposalsVotesError, proposalsVotesStatus} =
+    useProposalsVotes(proposalsVotingAdapters);
 
   /**
    * Their hooks
@@ -410,9 +403,8 @@ export function useProposals({
       const snapshotDraftEntries = await getSnapshotDraftsByAdapterAddress(
         adapterAddress
       );
-      const snapshotProposalEntries = await getSnapshotProposalsByAdapterAddress(
-        adapterAddress
-      );
+      const snapshotProposalEntries =
+        await getSnapshotProposalsByAdapterAddress(adapterAddress);
 
       const proposalIds = [
         ...snapshotDraftEntries,
@@ -437,50 +429,48 @@ export function useProposals({
       setDAOProposalIds(daoProposals.map(([id]) => id));
 
       const proposalDataMap = daoProposals
-        .map(
-          ([idInDAO, p]): ProposalData => {
-            const snapshotDraftEntry = snapshotDraftEntries.find(
-              ([id]) => id === idInDAO
-            );
-            const snapshotProposalEntry = snapshotProposalEntries.find(
-              ([id]) => id === idInDAO
-            );
+        .map(([idInDAO, p]): ProposalData => {
+          const snapshotDraftEntry = snapshotDraftEntries.find(
+            ([id]) => id === idInDAO
+          );
+          const snapshotProposalEntry = snapshotProposalEntries.find(
+            ([id]) => id === idInDAO
+          );
 
-            const snapshotDraft = snapshotDraftEntry
-              ? {
-                  ...snapshotDraftEntry[1],
-                  idInDAO,
-                  idInSnapshot: snapshotDraftEntry[0],
-                }
-              : undefined;
+          const snapshotDraft = snapshotDraftEntry
+            ? {
+                ...snapshotDraftEntry[1],
+                idInDAO,
+                idInSnapshot: snapshotDraftEntry[0],
+              }
+            : undefined;
 
-            const snapshotProposal = snapshotProposalEntry
-              ? {
-                  ...snapshotProposalEntry[1],
-                  idInDAO,
-                  idInSnapshot: snapshotProposalEntry[0],
-                }
-              : undefined;
+          const snapshotProposal = snapshotProposalEntry
+            ? {
+                ...snapshotProposalEntry[1],
+                idInDAO,
+                idInSnapshot: snapshotProposalEntry[0],
+              }
+            : undefined;
 
-            return {
-              idInDAO,
-              daoProposal: p,
-              // To be set later in a `useEffect` above
-              daoProposalVotes: undefined,
-              // To be set later in a `useEffect` above
-              daoProposalVotingAdapter: undefined,
-              // To be set later in a `useEffect` above
-              daoProposalVotingState: undefined,
-              snapshotDraft,
-              getCommonSnapshotProposalData: () => undefined,
-              refetchProposalOrDraft: () => {},
-              snapshotProposal,
-              snapshotType: snapshotProposal
-                ? SnapshotType.proposal
-                : SnapshotType.draft,
-            };
-          }
-        )
+          return {
+            idInDAO,
+            daoProposal: p,
+            // To be set later in a `useEffect` above
+            daoProposalVotes: undefined,
+            // To be set later in a `useEffect` above
+            daoProposalVotingAdapter: undefined,
+            // To be set later in a `useEffect` above
+            daoProposalVotingState: undefined,
+            snapshotDraft,
+            getCommonSnapshotProposalData: () => undefined,
+            refetchProposalOrDraft: () => {},
+            snapshotProposal,
+            snapshotType: snapshotProposal
+              ? SnapshotType.proposal
+              : SnapshotType.draft,
+          };
+        })
         .filter((p) => p.snapshotDraft || p.snapshotProposal);
 
       setProposalsStatus(AsyncStatus.FULFILLED);

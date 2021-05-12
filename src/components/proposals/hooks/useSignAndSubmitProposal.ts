@@ -103,17 +103,12 @@ export function useSignAndSubmitProposal<
    * State
    */
 
-  const [proposalData, setProposalData] = useState<
-    SignAndSendProposalReturn<T>
-  >();
-  const [
-    proposalSignAndSendError,
-    setProposalSignAndSendError,
-  ] = useState<Error>();
-  const [
-    proposalSignAndSendStatus,
-    setProposalSignAndSendStatus,
-  ] = useState<Web3TxStatus>(Web3TxStatus.STANDBY);
+  const [proposalData, setProposalData] =
+    useState<SignAndSendProposalReturn<T>>();
+  const [proposalSignAndSendError, setProposalSignAndSendError] =
+    useState<Error>();
+  const [proposalSignAndSendStatus, setProposalSignAndSendStatus] =
+    useState<Web3TxStatus>(Web3TxStatus.STANDBY);
 
   /**
    * Functions
@@ -211,12 +206,14 @@ export function useSignAndSubmitProposal<
       };
 
       // 1. Check proposal type and prepare appropriate message
-      const message = (type === SnapshotType.draft
-        ? await buildDraftMessage(commonData, SNAPSHOT_HUB_API_URL)
-        : await buildProposalMessageHelper({
-            ...commonData,
-            timestamp,
-          })) as ProposalOrDraftSignDataFromType<T>;
+      const message = (
+        type === SnapshotType.draft
+          ? await buildDraftMessage(commonData, SNAPSHOT_HUB_API_URL)
+          : await buildProposalMessageHelper({
+              ...commonData,
+              timestamp,
+            })
+      ) as ProposalOrDraftSignDataFromType<T>;
 
       // 2. Prepare signing data. Snapshot and the contracts will verify this same data against the signature.
       const erc712Message =

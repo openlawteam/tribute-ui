@@ -41,13 +41,8 @@ export default function FinalizeModal({
   /**
    * Hooks
    */
-  const {
-    txError,
-    txEtherscanURL,
-    txIsPromptOpen,
-    txSend,
-    txStatus,
-  } = useContractSend();
+  const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
+    useContractSend();
   const gasPrices = useETHGasPrice();
   const {dao} = useDao();
   const {connected, account} = useWeb3Modal();

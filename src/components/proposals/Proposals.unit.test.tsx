@@ -190,19 +190,18 @@ describe('ProposalCard unit tests', () => {
      * Mock results for `useProposalsVotingAdapter`
      */
 
-    const offchainVotingAdapterAddressResponse = web3Instance.eth.abi.encodeParameter(
-      'address',
-      DEFAULT_ETH_ADDRESS
-    );
+    const offchainVotingAdapterAddressResponse =
+      web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS);
     const noVotingAdapterAddressResponse = web3Instance.eth.abi.encodeParameter(
       'address',
       BURN_ADDRESS
     );
 
-    const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
-      'string',
-      VotingAdapterName.OffchainVotingContract
-    );
+    const offchainVotingAdapterNameResponse =
+      web3Instance.eth.abi.encodeParameter(
+        'string',
+        VotingAdapterName.OffchainVotingContract
+      );
 
     // Mock `dao.votingAdapter` responses
     mockWeb3Provider.injectResult(
@@ -493,19 +492,16 @@ describe('ProposalCard unit tests', () => {
        * Mock results for `useProposalsVotingAdapter`
        */
 
-      const offchainVotingAdapterAddressResponse = web3Instance.eth.abi.encodeParameter(
-        'address',
-        DEFAULT_ETH_ADDRESS
-      );
-      const noVotingAdapterAddressResponse = web3Instance.eth.abi.encodeParameter(
-        'address',
-        BURN_ADDRESS
-      );
+      const offchainVotingAdapterAddressResponse =
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS);
+      const noVotingAdapterAddressResponse =
+        web3Instance.eth.abi.encodeParameter('address', BURN_ADDRESS);
 
-      const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
-        'string',
-        VotingAdapterName.OffchainVotingContract
-      );
+      const offchainVotingAdapterNameResponse =
+        web3Instance.eth.abi.encodeParameter(
+          'string',
+          VotingAdapterName.OffchainVotingContract
+        );
 
       // Mock `dao.votingAdapter` responses
       mockWeb3Provider.injectResult(
@@ -762,19 +758,16 @@ describe('ProposalCard unit tests', () => {
        * Mock results for `useProposalsVotingAdapter`
        */
 
-      const offchainVotingAdapterAddressResponse = web3Instance.eth.abi.encodeParameter(
-        'address',
-        DEFAULT_ETH_ADDRESS
-      );
-      const noVotingAdapterAddressResponse = web3Instance.eth.abi.encodeParameter(
-        'address',
-        BURN_ADDRESS
-      );
+      const offchainVotingAdapterAddressResponse =
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS);
+      const noVotingAdapterAddressResponse =
+        web3Instance.eth.abi.encodeParameter('address', BURN_ADDRESS);
 
-      const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
-        'string',
-        VotingAdapterName.OffchainVotingContract
-      );
+      const offchainVotingAdapterNameResponse =
+        web3Instance.eth.abi.encodeParameter(
+          'string',
+          VotingAdapterName.OffchainVotingContract
+        );
 
       // Mock `dao.votingAdapter` responses
       mockWeb3Provider.injectResult(
@@ -922,23 +915,24 @@ describe('ProposalCard unit tests', () => {
           async (_req, res, ctx) =>
             res(
               ctx.json({
-                '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333': {
-                  ...defaultProposalBody,
-                  msg: {
-                    ...defaultProposalBody.msg,
-                    payload: {
-                      ...defaultProposalBody.msg.payload,
-                      name: 'A proposal with no snapshot votes',
+                '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333':
+                  {
+                    ...defaultProposalBody,
+                    msg: {
+                      ...defaultProposalBody.msg,
+                      payload: {
+                        ...defaultProposalBody.msg.payload,
+                        name: 'A proposal with no snapshot votes',
+                      },
                     },
+                    data: {
+                      erc712DraftHash:
+                        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434',
+                      authorIpfsHash: '',
+                    },
+                    // Define empty votes
+                    votes: [],
                   },
-                  data: {
-                    erc712DraftHash:
-                      '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434',
-                    authorIpfsHash: '',
-                  },
-                  // Define empty votes
-                  votes: [],
-                },
               })
             )
         ),

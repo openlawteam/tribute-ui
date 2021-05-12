@@ -49,10 +49,8 @@ export default function CreateGovernanceProposal() {
    */
 
   const {connected, account} = useWeb3Modal();
-  const {
-    proposalSignAndSendStatus,
-    signAndSendProposal,
-  } = useSignAndSubmitProposal<SnapshotType.proposal>();
+  const {proposalSignAndSendStatus, signAndSendProposal} =
+    useSignAndSubmitProposal<SnapshotType.proposal>();
   const {defaultChainError} = useIsDefaultChain();
 
   /**

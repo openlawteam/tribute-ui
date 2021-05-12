@@ -101,18 +101,10 @@ export default function CreateTransferProposal() {
   const {defaultChainError} = useIsDefaultChain();
   const {connected, account, web3Instance} = useWeb3Modal();
   const gasPrices = useETHGasPrice();
-  const {
-    txError,
-    txEtherscanURL,
-    txIsPromptOpen,
-    txSend,
-    txStatus,
-  } = useContractSend();
-  const {
-    proposalData,
-    proposalSignAndSendStatus,
-    signAndSendProposal,
-  } = useSignAndSubmitProposal<SnapshotType.proposal>();
+  const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
+    useContractSend();
+  const {proposalData, proposalSignAndSendStatus, signAndSendProposal} =
+    useSignAndSubmitProposal<SnapshotType.proposal>();
 
   /**
    * Their hooks

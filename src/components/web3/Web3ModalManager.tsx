@@ -65,9 +65,8 @@ export default function Web3ModalManager({
    * State
    */
 
-  const [defaultWeb3NetID, setDefaultWeb3NetID] = useState<
-    number | undefined
-  >();
+  const [defaultWeb3NetID, setDefaultWeb3NetID] =
+    useState<number | undefined>();
 
   /**
    * Variables

@@ -37,14 +37,10 @@ export function useGovernanceProposals({
   const [governanceProposals, setGovernanceProposals] = useState<
     ProposalData[]
   >([]);
-  const [
-    governanceProposalsError,
-    setGovernanceProposalsError,
-  ] = useState<Error>();
-  const [
-    governanceProposalsStatus,
-    setGovernanceProposalsStatus,
-  ] = useState<AsyncStatus>(AsyncStatus.STANDBY);
+  const [governanceProposalsError, setGovernanceProposalsError] =
+    useState<Error>();
+  const [governanceProposalsStatus, setGovernanceProposalsStatus] =
+    useState<AsyncStatus>(AsyncStatus.STANDBY);
 
   /**
    * Our hooks

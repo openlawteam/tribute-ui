@@ -51,12 +51,8 @@ export default function TransferDetails() {
    */
 
   // @todo Use dynamic `SnapshotType` depending on subgraph data for `type` arg.
-  const {
-    proposalData,
-    proposalError,
-    proposalNotFound,
-    proposalStatus,
-  } = useProposalOrDraft(proposalId);
+  const {proposalData, proposalError, proposalNotFound, proposalStatus} =
+    useProposalOrDraft(proposalId);
 
   /**
    * Functions
@@ -128,10 +124,8 @@ export default function TransferDetails() {
     let transferAmount = PLACEHOLDER;
     let transferAmountUnit = '';
     try {
-      ({
-        transferAmount,
-        transferAmountUnit,
-      } = commonData?.msg.payload.metadata.proposalAmountValues);
+      ({transferAmount, transferAmountUnit} =
+        commonData?.msg.payload.metadata.proposalAmountValues);
     } catch (error) {
       transferAmount = PLACEHOLDER;
       transferAmountUnit = '';

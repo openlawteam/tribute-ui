@@ -99,10 +99,11 @@ const mockWeb3Responses: Parameters<typeof Wrapper>[0]['getProps'] = ({
     '0xa8ED02b24B4E9912e39337322885b65b23CdF188'
   );
 
-  const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
-    'string',
-    VotingAdapterName.OffchainVotingContract
-  );
+  const offchainVotingAdapterNameResponse =
+    web3Instance.eth.abi.encodeParameter(
+      'string',
+      VotingAdapterName.OffchainVotingContract
+    );
 
   const votingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
     'string',
@@ -407,8 +408,7 @@ describe('useProposals unit tests', () => {
         OffchainVotingContract: {
           '0': '8376297',
           '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-          '2':
-            '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
+          '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
           '3': '1',
           '4': '0',
           '5': '0',
@@ -630,10 +630,8 @@ describe('useProposals unit tests', () => {
        * Mock results for `useProposalsVotingAdapter`
        */
 
-      const offchainVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
-        'address',
-        DEFAULT_ETH_ADDRESS
-      );
+      const offchainVotingAdapterResponse =
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS);
       const noVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
         'address',
         BURN_ADDRESS
@@ -643,10 +641,11 @@ describe('useProposals unit tests', () => {
         '0xa8ED02b24B4E9912e39337322885b65b23CdF188'
       );
 
-      const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
-        'string',
-        VotingAdapterName.OffchainVotingContract
-      );
+      const offchainVotingAdapterNameResponse =
+        web3Instance.eth.abi.encodeParameter(
+          'string',
+          VotingAdapterName.OffchainVotingContract
+        );
 
       const votingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
         'string',
@@ -872,8 +871,7 @@ describe('useProposals unit tests', () => {
         OffchainVotingContract: {
           '0': '8376297',
           '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-          '2':
-            '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
+          '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
           '3': '1',
           '4': '0',
           '5': '0',
@@ -1095,20 +1093,19 @@ describe('useProposals unit tests', () => {
        * Mock results for `useProposalsVotingAdapter`
        */
 
-      const offchainVotingAdapterResponse = web3Instance.eth.abi.encodeParameter(
-        'address',
-        DEFAULT_ETH_ADDRESS
-      );
+      const offchainVotingAdapterResponse =
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS);
 
       const votingAdapterResponse = web3Instance.eth.abi.encodeParameter(
         'address',
         '0xa8ED02b24B4E9912e39337322885b65b23CdF188'
       );
 
-      const offchainVotingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
-        'string',
-        VotingAdapterName.OffchainVotingContract
-      );
+      const offchainVotingAdapterNameResponse =
+        web3Instance.eth.abi.encodeParameter(
+          'string',
+          VotingAdapterName.OffchainVotingContract
+        );
 
       const votingAdapterNameResponse = web3Instance.eth.abi.encodeParameter(
         'string',
@@ -1301,8 +1298,7 @@ describe('useProposals unit tests', () => {
         OffchainVotingContract: {
           '0': '8376297',
           '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-          '2':
-            '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
+          '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
           '3': '1',
           '4': '0',
           '5': '0',

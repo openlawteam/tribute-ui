@@ -45,20 +45,14 @@ export function useProposalsVotingState(
    * State
    */
 
-  const [
-    proposalsVotingState,
-    setProposaslsVotingState,
-  ] = useState<ProposalsVotingStateTuples>([]);
+  const [proposalsVotingState, setProposaslsVotingState] =
+    useState<ProposalsVotingStateTuples>([]);
 
-  const [
-    proposalsVotingStateError,
-    setProposalsVotingStateError,
-  ] = useState<Error>();
+  const [proposalsVotingStateError, setProposalsVotingStateError] =
+    useState<Error>();
 
-  const [
-    proposalsVotingStateStatus,
-    setProposalsVotingStateStatus,
-  ] = useState<AsyncStatus>(AsyncStatus.STANDBY);
+  const [proposalsVotingStateStatus, setProposalsVotingStateStatus] =
+    useState<AsyncStatus>(AsyncStatus.STANDBY);
 
   /**
    * Cached callbacks

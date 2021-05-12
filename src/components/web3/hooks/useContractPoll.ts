@@ -34,9 +34,8 @@ export function useContractPoll<T>(
   const [isPolling, setIsPolling] = useState<boolean>(false);
   const [pollContractData, setPollContractData] = useState<T>();
   const [pollContractError, setPollContractError] = useState<Error>();
-  const [stopPollingRequested, setStopPollingRequested] = useState<boolean>(
-    false
-  );
+  const [stopPollingRequested, setStopPollingRequested] =
+    useState<boolean>(false);
 
   /**
    * Cached callbacks

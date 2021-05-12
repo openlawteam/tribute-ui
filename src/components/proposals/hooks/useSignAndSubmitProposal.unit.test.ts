@@ -277,19 +277,16 @@ describe('useSignAndSubmitProposal unit tests', () => {
       });
 
       // Call signAndSendProposal
-      const {
-        data,
-        signature,
-        uniqueId,
-      } = await result.current.signAndSendProposal({
-        partialProposalData: {
-          name: 'Test Name',
-          body: 'Test Body',
-          metadata: {},
-        },
-        adapterName: ContractAdapterNames.onboarding,
-        type: SnapshotType.draft,
-      });
+      const {data, signature, uniqueId} =
+        await result.current.signAndSendProposal({
+          partialProposalData: {
+            name: 'Test Name',
+            body: 'Test Body',
+            metadata: {},
+          },
+          adapterName: ContractAdapterNames.onboarding,
+          type: SnapshotType.draft,
+        });
 
       // @note Set the timestamp by hand as dates will always be different
       const now = (Date.now() / 1000).toFixed();
@@ -368,21 +365,17 @@ describe('useSignAndSubmitProposal unit tests', () => {
       });
 
       // Call signAndSendProposal
-      const {
-        data,
-        signature,
-        uniqueId,
-        uniqueIdDraft,
-      } = await result.current.signAndSendProposal({
-        partialProposalData: {
-          name: 'Test Name',
-          body: 'Test Body',
-          metadata: {},
-          timestamp: '1610981167',
-        },
-        adapterName: ContractAdapterNames.onboarding,
-        type: SnapshotType.proposal,
-      });
+      const {data, signature, uniqueId, uniqueIdDraft} =
+        await result.current.signAndSendProposal({
+          partialProposalData: {
+            name: 'Test Name',
+            body: 'Test Body',
+            metadata: {},
+            timestamp: '1610981167',
+          },
+          adapterName: ContractAdapterNames.onboarding,
+          type: SnapshotType.proposal,
+        });
 
       // @note Set the timestamp by hand as dates will always be different
       const now = Math.floor(Date.now() / 1000);
