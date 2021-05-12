@@ -11,15 +11,18 @@ import Wrapper from '../../../test/Wrapper';
 describe('useSignAndSendVote unit tests', () => {
   test('should return correct data when calling signAndSendVote', async () => {
     await act(async () => {
-      const {result, waitForNextUpdate} = renderHook(
+      let mockWeb3Provider: any;
+      let web3Instance: any;
+
+      const {result, waitForValueToChange} = renderHook(
         () => useSignAndSendVote(),
         {
           initialProps: {
             useInit: true,
             useWallet: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              // Mock signature
-              mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+            getProps: (p) => {
+              mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
           },
           wrapper: Wrapper,
@@ -32,6 +35,11 @@ describe('useSignAndSendVote unit tests', () => {
         expect(result.current.voteData).toBe(undefined);
         expect(result.current.voteDataError).toBe(undefined);
         expect(result.current.voteDataStatus).toBe(Web3TxStatus.STANDBY);
+      });
+
+      await waitFor(() => {
+        // Mock signature
+        mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
       });
 
       // Call signAndSendVote
@@ -52,8 +60,15 @@ describe('useSignAndSendVote unit tests', () => {
         );
       });
 
-      await waitForNextUpdate();
-      await waitForNextUpdate();
+      await waitForValueToChange(() => result.current.voteDataStatus);
+
+      // Assert pending state
+      expect(result.current.signAndSendVote).toBeInstanceOf(Function);
+      expect(result.current.voteData).toBe(undefined);
+      expect(result.current.voteDataError).toBe(undefined);
+      expect(result.current.voteDataStatus).toBe(Web3TxStatus.PENDING);
+
+      await waitForValueToChange(() => result.current.voteData);
 
       // @note Set the timestamp by hand as dates will always be different
       const now = (Date.now() / 1000).toFixed();

@@ -8,54 +8,55 @@ import {
   getTransactionReceipt,
   sendTransaction,
 } from '../../../test/web3Responses';
-import {DEFAULT_ETH_ADDRESS} from '../../../test/helpers';
+import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../../test/helpers';
 import {useContractSend} from '.';
 import {Web3TxStatus} from '../types';
 import Wrapper from '../../../test/Wrapper';
+import {Store} from 'redux';
 
 describe('useContractSend unit tests', () => {
   test('should return correct data when calling txSend', async () => {
-    await act(async () => {
-      let store: any;
-      let mockWeb3Provider: any;
-      let web3Instance: any;
+    let store: Store;
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
-      const {result, waitForNextUpdate} = await renderHook(
-        () => useContractSend(),
-        {
-          wrapper: Wrapper,
-          initialProps: {
-            useInit: true,
-            useWallet: true,
-            getProps: (p) => {
-              store = p.store;
-              mockWeb3Provider = p.mockWeb3Provider;
-              web3Instance = p.web3Instance;
-
-              mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
-              mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
-              mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
-              mockWeb3Provider.injectResult(
-                ...getTransactionReceipt({web3Instance})
-              );
-            },
+    const {result, waitForNextUpdate} = await renderHook(
+      () => useContractSend(),
+      {
+        wrapper: Wrapper,
+        initialProps: {
+          useInit: true,
+          useWallet: true,
+          getProps: (p) => {
+            store = p.store;
+            mockWeb3Provider = p.mockWeb3Provider;
+            web3Instance = p.web3Instance;
           },
-        }
-      );
+        },
+      }
+    );
 
+    await act(async () => {
+      // Wait for the contract used to in our test to be initialised
       await waitFor(() => {
         expect(store.getState().contracts.OnboardingContract).not.toBe(null);
       });
 
       const spyOnProcess = jest.fn();
 
-      // assert initial state
+      // Assert initial state
       expect(result.current.txError).toBe(undefined);
       expect(result.current.txEtherscanURL).toBe('');
       expect(result.current.txIsPromptOpen).toBe(false);
       expect(result.current.txReceipt).toBe(undefined);
       expect(result.current.txSend).toBeInstanceOf(Function);
       expect(result.current.txStatus).toBe(Web3TxStatus.STANDBY);
+
+      // Mock RPC responses
+      mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
+      mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
+      mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
 
       // Call txSend
       result.current.txSend(
@@ -75,7 +76,7 @@ describe('useContractSend unit tests', () => {
         spyOnProcess
       );
 
-      // assert awaiting confirmation state
+      // Assert awaiting confirmation state
       expect(result.current.txError).toBe(undefined);
       expect(result.current.txEtherscanURL).toBe('');
       expect(result.current.txIsPromptOpen).toBe(true);
@@ -85,7 +86,7 @@ describe('useContractSend unit tests', () => {
 
       await waitForNextUpdate();
 
-      // assert pending state
+      // Assert pending state
       expect(result.current.txError).toBe(undefined);
       expect(result.current.txEtherscanURL).toBe('');
       expect(result.current.txIsPromptOpen).toBe(false);
@@ -95,7 +96,7 @@ describe('useContractSend unit tests', () => {
 
       await waitForNextUpdate();
 
-      // assert OK state
+      // Assert OK state
       expect(result.current.txError).toBe(undefined);
       expect(result.current.txEtherscanURL).toBe('');
       expect(result.current.txIsPromptOpen).toBe(false);
@@ -116,7 +117,7 @@ describe('useContractSend unit tests', () => {
       expect(result.current.txSend).toBeInstanceOf(Function);
       expect(result.current.txStatus).toBe(Web3TxStatus.FULFILLED);
 
-      // assert onProcess callback was called with txHash
+      // Assert onProcess callback was called with txHash
       expect(spyOnProcess.mock.calls[0][0]).toBe(
         '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331'
       );

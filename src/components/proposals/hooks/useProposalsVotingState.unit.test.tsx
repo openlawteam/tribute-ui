@@ -1,9 +1,11 @@
-import {renderHook, act} from '@testing-library/react-hooks';
 import {AbiItem} from 'web3-utils/types';
+import {renderHook, act} from '@testing-library/react-hooks';
+import Web3 from 'web3';
 
 import {
   DEFAULT_ETH_ADDRESS,
   DEFAULT_PROPOSAL_HASH,
+  FakeHttpProvider,
 } from '../../../test/helpers';
 import {AsyncStatus} from '../../../util/types';
 import {ProposalVotingAdapterData, ProposalVotingAdapterTuple} from '../types';
@@ -38,47 +40,55 @@ describe('useProposalsVotingState unit tests', () => {
       ],
     ];
 
-    await act(async () => {
-      const {result, waitForValueToChange} = await renderHook(
-        () => useProposalsVotingState(proposalsVotingAdapterTuples),
-        {
-          wrapper: Wrapper,
-          initialProps: {
-            useInit: true,
-            useWallet: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              // Mock proposals' voting state multicall response
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [
-                    0,
-                    [
-                      // VotingState.NOT_STARTED
-                      web3Instance.eth.abi.encodeParameter('uint8', '0'),
-                      // VotingState.PASS
-                      web3Instance.eth.abi.encodeParameter('uint8', '2'),
-                      // VotingState.NOT_PASS
-                      web3Instance.eth.abi.encodeParameter('uint8', '3'),
-                    ],
-                  ]
-                )
-              );
-            },
-          },
-        }
-      );
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
+    const {result, waitForValueToChange} = renderHook(
+      () => useProposalsVotingState(proposalsVotingAdapterTuples),
+      {
+        wrapper: Wrapper,
+        initialProps: {
+          useInit: true,
+          useWallet: true,
+          getProps: (p) => {
+            mockWeb3Provider = p.mockWeb3Provider;
+            web3Instance = p.web3Instance;
+          },
+        },
+      }
+    );
+
+    await act(async () => {
+      // Assert initial state
       expect(result.current.proposalsVotingStateStatus).toBe(
         AsyncStatus.STANDBY
       );
       expect(result.current.proposalsVotingStateError).toBe(undefined);
       expect(result.current.proposalsVotingState).toMatchObject([]);
 
+      // Mock proposals' voting state multicall response
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              // VotingState.NOT_STARTED
+              web3Instance.eth.abi.encodeParameter('uint8', '0'),
+              // VotingState.PASS
+              web3Instance.eth.abi.encodeParameter('uint8', '2'),
+              // VotingState.NOT_PASS
+              web3Instance.eth.abi.encodeParameter('uint8', '3'),
+            ],
+          ]
+        )
+      );
+
       await waitForValueToChange(
         () => result.current.proposalsVotingStateStatus
       );
 
+      // Assert pending state
       expect(result.current.proposalsVotingStateStatus).toBe(
         AsyncStatus.PENDING
       );
@@ -89,10 +99,11 @@ describe('useProposalsVotingState unit tests', () => {
         () => result.current.proposalsVotingStateStatus
       );
 
+      // Assert fulfilled state
+      expect(result.current.proposalsVotingStateError).toBe(undefined);
       expect(result.current.proposalsVotingStateStatus).toBe(
         AsyncStatus.FULFILLED
       );
-
       expect(result.current.proposalsVotingState).toMatchObject([
         [DEFAULT_PROPOSAL_HASH, '0'],
         [DEFAULT_PROPOSAL_HASH, '2'],
@@ -115,37 +126,19 @@ describe('useProposalsVotingState unit tests', () => {
       ],
     ];
 
-    await act(async () => {
-      const {result, waitForValueToChange} = await renderHook(
-        () => useProposalsVotingState(badProposalsVotingAdapterTuples),
-        {
-          wrapper: Wrapper,
-          initialProps: {
-            useInit: true,
-            useWallet: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              // Mock proposals' voting state multicall response
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [
-                    0,
-                    [
-                      // VotingState.NOT_STARTED
-                      web3Instance.eth.abi.encodeParameter('uint8', '0'),
-                      // VotingState.PASS
-                      web3Instance.eth.abi.encodeParameter('uint8', '2'),
-                      // VotingState.NOT_PASS
-                      web3Instance.eth.abi.encodeParameter('uint8', '3'),
-                    ],
-                  ]
-                )
-              );
-            },
-          },
-        }
-      );
+    const {result, waitForValueToChange} = renderHook(
+      () => useProposalsVotingState(badProposalsVotingAdapterTuples),
+      {
+        wrapper: Wrapper,
+        initialProps: {
+          useInit: true,
+          useWallet: true,
+        },
+      }
+    );
 
+    await act(async () => {
+      // Assert initial state
       expect(result.current.proposalsVotingStateStatus).toBe(
         AsyncStatus.STANDBY
       );
@@ -156,6 +149,7 @@ describe('useProposalsVotingState unit tests', () => {
         () => result.current.proposalsVotingStateStatus
       );
 
+      // Assert fulfilled state
       expect(result.current.proposalsVotingStateStatus).toBe(
         AsyncStatus.FULFILLED
       );
@@ -178,43 +172,51 @@ describe('useProposalsVotingState unit tests', () => {
       ],
     ];
 
-    await act(async () => {
-      const {result, waitForValueToChange} = await renderHook(
-        () => useProposalsVotingState(badProposalsVotingAdapterTuples),
-        {
-          wrapper: Wrapper,
-          initialProps: {
-            useInit: true,
-            useWallet: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              // Mock proposals' voting state multicall response
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [
-                    0,
-                    [
-                      // VotingState.PASS
-                      web3Instance.eth.abi.encodeParameter('uint8', '2'),
-                    ],
-                  ]
-                )
-              );
-            },
-          },
-        }
-      );
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
+    const {result, waitForValueToChange} = renderHook(
+      () => useProposalsVotingState(badProposalsVotingAdapterTuples),
+      {
+        wrapper: Wrapper,
+        initialProps: {
+          useInit: true,
+          useWallet: true,
+          getProps: (p) => {
+            mockWeb3Provider = p.mockWeb3Provider;
+            web3Instance = p.web3Instance;
+          },
+        },
+      }
+    );
+
+    await act(async () => {
+      // Assert initial state
       expect(result.current.proposalsVotingStateStatus).toBe(
         AsyncStatus.STANDBY
       );
       expect(result.current.proposalsVotingStateError).toBe(undefined);
       expect(result.current.proposalsVotingState).toMatchObject([]);
 
+      // Mock proposals' voting state multicall response
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              // VotingState.PASS
+              web3Instance.eth.abi.encodeParameter('uint8', '2'),
+            ],
+          ]
+        )
+      );
+
       await waitForValueToChange(
         () => result.current.proposalsVotingStateStatus
       );
 
+      // Assert pending state
       expect(result.current.proposalsVotingStateStatus).toBe(
         AsyncStatus.PENDING
       );
@@ -225,6 +227,7 @@ describe('useProposalsVotingState unit tests', () => {
         () => result.current.proposalsVotingStateStatus
       );
 
+      // Assert fulfilled state
       expect(result.current.proposalsVotingStateStatus).toBe(
         AsyncStatus.FULFILLED
       );
@@ -238,37 +241,19 @@ describe('useProposalsVotingState unit tests', () => {
   test('should not run if empty array of proposalIds', async () => {
     const emptyProposalsVotingAdapterTuples = [] as ProposalVotingAdapterTuple[];
 
-    await act(async () => {
-      const {result, waitForNextUpdate} = await renderHook(
-        () => useProposalsVotingState(emptyProposalsVotingAdapterTuples),
-        {
-          wrapper: Wrapper,
-          initialProps: {
-            useInit: true,
-            useWallet: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              // Mock proposals' voting state multicall response
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [
-                    0,
-                    [
-                      // VotingState.NOT_STARTED
-                      web3Instance.eth.abi.encodeParameter('uint8', '0'),
-                      // VotingState.PASS
-                      web3Instance.eth.abi.encodeParameter('uint8', '2'),
-                      // VotingState.NOT_PASS
-                      web3Instance.eth.abi.encodeParameter('uint8', '3'),
-                    ],
-                  ]
-                )
-              );
-            },
-          },
-        }
-      );
+    const {result, waitForNextUpdate} = renderHook(
+      () => useProposalsVotingState(emptyProposalsVotingAdapterTuples),
+      {
+        wrapper: Wrapper,
+        initialProps: {
+          useInit: true,
+          useWallet: true,
+        },
+      }
+    );
 
+    await act(async () => {
+      // Assert initial state
       expect(result.current.proposalsVotingStateStatus).toBe(
         AsyncStatus.STANDBY
       );
