@@ -88,13 +88,13 @@ export default function Routes() {
         <Route
           key="governance-proposals"
           exact
-          path="/governance-proposals"
+          path="/governance"
           render={() => <GovernanceProposals />}
         />,
         <Route
           key="governance-proposal-details"
           exact
-          path={`/governance-proposals/${proposalIdParameter}`}
+          path={`/governance/${proposalIdParameter}`}
           render={() => <GovernanceProposalDetails />}
         />,
         <Route

@@ -14,7 +14,7 @@ export default function GovernanceProposals() {
    */
 
   function handleClickProposalDetails(id: string) {
-    id && history.push(`/governance-proposals/${id}`);
+    id && history.push(`/governance/${id}`);
   }
 
   /**
