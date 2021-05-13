@@ -33,7 +33,7 @@ describe('GovernanceProposalDetails unit tests', () => {
     function GoToGovernanceDetailsViaApp() {
       const history = useHistory();
 
-      history.push(`/governance-proposals/${DEFAULT_PROPOSAL_HASH}`);
+      history.push(`/governance/${DEFAULT_PROPOSAL_HASH}`);
 
       return <App />;
     }
@@ -149,14 +149,14 @@ describe('GovernanceProposalDetails unit tests', () => {
     });
   });
 
-  test('can click "view all" button to go to /governance-proposals', async () => {
+  test('can click "view all" button to go to /governance', async () => {
     let accessHistory: any;
 
     // Using the `<App />` let's the governance details page access the `proposalId` param from `useParams`.
     function GoToGovernanceDetailsViaApp() {
       const history = useHistory();
 
-      history.push(`/governance-proposals/${DEFAULT_PROPOSAL_HASH}`);
+      history.push(`/governance/${DEFAULT_PROPOSAL_HASH}`);
 
       accessHistory = history;
 
@@ -169,7 +169,7 @@ describe('GovernanceProposalDetails unit tests', () => {
       </Wrapper>
     );
 
-    // Temporarily disregard requests for the upcoming `/governance-proposals` page to - just return OK.
+    // Temporarily disregard requests for the upcoming `/governance` page to - just return OK.
     server.use(
       ...[rest.get('*', async (_req, res, ctx) => res(ctx.status(200)))]
     );
@@ -179,7 +179,7 @@ describe('GovernanceProposalDetails unit tests', () => {
     userEvent.click(screen.getByRole('button', {name: /view all/i}));
 
     await waitFor(() => {
-      expect(accessHistory.location.pathname).toBe('/governance-proposals');
+      expect(accessHistory.location.pathname).toBe('/governance');
     });
   });
 });

@@ -112,7 +112,7 @@ export default function CreateGovernanceProposal() {
       });
 
       // Go to newly creatd governance proposal's page
-      history.push(`/governance-proposals/${uniqueId}`);
+      history.push(`/governance/${uniqueId}`);
     } catch (error) {
       setSubmitError(error);
     }

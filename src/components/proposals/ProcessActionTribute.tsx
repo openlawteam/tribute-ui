@@ -239,9 +239,7 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
             txArguments
           );
         } catch (error) {
-          throw new Error(
-            'Your ERC20 tokens could not be approved for transfer.'
-          );
+          throw error;
         }
       }
     } catch (error) {

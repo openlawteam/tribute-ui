@@ -95,7 +95,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
   function viewAll(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
 
-    history.push('/governance-proposals');
+    history.push('/governance');
   }
 
   /**
