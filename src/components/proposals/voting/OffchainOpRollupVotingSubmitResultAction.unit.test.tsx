@@ -103,7 +103,110 @@ const proposalData: Partial<ProposalData> = {
 };
 
 describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
-  test('should submit a vote result', async () => {
+  test('should submit a vote result (off-chain proof was not submitted previously)', async () => {
+    /**
+     * Mock response to set that the off-chain proof was not submitted previously.
+     * The default is a 200 response.
+     */
+    server.use(
+      rest.get(
+        `${SNAPSHOT_HUB_API_URL}/api/:spaceName/offchain_proof/:merkleRoot`,
+        (_req, res, ctx) => res(ctx.status(404))
+      )
+    );
+
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    const {rerender} = render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposalData as ProposalData}
+        />
+      </Wrapper>
+    );
+
+    // Set the `daoProposalVotingAdapter.getWeb3VotingAdapterContract`
+    rerender(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={
+            {
+              ...proposalData,
+              daoProposalVotingAdapter: {
+                getWeb3VotingAdapterContract: () =>
+                  new web3Instance.eth.Contract(
+                    OffchainVotingABI as any,
+                    DEFAULT_ETH_ADDRESS
+                  ),
+              },
+            } as ProposalData
+          }
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeEnabled();
+    });
+
+    // Setup: Mock RPC calls for `processProposal`
+    await waitFor(() => {
+      // Mock signature
+      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+
+      // Mock RPC calls for estimating gas before the tx
+      mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
+    });
+
+    userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/awaiting your confirmation/i)
+      ).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // The component start `useFirstItemStart = true` for `<CycleMessage />`
+      expect(screen.getByText(TX_CYCLE_MESSAGES[0])).toBeInTheDocument();
+      expect(screen.getByText(/view progress/i)).toBeInTheDocument();
+    });
+
+    // Mock RPC calls for `submitVoteResult`
+    await waitFor(() => {
+      mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
+      mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/result submitted!/i)).toBeInTheDocument();
+      expect(screen.getByText(/view transaction/i)).toBeInTheDocument();
+    });
+  });
+
+  test('should submit a vote result (off-chain proof was submitted previously)', async () => {
     let mockWeb3Provider: FakeHttpProvider;
     let web3Instance: Web3;
 
@@ -268,7 +371,99 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
     });
   });
 
+  test('should show an error when getting Snapshot off-chain proof fails', async () => {
+    server.use(
+      rest.get(
+        `${SNAPSHOT_HUB_API_URL}/api/:spaceName/offchain_proof/:merkleRoot`,
+        (_req, res, ctx) => res(ctx.status(500))
+      )
+    );
+
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    const {rerender} = render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposalData as ProposalData}
+        />
+      </Wrapper>
+    );
+
+    // Set the `daoProposalVotingAdapter.getWeb3VotingAdapterContract`
+    rerender(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={
+            {
+              ...proposalData,
+              daoProposalVotingAdapter: {
+                getWeb3VotingAdapterContract: () =>
+                  new web3Instance.eth.Contract(
+                    OffchainVotingABI as any,
+                    DEFAULT_ETH_ADDRESS
+                  ),
+              },
+            } as ProposalData
+          }
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toBeEnabled();
+    });
+
+    // Setup: Mock RPC calls for `processProposal`
+    await waitFor(() => {
+      // Mock signature
+      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+    });
+
+    userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
+
+    await waitFor(() => {
+      expect(screen.getByText(/^something went wrong$/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /something went wrong while getting the off-chain vote proof\./i
+        )
+      ).toBeInTheDocument();
+    });
+  });
+
   test('should show an error when submitting Snapshot off-chain proof fails', async () => {
+    /**
+     * Mock response to set that the off-chain proof was not submitted previously.
+     * The default is a 200 response.
+     */
+    server.use(
+      rest.get(
+        `${SNAPSHOT_HUB_API_URL}/api/:spaceName/offchain_proof/:merkleRoot`,
+        (_req, res, ctx) => res(ctx.status(404))
+      )
+    );
+
     server.use(
       rest.post(
         `${SNAPSHOT_HUB_API_URL}/api/:spaceName/offchain_proofs`,
@@ -368,8 +563,9 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
 
     wrapperStore.dispatch(
       setConnectedMember({
-        isActiveMember: false,
         delegateKey: DEFAULT_ETH_ADDRESS,
+        isActiveMember: false,
+        isAddressDelegated: false,
         memberAddress: DEFAULT_ETH_ADDRESS,
       })
     );

@@ -14,10 +14,10 @@ import {VoteEntry} from '@openlaw/snapshot-js-erc712/dist/types';
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {DEFAULT_CHAIN, UNITS_ADDRESS} from '../../../config';
 import {getAdapterAddressFromContracts} from '../../web3/helpers';
+import {getOffchainVotingProof, submitOffchainVotingProof} from '../helpers';
 import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
-import {submitOffchainVotingProof} from '../helpers';
 import {useMemberActionDisabled} from '../../../hooks';
 import {useWeb3Modal, useContractSend, useETHGasPrice} from '../../web3/hooks';
 import CycleMessage from '../../feedback/CycleMessage';
@@ -202,20 +202,27 @@ export function OffchainOpRollupVotingSubmitResultAction(
       // 3. Sign message
       const signature = await signMessage(provider, account, messageParams);
 
+      // 4. Check if off-chain proof has already been submitted
+      const snapshotOffchainProofExists: boolean =
+        ((await getOffchainVotingProof(voteResultTreeHexRoot))?.merkle_root
+          .length || '') > 0;
+
       /**
-       * 4. Send off-chain vote proof to Snapshot Hub for storage and later use.
+       * 5. Send off-chain vote proof silently to Snapshot Hub for storage and later use.
        *
-       * @note We're piggy-backing on the signature async call, instead of setting another status.
-       *   It may confuse the user if we were to display text saying we're "submitting
-       *   off-chain proof", or something to this effect.
+       * We're piggy-backing off of the signature async call's status, instead of setting another status.
+       * E.g. It may confuse the user if we were to display text saying we're "submitting
+       * off-chain proof", or something to this effect, for a second or two.
        */
-      await submitOffchainVotingProof({
-        actionId: adapterAddress,
-        chainId: DEFAULT_CHAIN,
-        steps: votes,
-        merkleRoot: voteResultTreeHexRoot,
-        verifyingContract: daoRegistryAddress,
-      });
+      if (!snapshotOffchainProofExists) {
+        await submitOffchainVotingProof({
+          actionId: adapterAddress,
+          chainId: DEFAULT_CHAIN,
+          steps: votes,
+          merkleRoot: voteResultTreeHexRoot,
+          verifyingContract: daoRegistryAddress,
+        });
+      }
 
       setSignatureStatus(Web3TxStatus.FULFILLED);
 
@@ -232,7 +239,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      // 5. Send the tx
+      // 6. Send the tx
       await txSend(
         'submitVoteResult',
         votingAdapterMethods,
