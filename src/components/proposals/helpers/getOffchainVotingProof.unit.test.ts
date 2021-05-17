@@ -11,7 +11,7 @@ const DEFAULT_MERKLE_ROOT_HEX: string =
 
 describe('getOffchainVotingProof unit tests', () => {
   test('can fetch proof', async () => {
-    let testResponse: SnapshotOffchainProofResponse;
+    let testResponse: SnapshotOffchainProofResponse | undefined;
     let testError: Error;
 
     try {
@@ -22,6 +22,29 @@ describe('getOffchainVotingProof unit tests', () => {
 
     await waitFor(async () => {
       expect(testResponse).toMatchObject(snapshotAPIOffchainProofResponse);
+      expect(testError).toBe(undefined);
+    });
+  });
+
+  test('can return "undefined" if no proof exists', async () => {
+    server.use(
+      rest.get(
+        `${SNAPSHOT_HUB_API_URL}/api/:spaceName/offchain_proof/:merkleRoot`,
+        (_req, res, ctx) => res(ctx.status(404))
+      )
+    );
+
+    let testResponse: SnapshotOffchainProofResponse | undefined;
+    let testError: Error;
+
+    try {
+      testResponse = await getOffchainVotingProof(DEFAULT_MERKLE_ROOT_HEX);
+    } catch (error) {
+      testError = error;
+    }
+
+    await waitFor(async () => {
+      expect(testResponse).toBe(undefined);
       expect(testError).toBe(undefined);
     });
   });

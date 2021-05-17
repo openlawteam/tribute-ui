@@ -11,12 +11,18 @@ import {SnapshotOffchainProofResponse} from '../voting/types';
  */
 export async function getOffchainVotingProof(
   merkleRootHex: string
-): Promise<SnapshotOffchainProofResponse> {
+): Promise<SnapshotOffchainProofResponse | undefined> {
   try {
     const response = await fetch(
       `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/offchain_proof/${merkleRootHex}`
     );
 
+    // Return empty if not found
+    if (response.status === 404) {
+      return undefined;
+    }
+
+    // Some other error occured
     if (!response.ok) {
       throw new Error(
         'Something went wrong while getting the off-chain vote proof.'
