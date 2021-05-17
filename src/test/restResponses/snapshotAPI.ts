@@ -5,13 +5,14 @@ import {
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
 
-import {VOTE_CHOICES} from '../../components/web3/config';
 import {
   DEFAULT_DRAFT_HASH,
   DEFAULT_ETH_ADDRESS,
   DEFAULT_PROPOSAL_HASH,
   DEFAULT_SIG,
 } from '../helpers';
+import {SnapshotOffchainProofResponse} from '../../components/proposals/voting/types';
+import {VOTE_CHOICES} from '../../components/web3/config';
 
 export const snapshotAPIRootResponse = {
   name: 'snapshot-hub',
@@ -103,7 +104,7 @@ export const snapshotAPIProposalResponse: SnapshotProposalResponse = {
   },
 };
 
-export const snapshotAPIOffchainProofResponse: any = {
+export const snapshotAPIOffchainProofResponse: SnapshotOffchainProofResponse = {
   merkle_root:
     '0x2f6a1ec9f67c87e7956228a0838b0980748f2dda936a0ebaf3e929f192fa7b6c',
   space: 'tribute',
@@ -111,7 +112,7 @@ export const snapshotAPIOffchainProofResponse: any = {
     {
       sig: '0x2ec030f67e0655ad7cacc5625b535442f1075a8ee02acbd8a6b9a77c75fe3f8068b8a360276facfd4e87c022f2c6d15ada22f5fd40f53e2aba2021a40c6368981c',
       nbNo: '1',
-      type: 'vote',
+      type: SnapshotType.vote,
       index: 0,
       nbYes: '0',
       choice: 2,

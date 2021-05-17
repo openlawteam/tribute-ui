@@ -1,4 +1,5 @@
 import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
+import {SnapshotOffchainProofResponse} from '../voting/types';
 
 /**
  * getOffchainVotingProof
@@ -10,10 +11,10 @@ import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
  */
 export async function getOffchainVotingProof(
   merkleRootHex: string
-): Promise<any> {
+): Promise<SnapshotOffchainProofResponse> {
   try {
     const response = await fetch(
-      `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/offchain_proofs/${merkleRootHex}`
+      `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/offchain_proof/${merkleRootHex}`
     );
 
     if (!response.ok) {

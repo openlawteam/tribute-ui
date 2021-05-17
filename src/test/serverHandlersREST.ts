@@ -3,6 +3,7 @@ import {rest} from 'msw';
 import {SNAPSHOT_HUB_API_URL} from '../config';
 import {
   snapshotAPIDraftResponse,
+  snapshotAPIOffchainProofResponse,
   snapshotAPIProposalResponse,
   snapshotAPIRootResponse,
   snapshotAPISpaceResponse,
@@ -43,12 +44,18 @@ const postSnapshotAPIOffchainProof = rest.post(
   (_req, res, ctx) => res(ctx.status(201))
 );
 
+const getSnapshotAPIOffchainProof = rest.get(
+  `${SNAPSHOT_HUB_API_URL}/api/:spaceName/offchain_proof/:merkleRoot`,
+  (_req, res, ctx) => res(ctx.json(snapshotAPIOffchainProofResponse))
+);
+
 /**
  * HANDLERS TO EXPORT
  */
 
 const handlers = [
   getSnapshotAPIDraft,
+  getSnapshotAPIOffchainProof,
   getSnapshotAPIProposal,
   getSnapshotAPIRoot,
   getSnapshotAPISpace,
