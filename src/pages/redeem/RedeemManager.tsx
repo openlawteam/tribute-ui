@@ -4,7 +4,7 @@ import EtherscanURL from '../../components/web3/EtherscanURL';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import Loader from '../../components/feedback/Loader';
-import useRedeemCoupon, {FetchStatus} from '../../hooks/useRedeemCoupon';
+import {useRedeemCoupon, FetchStatus} from '../../hooks/useRedeemCoupon';
 
 import {formatNumber} from '../../util/helpers/formatNumber';
 import {Web3TxStatus} from '../../components/web3/types';

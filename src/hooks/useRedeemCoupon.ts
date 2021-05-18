@@ -37,7 +37,7 @@ type ReturnUseRedeemCoupon = {
   txIsPromptOpen: boolean;
 };
 
-export default function useRedeemCoupon(): ReturnUseRedeemCoupon {
+export function useRedeemCoupon(): ReturnUseRedeemCoupon {
   /**
    * State
    */
