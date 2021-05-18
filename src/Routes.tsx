@@ -12,6 +12,7 @@ import Members from './pages/members/Members';
 import Membership from './pages/membership/Membership';
 import MembershipDetails from './pages/membership/MembershipDetails';
 import NotFound from './pages/subpages/NotFound';
+import Redeem from './pages/redeem/Redeem';
 import TransferDetails from './pages/transfers/TransferDetails';
 import Transfers from './pages/transfers/Transfers';
 import TributeDetails from './pages/tributes/TributeDetails';
@@ -115,6 +116,7 @@ export default function Routes() {
           path="/dao-manager"
           render={() => <AdapterOrExtensionManager />}
         />,
+        <Route key="redeem" exact path="/redeem" render={() => <Redeem />} />,
         <Route key="no-match" component={NotFound} />,
       ]}
     </Switch>
