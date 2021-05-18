@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 
 type LoaderWithEmojiProps = {
+  emoji: string;
   // Show waiting effect after some time has elapsed. Prevents the "sudden
   // spinner" UI/UX no-no. Esp. if we could have cached data.
   showAfterMs?: number;
@@ -23,7 +24,7 @@ export default function LoaderWithEmoji(props: LoaderWithEmojiProps) {
   return !showAfterMs || (showAfterMs && showLoaderAfterMs) ? (
     <div className="loader--emoji">
       <span role="img" aria-label="Loading content...">
-        🎟
+        {props.emoji}
       </span>
     </div>
   ) : null;

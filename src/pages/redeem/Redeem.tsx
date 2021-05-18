@@ -83,7 +83,7 @@ export default function RedeemCoupon() {
   if (connected && isInProcess) {
     return (
       <RenderWrapper>
-        <LoaderWithEmoji />
+        <LoaderWithEmoji emoji={'🎟'} />
         <p>Checking... please wait</p>
       </RenderWrapper>
     );
