@@ -52,12 +52,6 @@ export default function RedeemCoupon() {
       const response = await fetch(`${COUPON_API_URL}/api/coupon/redeem`, {
         method: 'POST',
         body: JSON.stringify({
-          // search by signature or eth addr
-          // ...(query.coupon === undefined || !query.coupon
-          //   ? { recipient: account.toLowerCase() }
-          //   : { signature: query.coupon }),
-
-          // @note only checking signature for now
           signature: coupon,
         }),
         headers: {
