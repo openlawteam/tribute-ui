@@ -8,8 +8,19 @@ import RedeemManager from './RedeemManager';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import {COUPON_API_URL} from '../../config';
 
+type RedeemCouponType = {
+  amount: number;
+  dao: {daoAddress: string};
+  isRedeemed: boolean;
+  nonce: number;
+  recipient: string;
+  signature: string;
+};
+
 export default function RedeemCoupon() {
-  const [redeemableCoupon, setReedemableCoupon] = useState<any[]>([]); // @todo typify
+  const [redeemableCoupon, setReedemableCoupon] = useState<RedeemCouponType[]>(
+    []
+  );
   const [isInProcess, setIsInProcess] = useState<boolean>(false);
 
   const location = useLocation<{coupon: string}>();
