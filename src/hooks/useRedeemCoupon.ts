@@ -3,6 +3,7 @@ import {AbiItem} from 'web3-utils/types';
 import {toChecksumAddress} from 'web3-utils';
 import {getAdapterAddress} from '../components/web3/helpers';
 import {ContractAdapterNames, Web3TxStatus} from '../components/web3/types';
+import {COUPON_API_URL} from '../config';
 import {
   useContractSend,
   useETHGasPrice,
@@ -144,7 +145,7 @@ export default function useRedeemCoupon(): ReturnUseRedeemCoupon {
 
       if (tx) {
         // update the db and send email
-        await fetch('/api/coupon/redeem', {
+        await fetch(`${COUPON_API_URL}/api/coupon/redeem`, {
           method: 'PATCH',
           body: JSON.stringify({
             // search by signature

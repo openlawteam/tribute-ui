@@ -6,10 +6,10 @@ import FadeIn from '../../components/common/FadeIn';
 import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 import RedeemManager from './RedeemManager';
 import {useWeb3Modal} from '../../components/web3/hooks';
+import {COUPON_API_URL} from '../../config';
 
 export default function RedeemCoupon() {
   const [redeemableCoupon, setReedemableCoupon] = useState<any[]>([]); // @todo typify
-  const [submitError, setSubmitError] = useState(undefined);
   const [isInProcess, setIsInProcess] = useState<boolean>(false);
 
   const location = useLocation<{coupon: string}>();
@@ -37,9 +37,8 @@ export default function RedeemCoupon() {
   async function checkBySigOrAddr() {
     try {
       setIsInProcess(true);
-      // https://coupon.dev.thelao.io/
       // handle adding new authorized user to thee `auth` tbl
-      const response = await fetch('/api/coupon/redeem', {
+      const response = await fetch(`${COUPON_API_URL}/api/coupon/redeem`, {
         method: 'POST',
         body: JSON.stringify({
           // search by signature or eth addr
@@ -60,7 +59,6 @@ export default function RedeemCoupon() {
       setReedemableCoupon(coupons);
       setIsInProcess(false);
     } catch (error) {
-      setSubmitError(error);
       setIsInProcess(false);
     }
   }
