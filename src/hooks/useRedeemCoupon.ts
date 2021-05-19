@@ -55,13 +55,8 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
   const {account, web3Instance} = useWeb3Modal();
   const {defaultChainError} = useIsDefaultChain();
 
-  const {
-    txError,
-    txEtherscanURL,
-    txIsPromptOpen,
-    txSend,
-    txStatus,
-  } = useContractSend();
+  const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
+    useContractSend();
 
   /**
    * Variables
@@ -99,7 +94,8 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
       );
 
       const daoRegistryContractABI: AbiItem[] = lazyDaoRegistryABI as any;
-      const couponOnboardingContractABI: AbiItem[] = lazyCouponOnboardingABI as any;
+      const couponOnboardingContractABI: AbiItem[] =
+        lazyCouponOnboardingABI as any;
 
       const daoRegistryInstance = new web3Instance.eth.Contract(
         daoRegistryContractABI,
