@@ -7,7 +7,6 @@
   position: relative;
   box-shadow: 0 2px 2px 0 $color-shadow-primary;
   text-align: center;
-  // font-family: $font-accent;
 
   flex: 0 55%;
   min-width: 55%;
@@ -49,6 +48,8 @@
   @include size-down-down {
     padding: 0.5rem;
     width: 24rem;
+    max-width: 100vw;
+    box-sizing: border-box;
   }
 
   .redeemcard__redeemed {
@@ -70,5 +71,9 @@
     > sup {
       margin-left: 0.5rem;
     }
+  }
+
+  .button {
+    min-width: 7.1rem;
   }
 }

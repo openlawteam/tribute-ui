@@ -1,3 +1,5 @@
+import {toChecksumAddress} from 'web3-utils';
+
 import {CycleEllipsis} from '../../components/feedback/CycleEllipsis';
 import CycleMessage from '../../components/feedback/CycleMessage';
 import EtherscanURL from '../../components/web3/EtherscanURL';
@@ -5,11 +7,10 @@ import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDet
 import FadeIn from '../../components/common/FadeIn';
 import Loader from '../../components/feedback/Loader';
 import {useRedeemCoupon, FetchStatus} from '../../hooks/useRedeemCoupon';
-
 import {formatNumber} from '../../util/helpers/formatNumber';
 import {Web3TxStatus} from '../../components/web3/types';
 import {truncateEthAddress} from '../../util/helpers/truncateEthAddress';
-import {truncateSignature} from '../../util/helpers/truncateSignature';
+// import {truncateSignature} from '../../util/helpers/truncateSignature';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 
 type RedeemManagerProps = {
@@ -92,8 +93,9 @@ function RedeemCard({redeemable}: Record<string, any>) {
       className={`redeemcard redeemcard__content ${
         isDone ? 'fireworks' : ''
       } `}>
-      <p>{truncateEthAddress(redeemable.recipient, 8)}</p>
-      <p>{truncateSignature(redeemable.signature, 16)}</p>
+      <p>{truncateEthAddress(toChecksumAddress(redeemable.recipient), 7)}</p>
+      {/* @note Commenting the signature out for now. It may not be useful (and potentially confusing) to the user who doesn't necessarily need to understand what it is. */}
+      {/* <p>{truncateSignature(redeemable.signature, 16)}</p> */}
       <p className="redeemcard__unit">
         {formatNumber(redeemable.amount)}
         <sup>units</sup>
