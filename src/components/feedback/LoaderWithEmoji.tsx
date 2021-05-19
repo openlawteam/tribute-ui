@@ -22,7 +22,7 @@ export default function LoaderWithEmoji(props: LoaderWithEmojiProps) {
   }, [showAfterMs]);
 
   return !showAfterMs || (showAfterMs && showLoaderAfterMs) ? (
-    <div>
+    <div className="loader--emoji">
       <span role="img" aria-label="Loading content...">
         {props.emoji}
       </span>

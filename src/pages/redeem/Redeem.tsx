@@ -78,7 +78,7 @@ export default function RedeemCoupon() {
       <RenderWrapper>
         <div className="form__description--unauthorized">
           <p className="color-brightsalmon">
-            Connect your wallet to redeem a coupon.
+            Connect your wallet to redeem coupon.
           </p>
         </div>
       </RenderWrapper>
@@ -128,16 +128,12 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
     <Wrap className="section-wrapper">
       <FadeIn>
         <div className="titlebar">
-          <h2 className="titlebar__title">Redeem a Coupon</h2>
+          <h2 className="titlebar__title">Redeem Coupon</h2>
         </div>
 
         <div className="form-wrapper">
           <div className="form__description">
-            <p>
-              Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
-              consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut
-              lacus dictum fermentum vel tincidunt neque. Sed sed lacinia...
-            </p>
+            <p>Redeem your coupon to get your membership units.</p>
           </div>
 
           {/* RENDER CHILDREN */}
