@@ -148,6 +148,16 @@ export const NFT_COLLECTION_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.GANACHE]: '0xcF34FFFBba648719DAe106202674949f1679772B',
 };
 
+// @todo
+export const ERC20_TOKEN_FACTORY_CONTRACT_ADDRESS = {
+  [CHAINS.MAINNET]: '',
+  [CHAINS.ROPSTEN]: '',
+  [CHAINS.RINKEBY]: '',
+  [CHAINS.GOERLI]: '',
+  [CHAINS.KOVAN]: '',
+  [CHAINS.GANACHE]: '0x862d71d6E9Be8a7495EfEBa6f2b657b00E629c95',
+};
+
 /**
  * ADAPTER CONTRACTS
  * @note as per https://github.com/openlawteam/tribute-contracts#architecture
