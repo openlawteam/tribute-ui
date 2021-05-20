@@ -126,7 +126,7 @@ function RedeemCard({redeemable}: Record<string, any>) {
       {isInProcessOrDone && (
         <div
           className="form__submit-status-container"
-          style={{marginTop: '.5rem'}}>
+          style={{marginTop: '1rem'}}>
           {renderSubmitStatus()}
         </div>
       )}

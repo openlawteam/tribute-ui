@@ -1,5 +1,6 @@
 import {useLocation} from 'react-router-dom';
 import {useCallback, useEffect, useState} from 'react';
+import {toChecksumAddress} from 'web3-utils';
 
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
@@ -7,6 +8,7 @@ import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 import RedeemManager from './RedeemManager';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import {COUPON_API_URL} from '../../config';
+import {truncateEthAddress} from '../../util/helpers/truncateEthAddress';
 
 type RedeemCouponType = {
   amount: number;
@@ -110,7 +112,20 @@ export default function RedeemCoupon() {
     return (
       <RenderWrapper>
         <p className="color-brightsalmon">
-          Coupon not found for this connected account.
+          {redeemableCoupon[0].recipient ? (
+            <>
+              Connect with{' '}
+              <span className="redeemcard__address">
+                {truncateEthAddress(
+                  toChecksumAddress(redeemableCoupon[0].recipient),
+                  7
+                )}
+              </span>{' '}
+              account to view coupon.
+            </>
+          ) : (
+            'Coupon not found for this connected account.'
+          )}
         </p>
       </RenderWrapper>
     );
