@@ -7,6 +7,7 @@ export enum DaoAdapterConstants {
   BANK = 'bank',
   CONFIGURATION = 'configuration',
   COUPON_ONBOARDING = 'coupon-onboarding',
+  DAO_REGISTRY = 'daoRegistry',
   DISTRIBUTE = 'distribute',
   EXECUTION = 'execution',
   FINANCING = 'financing',

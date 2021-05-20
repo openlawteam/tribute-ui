@@ -5,6 +5,7 @@ import {
   CONTRACT_CONFIGURATION,
   CONTRACT_COUPON_ONBOARDING,
   CONTRACT_DAO_FACTORY,
+  CONTRACT_DAO_REGISTRY_ADAPTER,
   CONTRACT_DAO_REGISTRY,
   CONTRACT_DISTRIBUTE,
   CONTRACT_FINANCING,
@@ -28,6 +29,7 @@ const initialState = {
   ConfigurationContract: null,
   CouponOnboardingContract: null,
   DaoFactoryContract: null,
+  DaoRegistryAdapterContract: null,
   DaoRegistryContract: null,
   DistributeContract: null,
   FinancingContract: null,
@@ -63,6 +65,8 @@ export default function reducer(
       return contractDAOFactory(state, payload);
     case CONTRACT_DAO_REGISTRY:
       return contractDAORegistry(state, payload);
+    case CONTRACT_DAO_REGISTRY_ADAPTER:
+      return contractDaoRegistryAdapter(state, payload);
     case CONTRACT_DISTRIBUTE:
       return contractDistribute(state, payload);
     case CONTRACT_FINANCING:
@@ -103,6 +107,13 @@ function contractDAOFactory(state: ContractsState, payload: any) {
 
 function contractDAORegistry(state: ContractsState, payload: any) {
   return {...state, DaoRegistryContract: {...payload}};
+}
+
+function contractDaoRegistryAdapter(
+  state: ContractsState,
+  payload: any
+): ContractsState {
+  return {...state, DaoRegistryAdapterContract: {...payload}};
 }
 
 function contractBankExtension(

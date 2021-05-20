@@ -5,6 +5,7 @@ import {
   BANK_ADAPTER_CONTRACT_ADDRESS,
   CONFIGURATION_CONTRACT_ADDRESS,
   COUPONONBOARDING_CONTRACT_ADDRESS,
+  DAO_REGISTRY_ADAPTER_CONTRACT_ADDRESS,
   DEFAULT_CHAIN,
   DISTRIBUTE_CONTRACT_ADDRESS,
   FINANCING_CONTRACT_ADDRESS,
@@ -185,6 +186,13 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
     abiFunctionName: 'configureDao',
     description:
       'Provides a way to onboard an initial group of members quickly without requiring multiple proposals.',
+  },
+  {
+    name: DaoAdapterConstants.DAO_REGISTRY,
+    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.DAO_REGISTRY),
+    contractAddress: DAO_REGISTRY_ADAPTER_CONTRACT_ADDRESS[DEFAULT_CHAIN],
+    abiFunctionName: 'updateDelegateKey',
+    description: 'Allows the member to update delegate key.',
   },
   // {
   //   isExtension: true,

@@ -9,6 +9,7 @@ import {
   initContractCouponOnboarding,
   initContractDaoFactory,
   initContractDaoRegistry,
+  initContractDaoRegistryAdapter,
   initContractDistribute,
   initContractFinancing,
   initContractGuildKick,
@@ -86,6 +87,7 @@ export function useInitContracts(): () => Promise<void> {
       await dispatch(initContractNFTExtension(web3Instance));
       await dispatch(initContractNFTAdapter(web3Instance));
       await dispatch(initContractCouponOnboarding(web3Instance));
+      await dispatch(initContractDaoRegistryAdapter(web3Instance));
     } catch (error) {
       throw error;
     }

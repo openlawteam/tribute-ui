@@ -44,7 +44,8 @@ type ContractAction =
   | typeof CONTRACT_TRIBUTE
   | typeof CONTRACT_TRIBUTE_NFT
   | typeof CONTRACT_VOTING
-  | typeof CONTRACT_VOTING_OP_ROLLUP;
+  | typeof CONTRACT_VOTING_OP_ROLLUP
+  | typeof CONTRACT_DAO_REGISTRY_ADAPTER;
 
 export const CONTRACT_BANK_ADAPTER = 'CONTRACT_BANK_ADAPTER';
 export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
@@ -53,6 +54,7 @@ export const CONTRACT_CONFIGURATION = 'CONTRACT_CONFIGURATION';
 export const CONTRACT_COUPON_ONBOARDING = 'CONTRACT_COUPON_ONBOARDING';
 export const CONTRACT_DAO_FACTORY = 'CONTRACT_DAO_FACTORY';
 export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
+export const CONTRACT_DAO_REGISTRY_ADAPTER = 'CONTRACT_DAO_REGISTRY_ADAPTER';
 export const CONTRACT_DISTRIBUTE = 'CONTRACT_DISTRIBUTE';
 export const CONTRACT_FINANCING = 'CONTRACT_FINANCING';
 export const CONTRACT_GUILDKICK = 'CONTRACT_GUILDKICK';
@@ -284,6 +286,21 @@ export function initContractNFTAdapter(
     adapterOrExtensionName: ContractAdapterNames.nft,
     contractAddress,
     lazyImport: () => import('../../truffle-contracts/NFTAdapterContract.json'),
+    web3Instance,
+  });
+}
+
+export function initContractDaoRegistryAdapter(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_DAO_REGISTRY_ADAPTER,
+    adapterNameForRedux: DaoAdapterConstants.DAO_REGISTRY,
+    adapterOrExtensionName: ContractAdapterNames.dao_registry,
+    contractAddress,
+    lazyImport: () =>
+      import('../../truffle-contracts/DaoRegistryAdapterContract.json'),
     web3Instance,
   });
 }

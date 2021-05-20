@@ -35,6 +35,7 @@ export type ContractsState = {
   ConfigurationContract: ContractsStateEntry | null;
   CouponOnboardingContract: ContractsStateEntry | null;
   DaoFactoryContract: ContractsStateEntry | null;
+  DaoRegistryAdapterContract: ContractsStateEntry | null;
   DaoRegistryContract: ContractsStateEntry | null;
   DistributeContract: ContractsStateEntry | null;
   FinancingContract: ContractsStateEntry | null;

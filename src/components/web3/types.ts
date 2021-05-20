@@ -30,6 +30,7 @@ export enum ContractAdapterNames {
   bank = 'bank',
   configuration = 'configuration',
   coupon_onboarding = 'coupon-onboarding',
+  dao_registry = 'daoRegistry',
   distribute = 'distribute',
   financing = 'financing',
   guildkick = 'guildkick',

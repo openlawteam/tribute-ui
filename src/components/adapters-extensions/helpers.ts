@@ -94,7 +94,12 @@ export function getAccessControlLayer(
     [DaoAdapterConstants.NFT]: {
       COLLECT_NFT: true,
     },
-    [DaoAdapterConstants.COUPON_ONBOARDING]: {},
+    [DaoAdapterConstants.COUPON_ONBOARDING]: {
+      SUBMIT_PROPOSAL: false,
+      ADD_TO_BALANCE: true,
+      UPDATE_DELEGATE_KEY: false,
+      NEW_MEMBER: true,
+    },
     [DaoAdapterConstants.TRIBUTE_NFT]: {
       SUBMIT_PROPOSAL: true,
       NEW_MEMBER: true,
@@ -105,6 +110,9 @@ export function getAccessControlLayer(
       WITHDRAW_NFT: true,
       COLLECT_NFT: true,
       INTERNAL_TRANSFER: true,
+    },
+    [DaoAdapterConstants.DAO_REGISTRY]: {
+      UPDATE_DELEGATE_KEY: true,
     },
   };
 

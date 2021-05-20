@@ -4,6 +4,7 @@ import {
   initContractBankAdapter,
   initContractConfiguration,
   initContractCouponOnboarding,
+  initContractDaoRegistryAdapter,
   initContractDistribute,
   initContractFinancing,
   initContractGuildKick,
@@ -80,6 +81,9 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
         break;
       case DaoAdapterConstants.NFT:
         await dispatch(initContractNFTAdapter(web3Instance));
+        break;
+      case DaoAdapterConstants.DAO_REGISTRY:
+        await dispatch(initContractDaoRegistryAdapter(web3Instance));
         break;
     }
   }
