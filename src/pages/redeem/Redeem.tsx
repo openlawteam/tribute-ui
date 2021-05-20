@@ -112,7 +112,7 @@ export default function RedeemCoupon() {
     return (
       <RenderWrapper>
         <p className="color-brightsalmon">
-          {redeemableCoupon[0].recipient ? (
+          {redeemableCoupon[0]?.recipient ? (
             <>
               Connect with{' '}
               <span className="redeemcard__address">
