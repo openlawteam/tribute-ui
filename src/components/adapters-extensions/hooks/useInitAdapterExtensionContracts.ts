@@ -6,6 +6,7 @@ import {
   initContractCouponOnboarding,
   initContractDaoRegistryAdapter,
   initContractDistribute,
+  initContractERC20Extension,
   initContractFinancing,
   initContractGuildKick,
   initContractManaging,
@@ -84,6 +85,9 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
         break;
       case DaoAdapterConstants.DAO_REGISTRY:
         await dispatch(initContractDaoRegistryAdapter(web3Instance));
+        break;
+      case DaoExtensionConstants.ERC20:
+        await dispatch(initContractERC20Extension(web3Instance));
         break;
     }
   }

@@ -38,6 +38,7 @@ export type ContractsState = {
   DaoRegistryAdapterContract: ContractsStateEntry | null;
   DaoRegistryContract: ContractsStateEntry | null;
   DistributeContract: ContractsStateEntry | null;
+  ERC20ExtensionContract: ContractsStateEntry | null;
   FinancingContract: ContractsStateEntry | null;
   GuildBankContract: ContractsStateEntry | null;
   ManagingContract: ContractsStateEntry | null;

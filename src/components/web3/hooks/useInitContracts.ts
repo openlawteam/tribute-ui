@@ -11,6 +11,7 @@ import {
   initContractDaoRegistry,
   initContractDaoRegistryAdapter,
   initContractDistribute,
+  initContractERC20Extension,
   initContractFinancing,
   initContractGuildKick,
   initContractManaging,
@@ -88,6 +89,7 @@ export function useInitContracts(): () => Promise<void> {
       await dispatch(initContractNFTAdapter(web3Instance));
       await dispatch(initContractCouponOnboarding(web3Instance));
       await dispatch(initContractDaoRegistryAdapter(web3Instance));
+      await dispatch(initContractERC20Extension(web3Instance));
     } catch (error) {
       throw error;
     }

@@ -25,6 +25,7 @@ export enum DaoAdapterConstants {
 
 export enum DaoExtensionConstants {
   BANK = 'bank',
+  ERC20 = 'erc20-ext',
   NFT = 'nft',
 }
 

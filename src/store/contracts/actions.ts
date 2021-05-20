@@ -33,7 +33,9 @@ type ContractAction =
   | typeof CONTRACT_COUPON_ONBOARDING
   | typeof CONTRACT_DAO_FACTORY
   | typeof CONTRACT_DAO_REGISTRY
+  | typeof CONTRACT_DAO_REGISTRY_ADAPTER
   | typeof CONTRACT_DISTRIBUTE
+  | typeof CONTRACT_ERC20_EXTENSION
   | typeof CONTRACT_FINANCING
   | typeof CONTRACT_GUILDKICK
   | typeof CONTRACT_MANAGING
@@ -44,8 +46,7 @@ type ContractAction =
   | typeof CONTRACT_TRIBUTE
   | typeof CONTRACT_TRIBUTE_NFT
   | typeof CONTRACT_VOTING
-  | typeof CONTRACT_VOTING_OP_ROLLUP
-  | typeof CONTRACT_DAO_REGISTRY_ADAPTER;
+  | typeof CONTRACT_VOTING_OP_ROLLUP;
 
 export const CONTRACT_BANK_ADAPTER = 'CONTRACT_BANK_ADAPTER';
 export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
@@ -56,6 +57,7 @@ export const CONTRACT_DAO_FACTORY = 'CONTRACT_DAO_FACTORY';
 export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
 export const CONTRACT_DAO_REGISTRY_ADAPTER = 'CONTRACT_DAO_REGISTRY_ADAPTER';
 export const CONTRACT_DISTRIBUTE = 'CONTRACT_DISTRIBUTE';
+export const CONTRACT_ERC20_EXTENSION = 'CONTRACT_ERC20_EXTENSION';
 export const CONTRACT_FINANCING = 'CONTRACT_FINANCING';
 export const CONTRACT_GUILDKICK = 'CONTRACT_GUILDKICK';
 export const CONTRACT_MANAGING = 'CONTRACT_MANAGING';
@@ -402,6 +404,21 @@ export function initContractNFTExtension(
     contractAddress,
     isExtension: true,
     lazyImport: () => import('../../truffle-contracts/NFTExtension.json'),
+    web3Instance,
+  });
+}
+
+export function initContractERC20Extension(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_ERC20_EXTENSION,
+    adapterNameForRedux: DaoExtensionConstants.ERC20,
+    adapterOrExtensionName: ContractExtensionNames.erc20,
+    contractAddress,
+    isExtension: true,
+    lazyImport: () => import('../../truffle-contracts/ERC20Extension.json'),
     web3Instance,
   });
 }

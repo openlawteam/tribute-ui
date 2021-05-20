@@ -50,6 +50,7 @@ export enum ContractAdapterNames {
  */
 export enum ContractExtensionNames {
   bank = 'bank',
+  erc20 = 'erc20-ext',
   nft = 'nft',
 }
 
