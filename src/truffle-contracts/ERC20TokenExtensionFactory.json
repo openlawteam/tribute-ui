@@ -2,6 +2,30 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_identityAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "erc20ExtTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "ERC20TokenExtensionCreated",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "flags",
         "type": "uint256"
@@ -24,24 +48,13 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_addr",
-        "type": "address"
-      }
-    ],
-    "name": "isActiveMember",
+    "inputs": [],
+    "name": "identityAddress",
     "outputs": [
       {
-        "internalType": "bool",
+        "internalType": "address",
         "name": "",
-        "type": "bool"
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -115,28 +128,29 @@
     "type": "function"
   },
   {
-    "stateMutability": "payable",
-    "type": "receive"
-  },
-  {
     "inputs": [
       {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
+        "internalType": "string",
+        "name": "tokenName",
+        "type": "string"
       },
       {
         "internalType": "address",
-        "name": "nftAddr",
+        "name": "tokenAddress",
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "nftTokenId",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "tokenSymbol",
+        "type": "string"
+      },
+      {
+        "internalType": "uint8",
+        "name": "decimals",
+        "type": "uint8"
       }
     ],
-    "name": "collect",
+    "name": "create",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
