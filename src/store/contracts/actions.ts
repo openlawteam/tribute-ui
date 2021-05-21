@@ -33,7 +33,9 @@ type ContractAction =
   | typeof CONTRACT_COUPON_ONBOARDING
   | typeof CONTRACT_DAO_FACTORY
   | typeof CONTRACT_DAO_REGISTRY
+  | typeof CONTRACT_DAO_REGISTRY_ADAPTER
   | typeof CONTRACT_DISTRIBUTE
+  | typeof CONTRACT_ERC20_EXTENSION
   | typeof CONTRACT_FINANCING
   | typeof CONTRACT_GUILDKICK
   | typeof CONTRACT_MANAGING
@@ -53,7 +55,9 @@ export const CONTRACT_CONFIGURATION = 'CONTRACT_CONFIGURATION';
 export const CONTRACT_COUPON_ONBOARDING = 'CONTRACT_COUPON_ONBOARDING';
 export const CONTRACT_DAO_FACTORY = 'CONTRACT_DAO_FACTORY';
 export const CONTRACT_DAO_REGISTRY = 'CONTRACT_DAO_REGISTRY';
+export const CONTRACT_DAO_REGISTRY_ADAPTER = 'CONTRACT_DAO_REGISTRY_ADAPTER';
 export const CONTRACT_DISTRIBUTE = 'CONTRACT_DISTRIBUTE';
+export const CONTRACT_ERC20_EXTENSION = 'CONTRACT_ERC20_EXTENSION';
 export const CONTRACT_FINANCING = 'CONTRACT_FINANCING';
 export const CONTRACT_GUILDKICK = 'CONTRACT_GUILDKICK';
 export const CONTRACT_MANAGING = 'CONTRACT_MANAGING';
@@ -288,6 +292,21 @@ export function initContractNFTAdapter(
   });
 }
 
+export function initContractDaoRegistryAdapter(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_DAO_REGISTRY_ADAPTER,
+    adapterNameForRedux: DaoAdapterConstants.DAO_REGISTRY,
+    adapterOrExtensionName: ContractAdapterNames.dao_registry,
+    contractAddress,
+    lazyImport: () =>
+      import('../../truffle-contracts/DaoRegistryAdapterContract.json'),
+    web3Instance,
+  });
+}
+
 export function initContractRagequit(
   web3Instance: Web3,
   contractAddress?: string
@@ -385,6 +404,21 @@ export function initContractNFTExtension(
     contractAddress,
     isExtension: true,
     lazyImport: () => import('../../truffle-contracts/NFTExtension.json'),
+    web3Instance,
+  });
+}
+
+export function initContractERC20Extension(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_ERC20_EXTENSION,
+    adapterNameForRedux: DaoExtensionConstants.ERC20,
+    adapterOrExtensionName: ContractExtensionNames.erc20,
+    contractAddress,
+    isExtension: true,
+    lazyImport: () => import('../../truffle-contracts/ERC20Extension.json'),
     web3Instance,
   });
 }

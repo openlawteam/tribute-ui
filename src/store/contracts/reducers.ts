@@ -5,8 +5,10 @@ import {
   CONTRACT_CONFIGURATION,
   CONTRACT_COUPON_ONBOARDING,
   CONTRACT_DAO_FACTORY,
+  CONTRACT_DAO_REGISTRY_ADAPTER,
   CONTRACT_DAO_REGISTRY,
   CONTRACT_DISTRIBUTE,
+  CONTRACT_ERC20_EXTENSION,
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
   CONTRACT_MANAGING,
@@ -28,8 +30,10 @@ const initialState = {
   ConfigurationContract: null,
   CouponOnboardingContract: null,
   DaoFactoryContract: null,
+  DaoRegistryAdapterContract: null,
   DaoRegistryContract: null,
   DistributeContract: null,
+  ERC20ExtensionContract: null,
   FinancingContract: null,
   GuildBankContract: null,
   ManagingContract: null,
@@ -63,8 +67,12 @@ export default function reducer(
       return contractDAOFactory(state, payload);
     case CONTRACT_DAO_REGISTRY:
       return contractDAORegistry(state, payload);
+    case CONTRACT_DAO_REGISTRY_ADAPTER:
+      return contractDaoRegistryAdapter(state, payload);
     case CONTRACT_DISTRIBUTE:
       return contractDistribute(state, payload);
+    case CONTRACT_ERC20_EXTENSION:
+      return contractERC20Extension(state, payload);
     case CONTRACT_FINANCING:
       return contractFinancing(state, payload);
     case CONTRACT_GUILDKICK:
@@ -103,6 +111,13 @@ function contractDAOFactory(state: ContractsState, payload: any) {
 
 function contractDAORegistry(state: ContractsState, payload: any) {
   return {...state, DaoRegistryContract: {...payload}};
+}
+
+function contractDaoRegistryAdapter(
+  state: ContractsState,
+  payload: any
+): ContractsState {
+  return {...state, DaoRegistryAdapterContract: {...payload}};
 }
 
 function contractBankExtension(
@@ -184,4 +199,11 @@ function contractNFTExtension(
   payload: any
 ): ContractsState {
   return {...state, NFTExtensionContract: {...payload}};
+}
+
+function contractERC20Extension(
+  state: ContractsState,
+  payload: any
+): ContractsState {
+  return {...state, ERC20ExtensionContract: {...payload}};
 }

@@ -7,6 +7,7 @@ import {
   CONTRACT_BANK_ADAPTER,
   CONTRACT_BANK_EXTENSION,
   CONTRACT_CONFIGURATION,
+  CONTRACT_DAO_REGISTRY_ADAPTER,
   CONTRACT_DISTRIBUTE,
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
@@ -78,6 +79,9 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
         expect(reduxStore.getState().contracts.VotingContract).toBeNull();
         expect(reduxStore.getState().contracts.BankAdapterContract).toBeNull();
         expect(reduxStore.getState().contracts.NFTAdapterContract).toBeNull();
+        expect(
+          reduxStore.getState().contracts.DaoRegistryAdapterContract
+        ).toBeNull();
       });
 
       reduxStore.dispatch({
@@ -116,6 +120,9 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
       reduxStore.dispatch({
         type: CONTRACT_NFT_ADAPTER,
       });
+      reduxStore.dispatch({
+        type: CONTRACT_DAO_REGISTRY_ADAPTER,
+      });
 
       expect(
         reduxStore.getState().contracts.BankExtensionContract
@@ -135,6 +142,9 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
         reduxStore.getState().contracts.BankAdapterContract
       ).not.toBeNull();
       expect(reduxStore.getState().contracts.NFTAdapterContract).not.toBeNull();
+      expect(
+        reduxStore.getState().contracts.DaoRegistryAdapterContract
+      ).not.toBeNull();
     });
   });
 });

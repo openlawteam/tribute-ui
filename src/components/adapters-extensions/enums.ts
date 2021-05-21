@@ -7,6 +7,7 @@ export enum DaoAdapterConstants {
   BANK = 'bank',
   CONFIGURATION = 'configuration',
   COUPON_ONBOARDING = 'coupon-onboarding',
+  DAO_REGISTRY = 'daoRegistry',
   DISTRIBUTE = 'distribute',
   EXECUTION = 'execution',
   FINANCING = 'financing',
@@ -24,6 +25,7 @@ export enum DaoAdapterConstants {
 
 export enum DaoExtensionConstants {
   BANK = 'bank',
+  ERC20 = 'erc20-ext',
   NFT = 'nft',
 }
 

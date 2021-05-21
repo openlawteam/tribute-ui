@@ -30,6 +30,7 @@ export enum ContractAdapterNames {
   bank = 'bank',
   configuration = 'configuration',
   coupon_onboarding = 'coupon-onboarding',
+  dao_registry = 'daoRegistry',
   distribute = 'distribute',
   financing = 'financing',
   guildkick = 'guildkick',
@@ -49,6 +50,7 @@ export enum ContractAdapterNames {
  */
 export enum ContractExtensionNames {
   bank = 'bank',
+  erc20 = 'erc20-ext',
   nft = 'nft',
 }
 
