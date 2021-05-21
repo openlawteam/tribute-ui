@@ -15,11 +15,11 @@ describe('ProposalAmount component unit tests', () => {
         amount="100"
         amountUnit="OLT"
         amount2="100,000"
-        amount2Unit="UNITS"
+        amount2Unit="TRIB"
       />
     );
 
     expect(screen.getByText(/100 olt/i)).toBeInTheDocument();
-    expect(screen.getByText(/100,000 units/i)).toBeInTheDocument();
+    expect(screen.getByText(/100,000 trib/i)).toBeInTheDocument();
   });
 });
