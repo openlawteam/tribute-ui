@@ -148,7 +148,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
 
         <div className="form-wrapper">
           <div className="form__description">
-            <p>Redeem your coupon to get your membership units.</p>
+            <p>Redeem your coupon to get your membership tokens.</p>
           </div>
 
           {/* RENDER CHILDREN */}

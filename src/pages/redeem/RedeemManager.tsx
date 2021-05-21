@@ -1,5 +1,8 @@
+import {useState, useEffect} from 'react';
+import {useSelector} from 'react-redux';
 import {toChecksumAddress} from 'web3-utils';
 
+import {StoreState} from '../../store/types';
 import {CycleEllipsis} from '../../components/feedback/CycleEllipsis';
 import CycleMessage from '../../components/feedback/CycleMessage';
 import EtherscanURL from '../../components/web3/EtherscanURL';
@@ -31,6 +34,18 @@ export default function RedeemManager({redeemables}: RedeemManagerProps) {
 }
 
 function RedeemCard({redeemable}: Record<string, any>) {
+  /**
+   * Selectors
+   */
+
+  const ERC20ExtensionContract = useSelector(
+    (state: StoreState) => state.contracts?.ERC20ExtensionContract
+  );
+
+  /**
+   * Our hooks
+   */
+
   const {
     redeemCoupon,
     submitStatus,
@@ -39,6 +54,39 @@ function RedeemCard({redeemable}: Record<string, any>) {
     txEtherscanURL,
     txIsPromptOpen,
   } = useRedeemCoupon();
+
+  /**
+   * State
+   */
+
+  const [unitType, setUnitType] = useState<string>('tokens');
+
+  /**
+   * Effects
+   */
+
+  useEffect(() => {
+    async function getUnitType() {
+      if (!ERC20ExtensionContract) return;
+
+      try {
+        const symbol = await ERC20ExtensionContract.instance.methods
+          .symbol()
+          .call();
+
+        setUnitType(symbol);
+      } catch (error) {
+        console.log(error);
+        setUnitType('tokens');
+      }
+    }
+
+    getUnitType();
+  }, [ERC20ExtensionContract]);
+
+  /**
+   * Variables
+   */
 
   const isInProcess =
     submitStatus === FetchStatus.PENDING ||
@@ -49,6 +97,10 @@ function RedeemCard({redeemable}: Record<string, any>) {
     txStatus === Web3TxStatus.FULFILLED ||
     redeemable.isRedeemd;
   const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
+
+  /**
+   * Functions
+   */
 
   function renderSubmitStatus(): React.ReactNode {
     // Only for chain tx
@@ -88,6 +140,10 @@ function RedeemCard({redeemable}: Record<string, any>) {
     }
   }
 
+  /**
+   * Render
+   */
+
   return (
     <div
       className={`redeemcard redeemcard__content ${
@@ -98,7 +154,9 @@ function RedeemCard({redeemable}: Record<string, any>) {
       {/* <p>{truncateSignature(redeemable.signature, 16)}</p> */}
       <p className="redeemcard__unit">
         {formatNumber(redeemable.amount)}
-        <sup>units</sup>
+        <sup>
+          <small>{unitType}</small>
+        </sup>
       </p>
 
       {isDone && (

@@ -1,4 +1,5 @@
 import {useState, useCallback, useEffect} from 'react';
+import {useSelector} from 'react-redux';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {useHistory} from 'react-router-dom';
@@ -18,6 +19,7 @@ import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {UNITS_ADDRESS} from '../../config';
+import {StoreState} from '../../store/types';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import {CycleEllipsis} from '../../components/feedback';
@@ -58,6 +60,14 @@ type ERC20Details = {
 };
 
 export default function CreateTributeProposal() {
+  /**
+   * Selectors
+   */
+
+  const ERC20ExtensionContract = useSelector(
+    (state: StoreState) => state.contracts?.ERC20ExtensionContract
+  );
+
   /**
    * Our hooks
    */
@@ -214,6 +224,19 @@ export default function CreateTributeProposal() {
     }
   }
 
+  async function getRequestAmountUnit() {
+    if (!ERC20ExtensionContract) {
+      return 'UNITS';
+    } else {
+      try {
+        return await ERC20ExtensionContract.instance.methods.symbol().call();
+      } catch (error) {
+        console.log(error);
+        return 'UNITS';
+      }
+    }
+  }
+
   async function handleSubmit(values: FormInputs) {
     try {
       if (!isConnected) {
@@ -275,7 +298,7 @@ export default function CreateTributeProposal() {
         // may not exist there yet.)
         const proposalAmountValues = {
           requestAmount,
-          requestAmountUnit: 'UNITS',
+          requestAmountUnit: await getRequestAmountUnit(),
           tributeAmount,
           tributeAmountUnit: erc20Details.symbol,
         };
@@ -535,7 +558,7 @@ export default function CreateTributeProposal() {
             />
 
             <div className="form__input-description">
-              This is the amount of DAO membership units you are requesting be
+              This is the amount of DAO membership tokens you are requesting be
               sent to the Applicant Address in exchange for your tribute.
             </div>
           </div>

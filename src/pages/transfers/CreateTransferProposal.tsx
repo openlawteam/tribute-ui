@@ -617,7 +617,7 @@ export default function CreateTransferProposal() {
                       : !isEthAddressValid(memberAddress)
                       ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
                       : !(await isActiveMemberWithUnits(memberAddress))
-                      ? 'The address is not an active member with UNITS.'
+                      ? 'The address is not an active member with membership tokens.'
                       : true;
                   },
                 })}
@@ -722,7 +722,7 @@ export default function CreateTransferProposal() {
 
             <div className="form__input-description">
               {isTypeAllMembers
-                ? "If the proposal passes, this total amount will be distributed pro rata to all members' internal accounts, based on the current number of units held by each member."
+                ? "If the proposal passes, this total amount will be distributed pro rata to all members' internal accounts, based on the current number of membership tokens held by each member."
                 : "If the proposal passes, this amount will be distributed to the member's internal account."}
             </div>
           </div>
