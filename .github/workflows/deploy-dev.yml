@@ -42,7 +42,7 @@ jobs:
           REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0xe2b27e75dbc332C697a92F766aCDB05Dc7136CD9"
           REACT_APP_MULTICALL_CONTRACT_ADDRESS: "0xcF862b9b6abc0101070042bEF1d3D74BA03532a7"
           REACT_APP_SNAPSHOT_HUB_API_URL: https://snapshot-hub-erc712.dev.thelao.io
-          REACT_APP_COUPON_API_URL: https://coupon.dev.thelao.io
+          REACT_APP_COUPON_API_URL: https://coupon.dev.openlaw.io
           REACT_APP_SNAPSHOT_SPACE: tribute
           REACT_APP_GRAPH_API_URL: https://api.thegraph.com/subgraphs/name/openlawteam/tribute-dev
         run: npm run build
