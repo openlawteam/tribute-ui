@@ -36,12 +36,20 @@ export default function DaoToken({erc20Details}: DaoTokenProps): JSX.Element {
 
   function copyAddressToClipboard() {
     if (!erc20Details) return;
-    const input = document.createElement('input');
-    document.body.appendChild(input);
-    input.setAttribute('value', erc20Details.address);
-    input.select();
+    const copyText = document.createElement('input');
+    document.body.appendChild(copyText);
+    copyText.setAttribute('value', erc20Details.address);
+    copyText.select();
     document.execCommand('copy');
-    document.body.removeChild(input);
+    document.body.removeChild(copyText);
+
+    const tooltip = document.getElementById('copyTooltip');
+    (tooltip as HTMLElement).innerHTML = 'copied!';
+  }
+
+  function resetCopyTooltip() {
+    const tooltip = document.getElementById('copyTooltip');
+    (tooltip as HTMLElement).innerHTML = 'copy address';
   }
 
   /**
@@ -52,18 +60,23 @@ export default function DaoToken({erc20Details}: DaoTokenProps): JSX.Element {
     return (
       <div>
         Token: <span>{truncateEthAddress(erc20Details.address, 7)}</span>
-        <button
-          className="daotoken__button"
-          title="copy address"
-          onClick={copyAddressToClipboard}>
-          <CopySVG />
-        </button>
-        <button
-          className="daotoken__button"
-          title="add to wallet"
-          onClick={addTokenToWallet}>
-          <WalletSVG />
-        </button>
+        <div className="daotoken__tooltip">
+          <button
+            className="daotoken__button"
+            onClick={copyAddressToClipboard}
+            onMouseLeave={resetCopyTooltip}>
+            <span className="daotoken__tooltiptext" id="copyTooltip">
+              copy address
+            </span>
+            <CopySVG />
+          </button>
+        </div>
+        <div className="daotoken__tooltip">
+          <button className="daotoken__button" onClick={addTokenToWallet}>
+            <span className="daotoken__tooltiptext">add to wallet</span>
+            <WalletSVG />
+          </button>
+        </div>
       </div>
     );
   }
