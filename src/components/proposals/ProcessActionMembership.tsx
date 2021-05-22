@@ -13,6 +13,7 @@ import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import EtherscanURL from '../web3/EtherscanURL';
 import FadeIn from '../common/FadeIn';
 import Loader from '../feedback/Loader';
+import {ERC20RegisterDetails} from '../dao-token/DaoToken';
 
 type ProcessArguments = [
   string, // `dao`
@@ -73,6 +74,15 @@ export default function ProcessActionMembership(
   const daoRegistryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
   );
+  const ERC20ExtensionContract = useSelector(
+    (state: StoreState) => state.contracts?.ERC20ExtensionContract
+  );
+
+  /**
+   * State
+   */
+
+  const [erc20Details, setERC20Details] = useState<ERC20RegisterDetails>();
 
   /**
    * Our hooks
@@ -107,6 +117,9 @@ export default function ProcessActionMembership(
     getMembershipProposalAmount,
     [OnboardingContract, daoRegistryAddress, snapshotProposal]
   );
+  const getERC20DetailsCached = useCallback(getERC20Details, [
+    ERC20ExtensionContract,
+  ]);
 
   /**
    * Effects
@@ -143,6 +156,24 @@ export default function ProcessActionMembership(
     // 2. Set reasons
     setOtherDisabledReasons(Object.values(actionDisabledReasonsRef.current));
   }, [account, setOtherDisabledReasons, snapshotProposal]);
+
+  // Prepare DAO token info if original proposer is processing proposal
+  useEffect(() => {
+    // Proposals of this type will have this value stored in its snapshot
+    // metadata.
+    const {accountAuthorizedToProcessPassedProposal} = (
+      snapshotProposal as SnapshotProposal
+    ).msg.payload.metadata;
+
+    if (accountAuthorizedToProcessPassedProposal && account) {
+      if (
+        accountAuthorizedToProcessPassedProposal.toLowerCase() ===
+        account.toLowerCase()
+      ) {
+        getERC20DetailsCached();
+      }
+    }
+  }, [account, getERC20DetailsCached, snapshotProposal]);
 
   /**
    * Functions
@@ -195,8 +226,50 @@ export default function ProcessActionMembership(
         processArguments,
         txArguments
       );
+
+      await addTokenToWallet();
     } catch (error) {
       setSubmitError(error);
+    }
+  }
+
+  async function addTokenToWallet() {
+    if (!erc20Details) return;
+
+    try {
+      await window.ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: erc20Details,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getERC20Details() {
+    if (!ERC20ExtensionContract) return;
+
+    try {
+      const address = ERC20ExtensionContract.contractAddress;
+      const symbol = await ERC20ExtensionContract.instance.methods
+        .symbol()
+        .call();
+      const decimals = await ERC20ExtensionContract.instance.methods
+        .decimals()
+        .call();
+      const image = `${window.location.origin}/favicon.ico`;
+      setERC20Details({
+        address,
+        symbol,
+        decimals: Number(decimals),
+        image,
+      });
+    } catch (error) {
+      console.log(error);
+      setERC20Details(undefined);
     }
   }
 
