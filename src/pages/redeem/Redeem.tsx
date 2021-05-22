@@ -158,7 +158,7 @@ export default function RedeemCoupon() {
       <RenderWrapper>
         <div className="form__description--unauthorized">
           <p className="color-brightsalmon">
-            Connect your wallet to redeem coupon.
+            Connect your wallet to view coupon.
           </p>
         </div>
       </RenderWrapper>
