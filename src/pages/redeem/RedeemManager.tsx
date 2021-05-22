@@ -149,7 +149,7 @@ function RedeemCard({redeemable, erc20Details}: RedeemCardProps) {
       </button>
 
       {/* SUBMIT STATUS */}
-      {isInProcessOrDone && (
+      {isInProcessOrDone && !redeemable.isRedeemd && (
         <div
           className="form__submit-status-container"
           style={{marginTop: '1rem'}}>
