@@ -1,14 +1,18 @@
-import {useLocation} from 'react-router-dom';
 import {useCallback, useEffect, useState} from 'react';
+import {useLocation} from 'react-router-dom';
+import {useSelector} from 'react-redux';
 import {toChecksumAddress} from 'web3-utils';
 
+import {StoreState} from '../../store/types';
 import Wrap from '../../components/common/Wrap';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
+import {ERC20RegisterDetails} from '../../components/dao-token/DaoToken';
 import RedeemManager from './RedeemManager';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import {COUPON_API_URL} from '../../config';
 import {truncateEthAddress} from '../../util/helpers/truncateEthAddress';
+import {AsyncStatus} from '../../util/types';
 
 type RedeemCouponType = {
   amount: number;
@@ -20,17 +24,60 @@ type RedeemCouponType = {
 };
 
 export default function RedeemCoupon() {
+  /**
+   * Selectors
+   */
+
+  const ERC20ExtensionContract = useSelector(
+    (state: StoreState) => state.contracts?.ERC20ExtensionContract
+  );
+
+  /**
+   * State
+   */
+
   const [redeemableCoupon, setReedemableCoupon] = useState<RedeemCouponType[]>(
     []
   );
-  const [isInProcess, setIsInProcess] = useState<boolean>(false);
+  const [couponStatus, setCouponStatus] = useState<AsyncStatus>(
+    AsyncStatus.STANDBY
+  );
+  const [erc20Details, setERC20Details] = useState<ERC20RegisterDetails>();
+  const [erc20DetailsStatus, setERC20DetailsStatus] = useState<AsyncStatus>(
+    AsyncStatus.STANDBY
+  );
 
-  const location = useLocation<{coupon: string}>();
-  const coupon = new URLSearchParams(location.search).get('coupon');
+  /**
+   * Our hooks
+   */
 
   const {connected, account} = useWeb3Modal();
 
+  /**
+   * Their hooks
+   */
+
+  const location = useLocation<{coupon: string}>();
+
+  /**
+   * Variables
+   */
+
+  const coupon = new URLSearchParams(location.search).get('coupon');
+  const isInProcess =
+    couponStatus === AsyncStatus.STANDBY ||
+    couponStatus === AsyncStatus.PENDING ||
+    erc20DetailsStatus === AsyncStatus.STANDBY ||
+    erc20DetailsStatus === AsyncStatus.PENDING;
+
+  /**
+   * Cached callbacks
+   */
+
   const checkBySigOrAddrCached = useCallback(checkBySigOrAddr, [coupon]);
+  const getERC20DetailsCached = useCallback(getERC20Details, [
+    ERC20ExtensionContract,
+  ]);
 
   /**
    * Effects
@@ -42,6 +89,10 @@ export default function RedeemCoupon() {
     }
   }, [account, connected, checkBySigOrAddrCached]);
 
+  useEffect(() => {
+    getERC20DetailsCached();
+  }, [getERC20DetailsCached]);
+
   /**
    * Functions
    */
@@ -49,7 +100,7 @@ export default function RedeemCoupon() {
   // check using signature or eth addr
   async function checkBySigOrAddr() {
     try {
-      setIsInProcess(true);
+      setCouponStatus(AsyncStatus.PENDING);
       // handle adding new authorized user to thee `auth` tbl
       const response = await fetch(`${COUPON_API_URL}/api/coupon/redeem`, {
         method: 'POST',
@@ -64,9 +115,36 @@ export default function RedeemCoupon() {
       const coupons = await response.json();
 
       setReedemableCoupon(coupons);
-      setIsInProcess(false);
+      setCouponStatus(AsyncStatus.FULFILLED);
     } catch (error) {
-      setIsInProcess(false);
+      setCouponStatus(AsyncStatus.REJECTED);
+    }
+  }
+
+  async function getERC20Details() {
+    if (!ERC20ExtensionContract) return;
+
+    try {
+      setERC20DetailsStatus(AsyncStatus.PENDING);
+      const address = ERC20ExtensionContract.contractAddress;
+      const symbol = await ERC20ExtensionContract.instance.methods
+        .symbol()
+        .call();
+      const decimals = await ERC20ExtensionContract.instance.methods
+        .decimals()
+        .call();
+      const image = `${window.location.origin}/favicon.ico`;
+      setERC20Details({
+        address,
+        symbol,
+        decimals: Number(decimals),
+        image,
+      });
+      setERC20DetailsStatus(AsyncStatus.FULFILLED);
+    } catch (error) {
+      console.log(error);
+      setERC20Details(undefined);
+      setERC20DetailsStatus(AsyncStatus.REJECTED);
     }
   }
 
@@ -80,7 +158,7 @@ export default function RedeemCoupon() {
       <RenderWrapper>
         <div className="form__description--unauthorized">
           <p className="color-brightsalmon">
-            Connect your wallet to redeem coupon.
+            Connect your wallet to view coupon.
           </p>
         </div>
       </RenderWrapper>
@@ -115,7 +193,7 @@ export default function RedeemCoupon() {
           {redeemableCoupon[0]?.recipient ? (
             <>
               Connect with{' '}
-              <span className="redeemcard__address">
+              <span className="redeemcard__address--error">
                 {truncateEthAddress(
                   toChecksumAddress(redeemableCoupon[0].recipient),
                   7
@@ -133,7 +211,10 @@ export default function RedeemCoupon() {
 
   return (
     <RenderWrapper>
-      <RedeemManager redeemables={redeemableCoupon} />
+      <RedeemManager
+        redeemables={redeemableCoupon}
+        erc20Details={erc20Details}
+      />
     </RenderWrapper>
   );
 }

@@ -67,6 +67,10 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
     submitStatus === FetchStatus.FULFILLED;
 
   /**
+   * Effects
+   */
+
+  /**
    * Functions
    */
 

@@ -1,26 +1,31 @@
-import {useState, useEffect} from 'react';
-import {useSelector} from 'react-redux';
-import {toChecksumAddress} from 'web3-utils';
-
-import {StoreState} from '../../store/types';
 import {CycleEllipsis} from '../../components/feedback/CycleEllipsis';
 import CycleMessage from '../../components/feedback/CycleMessage';
 import EtherscanURL from '../../components/web3/EtherscanURL';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import Loader from '../../components/feedback/Loader';
+import DaoToken, {
+  ERC20RegisterDetails,
+} from '../../components/dao-token/DaoToken';
 import {useRedeemCoupon, FetchStatus} from '../../hooks/useRedeemCoupon';
 import {formatNumber} from '../../util/helpers/formatNumber';
 import {Web3TxStatus} from '../../components/web3/types';
-import {truncateEthAddress} from '../../util/helpers/truncateEthAddress';
-// import {truncateSignature} from '../../util/helpers/truncateSignature';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 
 type RedeemManagerProps = {
   redeemables: Record<string, any>;
+  erc20Details?: ERC20RegisterDetails;
 };
 
-export default function RedeemManager({redeemables}: RedeemManagerProps) {
+type RedeemCardProps = {
+  redeemable: Record<string, any>;
+  erc20Details?: ERC20RegisterDetails;
+};
+
+export default function RedeemManager({
+  redeemables,
+  erc20Details,
+}: RedeemManagerProps) {
   /**
    *  RENDER
    */
@@ -28,20 +33,12 @@ export default function RedeemManager({redeemables}: RedeemManagerProps) {
   // show the redeem card, if only one coupon available
   return (
     <RenderWrapper>
-      <RedeemCard redeemable={redeemables[0]} />
+      <RedeemCard redeemable={redeemables[0]} erc20Details={erc20Details} />
     </RenderWrapper>
   );
 }
 
-function RedeemCard({redeemable}: Record<string, any>) {
-  /**
-   * Selectors
-   */
-
-  const ERC20ExtensionContract = useSelector(
-    (state: StoreState) => state.contracts?.ERC20ExtensionContract
-  );
-
+function RedeemCard({redeemable, erc20Details}: RedeemCardProps) {
   /**
    * Our hooks
    */
@@ -54,35 +51,6 @@ function RedeemCard({redeemable}: Record<string, any>) {
     txEtherscanURL,
     txIsPromptOpen,
   } = useRedeemCoupon();
-
-  /**
-   * State
-   */
-
-  const [unitType, setUnitType] = useState<string>('tokens');
-
-  /**
-   * Effects
-   */
-
-  useEffect(() => {
-    async function getUnitType() {
-      if (!ERC20ExtensionContract) return;
-
-      try {
-        const symbol = await ERC20ExtensionContract.instance.methods
-          .symbol()
-          .call();
-
-        setUnitType(symbol);
-      } catch (error) {
-        console.log(error);
-        setUnitType('tokens');
-      }
-    }
-
-    getUnitType();
-  }, [ERC20ExtensionContract]);
 
   /**
    * Variables
@@ -149,15 +117,14 @@ function RedeemCard({redeemable}: Record<string, any>) {
       className={`redeemcard redeemcard__content ${
         isDone ? 'fireworks' : ''
       } `}>
-      <p>{truncateEthAddress(toChecksumAddress(redeemable.recipient), 7)}</p>
-      {/* @note Commenting the signature out for now. It may not be useful (and potentially confusing) to the user who doesn't necessarily need to understand what it is. */}
-      {/* <p>{truncateSignature(redeemable.signature, 16)}</p> */}
       <p className="redeemcard__unit">
         {formatNumber(redeemable.amount)}
         <sup>
-          <small>{unitType}</small>
+          <small>{erc20Details?.symbol || 'tokens'}</small>
         </sup>
       </p>
+
+      <DaoToken erc20Details={erc20Details} />
 
       {isDone && (
         <p className="redeemcard__redeemed">
@@ -173,6 +140,7 @@ function RedeemCard({redeemable}: Record<string, any>) {
 
       <button
         className="button"
+        style={{marginTop: '1.5rem'}}
         onClick={async () => {
           await redeemCoupon(redeemable);
         }}
@@ -181,7 +149,7 @@ function RedeemCard({redeemable}: Record<string, any>) {
       </button>
 
       {/* SUBMIT STATUS */}
-      {isInProcessOrDone && (
+      {isInProcessOrDone && !redeemable.isRedeemd && (
         <div
           className="form__submit-status-container"
           style={{marginTop: '1rem'}}>

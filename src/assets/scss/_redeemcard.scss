@@ -46,7 +46,7 @@
   }
 
   @include size-down-down {
-    padding: 0.5rem;
+    padding: 1rem 0.5rem;
     width: 24rem;
     max-width: 100vw;
     box-sizing: border-box;
@@ -78,7 +78,7 @@
   }
 }
 
-.redeemcard__address {
+.redeemcard__address--error {
   background-color: rgba(214, 216, 218, 0.2);
   font-family: $font-mono;
   padding: 0.5rem;
