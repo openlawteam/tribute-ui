@@ -142,7 +142,7 @@ function RedeemCard({redeemable, erc20Details}: RedeemCardProps) {
         className="button"
         style={{marginTop: '1.5rem'}}
         onClick={async () => {
-          await redeemCoupon(redeemable);
+          await redeemCoupon(redeemable, erc20Details);
         }}
         disabled={isInProcessOrDone}>
         {isInProcess ? <Loader /> : isDone ? 'Redeemed!' : 'Redeem'}
