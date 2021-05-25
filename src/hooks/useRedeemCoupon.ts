@@ -10,6 +10,7 @@ import {
   useIsDefaultChain,
   useWeb3Modal,
 } from '../components/web3/hooks';
+import {ERC20RegisterDetails} from '../components/dao-token/DaoToken';
 
 export enum FetchStatus {
   STANDBY = 'STANDBY',
@@ -28,7 +29,10 @@ type RedeemCouponArguments = [
 
 type ReturnUseRedeemCoupon = {
   isInProcessOrDone: boolean;
-  redeemCoupon: ({redeemableCoupon}: Record<string, any>) => Promise<void>;
+  redeemCoupon: (
+    {redeemableCoupon}: Record<string, any>,
+    erc20Details?: ERC20RegisterDetails
+  ) => Promise<void>;
   submitStatus: FetchStatus;
   submitError: Error | undefined;
   txStatus: Web3TxStatus;
@@ -74,7 +78,10 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
    * Functions
    */
 
-  async function handleRedeemCoupon(redeemableCoupon: Record<string, any>) {
+  async function handleRedeemCoupon(
+    redeemableCoupon: Record<string, any>,
+    erc20Details?: ERC20RegisterDetails
+  ) {
     try {
       if (defaultChainError) {
         throw new Error('Wrong network connected.');
@@ -158,9 +165,28 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
       }
 
       setSubmitStatus(FetchStatus.FULFILLED);
+
+      // suggest adding DAO token to wallet
+      await addTokenToWallet(erc20Details);
     } catch (error) {
       setSubmitError(error);
       setSubmitStatus(FetchStatus.REJECTED);
+    }
+  }
+
+  async function addTokenToWallet(erc20Details?: ERC20RegisterDetails) {
+    if (!erc20Details) return;
+
+    try {
+      await window.ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: erc20Details,
+        },
+      });
+    } catch (error) {
+      console.log(error);
     }
   }
 
