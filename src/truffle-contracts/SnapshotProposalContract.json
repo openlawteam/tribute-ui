@@ -406,13 +406,13 @@
           {
             "components": [
               {
-                "internalType": "uint256",
+                "internalType": "uint32",
                 "name": "choice",
-                "type": "uint256"
+                "type": "uint32"
               },
               {
                 "internalType": "bytes32",
-                "name": "proposalHash",
+                "name": "proposalId",
                 "type": "bytes32"
               }
             ],
@@ -449,13 +449,13 @@
           {
             "components": [
               {
-                "internalType": "uint256",
+                "internalType": "uint32",
                 "name": "choice",
-                "type": "uint256"
+                "type": "uint32"
               },
               {
                 "internalType": "bytes32",
-                "name": "proposalHash",
+                "name": "proposalId",
                 "type": "bytes32"
               }
             ],
@@ -485,13 +485,13 @@
       {
         "components": [
           {
-            "internalType": "uint256",
+            "internalType": "uint32",
             "name": "choice",
-            "type": "uint256"
+            "type": "uint32"
           },
           {
             "internalType": "bytes32",
-            "name": "proposalHash",
+            "name": "proposalId",
             "type": "bytes32"
           }
         ],

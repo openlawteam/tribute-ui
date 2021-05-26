@@ -564,24 +564,29 @@
       {
         "components": [
           {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
+            "internalType": "uint32",
+            "name": "choice",
+            "type": "uint32"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint64",
+            "name": "index",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
             "name": "timestamp",
-            "type": "uint256"
+            "type": "uint64"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbNo",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbYes",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
             "internalType": "bytes",
@@ -589,23 +594,8 @@
             "type": "bytes"
           },
           {
-            "internalType": "bytes",
-            "name": "rootSig",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256",
-            "name": "index",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "choice",
-            "type": "uint256"
-          },
-          {
             "internalType": "bytes32",
-            "name": "proposalHash",
+            "name": "proposalId",
             "type": "bytes32"
           },
           {
@@ -645,24 +635,29 @@
       {
         "components": [
           {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
+            "internalType": "uint32",
+            "name": "choice",
+            "type": "uint32"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint64",
+            "name": "index",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
             "name": "timestamp",
-            "type": "uint256"
+            "type": "uint64"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbNo",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbYes",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
             "internalType": "bytes",
@@ -670,23 +665,8 @@
             "type": "bytes"
           },
           {
-            "internalType": "bytes",
-            "name": "rootSig",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256",
-            "name": "index",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "choice",
-            "type": "uint256"
-          },
-          {
             "internalType": "bytes32",
-            "name": "proposalHash",
+            "name": "proposalId",
             "type": "bytes32"
           },
           {
@@ -759,24 +739,29 @@
       {
         "components": [
           {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
+            "internalType": "uint32",
+            "name": "choice",
+            "type": "uint32"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint64",
+            "name": "index",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
             "name": "timestamp",
-            "type": "uint256"
+            "type": "uint64"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbNo",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbYes",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
             "internalType": "bytes",
@@ -784,23 +769,8 @@
             "type": "bytes"
           },
           {
-            "internalType": "bytes",
-            "name": "rootSig",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256",
-            "name": "index",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "choice",
-            "type": "uint256"
-          },
-          {
             "internalType": "bytes32",
-            "name": "proposalHash",
+            "name": "proposalId",
             "type": "bytes32"
           },
           {
@@ -812,6 +782,11 @@
         "internalType": "struct OffchainVotingContract.VoteResultNode",
         "name": "result",
         "type": "tuple"
+      },
+      {
+        "internalType": "bytes",
+        "name": "rootSig",
+        "type": "bytes"
       }
     ],
     "name": "submitVoteResult",
@@ -915,24 +890,29 @@
       {
         "components": [
           {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
+            "internalType": "uint32",
+            "name": "choice",
+            "type": "uint32"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint64",
+            "name": "index",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
             "name": "timestamp",
-            "type": "uint256"
+            "type": "uint64"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbNo",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbYes",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
             "internalType": "bytes",
@@ -940,23 +920,8 @@
             "type": "bytes"
           },
           {
-            "internalType": "bytes",
-            "name": "rootSig",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256",
-            "name": "index",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "choice",
-            "type": "uint256"
-          },
-          {
             "internalType": "bytes32",
-            "name": "proposalHash",
+            "name": "proposalId",
             "type": "bytes32"
           },
           {
@@ -990,24 +955,29 @@
       {
         "components": [
           {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
+            "internalType": "uint32",
+            "name": "choice",
+            "type": "uint32"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint64",
+            "name": "index",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
             "name": "timestamp",
-            "type": "uint256"
+            "type": "uint64"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbNo",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbYes",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
             "internalType": "bytes",
@@ -1015,23 +985,8 @@
             "type": "bytes"
           },
           {
-            "internalType": "bytes",
-            "name": "rootSig",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256",
-            "name": "index",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "choice",
-            "type": "uint256"
-          },
-          {
             "internalType": "bytes32",
-            "name": "proposalHash",
+            "name": "proposalId",
             "type": "bytes32"
           },
           {
@@ -1065,24 +1020,29 @@
       {
         "components": [
           {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
+            "internalType": "uint32",
+            "name": "choice",
+            "type": "uint32"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint64",
+            "name": "index",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
             "name": "timestamp",
-            "type": "uint256"
+            "type": "uint64"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbNo",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbYes",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
             "internalType": "bytes",
@@ -1090,23 +1050,8 @@
             "type": "bytes"
           },
           {
-            "internalType": "bytes",
-            "name": "rootSig",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256",
-            "name": "index",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "choice",
-            "type": "uint256"
-          },
-          {
             "internalType": "bytes32",
-            "name": "proposalHash",
+            "name": "proposalId",
             "type": "bytes32"
           },
           {
@@ -1122,24 +1067,29 @@
       {
         "components": [
           {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
+            "internalType": "uint32",
+            "name": "choice",
+            "type": "uint32"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint64",
+            "name": "index",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
             "name": "timestamp",
-            "type": "uint256"
+            "type": "uint64"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbNo",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint88",
             "name": "nbYes",
-            "type": "uint256"
+            "type": "uint88"
           },
           {
             "internalType": "bytes",
@@ -1147,23 +1097,8 @@
             "type": "bytes"
           },
           {
-            "internalType": "bytes",
-            "name": "rootSig",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256",
-            "name": "index",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "choice",
-            "type": "uint256"
-          },
-          {
             "internalType": "bytes32",
-            "name": "proposalHash",
+            "name": "proposalId",
             "type": "bytes32"
           },
           {
