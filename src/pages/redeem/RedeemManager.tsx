@@ -140,7 +140,7 @@ function RedeemCard({redeemable, erc20Details}: RedeemCardProps) {
 
       <button
         className="button"
-        style={{marginTop: '1.5rem'}}
+        style={{marginTop: isDone ? '1rem' : '1.5rem'}}
         onClick={async () => {
           await redeemCoupon(redeemable, erc20Details);
         }}
