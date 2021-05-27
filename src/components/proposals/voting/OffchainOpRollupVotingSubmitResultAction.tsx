@@ -157,7 +157,6 @@ export function OffchainOpRollupVotingSubmitResultAction(
               .getPriorAmount(
                 /**
                  * Must be the true member's address for calculating voting power.
-                 * This value is (or at least should be) derived from `OffchainVoting.memberAddressesByDelegatedKey`.
                  */
                 voteData.msg.payload.metadata.memberAddress,
                 UNITS_ADDRESS,
