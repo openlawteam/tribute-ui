@@ -228,6 +228,13 @@ export function useSignAndSubmitProposal<
         DEFAULT_CHAIN
       );
 
+      console.log({
+        types,
+        domain,
+        primaryType: PRIMARY_TYPE_ERC712,
+        message: erc712Message,
+      });
+
       const dataToSign = JSON.stringify({
         types,
         domain,

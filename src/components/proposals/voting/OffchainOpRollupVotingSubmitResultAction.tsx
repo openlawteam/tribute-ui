@@ -6,10 +6,12 @@ import {
   prepareVoteResult,
   signMessage,
   SnapshotVoteResponseData,
-  toStepNode,
   VoteChoicesIndex,
 } from '@openlaw/snapshot-js-erc712';
-import {VoteEntry} from '@openlaw/snapshot-js-erc712/dist/types';
+import {
+  ToStepNodeResult,
+  VoteEntry,
+} from '@openlaw/snapshot-js-erc712/dist/types';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {DEFAULT_CHAIN, UNITS_ADDRESS} from '../../../config';
@@ -35,17 +37,8 @@ type SubmitVoteResultArguments = [
   string, // `dao`
   string, // `proposalId`
   string, // `proposal data`,
-  {
-    account: string;
-    choice: VoteChoicesIndex;
-    index: number;
-    nbNo: string;
-    nbYes: string;
-    proof: string[];
-    proposalHash: string;
+  ToStepNodeResult & {
     rootSig: string;
-    sig: string;
-    timestamp: number;
   }
 ];
 
@@ -144,21 +137,22 @@ export function OffchainOpRollupVotingSubmitResultAction(
       const voteEntriesPromises: Promise<VoteEntry>[] =
         snapshotProposal.votes.map(async (v) => {
           const voteData: SnapshotVoteResponseData = Object.values(v)[0];
+          const memberAddress: string =
+            voteData.msg.payload.metadata.memberAddress;
 
           return createVote({
-            proposalHash,
-            account: voteData.address,
-            voteYes: voteData.msg.payload.choice === VoteChoicesIndex.Yes,
-            timestamp: Number(voteData.msg.timestamp),
+            memberAddress,
+            proposalId: proposalHash,
             sig: voteData.sig,
-            // @todo conditionally use subgraph weight data
+            timestamp: Number(voteData.msg.timestamp),
+            voteYes: voteData.msg.payload.choice === VoteChoicesIndex.Yes,
             // @todo Use multicall
             weight: await bankExtensionMethods
               .getPriorAmount(
                 /**
                  * Must be the true member's address for calculating voting power.
                  */
-                voteData.msg.payload.metadata.memberAddress,
+                memberAddress,
                 UNITS_ADDRESS,
                 snapshotProposal.msg.payload.snapshot
               )
@@ -167,7 +161,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         });
 
       // 2. Prepare vote Result
-      const {voteResultTree, votes} = await prepareVoteResult({
+      const {voteResultTree, result} = await prepareVoteResult({
         actionId: adapterAddress,
         chainId: DEFAULT_CHAIN,
         daoAddress: daoRegistryAddress,
@@ -176,22 +170,13 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
       const voteResultTreeHexRoot: string = voteResultTree.getHexRoot();
 
-      const result = toStepNode({
-        actionId: adapterAddress,
-        chainId: DEFAULT_CHAIN,
-        merkleTree: voteResultTree,
-        // @note Should use last entry
-        step: votes[votes.length - 1],
-        verifyingContract: daoRegistryAddress,
-      });
-
       const {domain, types} = getVoteResultRootDomainDefinition(
         daoRegistryAddress,
         adapterAddress,
         DEFAULT_CHAIN
       );
 
-      const messageParams = JSON.stringify({
+      const messageParams: string = JSON.stringify({
         domain,
         message: {root: voteResultTreeHexRoot},
         primaryType: PRIMARY_TYPE_ERC712,
@@ -199,7 +184,11 @@ export function OffchainOpRollupVotingSubmitResultAction(
       });
 
       // 3. Sign message
-      const signature = await signMessage(provider, account, messageParams);
+      const signature: string = await signMessage(
+        provider,
+        account,
+        messageParams
+      );
 
       // 4. Check if off-chain proof has already been submitted
       const snapshotOffchainProofExists: boolean =
@@ -217,7 +206,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         await submitOffchainVotingProof({
           actionId: adapterAddress,
           chainId: DEFAULT_CHAIN,
-          steps: votes,
+          steps: result,
           merkleRoot: voteResultTreeHexRoot,
           verifyingContract: daoRegistryAddress,
         });
@@ -225,26 +214,26 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
       setSignatureStatus(Web3TxStatus.FULFILLED);
 
-      const submitVoteResultArguments: SubmitVoteResultArguments = [
-        daoRegistryAddress,
-        proposalHash,
-        voteResultTreeHexRoot,
-        {...result, rootSig: signature},
-      ];
+      // const submitVoteResultArguments: SubmitVoteResultArguments = [
+      //   daoRegistryAddress,
+      //   proposalHash,
+      //   voteResultTreeHexRoot,
+      //   {...result, rootSig: signature},
+      // ];
 
-      const txArguments = {
-        from: account || '',
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
-      };
+      // const txArguments = {
+      //   from: account || '',
+      //   // Set a fast gas price
+      //   ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+      // };
 
-      // 6. Send the tx
-      await txSend(
-        'submitVoteResult',
-        votingAdapterMethods,
-        submitVoteResultArguments,
-        txArguments
-      );
+      // // 6. Send the tx
+      // await txSend(
+      //   'submitVoteResult',
+      //   votingAdapterMethods,
+      //   submitVoteResultArguments,
+      //   txArguments
+      // );
     } catch (error) {
       setSubmitError(error);
       setSignatureStatus(Web3TxStatus.REJECTED);

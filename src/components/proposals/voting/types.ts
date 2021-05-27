@@ -1,4 +1,4 @@
-import {VoteEntryLeaf} from '@openlaw/snapshot-js-erc712/dist/types';
+import {ToStepNodeResult} from '@openlaw/snapshot-js-erc712/dist/types';
 
 /**
  * @see `IVoting.sol` in tribute-contracts
@@ -18,5 +18,5 @@ export enum VotingState {
 export type SnapshotOffchainProofResponse = {
   merkle_root: string;
   space: string;
-  steps: VoteEntryLeaf[];
+  steps: ToStepNodeResult[];
 };
