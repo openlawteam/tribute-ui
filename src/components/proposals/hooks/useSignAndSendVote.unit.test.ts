@@ -86,7 +86,7 @@ describe('useSignAndSendVote unit tests', () => {
         data: {
           payload: {
             choice: 1,
-            proposalHash: 'abc123',
+            proposalId: 'abc123',
             metadata: {
               memberAddress: DEFAULT_ETH_ADDRESS,
             },
