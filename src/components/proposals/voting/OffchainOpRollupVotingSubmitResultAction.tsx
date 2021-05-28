@@ -5,7 +5,6 @@ import {
   getVoteResultRootDomainDefinition,
   prepareVoteResult,
   signMessage,
-  SnapshotVoteResponseData,
   VoteChoicesIndex,
 } from '@openlaw/snapshot-js-erc712';
 import {
@@ -15,7 +14,11 @@ import {
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {DEFAULT_CHAIN, UNITS_ADDRESS} from '../../../config';
-import {getAdapterAddressFromContracts} from '../../web3/helpers';
+import {
+  getAdapterAddressFromContracts,
+  multicall,
+  MulticallTuple,
+} from '../../web3/helpers';
 import {getOffchainVotingProof, submitOffchainVotingProof} from '../helpers';
 import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
 import {ProposalData} from '../types';
@@ -27,6 +30,7 @@ import ErrorMessageWithDetails from '../../common/ErrorMessageWithDetails';
 import EtherscanURL from '../../web3/EtherscanURL';
 import FadeIn from '../../common/FadeIn';
 import Loader from '../../feedback/Loader';
+import {normalizeString, numberRangeArray} from '../../../util/helpers';
 
 type OffchainVotingSubmitResultActionProps = {
   adapterName: ContractAdapterNames;
@@ -34,12 +38,11 @@ type OffchainVotingSubmitResultActionProps = {
 };
 
 type SubmitVoteResultArguments = [
-  string, // `dao`
-  string, // `proposalId`
-  string, // `proposal data`,
-  ToStepNodeResult & {
-    rootSig: string;
-  }
+  daoAddress: string,
+  proposalId: string,
+  resultRoot: string,
+  lastResult: ToStepNodeResult,
+  rootSig: string
 ];
 
 export function OffchainOpRollupVotingSubmitResultAction(
@@ -63,19 +66,31 @@ export function OffchainOpRollupVotingSubmitResultAction(
    * Selectors
    */
 
-  const bankExtensionMethods = useSelector(
-    (s: StoreState) => s.contracts.BankExtensionContract?.instance.methods
+  const bankExtensionAddress = useSelector(
+    (s: StoreState) => s.contracts.BankExtensionContract?.contractAddress
+  );
+  const getPriorAmountABI = useSelector((s: StoreState) =>
+    s.contracts.BankExtensionContract?.abi.find(
+      (ai) => ai.name === 'getPriorAmount'
+    )
   );
   const daoRegistryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
   );
+  const daoRegistryMethods = useSelector(
+    (s: StoreState) => s.contracts.DaoRegistryContract?.instance.methods
+  );
+  const getMemberAddressABI = useSelector(
+    (s: StoreState) => s.contracts.DaoRegistryContract?.abi
+  )?.find((ai) => ai.name === 'getMemberAddress');
+
   const contracts = useSelector((s: StoreState) => s.contracts);
 
   /**
    * Our hooks
    */
 
-  const {account, provider} = useWeb3Modal();
+  const {account, provider, web3Instance} = useWeb3Modal();
 
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
 
@@ -113,12 +128,24 @@ export function OffchainOpRollupVotingSubmitResultAction(
         throw new Error('No DAO Registry address was found.');
       }
 
+      if (!bankExtensionAddress) {
+        throw new Error('No Bank Extension address was found.');
+      }
+
+      if (!getMemberAddressABI) {
+        throw new Error('No ABI for `getMemberAddress` was found.');
+      }
+
+      if (!getPriorAmountABI) {
+        throw new Error('No ABI for `getPriorAmount` was found.');
+      }
+
       if (!snapshotProposal) {
         throw new Error('No Snapshot proposal was found.');
       }
 
       if (!snapshotProposal.votes) {
-        throw new Error('No Snapshot proposal votes were found.');
+        throw new Error('No Snapshot proposal votes Array was found.');
       }
 
       if (!votingAdapterMethods) {
@@ -133,39 +160,69 @@ export function OffchainOpRollupVotingSubmitResultAction(
         contracts
       );
 
-      // 1. Create vote entries
-      const voteEntriesPromises: Promise<VoteEntry>[] =
-        snapshotProposal.votes.map(async (v) => {
-          const voteData: SnapshotVoteResponseData = Object.values(v)[0];
-          const memberAddress: string =
-            voteData.msg.payload.metadata.memberAddress;
+      // Get total number of potential and admitted members in the DAO
+      const numberOfDAOMembers: string = await daoRegistryMethods
+        .getNbMembers()
+        .call();
 
-          return createVote({
-            memberAddress,
-            proposalId: proposalHash,
-            sig: voteData.sig,
-            timestamp: Number(voteData.msg.timestamp),
-            voteYes: voteData.msg.payload.choice === VoteChoicesIndex.Yes,
-            // @todo Use multicall
-            weight: await bankExtensionMethods
-              .getPriorAmount(
-                /**
-                 * Must be the true member's address for calculating voting power.
-                 */
-                memberAddress,
-                UNITS_ADDRESS,
-                snapshotProposal.msg.payload.snapshot
+      const getMemberAddressCalls: MulticallTuple[] = numberRangeArray(
+        Number(numberOfDAOMembers) - 1,
+        0
+      ).map(
+        (memberIndex): MulticallTuple => [
+          daoRegistryAddress,
+          getMemberAddressABI,
+          [memberIndex.toString()],
+        ]
+      );
+
+      const memberAddresses: string[] = await multicall({
+        calls: getMemberAddressCalls,
+        web3Instance,
+      });
+
+      const memberBalanceCalls: MulticallTuple[] = memberAddresses.map(
+        (m): MulticallTuple => [
+          bankExtensionAddress,
+          getPriorAmountABI,
+          [m, UNITS_ADDRESS, snapshotProposal.msg.payload.snapshot.toString()],
+        ]
+      );
+
+      const memberBalancesAtSnapshot: string[] = await multicall({
+        calls: memberBalanceCalls,
+        web3Instance,
+      });
+
+      // 1. Create vote entries
+      const votes: VoteEntry[] = memberAddresses.map((memberAddress, i) => {
+        const voteData = Object.values(
+          snapshotProposal.votes?.find(
+            (v) =>
+              normalizeString(memberAddress) ===
+              normalizeString(
+                Object.values(v)[0].msg.payload.metadata.memberAddress
               )
-              .call(),
-          });
+          ) || {}
+        )[0];
+
+        // Create votes based on whether `voteData` was found for `memberAddress`
+        return createVote({
+          memberAddress,
+          proposalId: proposalHash,
+          sig: voteData?.sig || '0x',
+          timestamp: voteData ? Number(voteData.msg.timestamp) : 0,
+          voteYes: voteData?.msg.payload.choice === VoteChoicesIndex.Yes,
+          weight: memberBalancesAtSnapshot[i],
         });
+      });
 
       // 2. Prepare vote Result
       const {voteResultTree, result} = await prepareVoteResult({
         actionId: adapterAddress,
         chainId: DEFAULT_CHAIN,
         daoAddress: daoRegistryAddress,
-        votes: await Promise.all(voteEntriesPromises),
+        votes,
       });
 
       const voteResultTreeHexRoot: string = voteResultTree.getHexRoot();
@@ -214,26 +271,27 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
       setSignatureStatus(Web3TxStatus.FULFILLED);
 
-      // const submitVoteResultArguments: SubmitVoteResultArguments = [
-      //   daoRegistryAddress,
-      //   proposalHash,
-      //   voteResultTreeHexRoot,
-      //   {...result, rootSig: signature},
-      // ];
+      const submitVoteResultArguments: SubmitVoteResultArguments = [
+        daoRegistryAddress,
+        proposalHash,
+        voteResultTreeHexRoot,
+        result[result.length - 1],
+        signature,
+      ];
 
-      // const txArguments = {
-      //   from: account || '',
-      //   // Set a fast gas price
-      //   ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
-      // };
+      const txArguments = {
+        from: account || '',
+        // Set a fast gas price
+        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+      };
 
-      // // 6. Send the tx
-      // await txSend(
-      //   'submitVoteResult',
-      //   votingAdapterMethods,
-      //   submitVoteResultArguments,
-      //   txArguments
-      // );
+      // 6. Send the tx
+      await txSend(
+        'submitVoteResult',
+        votingAdapterMethods,
+        submitVoteResultArguments,
+        txArguments
+      );
     } catch (error) {
       setSubmitError(error);
       setSignatureStatus(Web3TxStatus.REJECTED);
