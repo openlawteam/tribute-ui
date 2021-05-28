@@ -20,6 +20,7 @@ import {
   MulticallTuple,
 } from '../../web3/helpers';
 import {getOffchainVotingProof, submitOffchainVotingProof} from '../helpers';
+import {normalizeString, numberRangeArray} from '../../../util/helpers';
 import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
@@ -30,7 +31,6 @@ import ErrorMessageWithDetails from '../../common/ErrorMessageWithDetails';
 import EtherscanURL from '../../web3/EtherscanURL';
 import FadeIn from '../../common/FadeIn';
 import Loader from '../../feedback/Loader';
-import {normalizeString, numberRangeArray} from '../../../util/helpers';
 
 type OffchainVotingSubmitResultActionProps = {
   adapterName: ContractAdapterNames;

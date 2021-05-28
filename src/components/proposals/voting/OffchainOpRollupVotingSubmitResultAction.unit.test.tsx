@@ -37,7 +37,7 @@ const defaultProposalVotes: SnapshotProposalResponseData['votes'] = [
         type: SnapshotType.vote,
         payload: {
           choice: 1, // Yes
-          proposalHash:
+          proposalId:
             '0x1679cac3f54777f5d9c95efd83beff9f87ac55487311ecacd95827d267a15c4e',
           metadata: {
             memberAddress: DEFAULT_ETH_ADDRESS,
@@ -61,7 +61,7 @@ const defaultProposalVotes: SnapshotProposalResponseData['votes'] = [
         type: SnapshotType.vote,
         payload: {
           choice: 2, // No
-          proposalHash:
+          proposalId:
             '0x1679cac3f54777f5d9c95efd83beff9f87ac55487311ecacd95827d267a15c4e',
           metadata: {
             memberAddress: '0xc0437e11094275376defbe51dc6e04598403d276',
@@ -101,6 +101,64 @@ const proposalData: Partial<ProposalData> = {
       '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333',
   } as SnapshotProposal,
 };
+
+function mockInitialCallsHelper(
+  mockWeb3Provider: FakeHttpProvider,
+  web3Instance: Web3
+) {
+  // Mock RPC call for `getNbMembers`
+  mockWeb3Provider.injectResult(
+    web3Instance.eth.abi.encodeParameter('uint256', 4)
+  );
+
+  // Mock `multicall` for `getMemberAddress`
+  mockWeb3Provider.injectResult(
+    web3Instance.eth.abi.encodeParameters(
+      ['uint256', 'bytes[]'],
+      [
+        0,
+        [
+          // Let's pretend this is the DaoFactory
+          web3Instance.eth.abi.encodeParameter(
+            'address',
+            '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
+          ),
+          // Let's pretend this is the DAO deployer
+          web3Instance.eth.abi.encodeParameter(
+            'address',
+            '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+          ),
+          // Voters from `defaultProposalVotes`
+          web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
+          web3Instance.eth.abi.encodeParameter(
+            'address',
+            '0xc0437e11094275376defbe51dc6e04598403d276'
+          ),
+        ],
+      ]
+    )
+  );
+
+  // Mock `multicall` for `getPriorAmount`
+  mockWeb3Provider.injectResult(
+    web3Instance.eth.abi.encodeParameters(
+      ['uint256', 'bytes[]'],
+      [
+        0,
+        [
+          // For `getPriorAmount` calls
+          web3Instance.eth.abi.encodeParameter('uint256', '0'),
+          web3Instance.eth.abi.encodeParameter('uint256', '1'),
+          web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+          web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+        ],
+      ]
+    )
+  );
+
+  // Mock signature
+  mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+}
 
 describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
   test('should submit a vote result (off-chain proof was not submitted previously)', async () => {
@@ -170,14 +228,9 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
       ).toBeEnabled();
     });
 
-    // Setup: Mock RPC calls for `processProposal`
+    // Setup: Mock RPC calls
     await waitFor(() => {
-      // Mock signature
-      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
-
-      // Mock RPC calls for estimating gas before the tx
-      mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
-      mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
+      mockInitialCallsHelper(mockWeb3Provider, web3Instance);
     });
 
     userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
@@ -196,6 +249,9 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
 
     // Mock RPC calls for `submitVoteResult`
     await waitFor(() => {
+      // Mock RPC calls for estimating gas before the tx
+      mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
     });
@@ -262,14 +318,9 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
       ).toBeEnabled();
     });
 
-    // Setup: Mock RPC calls for `processProposal`
+    // Setup: Mock RPC calls
     await waitFor(() => {
-      // Mock signature
-      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
-
-      // Mock RPC calls for estimating gas before the tx
-      mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
-      mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
+      mockInitialCallsHelper(mockWeb3Provider, web3Instance);
     });
 
     userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
@@ -288,6 +339,9 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
 
     // Mock RPC calls for `submitVoteResult`
     await waitFor(() => {
+      // Mock RPC calls for estimating gas before the tx
+      mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
     });
@@ -354,10 +408,9 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
       ).toBeEnabled();
     });
 
-    // Setup: Mock RPC calls for `processProposal`
+    // Setup: Mock RPC calls for signature and set mock error
     await waitFor(() => {
-      // Mock signature
-      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+      mockInitialCallsHelper(mockWeb3Provider, web3Instance);
 
       // Mock RPC error for estimating gas before the tx
       mockWeb3Provider.injectError({code: 1234, message: 'Bad stuff!'});
@@ -434,10 +487,9 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
       ).toBeEnabled();
     });
 
-    // Setup: Mock RPC calls for `processProposal`
+    // Setup: Mock RPC calls
     await waitFor(() => {
-      // Mock signature
-      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+      mockInitialCallsHelper(mockWeb3Provider, web3Instance);
     });
 
     userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
@@ -526,10 +578,9 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
       ).toBeEnabled();
     });
 
-    // Setup: Mock RPC calls for `processProposal`
+    // Setup: Mock RPC calls
     await waitFor(() => {
-      // Mock signature
-      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+      mockInitialCallsHelper(mockWeb3Provider, web3Instance);
     });
 
     userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
