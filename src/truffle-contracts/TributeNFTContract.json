@@ -89,6 +89,29 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "memberAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "contract DaoRegistry",
+        "name": "dao",
+        "type": "address"
+      },
+      {
+        "internalType": "contract BankExtension",
+        "name": "bank",
+        "type": "address"
+      }
+    ],
+    "name": "potentialNewMember",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       },
