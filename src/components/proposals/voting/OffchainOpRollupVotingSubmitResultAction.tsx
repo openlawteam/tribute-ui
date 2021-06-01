@@ -155,6 +155,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
       setSignatureStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       const {idInDAO: proposalHash} = snapshotProposal;
+
       const adapterAddress = getAdapterAddressFromContracts(
         adapterName,
         contracts
@@ -176,6 +177,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         ]
       );
 
+      // Get all member addresses in the DAO based on the member count
       const memberAddresses: string[] = await multicall({
         calls: getMemberAddressCalls,
         web3Instance,
@@ -189,12 +191,13 @@ export function OffchainOpRollupVotingSubmitResultAction(
         ]
       );
 
+      // Get all member balances
       const memberBalancesAtSnapshot: string[] = await multicall({
         calls: memberBalanceCalls,
         web3Instance,
       });
 
-      // 1. Create vote entries
+      // Create vote entries
       const votes: VoteEntry[] = memberAddresses.map((memberAddress, i) => {
         const voteData = Object.values(
           snapshotProposal.votes?.find(
@@ -217,7 +220,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         });
       });
 
-      // 2. Prepare vote Result
+      // Prepare vote Result
       const {voteResultTree, result} = await prepareVoteResult({
         actionId: adapterAddress,
         chainId: DEFAULT_CHAIN,
@@ -240,20 +243,20 @@ export function OffchainOpRollupVotingSubmitResultAction(
         types,
       });
 
-      // 3. Sign message
+      // Sign root hex result message
       const signature: string = await signMessage(
         provider,
         account,
         messageParams
       );
 
-      // 4. Check if off-chain proof has already been submitted
+      // Check if off-chain proof has already been submitted
       const snapshotOffchainProofExists: boolean =
         ((await getOffchainVotingProof(voteResultTreeHexRoot))?.merkle_root
           .length || '') > 0;
 
       /**
-       * 5. Send off-chain vote proof silently to Snapshot Hub for storage and later use.
+       * Send off-chain vote proof silently to Snapshot Hub for storage and later use.
        *
        * We're piggy-backing off of the signature async call's status, instead of setting another status.
        * E.g. It may confuse the user if we were to display text saying we're "submitting
@@ -285,7 +288,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      // 6. Send the tx
+      // Send the tx
       await txSend(
         'submitVoteResult',
         votingAdapterMethods,
