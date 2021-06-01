@@ -13,7 +13,12 @@ import {
 } from '@openlaw/snapshot-js-erc712/dist/types';
 
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
-import {DEFAULT_CHAIN, UNITS_ADDRESS} from '../../../config';
+import {
+  DEFAULT_CHAIN,
+  MEMBER_COUNT_ADDRESS,
+  TOTAL_ADDRESS,
+  UNITS_ADDRESS,
+} from '../../../config';
 import {
   getAdapterAddressFromContracts,
   multicall,
@@ -69,6 +74,9 @@ export function OffchainOpRollupVotingSubmitResultAction(
   const bankExtensionAddress = useSelector(
     (s: StoreState) => s.contracts.BankExtensionContract?.contractAddress
   );
+  const bankExtensionMethods = useSelector(
+    (s: StoreState) => s.contracts.BankExtensionContract?.instance.methods
+  );
   const getPriorAmountABI = useSelector((s: StoreState) =>
     s.contracts.BankExtensionContract?.abi.find(
       (ai) => ai.name === 'getPriorAmount'
@@ -76,9 +84,6 @@ export function OffchainOpRollupVotingSubmitResultAction(
   );
   const daoRegistryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
-  );
-  const daoRegistryMethods = useSelector(
-    (s: StoreState) => s.contracts.DaoRegistryContract?.instance.methods
   );
   const getMemberAddressABI = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.abi
@@ -156,18 +161,20 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
       const {idInDAO: proposalHash} = snapshotProposal;
 
+      const snapshot: string = snapshotProposal.msg.payload.snapshot.toString();
+
       const adapterAddress = getAdapterAddressFromContracts(
         adapterName,
         contracts
       );
 
-      // Get total number of potential and admitted members in the DAO
-      const numberOfDAOMembers: string = await daoRegistryMethods
-        .getNbMembers()
+      // Get total number of potential and admitted members in the DAO at the snapshot
+      const numberOfDAOMembersAtSnapshot: string = await bankExtensionMethods
+        .getPriorAmount(TOTAL_ADDRESS, MEMBER_COUNT_ADDRESS, snapshot)
         .call();
 
       const getMemberAddressCalls: MulticallTuple[] = numberRangeArray(
-        Number(numberOfDAOMembers) - 1,
+        Number(numberOfDAOMembersAtSnapshot) - 1,
         0
       ).map(
         (memberIndex): MulticallTuple => [
@@ -187,7 +194,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         (m): MulticallTuple => [
           bankExtensionAddress,
           getPriorAmountABI,
-          [m, UNITS_ADDRESS, snapshotProposal.msg.payload.snapshot.toString()],
+          [m, UNITS_ADDRESS, snapshot],
         ]
       );
 
