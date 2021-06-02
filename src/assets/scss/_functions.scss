@@ -1,3 +1,5 @@
+@use "sass:math";
+
 /**
  * Translate pixel values to em's
  * 
@@ -13,7 +15,7 @@
     $context: $context * 1px;
   }
 
-  @return $pixels / $context * 1em;
+  @return math.div($pixels, $context) * 1em;
 }
 
 /**
@@ -31,11 +33,11 @@
     $context: $context * 1px;
   }
 
-  @return $pixels / $context * 1rem;
+  @return math.div($pixels, $context) * 1rem;
 }
 
 @function strip-unit($value) {
-  @return $value / ($value * 0 + 1);
+  @return math.div($value, $value * 0 + 1);
 }
 
 /**
