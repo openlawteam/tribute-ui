@@ -438,11 +438,6 @@
       },
       {
         "internalType": "uint256",
-        "name": "index",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
         "name": "startingTime",
         "type": "uint256"
       },
