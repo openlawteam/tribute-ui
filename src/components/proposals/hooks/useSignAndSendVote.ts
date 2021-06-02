@@ -33,7 +33,7 @@ type UseSignAndSendVoteReturn = {
     partialVoteData: SignAndSendVoteDataParam;
     // e.g. Governance does not have an adpater name
     adapterName?: ContractAdapterNames;
-    proposalIdInDAO: SnapshotVoteData['payload']['proposalHash'];
+    proposalIdInDAO: SnapshotVoteData['payload']['proposalId'];
     proposalIdInSnapshot: string;
   }) => Promise<SignAndSendVoteReturn>;
   voteData: SignAndSendVoteReturn | undefined;
@@ -118,7 +118,7 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
      * We need to make sure this matches what has been submitted to
      * the DAO for later signature verifications.
      */
-    proposalIdInDAO: SnapshotVoteData['payload']['proposalHash'];
+    proposalIdInDAO: SnapshotVoteData['payload']['proposalId'];
     /**
      * Must match a `proposal` type's ID in Snapshot so a `vote` may be attached.
      */
@@ -174,7 +174,7 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
       };
 
       const voteProposalData: SnapshotVoteProposal = {
-        proposalHash: proposalIdInDAO,
+        proposalId: proposalIdInDAO,
         space: SPACE,
         token: snapshotSpace.token,
       };
@@ -189,7 +189,7 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
       const erc712Message = prepareVoteMessage({
         timestamp: message.timestamp,
         payload: {
-          proposalHash: message.payload.proposalHash,
+          proposalId: message.payload.proposalId,
           choice: VoteChoicesIndex[choice],
         },
       });
@@ -222,8 +222,7 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
         account,
         {
           ...message,
-          // @note We pass the proposal's hash (ID) so we can vote on it.
-          payload: {...message.payload, proposalHash: proposalIdInSnapshot},
+          payload: {...message.payload, proposalId: proposalIdInSnapshot},
         },
         signature,
         {

@@ -1,5 +1,5 @@
 import {SNAPSHOT_HUB_API_URL, SPACE} from '../../../config';
-import {VoteEntryLeaf} from '@openlaw/snapshot-js-erc712/dist/types';
+import {ToStepNodeResult} from '@openlaw/snapshot-js-erc712/dist/types';
 
 type SubmitOffchainVotingProofArguments = {
   /**
@@ -17,7 +17,7 @@ type SubmitOffchainVotingProofArguments = {
   /**
    * An array of Merkle tree steps
    */
-  steps: VoteEntryLeaf[];
+  steps: ToStepNodeResult[];
   /**
    * DAO Registry address
    */
