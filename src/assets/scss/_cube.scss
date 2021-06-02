@@ -1,8 +1,10 @@
+@use "sass:math";
+
 @use "./mixins" as *; /* load without namespace for convenience */
 
 $cubeHeight: 298px;
 $cubeWidth: 262px;
-$faceSize: $cubeWidth / 2;
+$faceSize: math.div($cubeWidth, 2);
 
 %cube-background {
   content: "";
@@ -23,8 +25,8 @@ $faceSize: $cubeWidth / 2;
   width: $cubeWidth;
 
   @include size-medium-down {
-    height: $cubeHeight / 2;
-    width: $cubeWidth / 2;
+    height: math.div($cubeHeight, 2);
+    width: math.div($cubeWidth, 2);
   }
 }
 
@@ -36,8 +38,8 @@ $faceSize: $cubeWidth / 2;
   width: $faceSize;
 
   @include size-medium-down {
-    height: $faceSize / 2;
-    width: $faceSize / 2;
+    height: math.div($faceSize, 2);
+    width: math.div($faceSize, 2);
   }
 
   &::before {
@@ -59,8 +61,8 @@ $faceSize: $cubeWidth / 2;
   top: $top;
 
   @include size-medium-down {
-    left: $left / 2;
-    top: $top / 2;
+    left: math.div($left, 2);
+    top: math.div($top, 2);
   }
 }
 
@@ -82,9 +84,9 @@ $faceSize: $cubeWidth / 2;
   height: $height;
 
   @include size-medium-down {
-    top: $top / 2;
-    width: $width / 2;
-    height: $height / 2;
+    top: math.div($top, 2);
+    width: math.div($width, 2);
+    height: math.div($height, 2);
   }
 }
 
@@ -106,9 +108,9 @@ $faceSize: $cubeWidth / 2;
   height: $height;
 
   @include size-medium-down {
-    left: $left / 2;
-    top: $top / 2;
-    width: $width / 2;
-    height: $height / 2;
+    left: math.div($left, 2);
+    top: math.div($top, 2);
+    width: math.div($width, 2);
+    height: math.div($height, 2);
   }
 }
