@@ -218,7 +218,6 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
         // Create votes based on whether `voteData` was found for `memberAddress`
         return createVote({
-          memberAddress,
           proposalId: proposalHash,
           sig: voteData?.sig || '0x',
           timestamp: voteData ? Number(voteData.msg.timestamp) : 0,

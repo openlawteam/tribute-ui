@@ -112,7 +112,6 @@ export const snapshotAPIOffchainProofResponse: SnapshotOffchainProofResponse = {
     {
       choice: 2,
       index: 0,
-      member: '0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1',
       nbNo: '1',
       nbYes: '0',
       proof: [],
