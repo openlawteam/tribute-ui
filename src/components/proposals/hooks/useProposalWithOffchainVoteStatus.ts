@@ -9,6 +9,7 @@ import {
   OffchainVotingAdapterVotes,
 } from '../types';
 import {BURN_ADDRESS} from '../../../util/constants';
+import {ENVIRONMENT} from '../../../config';
 import {multicall, MulticallTuple} from '../../web3/helpers';
 import {normalizeString} from '../../../util/helpers';
 import {proposalHasFlag} from '../helpers';
@@ -16,7 +17,6 @@ import {StoreState} from '../../../store/types';
 import {useVotingTimeStartEnd} from '.';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VotingState} from '../voting/types';
-import {ENVIRONMENT} from '../../../config';
 
 // @todo Logic to fall back to on-chain polling this if subgraph is not available
 
