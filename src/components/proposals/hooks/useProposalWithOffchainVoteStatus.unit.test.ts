@@ -1050,6 +1050,13 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
 
   // @note This test uses adjusted timeouts
   test('should poll for data when proposal is not yet processed', async () => {
+    // Use cached options to prevent any re-renders
+    const useProposalWithOffchainVoteStatusOptions: Parameters<
+      typeof useProposalWithOffchainVoteStatus
+    >[1] = {
+      pollInterval: 2000,
+    };
+
     const proposalData: Partial<ProposalData> = {
       daoProposalVotingAdapter: {
         votingAdapterAddress: DEFAULT_ETH_ADDRESS,
@@ -1078,9 +1085,10 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       const {result, waitForValueToChange} = await renderHook(
         // Set the `pollInterval` to be a bit quicker
         () =>
-          useProposalWithOffchainVoteStatus(proposalData as ProposalData, {
-            pollInterval: 2000,
-          }),
+          useProposalWithOffchainVoteStatus(
+            proposalData as ProposalData,
+            useProposalWithOffchainVoteStatusOptions
+          ),
         {
           wrapper: Wrapper,
           initialProps: {
@@ -1205,6 +1213,13 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
 
   // @note This test uses adjusted timeouts
   test('should stop polling for data when proposal processed', async () => {
+    // Use cached options to prevent any re-renders
+    const useProposalWithOffchainVoteStatusOptions: Parameters<
+      typeof useProposalWithOffchainVoteStatus
+    >[1] = {
+      pollInterval: 2000,
+    };
+
     const proposalData: Partial<ProposalData> = {
       daoProposalVotingAdapter: {
         votingAdapterAddress: DEFAULT_ETH_ADDRESS,
@@ -1232,9 +1247,10 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
     const {result} = renderHook(
       // Set the `pollInterval` to be a bit quicker
       () =>
-        useProposalWithOffchainVoteStatus(proposalData as ProposalData, {
-          pollInterval: 2000,
-        }),
+        useProposalWithOffchainVoteStatus(
+          proposalData as ProposalData,
+          useProposalWithOffchainVoteStatusOptions
+        ),
       {
         wrapper: Wrapper,
         initialProps: {
@@ -1303,6 +1319,13 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
   }, 6000);
 
   test('should return error when async call throws on initial fetch', async () => {
+    // Use cached options to prevent any re-renders
+    const useProposalWithOffchainVoteStatusOptions: Parameters<
+      typeof useProposalWithOffchainVoteStatus
+    >[1] = {
+      pollInterval: 2000,
+    };
+
     const proposalData: Partial<ProposalData> = {
       daoProposalVotingAdapter: undefined,
       snapshotDraft: fakeSnapshotDraft,
@@ -1314,9 +1337,10 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
     const {result, waitForValueToChange} = renderHook(
       // Set the `pollInterval` to be a bit quicker
       () =>
-        useProposalWithOffchainVoteStatus(proposalData as ProposalData, {
-          pollInterval: 1000,
-        }),
+        useProposalWithOffchainVoteStatus(
+          proposalData as ProposalData,
+          useProposalWithOffchainVoteStatusOptions
+        ),
       {
         wrapper: Wrapper,
         initialProps: {
@@ -1378,6 +1402,13 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
 
   // @note This test uses adjusted timeouts
   test('should return error when async call throws during polling', async () => {
+    // Use cached options to prevent any re-renders
+    const useProposalWithOffchainVoteStatusOptions: Parameters<
+      typeof useProposalWithOffchainVoteStatus
+    >[1] = {
+      pollInterval: 2000,
+    };
+
     const proposalData: Partial<ProposalData> = {
       daoProposalVotingAdapter: {
         votingAdapterAddress: DEFAULT_ETH_ADDRESS,
@@ -1406,9 +1437,10 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       const {result, waitForValueToChange} = await renderHook(
         // Set the `pollInterval` to be a bit quicker
         () =>
-          useProposalWithOffchainVoteStatus(proposalData as ProposalData, {
-            pollInterval: 2000,
-          }),
+          useProposalWithOffchainVoteStatus(
+            proposalData as ProposalData,
+            useProposalWithOffchainVoteStatusOptions
+          ),
         {
           wrapper: Wrapper,
           initialProps: {
