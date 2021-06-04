@@ -1,9 +1,10 @@
 import {useState, useRef, useEffect, useCallback} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {CycleEllipsis} from '../feedback';
 import {ProposalData, SnapshotProposal} from './types';
-import {StoreState} from '../../store/types';
+import {getConnectedMember} from '../../store/actions';
+import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
@@ -71,8 +72,8 @@ export default function ProcessActionMembership(
   const OnboardingContract = useSelector(
     (state: StoreState) => state.contracts?.OnboardingContract
   );
-  const daoRegistryAddress = useSelector(
-    (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
+  const daoRegistryContract = useSelector(
+    (s: StoreState) => s.contracts.DaoRegistryContract
   );
   const ERC20ExtensionContract = useSelector(
     (state: StoreState) => state.contracts?.ERC20ExtensionContract
@@ -88,7 +89,7 @@ export default function ProcessActionMembership(
    * Our hooks
    */
 
-  const {account} = useWeb3Modal();
+  const {account, web3Instance} = useWeb3Modal();
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
   const {
     isDisabled,
@@ -97,6 +98,12 @@ export default function ProcessActionMembership(
     setOtherDisabledReasons,
   } = useMemberActionDisabled(useMemberActionDisabledProps);
   const gasPrices = useETHGasPrice();
+
+  /**
+   * Their hooks
+   */
+
+  const dispatch = useDispatch<ReduxDispatch>();
 
   /**
    * Variables
@@ -115,7 +122,7 @@ export default function ProcessActionMembership(
 
   const getMembershipProposalAmountCached = useCallback(
     getMembershipProposalAmount,
-    [OnboardingContract, daoRegistryAddress, snapshotProposal]
+    [OnboardingContract, daoRegistryContract?.contractAddress, snapshotProposal]
   );
   const getERC20DetailsCached = useCallback(getERC20Details, [
     ERC20ExtensionContract,
@@ -184,7 +191,10 @@ export default function ProcessActionMembership(
       if (!snapshotProposal || !OnboardingContract) return;
 
       const proposalDetails = await OnboardingContract.instance.methods
-        .proposals(daoRegistryAddress, snapshotProposal.idInDAO)
+        .proposals(
+          daoRegistryContract?.contractAddress,
+          snapshotProposal.idInDAO
+        )
         .call();
 
       setMembershipProposalAmount(proposalDetails.amount);
@@ -196,8 +206,8 @@ export default function ProcessActionMembership(
 
   async function handleSubmit() {
     try {
-      if (!daoRegistryAddress) {
-        throw new Error('No DAO Registry address was found.');
+      if (!daoRegistryContract) {
+        throw new Error('No DAO Registry contract was found.');
       }
 
       if (!snapshotProposal) {
@@ -208,8 +218,12 @@ export default function ProcessActionMembership(
         throw new Error('No OnboardingContract found.');
       }
 
+      if (!account) {
+        throw new Error('No account found.');
+      }
+
       const processArguments: ProcessArguments = [
-        daoRegistryAddress,
+        daoRegistryContract.contractAddress,
         snapshotProposal.idInDAO,
       ];
 
@@ -220,14 +234,22 @@ export default function ProcessActionMembership(
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      await txSend(
+      const tx = await txSend(
         'processProposal',
         OnboardingContract.instance.methods,
         processArguments,
         txArguments
       );
 
-      await addTokenToWallet();
+      if (tx) {
+        // suggest adding DAO token to wallet
+        await addTokenToWallet();
+
+        // re-fetch member
+        await dispatch(
+          getConnectedMember({account, daoRegistryContract, web3Instance})
+        );
+      }
     } catch (error) {
       setSubmitError(error);
     }

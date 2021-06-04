@@ -162,17 +162,17 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
             'Content-Type': 'application/json',
           },
         });
+
+        setSubmitStatus(FetchStatus.FULFILLED);
+
+        // suggest adding DAO token to wallet
+        await addTokenToWallet(erc20Details);
+
+        // re-fetch member
+        await dispatch(
+          getConnectedMember({account, daoRegistryContract, web3Instance})
+        );
       }
-
-      setSubmitStatus(FetchStatus.FULFILLED);
-
-      // suggest adding DAO token to wallet
-      await addTokenToWallet(erc20Details);
-
-      // re-fetch member
-      await dispatch(
-        getConnectedMember({account, daoRegistryContract, web3Instance})
-      );
     } catch (error) {
       setSubmitError(error);
       setSubmitStatus(FetchStatus.REJECTED);

@@ -1,10 +1,11 @@
 import {useState} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {CycleEllipsis} from '../feedback';
 import {getContractByAddress} from '../web3/helpers';
 import {ProposalData} from './types';
-import {StoreState} from '../../store/types';
+import {getConnectedMember} from '../../store/actions';
+import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
@@ -53,22 +54,25 @@ export default function ProcessAction(props: ProcessActionProps) {
    */
 
   const contracts = useSelector((s: StoreState) => s.contracts);
-  const daoRegistryAddress = useSelector(
-    (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
+  const daoRegistryContract = useSelector(
+    (s: StoreState) => s.contracts.DaoRegistryContract
   );
 
   /**
    * Our hooks
    */
 
-  const {account} = useWeb3Modal();
-
+  const {account, web3Instance} = useWeb3Modal();
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
-
   const {isDisabled, openWhyDisabledModal, WhyDisabledModal} =
     useMemberActionDisabled(useMemberActionDisabledProps);
-
   const gasPrices = useETHGasPrice();
+
+  /**
+   * Their hooks
+   */
+
+  const dispatch = useDispatch<ReduxDispatch>();
 
   /**
    * Variables
@@ -88,12 +92,16 @@ export default function ProcessAction(props: ProcessActionProps) {
 
   async function handleSubmit() {
     try {
-      if (!daoRegistryAddress) {
-        throw new Error('No DAO Registry address was found.');
+      if (!daoRegistryContract) {
+        throw new Error('No DAO Registry contract was found.');
       }
 
       if (!snapshotProposal) {
         throw new Error('No Snapshot proposal was found.');
+      }
+
+      if (!account) {
+        throw new Error('No account found.');
       }
 
       const contract = getContractByAddress(
@@ -102,7 +110,7 @@ export default function ProcessAction(props: ProcessActionProps) {
       );
 
       const processArguments: ProcessArguments = [
-        daoRegistryAddress,
+        daoRegistryContract.contractAddress,
         snapshotProposal.idInDAO,
       ];
 
@@ -112,12 +120,19 @@ export default function ProcessAction(props: ProcessActionProps) {
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      await txSend(
+      const tx = await txSend(
         'processProposal',
         contract.instance.methods,
         processArguments,
         txArguments
       );
+
+      if (tx) {
+        // re-fetch member
+        await dispatch(
+          getConnectedMember({account, daoRegistryContract, web3Instance})
+        );
+      }
     } catch (error) {
       setSubmitError(error);
     }
