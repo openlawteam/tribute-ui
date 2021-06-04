@@ -18,7 +18,8 @@ import {ENVIRONMENT, INFURA_PROJECT_ID, GRAPH_API_URL} from './config';
 import {handleSubgraphError} from './gql';
 import {store} from './store';
 import App from './App';
-import Init, {InitError} from './Init';
+import Init from './Init';
+import InitError from './InitError';
 import reportWebVitals from './reportWebVitals';
 import Web3ModalManager from './components/web3/Web3ModalManager';
 
@@ -118,7 +119,7 @@ if (root !== null) {
             <Init
               render={({error, isInitComplete}) =>
                 error ? (
-                  <InitError error={error} />
+                  <App renderMainContent={() => <InitError error={error} />} />
                 ) : isInitComplete ? (
                   <App />
                 ) : null

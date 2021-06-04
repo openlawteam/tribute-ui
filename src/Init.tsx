@@ -9,10 +9,6 @@ import {SNAPSHOT_HUB_API_URL} from './config';
 import {useInitContracts} from './components/web3/hooks';
 import {useIsMounted} from './hooks';
 import {useWeb3Modal} from './components/web3/hooks';
-import ErrorMessageWithDetails from './components/common/ErrorMessageWithDetails';
-import FadeIn from './components/common/FadeIn';
-import Header from './components/Header';
-import Wrap from './components/common/Wrap';
 
 type InitPropsRenderProps = {
   error: Error | undefined;
@@ -21,10 +17,6 @@ type InitPropsRenderProps = {
 
 type InitProps = {
   render: (p: InitPropsRenderProps) => React.ReactElement | null;
-};
-
-type InitErrorProps = {
-  error: Error;
 };
 
 /**
@@ -182,55 +174,4 @@ export default function Init(props: InitProps) {
 
   // Render children
   return render({error, isInitComplete});
-}
-
-/**
- * InitError
- *
- * An error component that is meant to be used if the <Init /> component
- * could not complete any of its processes to provide the app with vital data.
- *
- * @param {InitErrorProps} props
- */
-export function InitError(props: InitErrorProps) {
-  const {error} = props;
-
-  return (
-    <>
-      <Header />
-
-      <Wrap className="section-wrapper">
-        <main>
-          <FadeIn>
-            <div
-              style={{
-                padding: '2em 1em 1em',
-                textAlign: 'center',
-              }}>
-              <h1 style={{fontSize: '2rem'}}>
-                <span
-                  className="pulse"
-                  role="img"
-                  aria-label="Emoji with eyes crossed out."
-                  style={{display: 'inline-block'}}>
-                  😵
-                </span>{' '}
-                Oops, something went wrong.
-              </h1>
-            </div>
-
-            <div
-              style={{
-                textAlign: 'center',
-                maxWidth: 600,
-                display: 'block',
-                margin: '0 auto',
-              }}>
-              <ErrorMessageWithDetails error={error} renderText="" />
-            </div>
-          </FadeIn>
-        </main>
-      </Wrap>
-    </>
-  );
 }

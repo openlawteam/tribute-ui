@@ -5,7 +5,7 @@ import App from './App';
 import Wrapper from './test/Wrapper';
 
 describe('App unit tests', () => {
-  test('can render index page', async () => {
+  test.only('can render index page', async () => {
     render(
       <Wrapper useInit>
         <App />
@@ -15,6 +15,8 @@ describe('App unit tests', () => {
     await waitFor(() => {
       // Header
       expect(screen.getByTestId(/header/)).toBeInTheDocument();
+      // Navigation
+      expect(screen.getByRole('navigation')).toBeInTheDocument();
       // Logo
       expect(screen.getByText(/TRIBUTE/)).toBeInTheDocument();
       // Subtitle
@@ -25,6 +27,23 @@ describe('App unit tests', () => {
       expect(screen.getByTestId('cube')).toBeInTheDocument();
       // Join button
       expect(screen.getByRole('button', {name: /join/i})).toBeInTheDocument();
+    });
+  });
+
+  test.only('can render `renderMainContent`', async () => {
+    const mainContentToRender = () => <p>So cool!</p>;
+
+    render(
+      <Wrapper useInit>
+        <App renderMainContent={mainContentToRender} />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      // Logo
+      expect(screen.getByRole('navigation')).toBeInTheDocument();
+      // Main content
+      expect(screen.getByText(/so cool!/i)).toBeInTheDocument();
     });
   });
 

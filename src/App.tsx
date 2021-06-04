@@ -3,7 +3,22 @@ import Header from './components/Header';
 import Head from './Head';
 import Routes from './Routes';
 
-export default function App() {
+type AppProps = {
+  /**
+   * Optionally provide a component to render for the main content.
+   */
+  renderMainContent?: () => React.ReactNode;
+};
+
+export default function App(props?: AppProps) {
+  const {renderMainContent} = props || {};
+
+  const mainContent: React.ReactNode = renderMainContent ? (
+    renderMainContent()
+  ) : (
+    <Routes />
+  );
+
   return (
     <>
       {/* HEAD (react-helmet) */}
@@ -12,9 +27,7 @@ export default function App() {
       {/* HEADER */}
       <Header />
 
-      <main>
-        <Routes />
-      </main>
+      <main>{mainContent}</main>
 
       {/* FOOTER */}
       <Footer />
