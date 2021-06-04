@@ -1,9 +1,10 @@
 import React, {useEffect, useState, useRef} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {CycleEllipsis} from '../feedback';
 import {ProposalData, DistributionStatus} from './types';
-import {StoreState} from '../../store/types';
+import {getConnectedMember} from '../../store/actions';
+import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
@@ -63,7 +64,7 @@ export default function PostProcessActionTransfer(
    * Our hooks
    */
 
-  const {account} = useWeb3Modal();
+  const {account, web3Instance} = useWeb3Modal();
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
   const {
     isDisabled,
@@ -72,6 +73,12 @@ export default function PostProcessActionTransfer(
     setOtherDisabledReasons,
   } = useMemberActionDisabled();
   const gasPrices = useETHGasPrice();
+
+  /**
+   * Their hooks
+   */
+
+  const dispatch = useDispatch<ReduxDispatch>();
 
   /**
    * Variables
@@ -153,6 +160,10 @@ export default function PostProcessActionTransfer(
         throw new Error('No DistributeContract found.');
       }
 
+      if (!account) {
+        throw new Error('No account found.');
+      }
+
       let toIndexArg = '0';
       const isTypeAllMembers =
         snapshotProposal?.msg.payload.metadata.isTypeAllMembers;
@@ -178,12 +189,19 @@ export default function PostProcessActionTransfer(
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      await txSend(
+      const tx = await txSend(
         'distribute',
         DistributeContract.instance.methods,
         distributeArguments,
         txArguments
       );
+
+      if (tx) {
+        // re-fetch member
+        await dispatch(
+          getConnectedMember({account, daoRegistryContract, web3Instance})
+        );
+      }
     } catch (error) {
       setSubmitError(error);
     }

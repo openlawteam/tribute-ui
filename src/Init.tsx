@@ -1,11 +1,11 @@
 import React, {useCallback, useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {getApiStatus as getSnapshotAPIStatus} from '@openlaw/snapshot-js-erc712';
 
 import {AsyncStatus} from './util/types';
 import {getConnectedMember} from './store/actions';
 import {ReduxDispatch, StoreState} from './store/types';
 import {SNAPSHOT_HUB_API_URL} from './config';
-import {useDispatch, useSelector} from 'react-redux';
 import {useInitContracts} from './components/web3/hooks';
 import {useIsMounted} from './hooks';
 import {useWeb3Modal} from './components/web3/hooks';

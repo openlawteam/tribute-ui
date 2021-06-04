@@ -1,10 +1,11 @@
 import {useState, useRef, useEffect, useCallback} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {toBN, AbiItem} from 'web3-utils';
 
 import {CycleEllipsis} from '../feedback';
 import {ProposalData, SnapshotProposal} from './types';
-import {StoreState} from '../../store/types';
+import {getConnectedMember} from '../../store/actions';
+import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
@@ -80,8 +81,8 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
   const TributeContract = useSelector(
     (state: StoreState) => state.contracts?.TributeContract
   );
-  const daoRegistryAddress = useSelector(
-    (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
+  const daoRegistryContract = useSelector(
+    (s: StoreState) => s.contracts.DaoRegistryContract
   );
   const ERC20ExtensionContract = useSelector(
     (state: StoreState) => state.contracts?.ERC20ExtensionContract
@@ -114,6 +115,12 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
   const gasPrices = useETHGasPrice();
 
   /**
+   * Their hooks
+   */
+
+  const dispatch = useDispatch<ReduxDispatch>();
+
+  /**
    * Variables
    */
 
@@ -133,7 +140,7 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
   const getTributeProposalDetailsCached = useCallback(
     getTributeProposalDetails,
-    [TributeContract, daoRegistryAddress, snapshotProposal]
+    [TributeContract, daoRegistryContract?.contractAddress, snapshotProposal]
   );
   const getERC20DetailsCached = useCallback(getERC20Details, [
     ERC20ExtensionContract,
@@ -202,7 +209,10 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
       if (!snapshotProposal || !TributeContract) return;
 
       const proposalDetails = await TributeContract.instance.methods
-        .proposals(daoRegistryAddress, snapshotProposal.idInDAO)
+        .proposals(
+          daoRegistryContract?.contractAddress,
+          snapshotProposal.idInDAO
+        )
         .call();
       const {token: tokenAddress, tributeAmount} = proposalDetails;
 
@@ -280,8 +290,8 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
   async function handleSubmit() {
     try {
-      if (!daoRegistryAddress) {
-        throw new Error('No DAO Registry address was found.');
+      if (!daoRegistryContract) {
+        throw new Error('No DAO Registry contract was found.');
       }
 
       if (!snapshotProposal) {
@@ -292,10 +302,14 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
         throw new Error('No TributeContract found.');
       }
 
+      if (!account) {
+        throw new Error('No account found.');
+      }
+
       await handleSubmitTokenApprove();
 
       const processArguments: ProcessArguments = [
-        daoRegistryAddress,
+        daoRegistryContract.contractAddress,
         snapshotProposal.idInDAO,
       ];
 
@@ -305,14 +319,22 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
         ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
       };
 
-      await txSend(
+      const tx = await txSend(
         'processProposal',
         TributeContract.instance.methods,
         processArguments,
         txArguments
       );
 
-      await addTokenToWallet();
+      if (tx) {
+        // suggest adding DAO token to wallet
+        await addTokenToWallet();
+
+        // re-fetch member
+        await dispatch(
+          getConnectedMember({account, daoRegistryContract, web3Instance})
+        );
+      }
     } catch (error) {
       setSubmitError(error);
     }

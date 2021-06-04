@@ -1,8 +1,8 @@
 import {useState} from 'react';
-import {AbiItem} from 'web3-utils/types';
+import {useDispatch, useSelector} from 'react-redux';
 import {toChecksumAddress} from 'web3-utils';
-import {getAdapterAddress} from '../components/web3/helpers';
-import {ContractAdapterNames, Web3TxStatus} from '../components/web3/types';
+
+import {Web3TxStatus} from '../components/web3/types';
 import {COUPON_API_URL} from '../config';
 import {
   useContractSend,
@@ -11,6 +11,8 @@ import {
   useWeb3Modal,
 } from '../components/web3/hooks';
 import {ERC20RegisterDetails} from '../components/dao-token/DaoToken';
+import {getConnectedMember} from '../store/actions';
+import {ReduxDispatch, StoreState} from '../store/types';
 
 export enum FetchStatus {
   STANDBY = 'STANDBY',
@@ -43,6 +45,17 @@ type ReturnUseRedeemCoupon = {
 
 export function useRedeemCoupon(): ReturnUseRedeemCoupon {
   /**
+   * Selectors
+   */
+
+  const daoRegistryContract = useSelector(
+    (s: StoreState) => s.contracts.DaoRegistryContract
+  );
+  const couponOnboardingContract = useSelector(
+    (s: StoreState) => s.contracts.CouponOnboardingContract
+  );
+
+  /**
    * State
    */
 
@@ -52,15 +65,20 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
   );
 
   /**
-   * Hooks
+   * Our hooks
    */
 
   const gasPrices = useETHGasPrice();
   const {account, web3Instance} = useWeb3Modal();
   const {defaultChainError} = useIsDefaultChain();
-
   const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
     useContractSend();
+
+  /**
+   * Their hooks
+   */
+
+  const dispatch = useDispatch<ReduxDispatch>();
 
   /**
    * Variables
@@ -91,37 +109,19 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
         throw new Error('No coupon data was found.');
       }
 
+      if (!account) {
+        throw new Error('No account found.');
+      }
+
+      if (!daoRegistryContract) {
+        throw new Error('No DAO Registry contract was found.');
+      }
+
+      if (!couponOnboardingContract) {
+        throw new Error('No Coupon Onboarding contract was found.');
+      }
+
       setSubmitStatus(FetchStatus.PENDING);
-
-      const {
-        dao: {daoAddress: daoRegistryAddress},
-      } = redeemableCoupon;
-
-      const {default: lazyDaoRegistryABI} = await import(
-        '../truffle-contracts/DaoRegistry.json'
-      );
-      const {default: lazyCouponOnboardingABI} = await import(
-        '../truffle-contracts/CouponOnboardingContract.json'
-      );
-
-      const daoRegistryContractABI: AbiItem[] = lazyDaoRegistryABI as any;
-      const couponOnboardingContractABI: AbiItem[] =
-        lazyCouponOnboardingABI as any;
-
-      const daoRegistryInstance = new web3Instance.eth.Contract(
-        daoRegistryContractABI,
-        daoRegistryAddress
-      );
-
-      const couponOnboardingAddress = await getAdapterAddress(
-        ContractAdapterNames.coupon_onboarding,
-        daoRegistryInstance
-      );
-
-      const couponOnboardingInstance = new web3Instance.eth.Contract(
-        couponOnboardingContractABI,
-        couponOnboardingAddress
-      );
 
       const applicantAddressToChecksum = toChecksumAddress(
         redeemableCoupon.recipient
@@ -129,7 +129,7 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
 
       // initiate tx
       const redeemCouponArguments: RedeemCouponArguments = [
-        daoRegistryAddress,
+        daoRegistryContract.contractAddress,
         applicantAddressToChecksum,
         String(redeemableCoupon.amount),
         Number(redeemableCoupon.nonce),
@@ -145,7 +145,7 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
       // Execute contract call for `redeemCoupon`
       const tx = await txSend(
         'redeemCoupon',
-        couponOnboardingInstance.methods,
+        couponOnboardingContract.instance.methods,
         redeemCouponArguments,
         txArguments
       );
@@ -162,12 +162,17 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
             'Content-Type': 'application/json',
           },
         });
+
+        setSubmitStatus(FetchStatus.FULFILLED);
+
+        // suggest adding DAO token to wallet
+        await addTokenToWallet(erc20Details);
+
+        // re-fetch member
+        await dispatch(
+          getConnectedMember({account, daoRegistryContract, web3Instance})
+        );
       }
-
-      setSubmitStatus(FetchStatus.FULFILLED);
-
-      // suggest adding DAO token to wallet
-      await addTokenToWallet(erc20Details);
     } catch (error) {
       setSubmitError(error);
       setSubmitStatus(FetchStatus.REJECTED);
