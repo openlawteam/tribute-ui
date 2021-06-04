@@ -1013,6 +1013,97 @@
         "type": "bytes32"
       },
       {
+        "internalType": "bool",
+        "name": "submitNewVote",
+        "type": "bool"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "resultRoot",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "blockNumber",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "gracePeriodStartingTime",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint32",
+            "name": "choice",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint64",
+            "name": "index",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "timestamp",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint88",
+            "name": "nbNo",
+            "type": "uint88"
+          },
+          {
+            "internalType": "uint88",
+            "name": "nbYes",
+            "type": "uint88"
+          },
+          {
+            "internalType": "bytes",
+            "name": "sig",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "proposalId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32[]",
+            "name": "proof",
+            "type": "bytes32[]"
+          }
+        ],
+        "internalType": "struct OffchainVotingContract.VoteResultNode",
+        "name": "node",
+        "type": "tuple"
+      }
+    ],
+    "name": "getBadNodeError",
+    "outputs": [
+      {
+        "internalType": "enum OffchainVotingContract.BadNodeError",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract DaoRegistry",
+        "name": "dao",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "proposalId",
+        "type": "bytes32"
+      },
+      {
         "components": [
           {
             "internalType": "uint32",
