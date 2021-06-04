@@ -222,7 +222,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
           sig: voteData?.sig || '0x',
           timestamp: voteData ? Number(voteData.msg.timestamp) : 0,
           voteYes: voteData?.msg.payload.choice === VoteChoicesIndex.Yes,
-          weight: memberBalancesAtSnapshot[i],
+          weight: voteData ? memberBalancesAtSnapshot[i] : '0',
         });
       });
 
