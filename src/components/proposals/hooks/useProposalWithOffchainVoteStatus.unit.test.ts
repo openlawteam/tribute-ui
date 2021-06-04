@@ -1048,8 +1048,15 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
     });
   });
 
-  // @note This test uses higher timeouts
-  test('should poll for data when proposal is not processed', async () => {
+  // @note This test uses adjusted timeouts
+  test('should poll for data when proposal is not yet processed', async () => {
+    // Use cached options to prevent any re-renders
+    const useProposalWithOffchainVoteStatusOptions: Parameters<
+      typeof useProposalWithOffchainVoteStatus
+    >[1] = {
+      pollInterval: 2000,
+    };
+
     const proposalData: Partial<ProposalData> = {
       daoProposalVotingAdapter: {
         votingAdapterAddress: DEFAULT_ETH_ADDRESS,
@@ -1076,7 +1083,12 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useProposalWithOffchainVoteStatus(proposalData as ProposalData),
+        // Set the `pollInterval` to be a bit quicker
+        () =>
+          useProposalWithOffchainVoteStatus(
+            proposalData as ProposalData,
+            useProposalWithOffchainVoteStatusOptions
+          ),
         {
           wrapper: Wrapper,
           initialProps: {
@@ -1190,17 +1202,24 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         );
       });
 
-      await waitForValueToChange(() => result.current.status, {timeout: 15000});
+      await waitForValueToChange(() => result.current.status, {timeout: 6000});
 
       // After polling the `status` should change
       await waitFor(() => {
         expect(result.current.status).toBe(ProposalFlowStatus.Process);
       });
     });
-  }, 15000); // Set jest timeout for this test to a higher value to detect polling
+  }, 6000);
 
-  // @note This test uses higher timeouts
+  // @note This test uses adjusted timeouts
   test('should stop polling for data when proposal processed', async () => {
+    // Use cached options to prevent any re-renders
+    const useProposalWithOffchainVoteStatusOptions: Parameters<
+      typeof useProposalWithOffchainVoteStatus
+    >[1] = {
+      pollInterval: 2000,
+    };
+
     const proposalData: Partial<ProposalData> = {
       daoProposalVotingAdapter: {
         votingAdapterAddress: DEFAULT_ETH_ADDRESS,
@@ -1226,7 +1245,12 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
     let mockWeb3Provider: FakeHttpProvider;
 
     const {result} = renderHook(
-      () => useProposalWithOffchainVoteStatus(proposalData as ProposalData),
+      // Set the `pollInterval` to be a bit quicker
+      () =>
+        useProposalWithOffchainVoteStatus(
+          proposalData as ProposalData,
+          useProposalWithOffchainVoteStatusOptions
+        ),
       {
         wrapper: Wrapper,
         initialProps: {
@@ -1283,7 +1307,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       const helpersToMock = await import('../../web3/helpers/multicall');
       const spy = jest.spyOn(helpersToMock, 'multicall');
 
-      await new Promise((r) => setTimeout(r, 14000));
+      await new Promise((r) => setTimeout(r, 1860));
 
       /**
        * We expect only 1 call as the proposal is processed
@@ -1292,9 +1316,16 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
 
       spy.mockRestore();
     });
-  }, 15000); // Set jest timeout for this test to a higher value to detect polling
+  }, 6000);
 
   test('should return error when async call throws on initial fetch', async () => {
+    // Use cached options to prevent any re-renders
+    const useProposalWithOffchainVoteStatusOptions: Parameters<
+      typeof useProposalWithOffchainVoteStatus
+    >[1] = {
+      pollInterval: 2000,
+    };
+
     const proposalData: Partial<ProposalData> = {
       daoProposalVotingAdapter: undefined,
       snapshotDraft: fakeSnapshotDraft,
@@ -1304,7 +1335,12 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
     let mockWeb3Provider: FakeHttpProvider;
 
     const {result, waitForValueToChange} = renderHook(
-      () => useProposalWithOffchainVoteStatus(proposalData as ProposalData),
+      // Set the `pollInterval` to be a bit quicker
+      () =>
+        useProposalWithOffchainVoteStatus(
+          proposalData as ProposalData,
+          useProposalWithOffchainVoteStatusOptions
+        ),
       {
         wrapper: Wrapper,
         initialProps: {
@@ -1364,8 +1400,15 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
     });
   });
 
-  // @note This test uses higher timeouts
+  // @note This test uses adjusted timeouts
   test('should return error when async call throws during polling', async () => {
+    // Use cached options to prevent any re-renders
+    const useProposalWithOffchainVoteStatusOptions: Parameters<
+      typeof useProposalWithOffchainVoteStatus
+    >[1] = {
+      pollInterval: 2000,
+    };
+
     const proposalData: Partial<ProposalData> = {
       daoProposalVotingAdapter: {
         votingAdapterAddress: DEFAULT_ETH_ADDRESS,
@@ -1392,7 +1435,12 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useProposalWithOffchainVoteStatus(proposalData as ProposalData),
+        // Set the `pollInterval` to be a bit quicker
+        () =>
+          useProposalWithOffchainVoteStatus(
+            proposalData as ProposalData,
+            useProposalWithOffchainVoteStatusOptions
+          ),
         {
           wrapper: Wrapper,
           initialProps: {
@@ -1510,12 +1558,12 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       });
 
       await waitForValueToChange(() => result.current.proposalFlowStatusError, {
-        timeout: 15000,
+        timeout: 6000,
       });
 
       expect(result.current.proposalFlowStatusError?.message).toMatch(
         /some bad error\./i
       );
     });
-  }, 15000); // Set jest timeout for this test to a higher value to detect polling
+  }, 6000);
 });

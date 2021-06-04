@@ -9,6 +9,7 @@ import {
   OffchainVotingAdapterVotes,
 } from '../types';
 import {BURN_ADDRESS} from '../../../util/constants';
+import {ENVIRONMENT} from '../../../config';
 import {multicall, MulticallTuple} from '../../web3/helpers';
 import {normalizeString} from '../../../util/helpers';
 import {proposalHasFlag} from '../helpers';
@@ -30,14 +31,17 @@ type UseProposalWithOffchainVoteStatusReturn = {
   status: ProposalFlowStatus | undefined;
 };
 
-const POLL_INTERVAL_MS: number = 5000;
+const DEFAULT_POLL_INTERVAL_MS: number =
+  ENVIRONMENT === 'production' ? 15000 : 5000;
 
 export function useProposalWithOffchainVoteStatus(
-  proposal: ProposalData
+  proposal: ProposalData,
+  options?: {pollInterval?: number}
 ): UseProposalWithOffchainVoteStatusReturn {
   const {daoProposalVotingAdapter, snapshotDraft, snapshotProposal} = proposal;
   const {votes: snapshotVotes} = snapshotProposal || {};
   const proposalId = snapshotDraft?.idInDAO || snapshotProposal?.idInDAO;
+  const {pollInterval = DEFAULT_POLL_INTERVAL_MS} = options || {};
 
   /**
    * Selectors
@@ -124,7 +128,7 @@ export function useProposalWithOffchainVoteStatus(
    * Cached callbacks
    */
 
-  const pollStatusFromContractCached = useCallback(pollStatusFromContract, [
+  const getStatusFromContractCached = useCallback(getStatusFromContract, [
     daoProposalVotingAdapter,
     daoRegistryABI,
     daoRegistryAddress,
@@ -136,10 +140,10 @@ export function useProposalWithOffchainVoteStatus(
 
   useEffect(() => {
     // Call as soon as possible.
-    pollStatusFromContractCached().catch((error) => {
+    getStatusFromContractCached().catch((error) => {
       setProposalFlowStatusError(error);
     });
-  }, [pollStatusFromContractCached]);
+  }, [getStatusFromContractCached]);
 
   useEffect(() => {
     /**
@@ -162,17 +166,17 @@ export function useProposalWithOffchainVoteStatus(
           clearInterval(pollingIntervalIdRef.current);
         }
 
-        await pollStatusFromContractCached();
+        await getStatusFromContractCached();
       } catch (error) {
         pollingIntervalIdRef.current &&
           clearInterval(pollingIntervalIdRef.current);
 
         setProposalFlowStatusError(error);
       }
-    }, POLL_INTERVAL_MS);
+    }, pollInterval);
 
     pollingIntervalIdRef.current = intervalId;
-  }, [atProcessedInDAO, pollStatusFromContractCached]);
+  }, [atProcessedInDAO, pollInterval, getStatusFromContractCached]);
 
   // Stop polling if propsal is processed
   useEffect(() => {
@@ -203,7 +207,7 @@ export function useProposalWithOffchainVoteStatus(
     };
   }
 
-  async function pollStatusFromContract() {
+  async function getStatusFromContract() {
     try {
       if (!daoRegistryABI || !daoRegistryAddress || !proposalId) {
         return;
