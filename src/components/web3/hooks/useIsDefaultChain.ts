@@ -3,21 +3,29 @@ import {useEffect, useState} from 'react';
 import {useWeb3Modal} from '.';
 import {CHAIN_NAME, DEFAULT_CHAIN} from '../../../config';
 
+type UseIsDefaultChainReturn = {
+  /**
+   * The default chain of the app
+   */
+  defaultChain: number;
+  /**
+   * Any error derived from detecting the default chain
+   */
+  defaultChainError: Error | undefined;
+  /**
+   * Specifies if the curently connected chain matches the app's default chain
+   */
+  isDefaultChain: boolean;
+};
+
 /**
  * useIsDefaultChain
  *
- * Checks if the connected account it connected to the default chain
- * @returns {
- *  defaultChain: number,
- *  defaultChainError: string,
- *  isDefaultChain: boolean
- * }
+ * Checks if the connected account it connected to the default chain.
+ *
+ * @returns UseIsDefaultChainReturn
  */
-export function useIsDefaultChain(): {
-  defaultChain: number;
-  defaultChainError: Error | undefined;
-  isDefaultChain: boolean;
-} {
+export function useIsDefaultChain(): UseIsDefaultChainReturn {
   /**
    * Our hooks
    */
@@ -35,9 +43,14 @@ export function useIsDefaultChain(): {
    * Effects
    */
 
+  // Determine `isDefaultChain`
   useEffect(() => {
     setIsDefaultChain(networkId === DEFAULT_CHAIN);
+  }, [networkId]);
 
+  // Determine `defaultChainError`
+  useEffect(() => {
+    // User is already connected to a wallet, and chain is incorrect.
     if (connected && networkId !== DEFAULT_CHAIN) {
       setDefaultChainError(
         new Error(`Please connect to the ${CHAIN_NAME[DEFAULT_CHAIN]}.`)
@@ -46,7 +59,7 @@ export function useIsDefaultChain(): {
       return;
     }
 
-    // If we make it here, reset after running checks.
+    // Reset error after successful checks.
     setDefaultChainError(undefined);
   }, [connected, networkId]);
 
