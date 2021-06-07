@@ -1,6 +1,8 @@
 import {createContext, useEffect, useRef, useState} from 'react';
 import Web3 from 'web3';
+import Web3Modal from 'web3modal';
 
+import {AsyncStatus} from '../../util/types';
 import {ETHEREUM_PROVIDER_URL} from '../../config';
 import useWeb3ModalManager, {DefaultTheme} from './hooks/useWeb3ModalManager';
 
@@ -22,8 +24,8 @@ export type Web3ModalContextValue = {
   onDisconnect: () => void;
   provider: any;
   providerOptions: Record<string, any>;
-  web3Instance: Web3;
-  web3Modal: any;
+  web3Instance: Web3 | undefined;
+  web3Modal: Web3Modal | undefined;
 };
 
 export const Web3ModalContext = createContext<Web3ModalContextValue>(
@@ -85,9 +87,10 @@ export default function Web3ModalManager({
   const {
     account,
     connected,
+    initialCachedConnectorCheckStatus,
+    networkId = defaultWeb3NetID,
     onConnectTo,
     onDisconnect,
-    networkId = defaultWeb3NetID,
     provider = defaultWeb3InstanceRef.current?.currentProvider,
     web3Instance = defaultWeb3InstanceRef.current,
     web3Modal,
@@ -99,24 +102,27 @@ export default function Web3ModalManager({
 
   // Set network ID when using `defaultWeb3InstanceRef` (i.e. not connected to a wallet)
   useEffect(() => {
-    if (!connected) {
+    if (
+      !connected &&
+      initialCachedConnectorCheckStatus === AsyncStatus.FULFILLED
+    ) {
       defaultWeb3InstanceRef.current?.eth.net
         .getId()
         .then(setDefaultWeb3NetID)
         .catch(() => setDefaultWeb3NetID(undefined));
     }
-  }, [connected]);
+  }, [connected, initialCachedConnectorCheckStatus]);
 
   /**
    * Render
    */
 
-  const web3ModalContext = {
+  const web3ModalContext: Web3ModalContextValue = {
     account,
     connected,
+    networkId,
     onConnectTo,
     onDisconnect,
-    networkId,
     provider,
     providerOptions,
     web3Instance,

@@ -6,6 +6,7 @@ import Web3Modal from 'web3modal';
 import {DEFAULT_CHAIN} from '../../../config';
 import {clearConnectedMember} from '../../../store/actions';
 import {NetworkNames, NetworkIDs} from '../../../util/enums';
+import {AsyncStatus} from '../../../util/types';
 
 type NetworkNameType = NetworkNames;
 
@@ -18,6 +19,7 @@ export enum DefaultTheme {
 }
 
 enum ActionType {
+  INITIAL_CACHED_CONNECTOR_CHECK_STATUS,
   INIT_WEB3MODAL,
   ACTIVATE_PROVIDER,
   UPDATE,
@@ -33,13 +35,14 @@ interface Action {
 }
 
 interface Web3ModalManagerState {
-  provider?: any;
-  networkId?: number;
   account?: undefined | string;
   connected?: boolean;
   error?: Error;
-  web3Modal?: any;
-  web3Instance?: any;
+  initialCachedConnectorCheckStatus?: AsyncStatus;
+  networkId?: number;
+  provider?: any;
+  web3Instance?: Web3;
+  web3Modal?: Web3Modal;
 }
 
 function reducer(
@@ -47,36 +50,47 @@ function reducer(
   {type, payload}: Action
 ): Web3ModalManagerState {
   switch (type) {
+    case ActionType.INITIAL_CACHED_CONNECTOR_CHECK_STATUS: {
+      return {
+        ...state,
+        initialCachedConnectorCheckStatus: payload,
+      };
+    }
+
     case ActionType.INIT_WEB3MODAL: {
       const {web3Modal} = payload;
       return {web3Modal};
     }
+
     case ActionType.ACTIVATE_PROVIDER: {
       const {provider, networkId, account, web3Modal} = payload;
       return {provider, networkId, account, web3Modal};
     }
+
     case ActionType.UPDATE: {
       const {provider, networkId, account, connected, web3Instance} = payload;
 
       return {
         ...state,
-        ...(provider === undefined ? {} : {provider}),
-        ...(networkId === undefined ? {} : {networkId}),
-        ...(account === undefined ? {} : {account}),
-        ...(connected === undefined ? {} : {connected}),
-        ...(web3Instance === undefined ? {} : {web3Instance}),
+        ...(provider === undefined ? null : {provider}),
+        ...(networkId === undefined ? null : {networkId}),
+        ...(account === undefined ? null : {account}),
+        ...(connected === undefined ? null : {connected}),
+        ...(web3Instance === undefined ? null : {web3Instance}),
       };
     }
+
     case ActionType.UPDATE_FROM_ERROR: {
       const {provider, networkId, account} = payload;
       return {
         ...state,
-        ...(provider === undefined ? {} : {provider}),
-        ...(networkId === undefined ? {} : {networkId}),
-        ...(account === undefined ? {} : {account}),
+        ...(provider === undefined ? null : {provider}),
+        ...(networkId === undefined ? null : {networkId}),
+        ...(account === undefined ? null : {account}),
         error: undefined,
       };
     }
+
     case ActionType.ERROR: {
       const {error} = payload;
       const {provider} = state;
@@ -85,6 +99,7 @@ function reducer(
         error,
       };
     }
+
     case ActionType.ERROR_FROM_ACTIVATION: {
       const {provider, error} = payload;
       return {
@@ -92,6 +107,7 @@ function reducer(
         error,
       };
     }
+
     case ActionType.DEACTIVATE_PROVIDER: {
       return {};
     }
@@ -110,16 +126,22 @@ export default function useWeb3ModalManager({
   providerOptions,
 }: Web3ModalManagerInterface) {
   /**
-   * Context State
+   * Reducers
    */
-  const [state, dispatch] = useReducer(reducer, {});
+
+  const [state, dispatch] = useReducer<typeof reducer>(reducer, {
+    initialCachedConnectorCheckStatus: AsyncStatus.STANDBY,
+  });
+
+  /**
+   * Variables
+   */
 
   const web3ModalTheme = defaultTheme;
   const web3ModalChain = defaultChain || DEFAULT_CHAIN;
 
   /**
-   * @note
-   * Disable hooks checks for now as additional deps causes issues.
+   * @note Disable hook lint checks for now as some additional deps cause render issues.
    */
   //eslint-disable-next-line react-hooks/exhaustive-deps
   const onConnectToCached = useCallback(onConnectTo, [state.web3Modal]);
@@ -151,25 +173,59 @@ export default function useWeb3ModalManager({
   }, [getNetworkNameCached, providerOptions, web3ModalTheme, state.web3Modal]);
 
   /**
-   * Automagically connect to cached provider `localStorage`
+   * Attempt to initialise connection to a cached provider
    */
   useEffect(() => {
-    async function activeWeb3ModalCached(cachedProvider: string) {
-      if (cachedProvider) {
-        await onConnectToCached(cachedProvider);
-      }
-    }
-
-    if (state.web3Modal && getCachedProvider()) {
-      activeWeb3ModalCached(state.web3Modal.cachedProvider);
-    }
-  }, [onConnectToCached, state.web3Modal]);
+    attemptUpdateFromCachedConnector(
+      state.web3Modal?.cachedProvider,
+      onConnectToCached
+    );
+  }, [onConnectToCached, state.web3Modal?.cachedProvider]);
 
   /**
-   * Double checking if a cached provider exists in `localStorage`
+   * attemptUpdateFromCachedConnector
+   *
+   * Will attempt to connect if a `connectorId` (e.g. `"injected"`)
+   * and cached provider (via `localStorage`) is available.
+   *
+   * @param connectorId `String | undefined`
+   * @param action `Function` callback which dispatches an action to connect
+   * @returns void
    */
-  function getCachedProvider(): string | null {
-    return localStorage.getItem(WEB3_CONNECT_CACHED_PROVIDER);
+  async function attemptUpdateFromCachedConnector(
+    connectorId: string | undefined,
+    action: (cid: string) => Promise<void>
+  ): Promise<void> {
+    const statusAction = ActionType.INITIAL_CACHED_CONNECTOR_CHECK_STATUS;
+
+    try {
+      /**
+       * Wait for the `state.web3Modal` object to be available, as `cachedProvider`
+       * defaults to an empty `String` if not set.
+       */
+      if (typeof connectorId !== 'string') return;
+
+      dispatch({
+        type: statusAction,
+        payload: AsyncStatus.PENDING,
+      });
+
+      if (connectorId && localStorage.getItem(WEB3_CONNECT_CACHED_PROVIDER)) {
+        await action(connectorId);
+      }
+
+      dispatch({
+        type: statusAction,
+        payload: AsyncStatus.FULFILLED,
+      });
+    } catch (error) {
+      dispatch({
+        type: statusAction,
+        payload: AsyncStatus.REJECTED,
+      });
+
+      console.log(error);
+    }
   }
 
   /**
@@ -184,7 +240,7 @@ export default function useWeb3ModalManager({
 
       subscribeProvider(provider);
 
-      const web3: any = new Web3(provider);
+      const web3: Web3 = new Web3(provider);
 
       // get accounts
       const accounts = await web3.eth.getAccounts();
