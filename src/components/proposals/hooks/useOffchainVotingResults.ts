@@ -90,7 +90,12 @@ export function useOffchainVotingResults(
   useEffect(() => {
     const proposalsToMap = Array.isArray(proposals) ? proposals : [proposals];
 
-    if (!bankAddress || !getPriorAmountABI || !proposalsToMap.length) {
+    if (
+      !bankAddress ||
+      !getPriorAmountABI ||
+      !proposalsToMap.length ||
+      !web3Instance
+    ) {
       return;
     }
 

@@ -63,7 +63,7 @@ export function useInitContracts(): () => Promise<void> {
    */
   async function initContracts() {
     try {
-      if (!isDefaultChain) return;
+      if (!isDefaultChain || !web3Instance) return;
 
       // Must init registry first
       await dispatch(initContractDaoRegistry(web3Instance));

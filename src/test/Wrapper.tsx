@@ -95,7 +95,7 @@ export default function Wrapper(
         networkId: mockChains.GANACHE,
         provider: mockWeb3Provider,
         web3Instance: mockWeb3,
-        web3Modal: null,
+        web3Modal: null as any,
       }));
   }, [mockWeb3, mockWeb3Provider, useWallet]);
 

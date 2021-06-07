@@ -76,7 +76,7 @@ export function useProposalsVotingState(
    */
 
   async function getProposalsVotingStateOnchain() {
-    if (!registryAddress || !proposalVotingAdapters.length) {
+    if (!registryAddress || !proposalVotingAdapters.length || !web3Instance) {
       return;
     }
 

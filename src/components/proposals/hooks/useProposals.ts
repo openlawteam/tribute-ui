@@ -373,7 +373,7 @@ export function useProposals({
 
       const proposals = (await multicall({
         calls,
-        web3Instance,
+        web3Instance: web3Instance as any,
       })) as Proposal[];
 
       const entries = proposalIds.map((id, i): [string, Proposal] => [

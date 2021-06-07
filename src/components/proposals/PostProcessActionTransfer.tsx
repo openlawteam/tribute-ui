@@ -2,8 +2,8 @@ import React, {useEffect, useState, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {CycleEllipsis} from '../feedback';
-import {ProposalData, DistributionStatus} from './types';
 import {getConnectedMember} from '../../store/actions';
+import {ProposalData, DistributionStatus} from './types';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
@@ -162,6 +162,10 @@ export default function PostProcessActionTransfer(
 
       if (!account) {
         throw new Error('No account found.');
+      }
+
+      if (!web3Instance) {
+        throw new Error('No Web3 instance was found.');
       }
 
       let toIndexArg = '0';

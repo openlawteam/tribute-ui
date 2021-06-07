@@ -42,52 +42,52 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
   async function initAdapterExtensionContract(adapterExtensionName: string) {
     switch (adapterExtensionName) {
       case DaoAdapterConstants.CONFIGURATION:
-        await dispatch(initContractConfiguration(web3Instance));
+        await dispatch(initContractConfiguration(web3Instance as any));
         break;
       case DaoAdapterConstants.FINANCING:
-        await dispatch(initContractFinancing(web3Instance));
+        await dispatch(initContractFinancing(web3Instance as any));
         break;
       case DaoAdapterConstants.GUILDKICK:
-        await dispatch(initContractGuildKick(web3Instance));
+        await dispatch(initContractGuildKick(web3Instance as any));
         break;
       case DaoAdapterConstants.MANAGING:
-        await dispatch(initContractManaging(web3Instance));
+        await dispatch(initContractManaging(web3Instance as any));
         break;
       case DaoAdapterConstants.RAGEQUIT:
-        await dispatch(initContractRagequit(web3Instance));
+        await dispatch(initContractRagequit(web3Instance as any));
         break;
       case DaoAdapterConstants.BANK:
-        await dispatch(initContractBankAdapter(web3Instance));
+        await dispatch(initContractBankAdapter(web3Instance as any));
         break;
       case DaoExtensionConstants.NFT:
-        await dispatch(initContractNFTExtension(web3Instance));
+        await dispatch(initContractNFTExtension(web3Instance as any));
         break;
       case DaoAdapterConstants.ONBOARDING:
-        await dispatch(initContractOnboarding(web3Instance));
+        await dispatch(initContractOnboarding(web3Instance as any));
         break;
       case DaoAdapterConstants.TRIBUTE:
-        await dispatch(initContractTribute(web3Instance));
+        await dispatch(initContractTribute(web3Instance as any));
         break;
       case DaoAdapterConstants.DISTRIBUTE:
-        await dispatch(initContractDistribute(web3Instance));
+        await dispatch(initContractDistribute(web3Instance as any));
         break;
       case DaoAdapterConstants.VOTING:
-        await dispatch(initRegisteredVotingAdapter(web3Instance));
+        await dispatch(initRegisteredVotingAdapter(web3Instance as any));
         break;
       case DaoAdapterConstants.COUPON_ONBOARDING:
-        await dispatch(initContractCouponOnboarding(web3Instance));
+        await dispatch(initContractCouponOnboarding(web3Instance as any));
         break;
       case DaoAdapterConstants.TRIBUTE_NFT:
-        await dispatch(initContractTributeNFT(web3Instance));
+        await dispatch(initContractTributeNFT(web3Instance as any));
         break;
       case DaoAdapterConstants.NFT:
-        await dispatch(initContractNFTAdapter(web3Instance));
+        await dispatch(initContractNFTAdapter(web3Instance as any));
         break;
       case DaoAdapterConstants.DAO_REGISTRY:
-        await dispatch(initContractDaoRegistryAdapter(web3Instance));
+        await dispatch(initContractDaoRegistryAdapter(web3Instance as any));
         break;
       case DaoExtensionConstants.ERC20:
-        await dispatch(initContractERC20Extension(web3Instance));
+        await dispatch(initContractERC20Extension(web3Instance as any));
         break;
     }
   }

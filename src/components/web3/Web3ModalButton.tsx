@@ -192,11 +192,12 @@ function ConnectWallet({
 }
 
 type ProviderSVGType = {
-  providerName: string;
+  providerName: string | undefined;
 };
 
 function ProviderSVG({providerName}: ProviderSVGType): JSX.Element | null {
   if (!providerName) return null;
+
   return (
     <span className="walletconnect__wallet-icon">
       {svgWalletIcon[providerName]}

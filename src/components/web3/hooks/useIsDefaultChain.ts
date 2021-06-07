@@ -32,6 +32,8 @@ export function useIsDefaultChain(): UseIsDefaultChainReturn {
 
   const {networkId, connected} = useWeb3Modal();
 
+  console.log('networkId', networkId);
+
   /**
    * State
    */

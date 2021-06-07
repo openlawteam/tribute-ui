@@ -157,6 +157,10 @@ export function OffchainOpRollupVotingSubmitResultAction(
         throw new Error('No "OffchainVotingContract" methods were found.');
       }
 
+      if (!web3Instance) {
+        throw new Error('No Web3 instance was found.');
+      }
+
       setSignatureStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       const {idInDAO: proposalHash} = snapshotProposal;

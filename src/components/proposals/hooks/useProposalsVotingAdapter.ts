@@ -86,7 +86,12 @@ export function useProposalsVotingAdapter(
    */
 
   async function getProposalsVotingAdaptersOnchain(): Promise<void> {
-    if (!registryAddress || !registryABI || !proposalIds.length) {
+    if (
+      !proposalIds.length ||
+      !registryABI ||
+      !registryAddress ||
+      !web3Instance
+    ) {
       return;
     }
 
