@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {memo, useState} from 'react';
 import {isMobile} from 'react-device-detect';
 
 import {CHAINS} from '../../config';
@@ -22,12 +22,13 @@ type ConnectWalletProps = {
   customWalletText?: string;
   showWalletETHBadge?: boolean;
 };
+
 function ConnectWallet({
   customWalletText,
   showWalletETHBadge,
 }: ConnectWalletProps): JSX.Element {
   /**
-   * Hooks
+   * Our hooks
    */
 
   const {
@@ -40,7 +41,7 @@ function ConnectWallet({
     web3Modal,
   } = useWeb3Modal();
 
-  const {defaultChain, defaultChainError, isDefaultChain} = useIsDefaultChain();
+  const {defaultChainError, isDefaultChain} = useIsDefaultChain();
 
   /**
    * State
@@ -52,9 +53,9 @@ function ConnectWallet({
    * Variables
    */
 
-  const isWrongNetwork: boolean = networkId !== defaultChain ?? isDefaultChain;
+  const isWrongNetwork: boolean = isDefaultChain === false;
   const isChainGanache = networkId === CHAINS.GANACHE;
-  const displayWalletText: string | undefined = getWalletText();
+  const displayWalletText: string = getWalletText();
 
   /**
    * Functions
@@ -193,6 +194,7 @@ function ConnectWallet({
 type ProviderSVGType = {
   providerName: string;
 };
+
 function ProviderSVG({providerName}: ProviderSVGType): JSX.Element | null {
   if (!providerName) return null;
   return (
@@ -205,6 +207,7 @@ function ProviderSVG({providerName}: ProviderSVGType): JSX.Element | null {
 type DisplayChainErrorProps = {
   defaultChainError: string;
 };
+
 function DisplayChainError({
   defaultChainError,
 }: DisplayChainErrorProps): JSX.Element {
@@ -213,15 +216,13 @@ function DisplayChainError({
       <div className="error-message">
         <small>{defaultChainError}</small>
       </div>
+      <div className="loader--large-container">
+        <LoaderLarge />
+      </div>
       <div>
-        <div className="loader--large-container">
-          <LoaderLarge />
-        </div>
-        <div>
-          <small>Waiting for the right network&hellip;</small>
-          <br />
-          <small>Switch networks from your wallet</small>
-        </div>
+        <small>Waiting for the right network&hellip;</small>
+        <br />
+        <small>Switch networks from your wallet</small>
       </div>
     </>
   );
@@ -231,7 +232,7 @@ function DisplayChainError({
  * Web3ModalButton
  * @param props: Web3ModalButtonProps
  */
-export default React.memo(function Web3ModalButton({
+export default memo(function Web3ModalButton({
   customWalletText,
   showWalletETHBadge,
 }: Web3ModalButtonProps): JSX.Element {
