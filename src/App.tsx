@@ -30,6 +30,10 @@ export default function App(props?: AppProps) {
     <Routes />
   );
 
+  /**
+   * Functions
+   */
+
   function RenderIndexOrSubpage() {
     const mainComponent: React.ReactNode = <main>{mainContent}</main>;
 
@@ -45,6 +49,10 @@ export default function App(props?: AppProps) {
       </>
     );
   }
+
+  /**
+   * Render
+   */
 
   return (
     <>
