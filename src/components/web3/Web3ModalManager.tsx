@@ -31,6 +31,7 @@ type Web3ModalManagerProps = {
 export type Web3ModalContextValue = {
   account: string | undefined;
   connected: boolean | undefined;
+  initialCachedConnectorCheckStatus: AsyncStatus | undefined;
   networkId: number | undefined;
   onConnectTo: (providerName: string) => void;
   onDisconnect: () => void;
@@ -136,6 +137,7 @@ export default function Web3ModalManager({
   const web3ModalContext: Web3ModalContextValue = {
     account,
     connected,
+    initialCachedConnectorCheckStatus,
     networkId,
     onConnectTo,
     onDisconnect,

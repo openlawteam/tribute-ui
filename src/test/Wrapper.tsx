@@ -10,6 +10,7 @@ import {
   Web3ModalContext,
   Web3ModalContextValue,
 } from '../components/web3/Web3ModalManager';
+import {AsyncStatus} from '../util/types';
 import {CHAINS as mockChains} from '../config';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider, getNewStore} from './helpers';
 import {VotingAdapterName} from '../components/adapters-extensions/enums';
@@ -89,6 +90,7 @@ export default function Wrapper(
       .mockImplementation(() => ({
         account: DEFAULT_ETH_ADDRESS,
         connected: true,
+        initialCachedConnectorCheckStatus: AsyncStatus.FULFILLED,
         providerOptions: {},
         onConnectTo: () => {},
         onDisconnect: () => {},

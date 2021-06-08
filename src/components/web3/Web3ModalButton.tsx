@@ -1,6 +1,7 @@
 import {memo, useEffect, useState} from 'react';
 import {isMobile} from 'react-device-detect';
 
+import {AsyncStatus} from '../../util/types';
 import {CHAINS} from '../../config';
 import {svgWalletIcon} from './WalletIcons';
 import {truncateEthAddress} from '../../util/helpers';
@@ -34,6 +35,7 @@ function ConnectWallet({
   const {
     account,
     connected,
+    initialCachedConnectorCheckStatus,
     networkId,
     onConnectTo,
     onDisconnect,
@@ -66,10 +68,13 @@ function ConnectWallet({
    * which will alert the user to change chains.
    */
   useEffect(() => {
-    if (!isDefaultChain && web3Modal) {
+    if (
+      !isDefaultChain &&
+      initialCachedConnectorCheckStatus === AsyncStatus.FULFILLED
+    ) {
       setOpenModal(true);
     }
-  }, [isDefaultChain, web3Modal]);
+  }, [isDefaultChain, initialCachedConnectorCheckStatus]);
 
   /**
    * Functions
