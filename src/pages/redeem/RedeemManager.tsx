@@ -1,3 +1,5 @@
+import {toChecksumAddress} from 'web3-utils';
+
 import {CycleEllipsis} from '../../components/feedback/CycleEllipsis';
 import CycleMessage from '../../components/feedback/CycleMessage';
 import EtherscanURL from '../../components/web3/EtherscanURL';
@@ -118,7 +120,8 @@ function RedeemCard({redeemable, erc20Details}: RedeemCardProps) {
         isDone ? 'fireworks' : ''
       } `}>
       <p className="redeemcard__recipient">
-        Recipient: {truncateEthAddress(redeemable.recipient, 7)}
+        Recipient:{' '}
+        {truncateEthAddress(toChecksumAddress(redeemable.recipient), 7)}
       </p>
       <p className="redeemcard__unit">
         {formatNumber(redeemable.amount)}
