@@ -93,7 +93,7 @@ export default function AdapterOrExtensionManager() {
    * Hooks
    */
   const {defaultChainError} = useIsDefaultChain();
-  const {connected, account} = useWeb3Modal();
+  const {connected, account, web3Instance} = useWeb3Modal();
   const {
     adapterExtensionStatus,
     getAdapterOrExtensionFromRedux,
@@ -298,6 +298,10 @@ export default function AdapterOrExtensionManager() {
       throw new Error('No DAO Registry contract was found.');
     }
 
+    if (!web3Instance) {
+      throw new Error('No Web3 instance was found.');
+    }
+
     try {
       setIsInProcess((prevState) => ({
         ...prevState,
@@ -364,7 +368,7 @@ export default function AdapterOrExtensionManager() {
       }));
 
       // init adapter/extension contracts
-      initAdapterExtensionContract(adapterOrExtensionName);
+      initAdapterExtensionContract(adapterOrExtensionName, web3Instance);
     } catch (error) {
       setIsInProcess((prevState) => ({
         ...prevState,
@@ -390,6 +394,10 @@ export default function AdapterOrExtensionManager() {
 
     if (!DaoFactoryContract) {
       throw new Error('DaoFactoryContract not found');
+    }
+
+    if (!web3Instance) {
+      throw new Error('No Web3 instance was found.');
     }
 
     try {
@@ -457,7 +465,11 @@ export default function AdapterOrExtensionManager() {
       // init adapter contracts to the store for all added adapters
       for (const adapterName in selections) {
         if (selections[adapterName]) {
-          adapterName && initAdapterExtensionContract(adapterName);
+          adapterName &&
+            initAdapterExtensionContract(
+              adapterName as DaoAdapterConstants,
+              web3Instance
+            );
         }
       }
     } catch (error) {

@@ -1,4 +1,5 @@
 import {useDispatch} from 'react-redux';
+import Web3 from 'web3';
 
 import {
   initContractBankAdapter,
@@ -19,75 +20,79 @@ import {
   initRegisteredVotingAdapter,
 } from '../../../store/actions';
 
-import {ReduxDispatch} from '../../../store/types';
 import {DaoAdapterConstants, DaoExtensionConstants} from '../enums';
-
-import {useWeb3Modal} from '../../web3/hooks';
+import {ReduxDispatch} from '../../../store/types';
 
 type UseInitAdapterExtensionContractsReturn = {
-  initAdapterExtensionContract: (adapterExtensionName: string) => void;
+  initAdapterExtensionContract: (
+    adapterExtensionName: DaoAdapterConstants | DaoExtensionConstants,
+    web3Instance: Web3
+  ) => void;
 };
 
 export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContractsReturn {
   /**
-   * Our hooks
-   */
-  const {web3Instance} = useWeb3Modal();
-
-  /**
    * Their hooks
    */
+
   const dispatch = useDispatch<ReduxDispatch>();
 
-  async function initAdapterExtensionContract(adapterExtensionName: string) {
+  /**
+   * Functions
+   */
+
+  async function initAdapterExtensionContract(
+    adapterExtensionName: DaoAdapterConstants | DaoExtensionConstants,
+    web3Instance: Web3
+  ) {
     switch (adapterExtensionName) {
       case DaoAdapterConstants.CONFIGURATION:
-        await dispatch(initContractConfiguration(web3Instance as any));
+        await dispatch(initContractConfiguration(web3Instance));
         break;
       case DaoAdapterConstants.FINANCING:
-        await dispatch(initContractFinancing(web3Instance as any));
+        await dispatch(initContractFinancing(web3Instance));
         break;
       case DaoAdapterConstants.GUILDKICK:
-        await dispatch(initContractGuildKick(web3Instance as any));
+        await dispatch(initContractGuildKick(web3Instance));
         break;
       case DaoAdapterConstants.MANAGING:
-        await dispatch(initContractManaging(web3Instance as any));
+        await dispatch(initContractManaging(web3Instance));
         break;
       case DaoAdapterConstants.RAGEQUIT:
-        await dispatch(initContractRagequit(web3Instance as any));
+        await dispatch(initContractRagequit(web3Instance));
         break;
       case DaoAdapterConstants.BANK:
-        await dispatch(initContractBankAdapter(web3Instance as any));
+        await dispatch(initContractBankAdapter(web3Instance));
         break;
       case DaoExtensionConstants.NFT:
-        await dispatch(initContractNFTExtension(web3Instance as any));
+        await dispatch(initContractNFTExtension(web3Instance));
         break;
       case DaoAdapterConstants.ONBOARDING:
-        await dispatch(initContractOnboarding(web3Instance as any));
+        await dispatch(initContractOnboarding(web3Instance));
         break;
       case DaoAdapterConstants.TRIBUTE:
-        await dispatch(initContractTribute(web3Instance as any));
+        await dispatch(initContractTribute(web3Instance));
         break;
       case DaoAdapterConstants.DISTRIBUTE:
-        await dispatch(initContractDistribute(web3Instance as any));
+        await dispatch(initContractDistribute(web3Instance));
         break;
       case DaoAdapterConstants.VOTING:
-        await dispatch(initRegisteredVotingAdapter(web3Instance as any));
+        await dispatch(initRegisteredVotingAdapter(web3Instance));
         break;
       case DaoAdapterConstants.COUPON_ONBOARDING:
-        await dispatch(initContractCouponOnboarding(web3Instance as any));
+        await dispatch(initContractCouponOnboarding(web3Instance));
         break;
       case DaoAdapterConstants.TRIBUTE_NFT:
-        await dispatch(initContractTributeNFT(web3Instance as any));
+        await dispatch(initContractTributeNFT(web3Instance));
         break;
       case DaoAdapterConstants.NFT:
-        await dispatch(initContractNFTAdapter(web3Instance as any));
+        await dispatch(initContractNFTAdapter(web3Instance));
         break;
       case DaoAdapterConstants.DAO_REGISTRY:
-        await dispatch(initContractDaoRegistryAdapter(web3Instance as any));
+        await dispatch(initContractDaoRegistryAdapter(web3Instance));
         break;
       case DaoExtensionConstants.ERC20:
-        await dispatch(initContractERC20Extension(web3Instance as any));
+        await dispatch(initContractERC20Extension(web3Instance));
         break;
     }
   }
