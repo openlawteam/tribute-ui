@@ -1,7 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useLocation} from 'react-router-dom';
 import {useSelector} from 'react-redux';
-import {toChecksumAddress} from 'web3-utils';
 
 import {StoreState} from '../../store/types';
 import Wrap from '../../components/common/Wrap';
@@ -11,7 +10,6 @@ import {ERC20RegisterDetails} from '../../components/dao-token/DaoToken';
 import RedeemManager from './RedeemManager';
 import {useWeb3Modal} from '../../components/web3/hooks';
 import {COUPON_API_URL} from '../../config';
-import {truncateEthAddress} from '../../util/helpers/truncateEthAddress';
 import {AsyncStatus} from '../../util/types';
 
 type RedeemCouponType = {
@@ -182,29 +180,10 @@ export default function RedeemCoupon() {
     );
   }
 
-  if (
-    !redeemableCoupon ||
-    !redeemableCoupon.length ||
-    redeemableCoupon[0]?.recipient.toLowerCase() !== account?.toLowerCase()
-  ) {
+  if (!redeemableCoupon || !redeemableCoupon.length) {
     return (
       <RenderWrapper>
-        <p className="color-brightsalmon">
-          {redeemableCoupon[0]?.recipient ? (
-            <>
-              Connect with{' '}
-              <span className="redeemcard__address--error">
-                {truncateEthAddress(
-                  toChecksumAddress(redeemableCoupon[0].recipient),
-                  7
-                )}
-              </span>{' '}
-              account to view coupon.
-            </>
-          ) : (
-            'Coupon not found for this connected account.'
-          )}
-        </p>
+        <p className="color-brightsalmon">Coupon not found.</p>
       </RenderWrapper>
     );
   }
@@ -229,7 +208,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
 
         <div className="form-wrapper">
           <div className="form__description">
-            <p>Redeem your coupon to get your membership tokens.</p>
+            <p>Redeem coupon to issue the membership tokens.</p>
           </div>
 
           {/* RENDER CHILDREN */}

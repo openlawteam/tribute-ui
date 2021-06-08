@@ -165,13 +165,18 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
 
         setSubmitStatus(FetchStatus.FULFILLED);
 
-        // suggest adding DAO token to wallet
-        await addTokenToWallet(erc20Details);
+        // if connected account is the coupon recipient
+        if (
+          redeemableCoupon.recipient.toLowerCase() === account.toLowerCase()
+        ) {
+          // suggest adding DAO token to wallet
+          await addTokenToWallet(erc20Details);
 
-        // re-fetch member
-        await dispatch(
-          getConnectedMember({account, daoRegistryContract, web3Instance})
-        );
+          // re-fetch member
+          await dispatch(
+            getConnectedMember({account, daoRegistryContract, web3Instance})
+          );
+        }
       }
     } catch (error) {
       setSubmitError(error);

@@ -1,3 +1,5 @@
+import {toChecksumAddress} from 'web3-utils';
+
 import {CycleEllipsis} from '../../components/feedback/CycleEllipsis';
 import CycleMessage from '../../components/feedback/CycleMessage';
 import EtherscanURL from '../../components/web3/EtherscanURL';
@@ -8,7 +10,7 @@ import DaoToken, {
   ERC20RegisterDetails,
 } from '../../components/dao-token/DaoToken';
 import {useRedeemCoupon, FetchStatus} from '../../hooks/useRedeemCoupon';
-import {formatNumber} from '../../util/helpers/formatNumber';
+import {formatNumber, truncateEthAddress} from '../../util/helpers';
 import {Web3TxStatus} from '../../components/web3/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 
@@ -117,6 +119,10 @@ function RedeemCard({redeemable, erc20Details}: RedeemCardProps) {
       className={`redeemcard redeemcard__content ${
         isDone ? 'fireworks' : ''
       } `}>
+      <p className="redeemcard__recipient">
+        Recipient:{' '}
+        {truncateEthAddress(toChecksumAddress(redeemable.recipient), 7)}
+      </p>
       <p className="redeemcard__unit">
         {formatNumber(redeemable.amount)}
         <sup>
