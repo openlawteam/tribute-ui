@@ -307,7 +307,7 @@ export default function useWeb3ModalManager({
       const networkId = await web3.eth.net.getId();
 
       // Run callback if provided
-      onBeforeConnect?.({
+      await onBeforeConnect?.({
         account: accounts[0],
         connected: true,
         error: state.error,
@@ -353,7 +353,7 @@ export default function useWeb3ModalManager({
       dispatch({type: ActionType.DEACTIVATE_PROVIDER});
 
       // Run callback if provided
-      onAfterDisconnect?.();
+      await onAfterDisconnect?.();
     } catch (error) {
       console.error(error);
     }
