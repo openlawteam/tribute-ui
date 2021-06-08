@@ -6,7 +6,7 @@ import {AsyncStatus} from './util/types';
 import {getConnectedMember} from './store/actions';
 import {ReduxDispatch, StoreState} from './store/types';
 import {SNAPSHOT_HUB_API_URL} from './config';
-import {useInitContracts} from './components/web3/hooks';
+import {useInitContracts, useIsDefaultChain} from './components/web3/hooks';
 import {useIsMounted} from './hooks';
 import {useWeb3Modal} from './components/web3/hooks';
 
@@ -68,9 +68,10 @@ export default function Init(props: InitProps) {
    * Our hooks
    */
 
-  const initContracts = useInitContracts();
   const {account, web3Instance} = useWeb3Modal();
+  const {isDefaultChain} = useIsDefaultChain();
   const {isMountedRef} = useIsMounted();
+  const initContracts = useInitContracts();
 
   /**
    * Their hooks
@@ -84,12 +85,15 @@ export default function Init(props: InitProps) {
 
   const handleInitContractsCached = useCallback(handleInitContracts, [
     initContracts,
+    isDefaultChain,
+    web3Instance,
   ]);
 
   const handleGetMemberCached = useCallback(handleGetMember, [
     account,
     daoRegistryContract,
     dispatch,
+    isDefaultChain,
     web3Instance,
   ]);
 
@@ -109,7 +113,7 @@ export default function Init(props: InitProps) {
   }, [processReadyMap]);
 
   useEffect(() => {
-    web3Instance && handleInitContractsCached();
+    handleInitContractsCached();
   }, [handleInitContractsCached, web3Instance]);
 
   useEffect(() => {
@@ -152,7 +156,11 @@ export default function Init(props: InitProps) {
 
   async function handleInitContracts() {
     try {
-      await initContracts();
+      if (!isDefaultChain || !web3Instance) {
+        return;
+      }
+
+      await initContracts({web3Instance});
     } catch (error) {
       setError(error);
     }
@@ -160,7 +168,12 @@ export default function Init(props: InitProps) {
 
   async function handleGetMember() {
     try {
-      if (!account || !daoRegistryContract || !web3Instance) {
+      if (
+        !account ||
+        !daoRegistryContract ||
+        !isDefaultChain ||
+        !web3Instance
+      ) {
         return;
       }
 

@@ -9,28 +9,20 @@ import Wrapper from '../../../test/Wrapper';
 describe('useIsDefaultChain unit tests', () => {
   test('should return correct data when OK', async () => {
     await act(async () => {
-      const {result, waitForValueToChange} = await renderHook(
-        () => useIsDefaultChain(),
-        {
-          wrapper: Wrapper,
-          initialProps: {
-            useInit: true,
-            useWallet: true,
-          },
-        }
-      );
+      const {result} = await renderHook(() => useIsDefaultChain(), {
+        wrapper: Wrapper,
+        initialProps: {
+          useInit: true,
+          useWallet: true,
+        },
+      });
 
       // Initial result
-      expect(result.current.defaultChain).toBe(DEFAULT_CHAIN);
-      expect(result.current.defaultChainError).toBe(undefined);
-      expect(result.current.isDefaultChain).toBe(false);
-
-      await waitForValueToChange(() => result.current.isDefaultChain);
-
-      // Assert OK
-      expect(result.current.defaultChain).toBe(DEFAULT_CHAIN);
-      expect(result.current.defaultChainError).toBe(undefined);
-      expect(result.current.isDefaultChain).toBe(true);
+      await waitFor(() => {
+        expect(result.current.defaultChain).toBe(DEFAULT_CHAIN);
+        expect(result.current.defaultChainError).toBe(undefined);
+        expect(result.current.isDefaultChain).toBe(true);
+      });
     });
   });
 
@@ -52,7 +44,7 @@ describe('useIsDefaultChain unit tests', () => {
           networkId: mockChains.RINKEBY,
           provider: mockWeb3Provider,
           web3Instance: mockWeb3,
-          web3Modal: null,
+          web3Modal: null as any,
         }));
 
       const {result, waitForValueToChange} = await renderHook(() =>
@@ -129,7 +121,7 @@ describe('useIsDefaultChain unit tests', () => {
           networkId: mockChains.RINKEBY,
           provider: mockWeb3Provider,
           web3Instance: mockWeb3,
-          web3Modal: null,
+          web3Modal: null as any,
         }));
 
       const {rerender, result, waitForValueToChange} = await renderHook(() =>
@@ -164,7 +156,7 @@ describe('useIsDefaultChain unit tests', () => {
           networkId: mockChains.GANACHE,
           provider: mockWeb3Provider,
           web3Instance: mockWeb3,
-          web3Modal: null,
+          web3Modal: null as any,
         }));
 
       // Re-render

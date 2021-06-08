@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+import {render} from 'react-dom';
 import {Store} from 'redux';
 import {Provider} from 'react-redux';
 import {BrowserRouter} from 'react-router-dom';
@@ -12,6 +12,8 @@ import {
 } from '@apollo/client';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 
+import {AsyncStatus} from './util/types';
+import {clearConnectedMember, clearContracts} from './store/actions';
 import {DefaultTheme} from './components/web3/hooks/useWeb3ModalManager';
 import {disableReactDevTools} from './util/helpers';
 import {ENVIRONMENT, INFURA_PROJECT_ID, GRAPH_API_URL} from './config';
@@ -109,10 +111,15 @@ export const getApolloClient = (
   });
 
 if (root !== null) {
-  ReactDOM.render(
+  render(
     <Provider store={store}>
       <BrowserRouter>
         <Web3ModalManager
+          onAfterDisconnect={() => store.dispatch(clearConnectedMember())}
+          onBeforeConnect={(state) =>
+            state.initialCachedConnectorCheckStatus === AsyncStatus.FULFILLED &&
+            store.dispatch(clearContracts())
+          }
           providerOptions={getProviderOptions()}
           defaultTheme={DefaultTheme.LIGHT}>
           <ApolloProvider client={getApolloClient(store)}>

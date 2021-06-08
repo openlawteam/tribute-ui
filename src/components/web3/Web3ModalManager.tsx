@@ -9,6 +9,18 @@ import useWeb3ModalManager, {DefaultTheme} from './hooks/useWeb3ModalManager';
 type Web3ModalProviderArguments = {
   defaultChain?: number;
   defaultTheme?: DefaultTheme;
+  /**
+   * Optional: Any action to take after disconnecting from an Ethereum provider.
+   */
+  onAfterDisconnect?: Parameters<
+    typeof useWeb3ModalManager
+  >[0]['onAfterDisconnect'];
+  /**
+   * Optional: Any action to take before connecting to an Ethereum provider.
+   */
+  onBeforeConnect?: Parameters<
+    typeof useWeb3ModalManager
+  >[0]['onBeforeConnect'];
   providerOptions: Record<string, any>; // required
 };
 
@@ -53,6 +65,8 @@ export default function Web3ModalManager({
   children,
   defaultChain,
   defaultTheme = DefaultTheme.DARK,
+  onBeforeConnect,
+  onAfterDisconnect,
   providerOptions,
 }: Web3ModalManagerProps) {
   /**
@@ -77,6 +91,8 @@ export default function Web3ModalManager({
   const web3ModalProviderArguments: Web3ModalProviderArguments = {
     defaultChain,
     defaultTheme,
+    onBeforeConnect,
+    onAfterDisconnect,
     providerOptions,
   };
 

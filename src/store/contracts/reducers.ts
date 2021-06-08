@@ -1,4 +1,5 @@
 import {
+  CLEAR_CONTRACTS,
   CONTRACT_BANK_ADAPTER,
   CONTRACT_BANK_EXTENSION,
   CONTRACT_BANK_FACTORY,
@@ -53,6 +54,8 @@ export default function reducer(
   const {type, ...payload} = action;
 
   switch (type) {
+    case CLEAR_CONTRACTS:
+      return clearContracts(state);
     case CONTRACT_BANK_ADAPTER:
       return contractBankAdapter(state, payload);
     case CONTRACT_BANK_EXTENSION:
@@ -99,6 +102,10 @@ export default function reducer(
     default:
       return state;
   }
+}
+
+function clearContracts(state: ContractsState) {
+  return {...state, ...initialState};
 }
 
 function contractBankFactory(state: ContractsState, payload: any) {

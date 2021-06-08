@@ -1,4 +1,4 @@
-import {memo, useState} from 'react';
+import {memo, useEffect, useState} from 'react';
 import {isMobile} from 'react-device-detect';
 
 import {CHAINS} from '../../config';
@@ -34,10 +34,10 @@ function ConnectWallet({
   const {
     account,
     connected,
-    providerOptions,
+    networkId,
     onConnectTo,
     onDisconnect,
-    networkId,
+    providerOptions,
     web3Modal,
   } = useWeb3Modal();
 
@@ -56,6 +56,20 @@ function ConnectWallet({
   const isWrongNetwork: boolean = isDefaultChain === false;
   const isChainGanache = networkId === CHAINS.GANACHE;
   const displayWalletText: string = getWalletText();
+
+  /**
+   * Effects
+   */
+
+  /**
+   * If the chain is not correct, and the `web3Modal` is ready, then open the modal
+   * which will alert the user to change chains.
+   */
+  useEffect(() => {
+    if (!isDefaultChain && web3Modal) {
+      setOpenModal(true);
+    }
+  }, [isDefaultChain, web3Modal]);
 
   /**
    * Functions

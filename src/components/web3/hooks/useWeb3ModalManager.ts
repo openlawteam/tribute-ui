@@ -1,12 +1,10 @@
 import {useReducer, useCallback, useEffect} from 'react';
-import {useDispatch} from 'react-redux';
 import Web3 from 'web3';
 import Web3Modal from 'web3modal';
 
-import {DEFAULT_CHAIN} from '../../../config';
-import {clearConnectedMember} from '../../../store/actions';
-import {NetworkNames, NetworkIDs} from '../../../util/enums';
 import {AsyncStatus} from '../../../util/types';
+import {DEFAULT_CHAIN} from '../../../config';
+import {NetworkNames, NetworkIDs} from '../../../util/enums';
 
 type NetworkNameType = NetworkNames;
 
@@ -19,14 +17,15 @@ export enum DefaultTheme {
 }
 
 enum ActionType {
-  INITIAL_CACHED_CONNECTOR_CHECK_STATUS,
-  INIT_WEB3MODAL,
   ACTIVATE_PROVIDER,
-  UPDATE,
-  UPDATE_FROM_ERROR,
-  ERROR,
-  ERROR_FROM_ACTIVATION,
   DEACTIVATE_PROVIDER,
+  ERROR_FROM_ACTIVATION,
+  ERROR,
+  INIT_WEB3MODAL,
+  INITIAL_CACHED_CONNECTOR_CHECK_STATUS,
+  UPDATE_ACCOUNT,
+  UPDATE_FROM_ERROR,
+  UPDATE_NEW_CONNECTION,
 }
 
 interface Action {
@@ -67,16 +66,12 @@ function reducer(
       return {provider, networkId, account, web3Modal};
     }
 
-    case ActionType.UPDATE: {
-      const {provider, networkId, account, connected, web3Instance} = payload;
+    case ActionType.UPDATE_ACCOUNT: {
+      const {account} = payload;
 
       return {
         ...state,
-        ...(provider === undefined ? null : {provider}),
-        ...(networkId === undefined ? null : {networkId}),
-        ...(account === undefined ? null : {account}),
-        ...(connected === undefined ? null : {connected}),
-        ...(web3Instance === undefined ? null : {web3Instance}),
+        account,
       };
     }
 
@@ -84,10 +79,23 @@ function reducer(
       const {provider, networkId, account} = payload;
       return {
         ...state,
-        ...(provider === undefined ? null : {provider}),
-        ...(networkId === undefined ? null : {networkId}),
-        ...(account === undefined ? null : {account}),
+        account,
         error: undefined,
+        networkId,
+        provider,
+      };
+    }
+
+    case ActionType.UPDATE_NEW_CONNECTION: {
+      const {provider, networkId, account, connected, web3Instance} = payload;
+
+      return {
+        ...state,
+        account,
+        connected,
+        networkId,
+        provider,
+        web3Instance,
       };
     }
 
@@ -117,12 +125,16 @@ function reducer(
 interface Web3ModalManagerInterface {
   defaultChain?: number;
   defaultTheme?: DefaultTheme;
-  providerOptions: Record<string, any>; //required
+  onAfterDisconnect?: () => void;
+  onBeforeConnect?: (state: Web3ModalManagerState) => void;
+  providerOptions: Record<string, any>;
 }
 
 export default function useWeb3ModalManager({
   defaultChain,
   defaultTheme,
+  onAfterDisconnect,
+  onBeforeConnect,
   providerOptions,
 }: Web3ModalManagerInterface) {
   /**
@@ -138,49 +150,98 @@ export default function useWeb3ModalManager({
    */
 
   const web3ModalTheme = defaultTheme;
-  const web3ModalChain = defaultChain || DEFAULT_CHAIN;
+  const web3ModalChain: number = defaultChain || DEFAULT_CHAIN;
 
   /**
-   * @note Disable hook lint checks for now as some additional deps cause render issues.
+   * Cached callbacks
    */
-  //eslint-disable-next-line react-hooks/exhaustive-deps
-  const onConnectToCached = useCallback(onConnectTo, [state.web3Modal]);
-  const getNetworkNameCached = useCallback(getNetworkName, [web3ModalChain]);
+
+  const onConnectToCached = useCallback(onConnectTo, [
+    onBeforeConnect,
+    state.error,
+    state.initialCachedConnectorCheckStatus,
+    state.web3Modal,
+  ]);
+
+  const chainChangedCallbackCached = useCallback(chainChangedCallback, [
+    onConnectToCached,
+    state.web3Modal?.cachedProvider,
+  ]);
 
   /**
-   * Their hooks
+   * Effects
    */
 
-  const storeDispatch = useDispatch();
-
-  /**
-   * Init Web3Modal
-   */
   useEffect(() => {
-    if (!state.web3Modal) {
-      dispatch({
-        type: ActionType.INIT_WEB3MODAL,
-        payload: {
-          web3Modal: new Web3Modal({
-            cacheProvider: true, // optional
-            network: getNetworkNameCached(), // optional
-            providerOptions, // required
-            theme: web3ModalTheme, // optional; `light` or `dark`. `dark` is default
-          }),
-        },
-      });
+    const provider = state.provider;
+
+    // Subscribe to accounts change
+    provider?.on('accountsChanged', accountsChangedCallback);
+
+    // Subscribe to chainId change
+    provider?.on('chainChanged', chainChangedCallbackCached);
+
+    return () => {
+      // Remove listeners on unmount
+      provider?.removeListener('accountsChanged', accountsChangedCallback);
+      provider?.removeListener('chainChanged', chainChangedCallbackCached);
+    };
+  }, [chainChangedCallbackCached, state.provider]);
+
+  // Init Web3Modal
+  useEffect(() => {
+    if (state.web3Modal) return;
+
+    dispatch({
+      type: ActionType.INIT_WEB3MODAL,
+      payload: {
+        web3Modal: new Web3Modal({
+          cacheProvider: true, // optional
+          network: getNetworkName(web3ModalChain), // optional
+          providerOptions, // required
+          theme: web3ModalTheme, // optional; `light` or `dark`. `dark` is default
+        }),
+      },
+    });
+  }, [providerOptions, state.web3Modal, web3ModalChain, web3ModalTheme]);
+
+  // Attempt to initialise connection to a cached provider
+  useEffect(() => {
+    if (
+      state.initialCachedConnectorCheckStatus === AsyncStatus.FULFILLED ||
+      state.initialCachedConnectorCheckStatus === AsyncStatus.PENDING
+    ) {
+      return;
     }
-  }, [getNetworkNameCached, providerOptions, web3ModalTheme, state.web3Modal]);
 
-  /**
-   * Attempt to initialise connection to a cached provider
-   */
-  useEffect(() => {
     attemptUpdateFromCachedConnector(
       state.web3Modal?.cachedProvider,
       onConnectToCached
     );
-  }, [onConnectToCached, state.web3Modal?.cachedProvider]);
+  }, [
+    onConnectToCached,
+    state.initialCachedConnectorCheckStatus,
+    state.web3Modal?.cachedProvider,
+  ]);
+
+  /**
+   * Functions
+   */
+
+  function accountsChangedCallback([account]: string[]) {
+    dispatch({
+      type: ActionType.UPDATE_ACCOUNT,
+      payload: {
+        account,
+      },
+    });
+  }
+
+  function chainChangedCallback(_chainIdHex: string) {
+    if (!state.web3Modal?.cachedProvider) return;
+
+    onConnectToCached(state.web3Modal?.cachedProvider);
+  }
 
   /**
    * attemptUpdateFromCachedConnector
@@ -238,8 +299,6 @@ export default function useWeb3ModalManager({
 
       const provider = await state.web3Modal.connectTo(connectorId);
 
-      subscribeProvider(provider);
-
       const web3: Web3 = new Web3(provider);
 
       // get accounts
@@ -247,13 +306,26 @@ export default function useWeb3ModalManager({
       // get connected network id
       const networkId = await web3.eth.net.getId();
 
+      // Run callback if provided
+      onBeforeConnect?.({
+        account: accounts[0],
+        connected: true,
+        error: state.error,
+        initialCachedConnectorCheckStatus:
+          state.initialCachedConnectorCheckStatus,
+        networkId,
+        provider,
+        web3Instance: web3,
+        web3Modal: state.web3Modal,
+      });
+
       dispatch({
-        type: ActionType.UPDATE,
+        type: ActionType.UPDATE_NEW_CONNECTION,
         payload: {
           account: accounts[0],
           connected: true,
-          provider,
           networkId,
+          provider,
           web3Instance: web3,
         },
       });
@@ -279,60 +351,15 @@ export default function useWeb3ModalManager({
 
       // Reset all states; except for web3Modal?!
       dispatch({type: ActionType.DEACTIVATE_PROVIDER});
-      storeDispatch(clearConnectedMember());
+
+      // Run callback if provided
+      onAfterDisconnect?.();
     } catch (error) {
       console.error(error);
     }
   }
 
-  function subscribeProvider(provider: any) {
-    if (!provider?.on) return;
-
-    // Subscribe to accounts change
-    provider.on('accountsChanged', (accounts: string[]) => {
-      dispatch({
-        type: ActionType.UPDATE,
-        payload: {
-          account: accounts[0],
-        },
-      });
-    });
-
-    // Subscribe to chainId change
-    provider.on('chainChanged', (chainId: string) => {
-      async function handleChainChanged(cachedProvider: string) {
-        // convert `chainId` hex string to number
-        const networkId = parseInt(chainId, 16);
-
-        dispatch({
-          type: ActionType.UPDATE,
-          payload: {
-            networkId,
-          },
-        });
-
-        // if we are connected to the correct network; connect to provider
-        Number(networkId) === Number(chainId) &&
-          (await onConnectToCached(cachedProvider));
-      }
-
-      if (state.web3Modal?.cachedProvider) {
-        handleChainChanged(state.web3Modal?.cachedProvider);
-      }
-    });
-
-    // Subscribe to provider connection
-    provider.on('connect', (info: {chainId: number}) => {
-      console.info('connect', info);
-    });
-
-    // Subscribe to provider disconnection
-    provider.on('disconnect', (error: {code: number; message: string}) => {
-      console.info('disconnect', error);
-    });
-  }
-
-  function getNetworkName(): NetworkNameType {
+  function getNetworkName(web3ModalChain: number): NetworkNameType {
     switch (web3ModalChain) {
       case NetworkIDs.GOERLI:
         return NetworkNames.GOERLI;

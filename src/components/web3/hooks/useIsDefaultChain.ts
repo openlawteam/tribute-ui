@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 
-import {useWeb3Modal} from '.';
 import {CHAIN_NAME, DEFAULT_CHAIN} from '../../../config';
+import {useWeb3Modal} from './useWeb3Modal';
 
 type UseIsDefaultChainReturn = {
   /**
@@ -32,23 +32,15 @@ export function useIsDefaultChain(): UseIsDefaultChainReturn {
 
   const {networkId, connected} = useWeb3Modal();
 
-  console.log('networkId', networkId);
-
   /**
    * State
    */
 
-  const [isDefaultChain, setIsDefaultChain] = useState<boolean>(false);
   const [defaultChainError, setDefaultChainError] = useState<Error>();
 
   /**
    * Effects
    */
-
-  // Determine `isDefaultChain`
-  useEffect(() => {
-    setIsDefaultChain(networkId === DEFAULT_CHAIN);
-  }, [networkId]);
 
   // Determine `defaultChainError`
   useEffect(() => {
@@ -68,6 +60,6 @@ export function useIsDefaultChain(): UseIsDefaultChainReturn {
   return {
     defaultChain: DEFAULT_CHAIN,
     defaultChainError,
-    isDefaultChain,
+    isDefaultChain: networkId === DEFAULT_CHAIN,
   };
 }
