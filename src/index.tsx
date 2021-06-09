@@ -12,7 +12,6 @@ import {
 } from '@apollo/client';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 
-import {AsyncStatus} from './util/types';
 import {clearConnectedMember, clearContracts} from './store/actions';
 import {DefaultTheme} from './components/web3/hooks/useWeb3ModalManager';
 import {disableReactDevTools} from './util/helpers';
@@ -115,11 +114,15 @@ if (root !== null) {
     <Provider store={store}>
       <BrowserRouter>
         <Web3ModalManager
-          onAfterDisconnect={() => store.dispatch(clearConnectedMember())}
-          onBeforeConnect={(state) =>
-            state.initialCachedConnectorCheckStatus === AsyncStatus.FULFILLED &&
-            store.dispatch(clearContracts())
-          }
+          onAfterDisconnect={() => {
+            // Clear out `connectedMember` and `contracts` Redux state
+            store.dispatch(clearConnectedMember());
+            store.dispatch(clearContracts());
+          }}
+          onBeforeConnect={() => {
+            // Clear out `contracts` Redux state
+            store.dispatch(clearContracts());
+          }}
           providerOptions={getProviderOptions()}
           defaultTheme={DefaultTheme.LIGHT}>
           <ApolloProvider client={getApolloClient(store)}>

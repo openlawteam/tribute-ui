@@ -56,7 +56,6 @@ export function useInitContracts(): (data: {
       // Must init registry first
       await dispatch(initContractDaoRegistry(web3Instance));
 
-      // Init more contracts
       await dispatch(initContractDaoFactory(web3Instance));
       await dispatch(initContractBankFactory(web3Instance));
       await dispatch(initContractConfiguration(web3Instance));
@@ -65,7 +64,6 @@ export function useInitContracts(): (data: {
       await dispatch(initContractManaging(web3Instance));
       await dispatch(initContractRagequit(web3Instance));
       await dispatch(initContractBankAdapter(web3Instance));
-      // Init other contracts
       await dispatch(initContractBankExtension(web3Instance));
       await dispatch(initContractManaging(web3Instance));
       await dispatch(initContractOnboarding(web3Instance));

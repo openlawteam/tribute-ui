@@ -2,9 +2,12 @@ import {createContext, useEffect, useRef, useState} from 'react';
 import Web3 from 'web3';
 import Web3Modal from 'web3modal';
 
+import useWeb3ModalManager, {
+  DefaultTheme,
+  Web3ModalError,
+} from './hooks/useWeb3ModalManager';
 import {AsyncStatus} from '../../util/types';
 import {ETHEREUM_PROVIDER_URL} from '../../config';
-import useWeb3ModalManager, {DefaultTheme} from './hooks/useWeb3ModalManager';
 
 type Web3ModalProviderArguments = {
   defaultChain?: number;
@@ -31,6 +34,7 @@ type Web3ModalManagerProps = {
 export type Web3ModalContextValue = {
   account: string | undefined;
   connected: boolean | undefined;
+  error: Web3ModalError | undefined;
   initialCachedConnectorCheckStatus: AsyncStatus | undefined;
   networkId: number | undefined;
   onConnectTo: (providerName: string) => void;
@@ -104,6 +108,7 @@ export default function Web3ModalManager({
   const {
     account,
     connected,
+    error,
     initialCachedConnectorCheckStatus,
     networkId = defaultWeb3NetID,
     onConnectTo,
@@ -137,6 +142,7 @@ export default function Web3ModalManager({
   const web3ModalContext: Web3ModalContextValue = {
     account,
     connected,
+    error,
     initialCachedConnectorCheckStatus,
     networkId,
     onConnectTo,

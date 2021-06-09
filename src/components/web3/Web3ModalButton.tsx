@@ -35,6 +35,8 @@ function ConnectWallet({
   const {
     account,
     connected,
+    // @todo Use and handle error in the UI
+    // error,
     initialCachedConnectorCheckStatus,
     networkId,
     onConnectTo,
@@ -84,15 +86,15 @@ function ConnectWallet({
     if (isMobile) {
       if (account) {
         return truncateEthAddress(account);
-      } else {
-        return 'Connect';
       }
+
+      return 'Connect';
     } else {
       if (showWalletETHBadge && account) {
         return truncateEthAddress(account);
-      } else {
-        return customWalletText || '';
       }
+
+      return customWalletText || '';
     }
   }
 
@@ -114,7 +116,7 @@ function ConnectWallet({
                 ? 'walletconnect__options-button--connected'
                 : ''
             }`}
-          onClick={async () => await onConnectTo(provider[0])}
+          onClick={() => onConnectTo(provider[0])}
           // disable WalletConnect button on Ganache network
           disabled={isChainGanache && provider[0] === 'walletconnect'}>
           <span className="wallet-name">{provider[1].display.name}</span>
@@ -186,9 +188,7 @@ function ConnectWallet({
             ? 'walletconnect__connect-button--error'
             : ''
         }`}
-        onClick={() => {
-          setOpenModal(true);
-        }}>
+        onClick={() => setOpenModal(true)}>
         <span
           className={`connect-button-text ${
             connected ? 'connect-button-text--ethAddress' : ''

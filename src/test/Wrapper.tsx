@@ -90,6 +90,7 @@ export default function Wrapper(
       .mockImplementation(() => ({
         account: DEFAULT_ETH_ADDRESS,
         connected: true,
+        error: undefined,
         initialCachedConnectorCheckStatus: AsyncStatus.FULFILLED,
         providerOptions: {},
         onConnectTo: () => {},

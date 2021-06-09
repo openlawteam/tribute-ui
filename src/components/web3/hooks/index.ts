@@ -1,4 +1,5 @@
 export * from './useContractSend';
+export * from './useContractPoll';
 export * from './useETHGasPrice';
 export * from './useInitContracts';
 export * from './useIsDefaultChain';
