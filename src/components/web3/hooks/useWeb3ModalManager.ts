@@ -174,8 +174,8 @@ export default function useWeb3ModalManager({
 
     return () => {
       // Remove listeners on unmount
-      provider?.removeListener('accountsChanged', accountsChangedCallback);
-      provider?.removeListener('chainChanged', chainChangedCallbackCached);
+      provider?.removeListener?.('accountsChanged', accountsChangedCallback);
+      provider?.removeListener?.('chainChanged', chainChangedCallbackCached);
     };
   }, [chainChangedCallbackCached, state.provider]);
 
