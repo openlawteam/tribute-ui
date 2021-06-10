@@ -34,11 +34,11 @@ type Web3ModalManagerProps = {
 export type Web3ModalContextValue = {
   account: string | undefined;
   connected: boolean | undefined;
+  connectWeb3Modal: (providerName: string) => void;
+  disconnectWeb3Modal: () => void;
   error: Web3ModalError | undefined;
   initialCachedConnectorCheckStatus: AsyncStatus | undefined;
   networkId: number | undefined;
-  onConnectTo: (providerName: string) => void;
-  onDisconnect: () => void;
   provider: any;
   providerOptions: Record<string, any>;
   web3Instance: Web3 | undefined;
@@ -108,11 +108,11 @@ export default function Web3ModalManager({
   const {
     account,
     connected,
+    connectWeb3Modal,
+    disconnectWeb3Modal,
     error,
     initialCachedConnectorCheckStatus,
     networkId = defaultWeb3NetID,
-    onConnectTo,
-    onDisconnect,
     provider = defaultWeb3InstanceRef.current?.currentProvider,
     web3Instance = defaultWeb3InstanceRef.current,
     web3Modal,
@@ -142,11 +142,11 @@ export default function Web3ModalManager({
   const web3ModalContext: Web3ModalContextValue = {
     account,
     connected,
+    connectWeb3Modal,
+    disconnectWeb3Modal,
     error,
     initialCachedConnectorCheckStatus,
     networkId,
-    onConnectTo,
-    onDisconnect,
     provider,
     providerOptions,
     web3Instance,

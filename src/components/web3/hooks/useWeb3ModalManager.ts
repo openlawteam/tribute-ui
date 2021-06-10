@@ -6,9 +6,6 @@ import {AsyncStatus} from '../../../util/types';
 import {DEFAULT_CHAIN} from '../../../config';
 import {NetworkNames, NetworkIDs} from '../../../util/enums';
 
-// The `web3Modal` localStorage cached provider key
-const WEB3_CONNECT_CACHED_PROVIDER: string = 'WEB3_CONNECT_CACHED_PROVIDER';
-
 export enum DefaultTheme {
   DARK = 'dark',
   LIGHT = 'light',
@@ -59,8 +56,8 @@ interface Web3ModalManagerInterface {
 }
 
 type UseWeb3ModalManagerReturn = {
-  onConnectTo: (connectorId: string) => Promise<void>;
-  onDisconnect: () => Promise<void>;
+  connectWeb3Modal: (connectorId: string) => Promise<void>;
+  disconnectWeb3Modal: () => Promise<void>;
   providerOptions: Web3ModalManagerInterface['providerOptions'];
 } & Web3ModalManagerState;
 
@@ -152,13 +149,13 @@ export default function useWeb3ModalManager({
    * Cached callbacks
    */
 
-  const onConnectToCached = useCallback(onConnectTo, [
+  const connectWeb3ModalCached = useCallback(connectWeb3Modal, [
     onBeforeConnect,
     state.web3Modal,
   ]);
 
   const chainChangedCallbackCached = useCallback(chainChangedCallback, [
-    onConnectToCached,
+    connectWeb3ModalCached,
     state.web3Modal?.cachedProvider,
   ]);
 
@@ -170,10 +167,10 @@ export default function useWeb3ModalManager({
     const provider = state.provider;
 
     // Subscribe to accounts change
-    provider?.on('accountsChanged', accountsChangedCallback);
+    provider?.on?.('accountsChanged', accountsChangedCallback);
 
     // Subscribe to chainId change
-    provider?.on('chainChanged', chainChangedCallbackCached);
+    provider?.on?.('chainChanged', chainChangedCallbackCached);
 
     return () => {
       // Remove listeners on unmount
@@ -201,20 +198,20 @@ export default function useWeb3ModalManager({
 
   // Attempt to initialise connection to a cached provider
   useEffect(() => {
+    // If the initial check has ran, or is running, exit.
     if (
       state.initialCachedConnectorCheckStatus === AsyncStatus.FULFILLED ||
-      state.initialCachedConnectorCheckStatus === AsyncStatus.PENDING ||
-      state.initialCachedConnectorCheckStatus === AsyncStatus.REJECTED
+      state.initialCachedConnectorCheckStatus === AsyncStatus.PENDING
     ) {
       return;
     }
 
     attemptUpdateFromCachedConnector(
       state.web3Modal?.cachedProvider,
-      onConnectToCached
+      connectWeb3ModalCached
     );
   }, [
-    onConnectToCached,
+    connectWeb3ModalCached,
     state.initialCachedConnectorCheckStatus,
     state.web3Modal?.cachedProvider,
   ]);
@@ -235,7 +232,7 @@ export default function useWeb3ModalManager({
   function chainChangedCallback(_chainIdHex: string) {
     if (!state.web3Modal?.cachedProvider) return;
 
-    onConnectToCached(state.web3Modal?.cachedProvider);
+    connectWeb3ModalCached(state.web3Modal?.cachedProvider);
   }
 
   /**
@@ -245,12 +242,12 @@ export default function useWeb3ModalManager({
    * and cached provider (via `localStorage`) is available.
    *
    * @param connectorId `String | undefined`
-   * @param action `Function` callback which dispatches an action to connect
+   * @param connectCallback `Function` callback which dispatches an action to connect
    * @returns void
    */
   async function attemptUpdateFromCachedConnector(
     connectorId: string | undefined,
-    action: (cid: string) => Promise<void>
+    connectCallback: (cid: string) => Promise<void>
   ): Promise<void> {
     const statusAction = ActionType.INITIAL_CACHED_CONNECTOR_CHECK_STATUS;
 
@@ -265,15 +262,9 @@ export default function useWeb3ModalManager({
       payload: {initialCachedConnectorCheckStatus: AsyncStatus.PENDING},
     });
 
-    if (connectorId && localStorage.getItem(WEB3_CONNECT_CACHED_PROVIDER)) {
-      try {
-        await action(connectorId);
-      } catch (error) {
-        dispatch({
-          type: statusAction,
-          payload: {initialCachedConnectorCheckStatus: AsyncStatus.REJECTED},
-        });
-      }
+    if (connectorId) {
+      // @note Does not throw
+      await connectCallback(connectorId);
     }
 
     dispatch({
@@ -286,7 +277,7 @@ export default function useWeb3ModalManager({
    * Connect to a specfic wallet; get account assets and
    * subscribe to provider events
    */
-  async function onConnectTo(connectorId: string): Promise<void> {
+  async function connectWeb3Modal(connectorId: string): Promise<void> {
     try {
       if (!state.web3Modal) return;
 
@@ -327,7 +318,7 @@ export default function useWeb3ModalManager({
   /**
    * Disconnect wallet button pressed.
    */
-  async function onDisconnect(): Promise<void> {
+  async function disconnectWeb3Modal(): Promise<void> {
     try {
       await state.provider?.close?.();
 
@@ -336,20 +327,23 @@ export default function useWeb3ModalManager({
       // and does not allow to re-scan the QR code with a new wallet.
       // Depending on your use case you may want or want not his behaviour.
       state.web3Modal && (await state.web3Modal.clearCachedProvider());
+
       // Reset all state
       dispatch({type: ActionType.DEACTIVATE_PROVIDER_WEB3MODAL});
 
       // Run callback if provided
       await onAfterDisconnect?.();
     } catch (error) {
-      const connectorId: string = state.web3Modal?.cachedProvider || 'provider';
+      const connectorId: string = state.web3Modal?.cachedProvider || '';
 
       dispatch({
         type: ActionType.ERROR_WEB3MODAL,
         payload: {
           error: {
             connectorId,
-            error: new Error(`Failed to disconnect from ${connectorId}.`),
+            error: new Error(
+              `Failed to disconnect from ${connectorId || 'provider'}.`
+            ),
             type: Web3ModalErrorType.DISCONNECT,
           },
         },
@@ -359,8 +353,8 @@ export default function useWeb3ModalManager({
 
   return {
     ...state,
-    onConnectTo,
-    onDisconnect,
+    connectWeb3Modal,
+    disconnectWeb3Modal,
     providerOptions,
   };
 }

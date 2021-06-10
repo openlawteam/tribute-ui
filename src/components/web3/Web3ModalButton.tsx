@@ -33,14 +33,14 @@ function ConnectWallet({
    */
 
   const {
-    account,
-    connected,
     // @todo Use and handle error in the UI
     // error,
+    account,
+    connected,
+    connectWeb3Modal,
+    disconnectWeb3Modal,
     initialCachedConnectorCheckStatus,
     networkId,
-    onConnectTo,
-    onDisconnect,
     providerOptions,
     web3Modal,
   } = useWeb3Modal();
@@ -116,7 +116,7 @@ function ConnectWallet({
                 ? 'walletconnect__options-button--connected'
                 : ''
             }`}
-          onClick={() => onConnectTo(provider[0])}
+          onClick={() => connectWeb3Modal(provider[0])}
           // disable WalletConnect button on Ganache network
           disabled={isChainGanache && provider[0] === 'walletconnect'}>
           <span className="wallet-name">{provider[1].display.name}</span>
@@ -170,7 +170,7 @@ function ConnectWallet({
           {connected && (
             <button
               className="walletconnect__disconnect-link-button"
-              onClick={onDisconnect}>
+              onClick={disconnectWeb3Modal}>
               {'Disconnect Wallet'}
             </button>
           )}

@@ -41,7 +41,7 @@ window.ethereum &&
 // Built-in web browser provider (only one can exist at a time),
 // MetaMask, Brave or Opera is added automatically by Web3modal
 function getProviderOptions() {
-  const providerOptions = {
+  return {
     // Injected providers
     injected: {
       display: {
@@ -65,7 +65,6 @@ function getProviderOptions() {
       },
     },
   };
-  return providerOptions;
 }
 
 // Create `ApolloClient`
