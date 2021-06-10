@@ -23,18 +23,20 @@ describe('Web3ModalManager unit tests', () => {
     },
   };
 
-  test('should provide correct data when connected', async () => {
-    let web3Context: Web3ModalContextValue;
-    let mock: jest.SpyInstance | undefined;
-
+  beforeEach(() => {
     /**
-     * Mock the websocket connection to the Web3 instance.
+     * Mock the initial websocket connection to the Web3 instance.
      */
     server.use(
       rest.get('http://127.0.0.1:7545/', async (_req, res, ctx) =>
         res(ctx.status(200))
       )
     );
+  });
+
+  test('should provide correct data when connected', async () => {
+    let web3Context: Web3ModalContextValue;
+    let mock: jest.SpyInstance | undefined;
 
     render(
       <Wrapper>
@@ -121,15 +123,6 @@ describe('Web3ModalManager unit tests', () => {
     const connectSpy = jest.fn();
     const disconnectSpy = jest.fn();
 
-    /**
-     * Mock the websocket connection to the Web3 instance.
-     */
-    server.use(
-      rest.get('http://127.0.0.1:7545/', async (_req, res, ctx) =>
-        res(ctx.status(200))
-      )
-    );
-
     render(
       <Wrapper>
         <Web3ModalManager
@@ -193,15 +186,6 @@ describe('Web3ModalManager unit tests', () => {
 
   test('should provide default `Web3` instance and provider', async () => {
     let web3Context: Web3ModalContextValue;
-
-    /**
-     * Mock the websocket connection to the Web3 instance.
-     */
-    server.use(
-      rest.get('http://127.0.0.1:7545/', async (_req, res, ctx) =>
-        res(ctx.status(200))
-      )
-    );
 
     render(
       <Wrapper>
