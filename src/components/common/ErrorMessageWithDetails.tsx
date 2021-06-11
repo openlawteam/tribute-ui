@@ -1,14 +1,13 @@
-import React from 'react';
+import {useState} from 'react';
 
 import {MetaMaskRPCError} from '../../util/types';
 import {normalizeString} from '../../util/helpers';
-
 import FadeIn from './FadeIn';
 
 type ErrorMessageWithDetailsProps = {
-  error?: Error;
+  detailsProps?: React.DetailsHTMLAttributes<HTMLDetailsElement>;
+  error: Error | undefined;
   renderText: (() => React.ReactElement) | string;
-  detailsProps?: React.HTMLAttributes<HTMLDetailsElement>;
 };
 
 export default function ErrorMessageWithDetails(
@@ -16,25 +15,53 @@ export default function ErrorMessageWithDetails(
 ) {
   const {error, renderText} = props;
 
-  // @link https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md#provider-errors
+  /**
+   * State
+   */
+
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
+  /**
+   * Variables
+   */
+
+  /**
+   * Some wallets will provide proper error codes. The `4001` is a "user rejected transaction".
+   *
+   * @link https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md#provider-errors
+   */
   const isWalletRejectedRequest =
     (error as MetaMaskRPCError)?.code === 4001 ||
     /^(the )?user rejected (the )?request$/g.test(
       normalizeString(error?.message || '')
     );
 
-  // @note Some wallets will provide proper error codes. The `4001` is a "user rejected transaction".
-  return error && !isWalletRejectedRequest ? (
+  const textToDisplay: React.ReactNode =
+    typeof renderText === 'string' ? renderText : renderText();
+
+  const areErrorMessageAndTextStringSame: boolean =
+    typeof renderText === 'string' &&
+    normalizeString(renderText) === normalizeString(error?.message || '')
+      ? true
+      : false;
+
+  /**
+   * Render
+   */
+
+  if (!error || isWalletRejectedRequest) return null;
+
+  return (
     <FadeIn>
       <div className="text-center">
-        <p className="error-message">
-          {typeof renderText === 'string' ? renderText : renderText()}
-        </p>
+        <p className="error-message">{textToDisplay}</p>
 
-        {error && (
+        {error && !areErrorMessageAndTextStringSame && (
           <details {...props.detailsProps}>
             <summary
+              aria-expanded={isExpanded}
               className="error-message"
+              onClick={() => setIsExpanded(!isExpanded)}
               style={{cursor: 'pointer', outline: 'none'}}>
               <small>Details</small>
             </summary>
@@ -45,5 +72,5 @@ export default function ErrorMessageWithDetails(
         )}
       </div>
     </FadeIn>
-  ) : null;
+  );
 }
