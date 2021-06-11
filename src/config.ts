@@ -53,7 +53,7 @@ export const CHAINS = {
 };
 
 // Network names for modal messaging
-export const CHAIN_NAME = {
+export const CHAIN_NAME_FULL = {
   [CHAINS.MAINNET]: 'Main Ethereum Network',
   [CHAINS.ROPSTEN]: 'Ropsten Test Network',
   [CHAINS.RINKEBY]: 'Rinkeby Test Network',

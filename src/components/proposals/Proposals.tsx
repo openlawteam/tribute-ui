@@ -15,6 +15,7 @@ import {VotingState} from './voting/types';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import LoaderLarge from '../feedback/LoaderLarge';
 import ProposalCard from './ProposalCard';
+import {useIsDefaultChain} from '../web3/hooks';
 
 type ProposalsProps = {
   adapterName: DaoAdapterConstants;
@@ -72,6 +73,8 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
     includeProposalsExistingOnlyOffchain,
   });
 
+  const {defaultChainError} = useIsDefaultChain();
+
   /**
    * Variables
    */
@@ -87,7 +90,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
     proposalsStatus === AsyncStatus.STANDBY ||
     proposalsStatus === AsyncStatus.PENDING;
 
-  const isError: boolean = proposalsStatus === AsyncStatus.REJECTED;
+  const error: Error | undefined = proposalsError || defaultChainError;
 
   /**
    * Effects
@@ -254,7 +257,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
    */
 
   // Render loading
-  if (isLoading && !isError) {
+  if (isLoading && !error) {
     return (
       <div className="loader--large-container">
         <LoaderLarge />
@@ -263,11 +266,11 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
   }
 
   // Render error
-  if (isError) {
+  if (error) {
     return (
       <div className="text-center">
         <ErrorMessageWithDetails
-          error={proposalsError}
+          error={error}
           renderText="Something went wrong while getting the proposals."
         />
       </div>

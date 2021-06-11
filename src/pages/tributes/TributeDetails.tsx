@@ -7,6 +7,7 @@ import {
 } from '../../components/proposals/types';
 import {AsyncStatus} from '../../util/types';
 import {ContractAdapterNames} from '../../components/web3/types';
+import {useIsDefaultChain} from '../../components/web3/hooks';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import {VotingState} from '../../components/proposals/voting/types';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
@@ -54,6 +55,15 @@ export default function TributeDetails() {
   const {proposalData, proposalError, proposalNotFound, proposalStatus} =
     useProposalOrDraft(proposalId);
 
+  const {defaultChainError} = useIsDefaultChain();
+
+  /**
+   * Variables
+   */
+
+  const isLoading: boolean = proposalStatus === AsyncStatus.PENDING;
+  const error: Error | undefined = proposalError || defaultChainError;
+
   /**
    * Functions
    */
@@ -94,7 +104,7 @@ export default function TributeDetails() {
    */
 
   // Render loading
-  if (proposalStatus === AsyncStatus.PENDING) {
+  if (isLoading && !error) {
     return (
       <RenderWrapper>
         <div className="loader--large-container">
@@ -114,12 +124,12 @@ export default function TributeDetails() {
   }
 
   // Render error
-  if (proposalStatus === AsyncStatus.REJECTED || proposalError) {
+  if (error) {
     return (
       <RenderWrapper>
         <div className="text-center">
           <ErrorMessageWithDetails
-            error={proposalError}
+            error={error}
             renderText="Something went wrong."
           />
         </div>
