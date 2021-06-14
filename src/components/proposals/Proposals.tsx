@@ -10,12 +10,12 @@ import {OffchainVotingStatus} from './voting';
 import {ProposalData, ProposalFlag} from './types';
 import {proposalHasFlag, proposalHasVotingState} from './helpers';
 import {ProposalHeaderNames} from '../../util/enums';
+import {useIsDefaultChain} from '../web3/hooks';
 import {useProposals} from './hooks';
 import {VotingState} from './voting/types';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import LoaderLarge from '../feedback/LoaderLarge';
 import ProposalCard from './ProposalCard';
-import {useIsDefaultChain} from '../web3/hooks';
 
 type ProposalsProps = {
   adapterName: DaoAdapterConstants;
