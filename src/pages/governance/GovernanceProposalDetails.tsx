@@ -34,6 +34,7 @@ export default function GovernanceProposalDetails() {
    * Variables
    */
 
+  const isLoading: boolean = proposalStatus === AsyncStatus.PENDING;
   const error: Error | undefined = proposalError || defaultChainError;
 
   /**
@@ -41,7 +42,7 @@ export default function GovernanceProposalDetails() {
    */
 
   // Render loading
-  if (proposalStatus === AsyncStatus.PENDING && !error) {
+  if (isLoading && !error) {
     return (
       <RenderWrapper>
         <div className="loader--large-container">
