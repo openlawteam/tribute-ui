@@ -2,14 +2,15 @@ import {useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
 import {AsyncStatus} from '../../util/types';
+import {Member} from './types';
 import {truncateEthAddress, normalizeString} from '../../util/helpers';
-import Wrap from '../../components/common/Wrap';
+import {useIsDefaultChain} from '../../components/web3/hooks';
+import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderLarge from '../../components/feedback/LoaderLarge';
 import NotFound from '../subpages/NotFound';
 import useMembers from './hooks/useMembers';
-import {Member} from './types';
-import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
+import Wrap from '../../components/common/Wrap';
 
 export default function MemberProfile() {
   /**
@@ -17,6 +18,7 @@ export default function MemberProfile() {
    */
 
   const {members, membersError, membersStatus} = useMembers();
+  const {defaultChainError} = useIsDefaultChain();
 
   /**
    * Their hooks
@@ -57,15 +59,17 @@ export default function MemberProfile() {
   const isLoading: boolean =
     membersStatus === AsyncStatus.STANDBY ||
     membersStatus === AsyncStatus.PENDING;
+
   const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
-  const isError: boolean = membersStatus === AsyncStatus.REJECTED;
+
+  const error: Error | undefined = membersError || defaultChainError;
 
   /**
    * Render
    */
 
   // Render loading
-  if (isLoading && !isError) {
+  if (isLoading && !error) {
     return (
       <RenderWrapper>
         <div className="loader--large-container">
@@ -76,12 +80,12 @@ export default function MemberProfile() {
   }
 
   // Render error
-  if (isError) {
+  if (error) {
     return (
       <RenderWrapper>
         <div className="text-center">
           <ErrorMessageWithDetails
-            error={membersError}
+            error={error}
             renderText="Something went wrong while getting the member."
           />
         </div>

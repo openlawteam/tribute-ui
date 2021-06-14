@@ -1,24 +1,23 @@
-import {useCallback, useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
 import {AbiItem, toBN} from 'web3-utils';
+import {useCallback, useEffect, useState} from 'react';
 import {useLazyQuery} from '@apollo/react-hooks';
+import {useSelector} from 'react-redux';
 import Web3 from 'web3';
 
-import {UNITS_ADDRESS, GQL_QUERY_POLLING_INTERVAL} from '../../../config';
 import {AsyncStatus} from '../../../util/types';
+import {GET_MEMBERS} from '../../../gql';
+import {Member} from '../types';
+import {multicall, MulticallTuple} from '../../../components/web3/helpers';
 import {normalizeString} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
 import {SubgraphNetworkStatus} from '../../../store/subgraphNetworkStatus/types';
-
-import {multicall, MulticallTuple} from '../../../components/web3/helpers';
+import {UNITS_ADDRESS, GQL_QUERY_POLLING_INTERVAL} from '../../../config';
 import {useWeb3Modal} from '../../../components/web3/hooks';
-import {Member} from '../types';
-import {GET_MEMBERS} from '../../../gql';
 
 type UseMembersReturn = {
   members: Member[];
-  membersStatus: AsyncStatus;
   membersError: Error | undefined;
+  membersStatus: AsyncStatus;
 };
 
 /**
@@ -66,9 +65,11 @@ export default function useMembers(): UseMembersReturn {
    */
 
   const [members, setMembers] = useState<Member[]>([]);
+
   const [membersStatus, setMembersStatus] = useState<AsyncStatus>(
     AsyncStatus.STANDBY
   );
+
   const [membersError, setMembersError] = useState<Error>();
 
   /**
@@ -80,6 +81,7 @@ export default function useMembers(): UseMembersReturn {
     DaoRegistryContract,
     web3Instance,
   ]);
+
   const getMembersFromSubgraphCached = useCallback(getMembersFromSubgraph, [
     data,
     error,

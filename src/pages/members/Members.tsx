@@ -1,13 +1,14 @@
 import {useHistory} from 'react-router-dom';
 
 import {AsyncStatus} from '../../util/types';
-import Wrap from '../../components/common/Wrap';
+import {Member} from './types';
+import {useIsDefaultChain} from '../../components/web3/hooks';
+import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
+import LoaderLarge from '../../components/feedback/LoaderLarge';
 import MemberCard from './MemberCard';
 import useMembers from './hooks/useMembers';
-import {Member} from './types';
-import LoaderLarge from '../../components/feedback/LoaderLarge';
-import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
+import Wrap from '../../components/common/Wrap';
 
 export default function Members() {
   /**
@@ -15,6 +16,7 @@ export default function Members() {
    */
 
   const {members, membersError, membersStatus} = useMembers();
+  const {defaultChainError} = useIsDefaultChain();
 
   /**
    * Their hooks
@@ -29,8 +31,10 @@ export default function Members() {
   const isLoading: boolean =
     membersStatus === AsyncStatus.STANDBY ||
     membersStatus === AsyncStatus.PENDING;
+
   const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
-  const isError: boolean = membersStatus === AsyncStatus.REJECTED;
+
+  const error: Error | undefined = membersError || defaultChainError;
 
   /**
    * Functions
@@ -61,7 +65,7 @@ export default function Members() {
    */
 
   // Render loading
-  if (isLoading && !isError) {
+  if (isLoading && !error) {
     return (
       <RenderWrapper>
         <div className="loader--large-container">
@@ -72,12 +76,12 @@ export default function Members() {
   }
 
   // Render error
-  if (isError) {
+  if (error) {
     return (
       <RenderWrapper>
         <div className="text-center">
           <ErrorMessageWithDetails
-            error={membersError}
+            error={error}
             renderText="Something went wrong while getting the members."
           />
         </div>
