@@ -649,14 +649,14 @@ describe('useWeb3ModalManager unit tests', () => {
     });
   });
 
-  test('onAfterDisconnect: should run callback', async () => {
-    const onAfterDisconnectSpy = jest.fn();
+  test('onBeforeDisconnect: should run callback', async () => {
+    const onBeforeDisconnectSpy = jest.fn();
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(() =>
         useWeb3ModalManager({
           defaultTheme: DefaultTheme.LIGHT,
-          onAfterDisconnect: onAfterDisconnectSpy,
+          onBeforeDisconnect: onBeforeDisconnectSpy,
           providerOptions,
         })
       );
@@ -692,7 +692,7 @@ describe('useWeb3ModalManager unit tests', () => {
 
       await waitForValueToChange(() => result.current.connected);
 
-      expect(onAfterDisconnectSpy.mock.calls.length).toBe(1);
+      expect(onBeforeDisconnectSpy.mock.calls.length).toBe(1);
 
       mock?.mockRestore();
     });

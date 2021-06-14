@@ -15,9 +15,9 @@ type Web3ModalProviderArguments = {
   /**
    * Optional: Any action to take after disconnecting from an Ethereum provider.
    */
-  onAfterDisconnect?: Parameters<
+  onBeforeDisconnect?: Parameters<
     typeof useWeb3ModalManager
-  >[0]['onAfterDisconnect'];
+  >[0]['onBeforeDisconnect'];
   /**
    * Optional: Any action to take before connecting to an Ethereum provider.
    */
@@ -71,7 +71,7 @@ export default function Web3ModalManager({
   defaultChain,
   defaultTheme = DefaultTheme.DARK,
   onBeforeConnect,
-  onAfterDisconnect,
+  onBeforeDisconnect,
   providerOptions,
 }: Web3ModalManagerProps) {
   /**
@@ -97,7 +97,7 @@ export default function Web3ModalManager({
     defaultChain,
     defaultTheme,
     onBeforeConnect,
-    onAfterDisconnect,
+    onBeforeDisconnect,
     providerOptions,
   };
 

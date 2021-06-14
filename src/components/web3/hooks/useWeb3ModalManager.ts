@@ -50,7 +50,7 @@ type Web3ModalManagerState = {
 interface Web3ModalManagerInterface {
   defaultChain?: number;
   defaultTheme?: DefaultTheme;
-  onAfterDisconnect?: () => void;
+  onBeforeDisconnect?: () => void;
   onBeforeConnect?: () => void;
   providerOptions: IProviderOptions;
 }
@@ -126,8 +126,8 @@ function reducer(
 export default function useWeb3ModalManager({
   defaultChain,
   defaultTheme,
-  onAfterDisconnect,
   onBeforeConnect,
+  onBeforeDisconnect,
   providerOptions,
 }: Web3ModalManagerInterface): UseWeb3ModalManagerReturn {
   /**
@@ -328,11 +328,11 @@ export default function useWeb3ModalManager({
       // Depending on your use case you may want or want not his behaviour.
       state.web3Modal && (await state.web3Modal.clearCachedProvider());
 
+      // Run callback if provided
+      await onBeforeDisconnect?.();
+
       // Reset all state
       dispatch({type: ActionType.DEACTIVATE_PROVIDER_WEB3MODAL});
-
-      // Run callback if provided
-      await onAfterDisconnect?.();
     } catch (error) {
       const connectorId: string = state.web3Modal?.cachedProvider || '';
 

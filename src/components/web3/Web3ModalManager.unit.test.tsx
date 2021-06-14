@@ -116,7 +116,7 @@ describe('Web3ModalManager unit tests', () => {
     });
   });
 
-  test('should pass and call `onBeforeConnect`, `onAfterDisconnect`', async () => {
+  test('should pass and call `onBeforeConnect`, `onBeforeDisconnect`', async () => {
     let web3Context: Web3ModalContextValue;
     let mock: jest.SpyInstance | undefined;
 
@@ -127,7 +127,7 @@ describe('Web3ModalManager unit tests', () => {
       <Wrapper>
         <Web3ModalManager
           onBeforeConnect={connectSpy}
-          onAfterDisconnect={disconnectSpy}
+          onBeforeDisconnect={disconnectSpy}
           providerOptions={providerOptions}>
           <Web3ModalContext.Consumer>
             {(context) => {
@@ -174,7 +174,7 @@ describe('Web3ModalManager unit tests', () => {
       web3Context.disconnectWeb3Modal();
     });
 
-    // Assert `onAfterDisconnect` called
+    // Assert `onBeforeDisconnect` called
     await waitFor(() => {
       expect(disconnectSpy.mock.calls.length).toBe(1);
     });
