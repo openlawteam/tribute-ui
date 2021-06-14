@@ -17,7 +17,7 @@ export default function App(props?: AppProps) {
    * Their hooks
    */
 
-  const location = useLocation();
+  const {pathname} = useLocation();
 
   /**
    * Variables
@@ -35,7 +35,7 @@ export default function App(props?: AppProps) {
 
   function renderContent() {
     // The index path has its own template
-    if (location.pathname === '/') {
+    if (pathname === '/') {
       return <>{mainContent}</>;
     }
 
