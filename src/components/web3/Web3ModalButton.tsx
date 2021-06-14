@@ -1,5 +1,6 @@
 import {memo, useEffect, useState} from 'react';
 import {isMobile} from 'react-device-detect';
+import {useLocation} from 'react-router';
 
 import {AsyncStatus} from '../../util/types';
 import {CHAINS} from '../../config';
@@ -48,6 +49,12 @@ function ConnectWallet({
   const {defaultChainError, isDefaultChain} = useIsDefaultChain();
 
   /**
+   * Their hooks
+   */
+
+  const {pathname} = useLocation();
+
+  /**
    * State
    */
 
@@ -66,17 +73,16 @@ function ConnectWallet({
    */
 
   /**
-   * If the chain is not correct, and the `web3Modal` is ready, then open the modal
-   * which will alert the user to change chains.
+   * If the `web3Modal` is ready, and/or the `pathname` changes,
+   * then open or close the modal based on the current chain.
+   *
+   * When open, the user will be alerted to change chains.
    */
   useEffect(() => {
-    if (
-      !isDefaultChain &&
-      initialCachedConnectorCheckStatus === AsyncStatus.FULFILLED
-    ) {
-      setOpenModal(true);
+    if (initialCachedConnectorCheckStatus === AsyncStatus.FULFILLED) {
+      setOpenModal(isDefaultChain ? false : true);
     }
-  }, [isDefaultChain, initialCachedConnectorCheckStatus]);
+  }, [isDefaultChain, initialCachedConnectorCheckStatus, pathname]);
 
   /**
    * Functions
