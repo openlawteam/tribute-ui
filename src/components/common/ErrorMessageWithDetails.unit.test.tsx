@@ -13,7 +13,7 @@ class WalletError extends Error {
   }
 }
 
-describe('ErrorMe', () => {
+describe('ErrorMessageWithDetails unit tests', () => {
   test('should return error message with details', () => {
     const {rerender} = render(
       <ErrorMessageWithDetails
@@ -48,18 +48,55 @@ describe('ErrorMe', () => {
     expect(() => screen.getByText(/^Some exotic error\.$/i)).toThrow();
   });
 
-  test('should return error message with details when `error` is function', () => {
+  test('should return error message with details when `renderText` is function', () => {
     render(
       <ErrorMessageWithDetails
-        error={new Error('Some exotic error.')}
-        renderText={() => <span data-testid="exotic-error">Error!</span>}
+        error={new Error('The most exotic error!')}
+        renderText={() => (
+          <span data-testid="exotic-error">Something went wrong</span>
+        )}
       />
     );
 
-    expect(screen.getByText(/^error!$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^something went wrong$/i)).toBeInTheDocument();
     expect(screen.getByText(/^details$/i)).toBeInTheDocument();
-    expect(screen.getByText(/^Some exotic error\.$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^the most exotic error!$/i)).toBeInTheDocument();
     expect(screen.getByTestId('exotic-error')).toBeInTheDocument();
+  });
+
+  test('should return error message with details when `error` is function', () => {
+    render(
+      <ErrorMessageWithDetails
+        error={() => (
+          <span data-testid="exotic-error">The most exotic error!</span>
+        )}
+        renderText="Something went wrong"
+      />
+    );
+
+    expect(screen.getByText(/^something went wrong$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^details$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^the most exotic error!$/i)).toBeInTheDocument();
+    expect(screen.getByTestId('exotic-error')).toBeInTheDocument();
+  });
+
+  test('should return error message with details when both `error` and `renderText` are functions', () => {
+    render(
+      <ErrorMessageWithDetails
+        error={() => (
+          <span data-testid="exotic-error-1">The most exotic error!</span>
+        )}
+        renderText={() => (
+          <span data-testid="exotic-error-2">Another exotic error!</span>
+        )}
+      />
+    );
+
+    expect(screen.getByText(/^another exotic error!$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^details$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^the most exotic error!$/i)).toBeInTheDocument();
+    expect(screen.getByTestId('exotic-error-1')).toBeInTheDocument();
+    expect(screen.getByTestId('exotic-error-2')).toBeInTheDocument();
   });
 
   test('should return `null` if 4001 error code (user rejected wallet tx)', () => {

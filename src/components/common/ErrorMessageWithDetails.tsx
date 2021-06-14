@@ -6,7 +6,7 @@ import FadeIn from './FadeIn';
 
 type ErrorMessageWithDetailsProps = {
   detailsProps?: React.DetailsHTMLAttributes<HTMLDetailsElement>;
-  error: Error | undefined;
+  error: Error | (() => React.ReactElement) | undefined;
   renderText: (() => React.ReactElement) | string;
 };
 
@@ -31,16 +31,18 @@ export default function ErrorMessageWithDetails(
    * @link https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md#provider-errors
    */
   const isWalletRejectedRequest =
-    (error as MetaMaskRPCError)?.code === 4001 ||
-    /^(the )?user rejected (the )?request$/g.test(
-      normalizeString(error?.message || '')
-    );
+    typeof error !== 'function' &&
+    ((error as MetaMaskRPCError)?.code === 4001 ||
+      /^(the )?user rejected (the )?request$/g.test(
+        normalizeString(error?.message || '')
+      ));
 
   const textToDisplay: React.ReactNode =
     typeof renderText === 'string' ? renderText : renderText();
 
   const areErrorMessageAndTextStringSame: boolean =
     typeof renderText === 'string' &&
+    typeof error !== 'function' &&
     normalizeString(renderText) === normalizeString(error?.message || '')
       ? true
       : false;
@@ -65,8 +67,11 @@ export default function ErrorMessageWithDetails(
               style={{cursor: 'pointer', outline: 'none'}}>
               <small>Details</small>
             </summary>
+
             <p className="error-message">
-              <small>{error.message}</small>
+              <small>
+                {typeof error === 'function' ? error() : error.message}
+              </small>
             </p>
           </details>
         )}
