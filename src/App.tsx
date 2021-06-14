@@ -24,27 +24,26 @@ export default function App(props?: AppProps) {
    */
 
   const {renderMainContent} = props || {};
-  const mainContent: React.ReactNode = renderMainContent ? (
-    renderMainContent()
-  ) : (
-    <Routes />
+
+  const mainContent: React.ReactNode = (
+    <main>{renderMainContent ? renderMainContent() : <Routes />}</main>
   );
 
   /**
    * Functions
    */
 
-  function RenderIndexOrSubpage() {
-    const mainComponent: React.ReactNode = <main>{mainContent}</main>;
-
+  function renderContent() {
+    // The index path has its own template
     if (location.pathname === '/') {
-      return <>{mainComponent}</>;
+      return <>{mainContent}</>;
     }
 
+    // Render default template
     return (
       <>
         <Header />
-        {mainComponent}
+        {mainContent}
         <Footer />
       </>
     );
@@ -60,7 +59,7 @@ export default function App(props?: AppProps) {
       <Head />
 
       {/* CONTENT */}
-      <RenderIndexOrSubpage />
+      {renderContent()}
     </>
   );
 }
