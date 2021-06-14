@@ -1,16 +1,16 @@
-import {useState, useEffect, useRef} from 'react';
-import {Transition} from 'react-transition-group';
-import ReactModal from 'react-modal';
-import Media from 'react-media';
 import {NavLink} from 'react-router-dom';
+import {Transition} from 'react-transition-group';
 import {useSelector} from 'react-redux';
+import {useState, useEffect, useRef} from 'react';
+import Media from 'react-media';
+import ReactModal from 'react-modal';
 
-import {StoreState} from '../store/types';
-import Web3ModalButton from './web3/Web3ModalButton';
-import {useWeb3Modal} from './web3/hooks';
 import {ModalLogo} from './logo';
-import TimesSVG from '../assets/svg/TimesSVG';
+import {StoreState} from '../store/types';
+import {useWeb3Modal} from './web3/hooks';
 import HamburgerSVG from '../assets/svg/HamburgerSVG';
+import TimesSVG from '../assets/svg/TimesSVG';
+import Web3ModalButton from './web3/Web3ModalButton';
 
 // see: http://reactcommunity.org/react-transition-group/transition
 const duration = 200;
@@ -245,7 +245,7 @@ export default function Nav() {
 
   return (
     <Media query="(max-width: 62em)">
-      {(matches: boolean) => (
+      {(_matches: boolean) => (
         <div className="nav-header">
           <div className="nav-header__menu-container">
             {/* NAV */}

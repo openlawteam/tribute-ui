@@ -1,23 +1,24 @@
 import React from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
-import {AsyncStatus} from '../../util/types';
-import {ContractAdapterNames} from '../../components/web3/types';
-import {useProposalOrDraft} from '../../components/proposals/hooks';
-import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
-import FadeIn from '../../components/common/FadeIn';
-import LoaderLarge from '../../components/feedback/LoaderLarge';
-import NotFound from '../subpages/NotFound';
-import ProposalActions from '../../components/proposals/ProposalActions';
-import ProposalAmount from '../../components/proposals/ProposalAmount';
-import ProposalDetails from '../../components/proposals/ProposalDetails';
-import Wrap from '../../components/common/Wrap';
 import {
   ProposalFlowStatus,
   RenderActionPropArguments,
 } from '../../components/proposals/types';
+import {AsyncStatus} from '../../util/types';
+import {ContractAdapterNames} from '../../components/web3/types';
+import {useIsDefaultChain} from '../../components/web3/hooks';
+import {useProposalOrDraft} from '../../components/proposals/hooks';
 import {VotingState} from '../../components/proposals/voting/types';
+import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
+import FadeIn from '../../components/common/FadeIn';
+import LoaderLarge from '../../components/feedback/LoaderLarge';
+import NotFound from '../subpages/NotFound';
 import ProcessActionMembership from '../../components/proposals/ProcessActionMembership';
+import ProposalActions from '../../components/proposals/ProposalActions';
+import ProposalAmount from '../../components/proposals/ProposalAmount';
+import ProposalDetails from '../../components/proposals/ProposalDetails';
+import Wrap from '../../components/common/Wrap';
 
 const PLACEHOLDER = '\u2014'; /* em dash */
 
@@ -53,6 +54,15 @@ export default function MembershipDetails() {
   // @todo Use dynamic `SnapshotType` depending on subgraph data for `type` arg.
   const {proposalData, proposalError, proposalNotFound, proposalStatus} =
     useProposalOrDraft(proposalId);
+
+  const {defaultChainError} = useIsDefaultChain();
+
+  /**
+   * Variables
+   */
+
+  const isLoading: boolean = proposalStatus === AsyncStatus.PENDING;
+  const error: Error | undefined = proposalError || defaultChainError;
 
   /**
    * Functions
@@ -94,7 +104,7 @@ export default function MembershipDetails() {
    */
 
   // Render loading
-  if (proposalStatus === AsyncStatus.PENDING) {
+  if (isLoading && !error) {
     return (
       <RenderWrapper>
         <div className="loader--large-container">
@@ -114,13 +124,13 @@ export default function MembershipDetails() {
   }
 
   // Render error
-  if (proposalStatus === AsyncStatus.REJECTED || proposalError) {
+  if (error) {
     return (
       <RenderWrapper>
         <div className="text-center">
           <ErrorMessageWithDetails
-            error={proposalError}
-            renderText="Something went wrong."
+            error={error}
+            renderText="Something went wrong while getting the proposal."
           />
         </div>
       </RenderWrapper>

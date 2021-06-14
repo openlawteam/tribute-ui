@@ -1,4 +1,5 @@
 import {useDispatch} from 'react-redux';
+import Web3 from 'web3';
 
 import {
   initContractBankAdapter,
@@ -19,27 +20,31 @@ import {
   initRegisteredVotingAdapter,
 } from '../../../store/actions';
 
-import {ReduxDispatch} from '../../../store/types';
 import {DaoAdapterConstants, DaoExtensionConstants} from '../enums';
-
-import {useWeb3Modal} from '../../web3/hooks';
+import {ReduxDispatch} from '../../../store/types';
 
 type UseInitAdapterExtensionContractsReturn = {
-  initAdapterExtensionContract: (adapterExtensionName: string) => void;
+  initAdapterExtensionContract: (
+    adapterExtensionName: DaoAdapterConstants | DaoExtensionConstants,
+    web3Instance: Web3
+  ) => void;
 };
 
 export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContractsReturn {
   /**
-   * Our hooks
-   */
-  const {web3Instance} = useWeb3Modal();
-
-  /**
    * Their hooks
    */
+
   const dispatch = useDispatch<ReduxDispatch>();
 
-  async function initAdapterExtensionContract(adapterExtensionName: string) {
+  /**
+   * Functions
+   */
+
+  async function initAdapterExtensionContract(
+    adapterExtensionName: DaoAdapterConstants | DaoExtensionConstants,
+    web3Instance: Web3
+  ) {
     switch (adapterExtensionName) {
       case DaoAdapterConstants.CONFIGURATION:
         await dispatch(initContractConfiguration(web3Instance));

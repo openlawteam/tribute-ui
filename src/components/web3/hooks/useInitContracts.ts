@@ -1,5 +1,6 @@
 import {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
+import Web3 from 'web3';
 
 import {
   initContractBankAdapter,
@@ -24,8 +25,6 @@ import {
   initRegisteredVotingAdapter,
 } from '../../../store/actions';
 import {ReduxDispatch} from '../../../store/types';
-import {useIsDefaultChain} from './useIsDefaultChain';
-import {useWeb3Modal} from '.';
 
 /**
  * useInitContracts
@@ -34,14 +33,9 @@ import {useWeb3Modal} from '.';
  *
  * @todo Use subgraph to pass the address to each init function, so it skips chain calls.
  */
-export function useInitContracts(): () => Promise<void> {
-  /**
-   * Our hooks
-   */
-
-  const {isDefaultChain} = useIsDefaultChain();
-  const {web3Instance} = useWeb3Modal();
-
+export function useInitContracts(): (data: {
+  web3Instance: Web3;
+}) => Promise<void> {
   /**
    * Their hooks
    */
@@ -52,23 +46,16 @@ export function useInitContracts(): () => Promise<void> {
    * Cached callbacks
    */
 
-  const initContractsCached = useCallback(initContracts, [
-    dispatch,
-    isDefaultChain,
-    web3Instance,
-  ]);
+  const initContractsCached = useCallback(initContracts, [dispatch]);
 
   /**
    * Init contracts
    */
-  async function initContracts() {
+  async function initContracts({web3Instance}: {web3Instance: Web3}) {
     try {
-      if (!isDefaultChain) return;
-
       // Must init registry first
       await dispatch(initContractDaoRegistry(web3Instance));
 
-      // Init more contracts
       await dispatch(initContractDaoFactory(web3Instance));
       await dispatch(initContractBankFactory(web3Instance));
       await dispatch(initContractConfiguration(web3Instance));
@@ -77,7 +64,6 @@ export function useInitContracts(): () => Promise<void> {
       await dispatch(initContractManaging(web3Instance));
       await dispatch(initContractRagequit(web3Instance));
       await dispatch(initContractBankAdapter(web3Instance));
-      // Init other contracts
       await dispatch(initContractBankExtension(web3Instance));
       await dispatch(initContractManaging(web3Instance));
       await dispatch(initContractOnboarding(web3Instance));

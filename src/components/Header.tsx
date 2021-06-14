@@ -1,21 +1,9 @@
-import {Link, useLocation} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 import {LeftLogo} from './logo';
 import Nav from './Nav';
 
 export default function Header() {
-  /**
-   * Their hooks
-   */
-
-  const location = useLocation();
-
-  /**
-   * Variables
-   */
-
-  const isIndexPath = location.pathname === '/';
-
   /**
    * Functions
    */
@@ -28,9 +16,6 @@ export default function Header() {
   /**
    * Render
    */
-
-  // Don't display header if we're on the index page
-  if (isIndexPath) return null;
 
   return (
     <header className="header">

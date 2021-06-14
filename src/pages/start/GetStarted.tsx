@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import {memo, useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
 import AOS from 'aos';
 import '../../../node_modules/aos/dist/aos.css';
@@ -6,10 +6,10 @@ import '../../../node_modules/aos/dist/aos.css';
 import {CenterLogo} from '../../components/logo';
 import {NavHamburger} from '../../components/Nav';
 import FadeIn from '../../components/common/FadeIn';
-import Wrap from '../../components/common/Wrap';
 import SocialMedia from '../../components/common/SocialMedia';
+import Wrap from '../../components/common/Wrap';
 
-const TributeCube = React.memo(() => {
+const TributeCube = memo(() => {
   return (
     <div
       className="cube"
@@ -25,7 +25,7 @@ const TributeCube = React.memo(() => {
 
 function GetStartedHeader() {
   return (
-    <div data-testid="header" className="landing__header">
+    <div data-testid="get-started-header" className="landing__header">
       <SocialMedia />
       <NavHamburger />
     </div>

@@ -209,7 +209,12 @@ export function useProposalWithOffchainVoteStatus(
 
   async function getStatusFromContract() {
     try {
-      if (!daoRegistryABI || !daoRegistryAddress || !proposalId) {
+      if (
+        !daoRegistryABI ||
+        !daoRegistryAddress ||
+        !proposalId ||
+        !web3Instance
+      ) {
         return;
       }
 

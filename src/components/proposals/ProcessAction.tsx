@@ -2,9 +2,9 @@ import {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {CycleEllipsis} from '../feedback';
+import {getConnectedMember} from '../../store/actions';
 import {getContractByAddress} from '../web3/helpers';
 import {ProposalData} from './types';
-import {getConnectedMember} from '../../store/actions';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
@@ -102,6 +102,10 @@ export default function ProcessAction(props: ProcessActionProps) {
 
       if (!account) {
         throw new Error('No account found.');
+      }
+
+      if (!web3Instance) {
+        throw new Error('No Web3 instance was found.');
       }
 
       const contract = getContractByAddress(

@@ -142,9 +142,8 @@ describe('GovernanceProposalDetails unit tests', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/^something went wrong\.$/i)).toBeInTheDocument();
       expect(
-        screen.getByText(/something went wrong while getting the proposal/i)
+        screen.getByText(/^something went wrong while getting the proposal\.$/i)
       ).toBeInTheDocument();
     });
   });

@@ -1,4 +1,5 @@
 import {Dispatch} from 'redux';
+import Web3 from 'web3';
 
 import {BURN_ADDRESS} from '../../util/constants';
 import {ConnectedMemberState} from '../connectedMember/types';
@@ -6,8 +7,6 @@ import {ContractsStateEntry} from '../contracts/types';
 import {hasFlag, multicall} from '../../components/web3/helpers';
 import {MemberFlag} from '../../components/web3/types';
 import {normalizeString} from '../../util/helpers';
-import {StoreState} from '../types';
-import Web3 from 'web3';
 
 export const SET_CONNECTED_MEMBER = 'SET_CONNECTED_MEMBER';
 export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
@@ -32,7 +31,7 @@ export function getConnectedMember({
   daoRegistryContract: ContractsStateEntry;
   web3Instance: Web3;
 }) {
-  return async function (dispatch: Dispatch<any>, getState: () => StoreState) {
+  return async function (dispatch: Dispatch<any>) {
     const daoRegistryMethods = daoRegistryContract?.instance.methods;
     const daoRegistryAddress = daoRegistryContract?.contractAddress;
 

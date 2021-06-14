@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+import {render} from 'react-dom';
 import {Store} from 'redux';
 import {Provider} from 'react-redux';
 import {BrowserRouter} from 'react-router-dom';
@@ -12,13 +12,15 @@ import {
 } from '@apollo/client';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 
+import {clearConnectedMember, clearContracts} from './store/actions';
 import {DefaultTheme} from './components/web3/hooks/useWeb3ModalManager';
 import {disableReactDevTools} from './util/helpers';
 import {ENVIRONMENT, INFURA_PROJECT_ID, GRAPH_API_URL} from './config';
 import {handleSubgraphError} from './gql';
 import {store} from './store';
 import App from './App';
-import Init, {InitError} from './Init';
+import Init from './Init';
+import InitError from './InitError';
 import reportWebVitals from './reportWebVitals';
 import Web3ModalManager from './components/web3/Web3ModalManager';
 
@@ -39,7 +41,7 @@ window.ethereum &&
 // Built-in web browser provider (only one can exist at a time),
 // MetaMask, Brave or Opera is added automatically by Web3modal
 function getProviderOptions() {
-  const providerOptions = {
+  return {
     // Injected providers
     injected: {
       display: {
@@ -63,7 +65,6 @@ function getProviderOptions() {
       },
     },
   };
-  return providerOptions;
 }
 
 // Create `ApolloClient`
@@ -108,17 +109,26 @@ export const getApolloClient = (
   });
 
 if (root !== null) {
-  ReactDOM.render(
+  render(
     <Provider store={store}>
       <BrowserRouter>
         <Web3ModalManager
+          onBeforeDisconnect={() => {
+            // Clear out `connectedMember` and `contracts` Redux state
+            store.dispatch(clearConnectedMember());
+            store.dispatch(clearContracts());
+          }}
+          onBeforeConnect={() => {
+            // Clear out `contracts` Redux state
+            store.dispatch(clearContracts());
+          }}
           providerOptions={getProviderOptions()}
           defaultTheme={DefaultTheme.LIGHT}>
           <ApolloProvider client={getApolloClient(store)}>
             <Init
               render={({error, isInitComplete}) =>
                 error ? (
-                  <InitError error={error} />
+                  <App renderMainContent={() => <InitError error={error} />} />
                 ) : isInitComplete ? (
                   <App />
                 ) : null

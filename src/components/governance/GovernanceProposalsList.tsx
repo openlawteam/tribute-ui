@@ -7,6 +7,7 @@ import {OffchainVotingStatus} from '../proposals/voting';
 import {ProposalData, VotingResult} from '../proposals/types';
 import {ProposalHeaderNames} from '../../util/enums';
 import {useGovernanceProposals} from './hooks';
+import {useIsDefaultChain} from '../web3/hooks';
 import {useOffchainVotingResults} from '../proposals/hooks';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import LoaderLarge from '../feedback/LoaderLarge';
@@ -80,6 +81,8 @@ export default function GovernanceProposalsList(
     offchainVotingResultsStatus,
   } = useOffchainVotingResults(proposalsForVotingResults);
 
+  const {defaultChainError} = useIsDefaultChain();
+
   /**
    * Variables
    */
@@ -94,9 +97,8 @@ export default function GovernanceProposalsList(
       proposalsForVotingResults.length > 0) ||
     offchainVotingResultsStatus === AsyncStatus.PENDING;
 
-  const isError: boolean =
-    governanceProposalsStatus === AsyncStatus.REJECTED ||
-    offchainVotingResultsStatus === AsyncStatus.REJECTED;
+  const error: Error | undefined =
+    governanceProposalsError || offchainVotingResultsError || defaultChainError;
 
   /**
    * Effects
@@ -215,7 +217,7 @@ export default function GovernanceProposalsList(
    */
 
   // Render loading
-  if (isLoading && !isError) {
+  if (isLoading && !error) {
     return (
       <div className="loader--large-container">
         <LoaderLarge />
@@ -233,11 +235,11 @@ export default function GovernanceProposalsList(
   }
 
   // Render error
-  if (isError) {
+  if (error) {
     return (
       <div className="text-center">
         <ErrorMessageWithDetails
-          error={governanceProposalsError || offchainVotingResultsError}
+          error={error}
           renderText="Something went wrong while getting the proposals."
         />
       </div>

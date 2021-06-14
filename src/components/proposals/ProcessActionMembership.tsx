@@ -2,8 +2,9 @@ import {useState, useRef, useEffect, useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {CycleEllipsis} from '../feedback';
-import {ProposalData, SnapshotProposal} from './types';
+import {ERC20RegisterDetails} from '../dao-token/DaoToken';
 import {getConnectedMember} from '../../store/actions';
+import {ProposalData, SnapshotProposal} from './types';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
@@ -14,7 +15,6 @@ import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import EtherscanURL from '../web3/EtherscanURL';
 import FadeIn from '../common/FadeIn';
 import Loader from '../feedback/Loader';
-import {ERC20RegisterDetails} from '../dao-token/DaoToken';
 
 type ProcessArguments = [
   string, // `dao`
@@ -220,6 +220,10 @@ export default function ProcessActionMembership(
 
       if (!account) {
         throw new Error('No account found.');
+      }
+
+      if (!web3Instance) {
+        throw new Error('No Web3 instance was found.');
       }
 
       const processArguments: ProcessArguments = [

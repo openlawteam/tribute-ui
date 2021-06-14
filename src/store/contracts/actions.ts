@@ -12,20 +12,21 @@ import {
   DAO_FACTORY_CONTRACT_ADDRESS,
   DAO_REGISTRY_CONTRACT_ADDRESS,
 } from '../../config';
-import {ContractsStateEntry} from '../contracts/types';
 import {
   getAdapterAddress,
   getVotingAdapterName,
 } from '../../components/web3/helpers';
-import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
-import {StoreState} from '../types';
 import {
   DaoAdapterConstants,
   DaoExtensionConstants,
   VotingAdapterName,
 } from '../../components/adapters-extensions/enums';
+import {ContractsStateEntry} from './types';
+import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
+import {StoreState} from '../types';
 
 type ContractAction =
+  | typeof CLEAR_CONTRACTS
   | typeof CONTRACT_BANK_ADAPTER
   | typeof CONTRACT_BANK_EXTENSION
   | typeof CONTRACT_BANK_FACTORY
@@ -48,6 +49,7 @@ type ContractAction =
   | typeof CONTRACT_VOTING
   | typeof CONTRACT_VOTING_OP_ROLLUP;
 
+export const CLEAR_CONTRACTS = 'CLEAR_CONTRACTS';
 export const CONTRACT_BANK_ADAPTER = 'CONTRACT_BANK_ADAPTER';
 export const CONTRACT_BANK_EXTENSION = 'CONTRACT_BANK_EXTENSION';
 export const CONTRACT_BANK_FACTORY = 'CONTRACT_BANK_FACTORY';
@@ -69,6 +71,12 @@ export const CONTRACT_TRIBUTE = 'CONTRACT_TRIBUTE';
 export const CONTRACT_TRIBUTE_NFT = 'CONTRACT_TRIBUTE_NFT';
 export const CONTRACT_VOTING = 'CONTRACT_VOTING';
 export const CONTRACT_VOTING_OP_ROLLUP = 'CONTRACT_VOTING_OP_ROLLUP';
+
+export function clearContracts(): Record<'type', typeof CLEAR_CONTRACTS> {
+  return {
+    type: CLEAR_CONTRACTS,
+  };
+}
 
 export function initContractBankFactory(web3Instance: Web3) {
   return async function (dispatch: Dispatch<any>) {

@@ -6,13 +6,9 @@ import {AsyncStatus} from './util/types';
 import {getConnectedMember} from './store/actions';
 import {ReduxDispatch, StoreState} from './store/types';
 import {SNAPSHOT_HUB_API_URL} from './config';
-import {useInitContracts} from './components/web3/hooks';
+import {useInitContracts, useIsDefaultChain} from './components/web3/hooks';
 import {useIsMounted} from './hooks';
 import {useWeb3Modal} from './components/web3/hooks';
-import ErrorMessageWithDetails from './components/common/ErrorMessageWithDetails';
-import FadeIn from './components/common/FadeIn';
-import Header from './components/Header';
-import Wrap from './components/common/Wrap';
 
 type InitPropsRenderProps = {
   error: Error | undefined;
@@ -21,10 +17,6 @@ type InitPropsRenderProps = {
 
 type InitProps = {
   render: (p: InitPropsRenderProps) => React.ReactElement | null;
-};
-
-type InitErrorProps = {
-  error: Error;
 };
 
 /**
@@ -76,9 +68,10 @@ export default function Init(props: InitProps) {
    * Our hooks
    */
 
-  const initContracts = useInitContracts();
   const {account, web3Instance} = useWeb3Modal();
+  const {isDefaultChain} = useIsDefaultChain();
   const {isMountedRef} = useIsMounted();
+  const initContracts = useInitContracts();
 
   /**
    * Their hooks
@@ -92,12 +85,15 @@ export default function Init(props: InitProps) {
 
   const handleInitContractsCached = useCallback(handleInitContracts, [
     initContracts,
+    isDefaultChain,
+    web3Instance,
   ]);
 
   const handleGetMemberCached = useCallback(handleGetMember, [
     account,
     daoRegistryContract,
     dispatch,
+    isDefaultChain,
     web3Instance,
   ]);
 
@@ -117,7 +113,7 @@ export default function Init(props: InitProps) {
   }, [processReadyMap]);
 
   useEffect(() => {
-    web3Instance && handleInitContractsCached();
+    handleInitContractsCached();
   }, [handleInitContractsCached, web3Instance]);
 
   useEffect(() => {
@@ -160,7 +156,11 @@ export default function Init(props: InitProps) {
 
   async function handleInitContracts() {
     try {
-      await initContracts();
+      if (!isDefaultChain || !web3Instance) {
+        return;
+      }
+
+      await initContracts({web3Instance});
     } catch (error) {
       setError(error);
     }
@@ -168,7 +168,12 @@ export default function Init(props: InitProps) {
 
   async function handleGetMember() {
     try {
-      if (!account || !daoRegistryContract || !web3Instance) {
+      if (
+        !account ||
+        !daoRegistryContract ||
+        !isDefaultChain ||
+        !web3Instance
+      ) {
         return;
       }
 
@@ -182,55 +187,4 @@ export default function Init(props: InitProps) {
 
   // Render children
   return render({error, isInitComplete});
-}
-
-/**
- * InitError
- *
- * An error component that is meant to be used if the <Init /> component
- * could not complete any of its processes to provide the app with vital data.
- *
- * @param {InitErrorProps} props
- */
-export function InitError(props: InitErrorProps) {
-  const {error} = props;
-
-  return (
-    <>
-      <Header />
-
-      <Wrap className="section-wrapper">
-        <main>
-          <FadeIn>
-            <div
-              style={{
-                padding: '2em 1em 1em',
-                textAlign: 'center',
-              }}>
-              <h1 style={{fontSize: '2rem'}}>
-                <span
-                  className="pulse"
-                  role="img"
-                  aria-label="Emoji with eyes crossed out."
-                  style={{display: 'inline-block'}}>
-                  😵
-                </span>{' '}
-                Oops, something went wrong.
-              </h1>
-            </div>
-
-            <div
-              style={{
-                textAlign: 'center',
-                maxWidth: 600,
-                display: 'block',
-                margin: '0 auto',
-              }}>
-              <ErrorMessageWithDetails error={error} renderText="" />
-            </div>
-          </FadeIn>
-        </main>
-      </Wrap>
-    </>
-  );
 }

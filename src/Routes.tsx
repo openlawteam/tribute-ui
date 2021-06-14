@@ -1,5 +1,6 @@
 import {Route, Switch} from 'react-router-dom';
 
+import AdapterOrExtensionManager from './components/adapters-extensions/AdapterOrExtensionManager';
 import CreateGovernanceProposal from './pages/governance/CreateGovernanceProposal';
 import CreateMembershipProposal from './pages/membership/CreateMembershipProposal';
 import CreateTransferProposal from './pages/transfers/CreateTransferProposal';
@@ -17,7 +18,6 @@ import TransferDetails from './pages/transfers/TransferDetails';
 import Transfers from './pages/transfers/Transfers';
 import TributeDetails from './pages/tributes/TributeDetails';
 import Tributes from './pages/tributes/Tributes';
-import AdapterOrExtensionManager from './components/adapters-extensions/AdapterOrExtensionManager';
 
 const proposalIdParameter: string = ':proposalId';
 
@@ -25,6 +25,7 @@ export default function Routes() {
   return (
     <Switch>
       {[
+        // Index page
         <Route key="splash" exact path="/" render={() => <GetStarted />} />,
         <Route
           key="join"
@@ -117,6 +118,7 @@ export default function Routes() {
           render={() => <AdapterOrExtensionManager />}
         />,
         <Route key="redeem" exact path="/redeem" render={() => <Redeem />} />,
+        // 404 component (note: does not redirect to a route to maintain original path)
         <Route key="no-match" component={NotFound} />,
       ]}
     </Switch>

@@ -128,6 +128,10 @@ export function useSignAndSubmitProposal<
       throw new Error('No "SNAPSHOT_HUB_API_URL" was found.');
     }
 
+    if (!web3Instance) {
+      throw new Error('No Web3 instance was found.');
+    }
+
     const snapshot: number = await web3Instance.eth.getBlockNumber();
 
     const votingTimeSeconds: number = parseInt(

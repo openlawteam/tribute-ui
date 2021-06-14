@@ -1,6 +1,8 @@
-import React, {useState} from 'react';
+import {memo, useEffect, useState} from 'react';
 import {isMobile} from 'react-device-detect';
+import {useLocation} from 'react-router';
 
+import {AsyncStatus} from '../../util/types';
 import {CHAINS} from '../../config';
 import {svgWalletIcon} from './WalletIcons';
 import {truncateEthAddress} from '../../util/helpers';
@@ -22,25 +24,35 @@ type ConnectWalletProps = {
   customWalletText?: string;
   showWalletETHBadge?: boolean;
 };
+
 function ConnectWallet({
   customWalletText,
   showWalletETHBadge,
 }: ConnectWalletProps): JSX.Element {
   /**
-   * Hooks
+   * Our hooks
    */
 
   const {
+    // @todo Use and handle error in the UI
+    // error,
     account,
     connected,
-    providerOptions,
-    onConnectTo,
-    onDisconnect,
+    connectWeb3Modal,
+    disconnectWeb3Modal,
+    initialCachedConnectorCheckStatus,
     networkId,
+    providerOptions,
     web3Modal,
   } = useWeb3Modal();
 
-  const {defaultChain, defaultChainError, isDefaultChain} = useIsDefaultChain();
+  const {defaultChainError, isDefaultChain} = useIsDefaultChain();
+
+  /**
+   * Their hooks
+   */
+
+  const {pathname} = useLocation();
 
   /**
    * State
@@ -52,9 +64,25 @@ function ConnectWallet({
    * Variables
    */
 
-  const isWrongNetwork: boolean = networkId !== defaultChain ?? isDefaultChain;
+  const isWrongNetwork: boolean = isDefaultChain === false;
   const isChainGanache = networkId === CHAINS.GANACHE;
-  const displayWalletText: string | undefined = getWalletText();
+  const displayWalletText: string = getWalletText();
+
+  /**
+   * Effects
+   */
+
+  /**
+   * If the `web3Modal` is ready, and/or the `pathname` changes,
+   * then open or close the modal based on the current chain.
+   *
+   * When open, the user will be alerted to change chains.
+   */
+  useEffect(() => {
+    if (initialCachedConnectorCheckStatus === AsyncStatus.FULFILLED) {
+      setOpenModal(isDefaultChain ? false : true);
+    }
+  }, [isDefaultChain, initialCachedConnectorCheckStatus, pathname]);
 
   /**
    * Functions
@@ -64,15 +92,15 @@ function ConnectWallet({
     if (isMobile) {
       if (account) {
         return truncateEthAddress(account);
-      } else {
-        return 'Connect';
       }
+
+      return 'Connect';
     } else {
       if (showWalletETHBadge && account) {
         return truncateEthAddress(account);
-      } else {
-        return customWalletText || '';
       }
+
+      return customWalletText || '';
     }
   }
 
@@ -94,7 +122,7 @@ function ConnectWallet({
                 ? 'walletconnect__options-button--connected'
                 : ''
             }`}
-          onClick={async () => await onConnectTo(provider[0])}
+          onClick={() => connectWeb3Modal(provider[0])}
           // disable WalletConnect button on Ganache network
           disabled={isChainGanache && provider[0] === 'walletconnect'}>
           <span className="wallet-name">{provider[1].display.name}</span>
@@ -148,7 +176,7 @@ function ConnectWallet({
           {connected && (
             <button
               className="walletconnect__disconnect-link-button"
-              onClick={onDisconnect}>
+              onClick={disconnectWeb3Modal}>
               {'Disconnect Wallet'}
             </button>
           )}
@@ -166,9 +194,7 @@ function ConnectWallet({
             ? 'walletconnect__connect-button--error'
             : ''
         }`}
-        onClick={() => {
-          setOpenModal(true);
-        }}>
+        onClick={() => setOpenModal(true)}>
         <span
           className={`connect-button-text ${
             connected ? 'connect-button-text--ethAddress' : ''
@@ -191,10 +217,12 @@ function ConnectWallet({
 }
 
 type ProviderSVGType = {
-  providerName: string;
+  providerName: string | undefined;
 };
+
 function ProviderSVG({providerName}: ProviderSVGType): JSX.Element | null {
   if (!providerName) return null;
+
   return (
     <span className="walletconnect__wallet-icon">
       {svgWalletIcon[providerName]}
@@ -205,6 +233,7 @@ function ProviderSVG({providerName}: ProviderSVGType): JSX.Element | null {
 type DisplayChainErrorProps = {
   defaultChainError: string;
 };
+
 function DisplayChainError({
   defaultChainError,
 }: DisplayChainErrorProps): JSX.Element {
@@ -213,15 +242,13 @@ function DisplayChainError({
       <div className="error-message">
         <small>{defaultChainError}</small>
       </div>
+      <div className="loader--large-container">
+        <LoaderLarge />
+      </div>
       <div>
-        <div className="loader--large-container">
-          <LoaderLarge />
-        </div>
-        <div>
-          <small>Waiting for the right network&hellip;</small>
-          <br />
-          <small>Switch networks from your wallet</small>
-        </div>
+        <small>Waiting for the right network&hellip;</small>
+        <br />
+        <small>Switch networks from your wallet</small>
       </div>
     </>
   );
@@ -231,7 +258,7 @@ function DisplayChainError({
  * Web3ModalButton
  * @param props: Web3ModalButtonProps
  */
-export default React.memo(function Web3ModalButton({
+export default memo(function Web3ModalButton({
   customWalletText,
   showWalletETHBadge,
 }: Web3ModalButtonProps): JSX.Element {

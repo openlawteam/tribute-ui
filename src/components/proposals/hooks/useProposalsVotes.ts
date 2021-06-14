@@ -83,7 +83,12 @@ export function useProposalsVotes(
    */
 
   async function getProposalsVotesOnchain() {
-    if (!registryAddress || !registryABI || !proposalVotingAdapters.length) {
+    if (
+      !proposalVotingAdapters.length ||
+      !registryABI ||
+      !registryAddress ||
+      !web3Instance
+    ) {
       return;
     }
 

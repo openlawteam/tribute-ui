@@ -10,10 +10,13 @@ import {
   Web3ModalContext,
   Web3ModalContextValue,
 } from '../components/web3/Web3ModalManager';
+import {AsyncStatus} from '../util/types';
 import {CHAINS as mockChains} from '../config';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider, getNewStore} from './helpers';
 import {VotingAdapterName} from '../components/adapters-extensions/enums';
-import Init, {InitError} from '../Init';
+import App from '../App';
+import Init from '../Init';
+import InitError from '../InitError';
 
 export type WrapperReturnProps = {
   mockWeb3Provider: FakeHttpProvider;
@@ -87,13 +90,15 @@ export default function Wrapper(
       .mockImplementation(() => ({
         account: DEFAULT_ETH_ADDRESS,
         connected: true,
+        error: undefined,
+        initialCachedConnectorCheckStatus: AsyncStatus.FULFILLED,
         providerOptions: {},
-        onConnectTo: () => {},
-        onDisconnect: () => {},
+        connectWeb3Modal: () => {},
+        disconnectWeb3Modal: () => {},
         networkId: mockChains.GANACHE,
         provider: mockWeb3Provider,
         web3Instance: mockWeb3,
-        web3Modal: null,
+        web3Modal: null as any,
       }));
   }, [mockWeb3, mockWeb3Provider, useWallet]);
 
@@ -240,7 +245,7 @@ export default function Wrapper(
           !error ? (
             <>{childrenToRender}</>
           ) : error ? (
-            <InitError error={error} />
+            <App renderMainContent={() => <InitError error={error} />} />
           ) : null
         }
       />

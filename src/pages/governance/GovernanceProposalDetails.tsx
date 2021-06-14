@@ -4,6 +4,7 @@ import {useHistory, useParams} from 'react-router-dom';
 
 import {AsyncStatus} from '../../util/types';
 import {GovernanceActions} from '../../components/governance';
+import {useIsDefaultChain} from '../../components/web3/hooks';
 import {useProposalOrDraft} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
@@ -27,12 +28,21 @@ export default function GovernanceProposalDetails() {
   const {proposalData, proposalError, proposalNotFound, proposalStatus} =
     useProposalOrDraft(proposalId, SnapshotType.proposal);
 
+  const {defaultChainError} = useIsDefaultChain();
+
+  /**
+   * Variables
+   */
+
+  const isLoading: boolean = proposalStatus === AsyncStatus.PENDING;
+  const error: Error | undefined = proposalError || defaultChainError;
+
   /**
    * Render
    */
 
   // Render loading
-  if (proposalStatus === AsyncStatus.PENDING) {
+  if (isLoading && !error) {
     return (
       <RenderWrapper>
         <div className="loader--large-container">
@@ -52,13 +62,13 @@ export default function GovernanceProposalDetails() {
   }
 
   // Render error
-  if (proposalStatus === AsyncStatus.REJECTED || proposalError) {
+  if (error) {
     return (
       <RenderWrapper>
         <div className="text-center">
           <ErrorMessageWithDetails
-            error={proposalError}
-            renderText="Something went wrong."
+            error={error}
+            renderText="Something went wrong while getting the proposal."
           />
         </div>
       </RenderWrapper>

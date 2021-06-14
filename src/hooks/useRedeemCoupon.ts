@@ -121,6 +121,10 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
         throw new Error('No Coupon Onboarding contract was found.');
       }
 
+      if (!web3Instance) {
+        throw new Error('No Web3 instance was found.');
+      }
+
       setSubmitStatus(FetchStatus.PENDING);
 
       const applicantAddressToChecksum = toChecksumAddress(
