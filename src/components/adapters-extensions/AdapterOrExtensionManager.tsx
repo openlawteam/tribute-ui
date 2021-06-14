@@ -80,14 +80,17 @@ export default function AdapterOrExtensionManager() {
   const [openFinalizeModal, setOpenFinalizeModal] = useState<boolean>(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [selectionCount, setSelectionCount] = useState<number>(0);
-  const [selections, setSelections] =
-    useState<Record<string, boolean> | undefined>();
+  const [selections, setSelections] = useState<
+    Record<string, boolean> | undefined
+  >();
   const [configureAdapterOrExtension, setConfigureAdapterOrExtension] =
     useState<AdaptersOrExtensions | undefined>();
-  const [isInProcess, setIsInProcess] =
-    useState<Record<string, boolean> | undefined>();
-  const [whyDisabledReason, setWhyDisabledReason] =
-    useState<WhyDisableModalTitles | undefined>();
+  const [isInProcess, setIsInProcess] = useState<
+    Record<string, boolean> | undefined
+  >();
+  const [whyDisabledReason, setWhyDisabledReason] = useState<
+    WhyDisableModalTitles | undefined
+  >();
 
   /**
    * Hooks
