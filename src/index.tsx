@@ -113,7 +113,7 @@ if (root !== null) {
     <Provider store={store}>
       <BrowserRouter>
         <Web3ModalManager
-          onAfterDisconnect={() => {
+          onBeforeDisconnect={() => {
             // Clear out `connectedMember` and `contracts` Redux state
             store.dispatch(clearConnectedMember());
             store.dispatch(clearContracts());
