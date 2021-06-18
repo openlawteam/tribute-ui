@@ -55,9 +55,8 @@ export function useOffchainVotingResults(
   const [offchainVotingResultsStatus, setOffchainVotingResultsStatus] =
     useState<AsyncStatus>(AsyncStatus.STANDBY);
 
-  const [offchainVotingResultsError, setOffchainVotingResultsError] = useState<
-    Error | undefined
-  >();
+  const [offchainVotingResultsError, setOffchainVotingResultsError] =
+    useState<Error | undefined>();
 
   /**
    * Our hooks
