@@ -36,8 +36,9 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
     }
   );
 
-  const [tokenHolderBalances, setTokenHolderBalances] =
-    useState<Record<string, any> | undefined>();
+  const [tokenHolderBalances, setTokenHolderBalances] = useState<
+    Record<string, any> | undefined
+  >();
   const [gqlError, setGqlError] = useState<Error>();
 
   const getTokenBalanceCallback = useCallback(getTokenBalance, [

@@ -329,10 +329,12 @@ export function useProposals({
        * Re-map entries setting the correct id used for the `proposalId` in the DAO.
        * If it has a draft hash, then this is what was submitted to the DAO, most likely (e.g. submit proposal)
        */
-      const proposalEntries = Object.entries(proposalsJSON).map(([id, p]): [
-        string,
-        SnapshotProposalResponseData
-      ] => [p.data.erc712DraftHash || id, p]);
+      const proposalEntries = Object.entries(proposalsJSON).map(
+        ([id, p]): [string, SnapshotProposalResponseData] => [
+          p.data.erc712DraftHash || id,
+          p,
+        ]
+      );
 
       return proposalEntries;
     } catch (error) {
