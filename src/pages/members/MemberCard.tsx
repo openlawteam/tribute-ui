@@ -1,6 +1,7 @@
 import {Member} from './types';
 
 import {truncateEthAddress} from '../../util/helpers';
+import {useWeb3Modal} from '../../components/web3/hooks';
 
 type MemberCardProps = {
   member: Member;
@@ -17,6 +18,12 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
   const {member, onClick} = props;
 
   /**
+   * Our hooks
+   */
+
+  const {account} = useWeb3Modal();
+
+  /**
    * Functions
    */
 
@@ -31,7 +38,13 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
    */
 
   return (
-    <div className="membercard" onClick={handleClick}>
+    <div
+      className={`membercard ${
+        account && account.toLowerCase() === member.address.toLowerCase()
+          ? `membercard--connected-account`
+          : ''
+      }`}
+      onClick={handleClick}>
       {/* TITLE */}
       <h3 className="membercard__title">
         {truncateEthAddress(member.address, 7)}
