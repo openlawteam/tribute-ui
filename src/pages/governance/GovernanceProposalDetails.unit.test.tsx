@@ -2,6 +2,11 @@ import {render, screen, waitFor} from '@testing-library/react';
 import {useHistory} from 'react-router';
 import userEvent from '@testing-library/user-event';
 
+import {createMockClient} from 'mock-apollo-client';
+
+import {GET_TOKEN_HOLDER_BALANCES} from '../../gql';
+import {tokenHolderBalancesResponse} from '../../test/gqlResponses';
+
 import {BURN_ADDRESS} from '../../util/constants';
 import {DEFAULT_PROPOSAL_HASH} from '../../test/helpers';
 import {rest, server} from '../../test/server';
@@ -9,6 +14,8 @@ import {SNAPSHOT_HUB_API_URL} from '../../config';
 import App from '../../App';
 import GovernanceProposalDetails from './GovernanceProposalDetails';
 import Wrapper from '../../test/Wrapper';
+
+const mockClient = createMockClient();
 
 const mockWeb3ResponsesDraft: Parameters<typeof Wrapper>[0]['getProps'] = ({
   mockWeb3Provider,
@@ -28,6 +35,10 @@ const mockWeb3ResponsesDraft: Parameters<typeof Wrapper>[0]['getProps'] = ({
 };
 
 describe('GovernanceProposalDetails unit tests', () => {
+  mockClient.setRequestHandler(GET_TOKEN_HOLDER_BALANCES, () =>
+    Promise.resolve(tokenHolderBalancesResponse)
+  );
+
   test('should render proposal', async () => {
     // Using the `<App />` let's the governance details page access the `proposalId` param from `useParams`.
     function GoToGovernanceDetailsViaApp() {
@@ -38,8 +49,18 @@ describe('GovernanceProposalDetails unit tests', () => {
       return <App />;
     }
 
+    server.use(
+      rest.get(`http://some/path/favicon.ico`, async (_req, res, ctx) =>
+        res(ctx.json({}))
+      )
+    );
+
     render(
-      <Wrapper useInit useWallet getProps={mockWeb3ResponsesDraft}>
+      <Wrapper
+        useInit
+        useWallet
+        getProps={mockWeb3ResponsesDraft}
+        mockApolloClient={mockClient}>
         <GoToGovernanceDetailsViaApp />
       </Wrapper>
     );
@@ -163,7 +184,11 @@ describe('GovernanceProposalDetails unit tests', () => {
     }
 
     render(
-      <Wrapper useInit useWallet getProps={mockWeb3ResponsesDraft}>
+      <Wrapper
+        useInit
+        useWallet
+        getProps={mockWeb3ResponsesDraft}
+        mockApolloClient={mockClient}>
         <GoToGovernanceDetailsViaApp />
       </Wrapper>
     );
