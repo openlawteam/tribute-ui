@@ -89,7 +89,7 @@ export default function DaoTokenHolder(
   function getTokenImage() {
     try {
       toDataURL(image).then((dataUrl: any) => {
-        setTokenImageURL(dataUrl);
+        dataUrl && setTokenImageURL(dataUrl);
       });
     } catch (error) {
       console.log(error);
