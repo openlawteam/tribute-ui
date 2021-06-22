@@ -22,7 +22,7 @@ type UseMembersReturn = {
 /**
  * useMembers
  *
- * @returns {UseMembersReturn} An object with the members, and the current async status.
+ * @returns {UseMembersReturn} An object with the members and the current async status.
  */
 export default function useMembers(): UseMembersReturn {
   /**
@@ -64,11 +64,9 @@ export default function useMembers(): UseMembersReturn {
    */
 
   const [members, setMembers] = useState<Member[]>([]);
-
   const [membersStatus, setMembersStatus] = useState<AsyncStatus>(
     AsyncStatus.STANDBY
   );
-
   const [membersError, setMembersError] = useState<Error>();
 
   /**

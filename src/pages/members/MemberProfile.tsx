@@ -109,6 +109,7 @@ export default function MemberProfile() {
         </div>
         <div className="memberprofile__info-item">
           <span>Voting Weight</span>
+          <span>TODO%</span>
         </div>
       </div>
     );
