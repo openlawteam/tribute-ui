@@ -36,7 +36,7 @@ export async function contractSend(
 
       const gasBN = new BN(gas)
         .decimalPlaces(0, BigNumber.ROUND_DOWN)
-        .toString();
+        .toNumber();
 
       await method(...methodArguments)
         .send({
