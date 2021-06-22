@@ -11,6 +11,7 @@ import {useWeb3Modal} from './web3/hooks';
 import HamburgerSVG from '../assets/svg/HamburgerSVG';
 import TimesSVG from '../assets/svg/TimesSVG';
 import Web3ModalButton from './web3/Web3ModalButton';
+import DaoTokenHolder from './dao-token/DaoTokenHolder';
 
 // see: http://reactcommunity.org/react-transition-group/transition
 const duration = 200;
