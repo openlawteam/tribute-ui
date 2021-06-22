@@ -62,7 +62,7 @@ export default function DaoTokenHolder(
 
       const holderData = holders?.find(
         (holder: any) =>
-          holder.member.delegateKey.toLowerCase() === account.toLowerCase()
+          holder.member?.delegateKey.toLowerCase() === account.toLowerCase()
       );
 
       holderData &&
