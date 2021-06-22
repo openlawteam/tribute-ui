@@ -6,8 +6,8 @@ export const tokenHolderBalancesResponse = {
           {
             balance: '10001',
             member: {
-              delegateKey: '0x18c2B9831a39979E5Da535Cd2FeaC8cccDCe0BB8',
-              id: '0x18c2B9831a39979E5Da535Cd2FeaC8cccDCe0BB8',
+              delegateKey: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+              id: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
             },
           },
           {

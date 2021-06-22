@@ -1,7 +1,6 @@
 import {render, screen, waitFor} from '@testing-library/react';
 import {useHistory} from 'react-router';
 import userEvent from '@testing-library/user-event';
-
 import {createMockClient} from 'mock-apollo-client';
 
 import {GET_TOKEN_HOLDER_BALANCES} from '../../gql';
@@ -50,8 +49,8 @@ describe('GovernanceProposalDetails unit tests', () => {
     }
 
     server.use(
-      rest.get(`http://some/path/favicon.ico`, async (_req, res, ctx) =>
-        res(ctx.json({}))
+      rest.get(`http://localhost/favicon.ico`, async (_req, res, ctx) =>
+        res(ctx.status(200))
       )
     );
 
