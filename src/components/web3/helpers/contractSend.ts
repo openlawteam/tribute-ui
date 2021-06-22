@@ -1,5 +1,6 @@
 import {Contract, SendOptions} from 'web3-eth-contract/types';
 import {TransactionReceipt} from 'web3-core/types';
+import BigNumber from 'bignumber.js';
 
 /**
  * contractSend
@@ -24,6 +25,7 @@ export async function contractSend(
   // Promisify so we can both `reject()` inside .on('error') and from transactions.
   return new Promise<TransactionReceipt>(async (resolve, reject) => {
     try {
+      const BN = BigNumber;
       const method = contractInstanceMethods[methodName];
 
       // estimate gas limit for transaction
@@ -32,10 +34,14 @@ export async function contractSend(
         value: txArguments.value,
       });
 
+      const gasBN = new BN(gas)
+        .decimalPlaces(0, BigNumber.ROUND_DOWN)
+        .toString();
+
       await method(...methodArguments)
         .send({
           ...txArguments,
-          gas,
+          gas: gasBN,
         })
         .on('transactionHash', function (txHash: string) {
           // Call onProcess with transaction hash
