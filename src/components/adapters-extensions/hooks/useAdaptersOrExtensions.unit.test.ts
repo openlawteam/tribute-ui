@@ -2,7 +2,7 @@ import {renderHook, act} from '@testing-library/react-hooks';
 import {createMockClient} from 'mock-apollo-client';
 
 import {GET_ADAPTERS_AND_EXTENSIONS} from '../../../gql';
-import {adaptersAndExtensions} from '../../../test/gqlResponses';
+import {adaptersAndExtensionsResponse} from '../../../test/gqlResponses';
 
 import {AsyncStatus} from '../../../util/types';
 import Wrapper from '../../../test/Wrapper';
@@ -13,7 +13,7 @@ const mockClient = createMockClient();
 
 describe('useAdaptersOrExtensions unit tests', () => {
   mockClient.setRequestHandler(GET_ADAPTERS_AND_EXTENSIONS, () =>
-    Promise.resolve(adaptersAndExtensions)
+    Promise.resolve(adaptersAndExtensionsResponse)
   );
 
   test('should return correct data when wallet is disconnected', async () => {

@@ -1,4 +1,4 @@
-export const adaptersAndExtensions = {
+export const adaptersAndExtensionsResponse = {
   data: {
     adapters: [
       {
