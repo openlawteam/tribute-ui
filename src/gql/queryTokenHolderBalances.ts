@@ -9,6 +9,7 @@ export const GET_TOKEN_HOLDER_BALANCES = gql`
         balance
         member {
           id
+          delegateKey
         }
       }
     }
