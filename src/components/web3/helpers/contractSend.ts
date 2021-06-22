@@ -34,14 +34,14 @@ export async function contractSend(
         value: txArguments.value,
       });
 
-      const gasBN = new BN(gas)
+      const gastoBN = new BN(gas)
         .decimalPlaces(0, BigNumber.ROUND_DOWN)
         .toNumber();
 
       await method(...methodArguments)
         .send({
           ...txArguments,
-          gas: gasBN,
+          gas: gastoBN,
         })
         .on('transactionHash', function (txHash: string) {
           // Call onProcess with transaction hash
