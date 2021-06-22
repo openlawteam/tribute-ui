@@ -10,23 +10,25 @@ export type ERC20RegisterDetails = {
 };
 
 type DaoTokenProps = {
-  erc20Details?: ERC20RegisterDetails;
+  daoTokenDetails?: ERC20RegisterDetails;
 };
 
-export default function DaoToken({erc20Details}: DaoTokenProps): JSX.Element {
+export default function DaoToken({
+  daoTokenDetails,
+}: DaoTokenProps): JSX.Element {
   /**
    * Functions
    */
 
   async function addTokenToWallet() {
-    if (!erc20Details) return;
+    if (!daoTokenDetails) return;
 
     try {
       await window.ethereum.request({
         method: 'wallet_watchAsset',
         params: {
           type: 'ERC20',
-          options: erc20Details,
+          options: daoTokenDetails,
         },
       });
     } catch (error) {
@@ -35,10 +37,11 @@ export default function DaoToken({erc20Details}: DaoTokenProps): JSX.Element {
   }
 
   function copyAddressToClipboard() {
-    if (!erc20Details) return;
+    if (!daoTokenDetails) return;
+
     const copyText = document.createElement('input');
     document.body.appendChild(copyText);
-    copyText.setAttribute('value', erc20Details.address);
+    copyText.setAttribute('value', daoTokenDetails.address);
     copyText.select();
     document.execCommand('copy');
     document.body.removeChild(copyText);
@@ -56,10 +59,10 @@ export default function DaoToken({erc20Details}: DaoTokenProps): JSX.Element {
    * Render
    */
 
-  if (erc20Details) {
+  if (daoTokenDetails) {
     return (
       <div>
-        Token: <span>{truncateEthAddress(erc20Details.address, 7)}</span>
+        Token: <span>{truncateEthAddress(daoTokenDetails.address, 7)}</span>
         <div className="daotoken__tooltip">
           <button
             className="daotoken__button"

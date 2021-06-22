@@ -1,10 +1,10 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useLazyQuery} from '@apollo/react-hooks';
 
-import {StoreState} from '../store/types';
+import {StoreState} from '../../../store/types';
 import {useSelector} from 'react-redux';
 
-import {GET_TOKEN_HOLDER_BALANCES} from '../gql';
+import {GET_TOKEN_HOLDER_BALANCES} from '../../../gql';
 
 type UseTokenHolderBalancesReturn = {
   tokenHolderBalances: Record<string, any> | undefined;

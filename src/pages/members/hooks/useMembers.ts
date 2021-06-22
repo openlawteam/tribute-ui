@@ -1,8 +1,7 @@
-import {AbiItem, toBN} from 'web3-utils';
 import {useCallback, useEffect, useState} from 'react';
 import {useLazyQuery} from '@apollo/react-hooks';
 import {useSelector} from 'react-redux';
-import Web3 from 'web3';
+import {AbiItem, toBN, toChecksumAddress} from 'web3-utils';
 
 import {AsyncStatus} from '../../../util/types';
 import {GET_MEMBERS} from '../../../gql';
@@ -23,7 +22,7 @@ type UseMembersReturn = {
 /**
  * useMembers
  *
- * @returns `UseMembersReturn` An object with the members, and the current async status.
+ * @returns {UseMembersReturn} An object with the members, and the current async status.
  */
 export default function useMembers(): UseMembersReturn {
   /**
@@ -144,8 +143,8 @@ export default function useMembers(): UseMembersReturn {
             return {
               ...parsedMember,
               // use formatted addresses
-              address: Web3.utils.toChecksumAddress(member.address),
-              delegateKey: Web3.utils.toChecksumAddress(member.delegateKey),
+              address: toChecksumAddress(member.address),
+              delegateKey: toChecksumAddress(member.delegateKey),
             };
           }
         );

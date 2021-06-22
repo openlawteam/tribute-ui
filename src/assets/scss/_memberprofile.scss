@@ -78,3 +78,24 @@
     padding: 0.5rem;
   }
 }
+
+.memberprofile__info-item {
+  display: flex;
+  flex-direction: column;
+  word-wrap: break-word;
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    16px,
+    18px
+  ); /* min font-size 1rem, max 1.125rem */
+
+  &:not(:last-child) {
+    margin-bottom: 2rem;
+  }
+
+  & > span:first-child {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+}

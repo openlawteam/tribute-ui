@@ -3,14 +3,20 @@ import {useHistory, useParams} from 'react-router-dom';
 
 import {AsyncStatus} from '../../util/types';
 import {Member} from './types';
-import {truncateEthAddress, normalizeString} from '../../util/helpers';
-import {useIsDefaultChain} from '../../components/web3/hooks';
+import {
+  truncateEthAddress,
+  normalizeString,
+  formatNumber,
+} from '../../util/helpers';
+import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderLarge from '../../components/feedback/LoaderLarge';
 import NotFound from '../subpages/NotFound';
 import useMembers from './hooks/useMembers';
 import Wrap from '../../components/common/Wrap';
+import {useDaoTokenDetails} from '../../components/dao-token/hooks';
+import DaoToken from '../../components/dao-token/DaoToken';
 
 export default function MemberProfile() {
   /**
@@ -19,6 +25,8 @@ export default function MemberProfile() {
 
   const {members, membersError, membersStatus} = useMembers();
   const {defaultChainError} = useIsDefaultChain();
+  const {account} = useWeb3Modal();
+  const {daoTokenDetails, daoTokenDetailsStatus} = useDaoTokenDetails();
 
   /**
    * Their hooks
@@ -58,11 +66,53 @@ export default function MemberProfile() {
 
   const isLoading: boolean =
     membersStatus === AsyncStatus.STANDBY ||
-    membersStatus === AsyncStatus.PENDING;
-
+    membersStatus === AsyncStatus.PENDING ||
+    daoTokenDetailsStatus === AsyncStatus.STANDBY ||
+    daoTokenDetailsStatus === AsyncStatus.PENDING;
   const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
-
   const error: Error | undefined = membersError || defaultChainError;
+  const isCurrentMemberConnected: boolean =
+    account &&
+    memberDetails &&
+    normalizeString(account) === normalizeString(memberDetails?.address)
+      ? true
+      : false;
+
+  /**
+   * Functions
+   */
+
+  function renderMemberInfo() {
+    if (!memberDetails) return;
+
+    return (
+      <div>
+        <div className="memberprofile__info-item">
+          {daoTokenDetails ? (
+            <>
+              <span>Dao Tokens</span>
+              <span>{`${formatNumber(memberDetails.units)} ${
+                daoTokenDetails.symbol || 'tokens'
+              }`}</span>
+              {isCurrentMemberConnected && (
+                <small>
+                  <DaoToken daoTokenDetails={daoTokenDetails} />
+                </small>
+              )}
+            </>
+          ) : (
+            <>
+              <span>Membership Units</span>
+              <span>{formatNumber(memberDetails.units)}</span>
+            </>
+          )}
+        </div>
+        <div className="memberprofile__info-item">
+          <span>Voting Weight</span>
+        </div>
+      </div>
+    );
+  }
 
   /**
    * Render
@@ -110,10 +160,12 @@ export default function MemberProfile() {
           <div className="proposaldetails">
             {/* LEFT COLUMN */}
 
-            {/* MEMBER ADDRESS */}
             <div className="memberprofile__left-column">
+              {/* MEMBER ADDRESS */}
               <h3>{truncateEthAddress(memberDetails.address, 7)}</h3>
-              <div>MemberProfile Info @todo</div>
+
+              {/* MEMBER INFO */}
+              {renderMemberInfo()}
             </div>
 
             {/* RIGHT COLUMN */}

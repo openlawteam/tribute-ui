@@ -1,17 +1,15 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useLocation} from 'react-router-dom';
-import {useSelector} from 'react-redux';
 
 import {AsyncStatus} from '../../util/types';
 import {COUPON_API_URL} from '../../config';
-import {ERC20RegisterDetails} from '../../components/dao-token/DaoToken';
-import {StoreState} from '../../store/types';
 import {useAbortController} from '../../hooks';
 import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderWithEmoji from '../../components/feedback/LoaderWithEmoji';
 import RedeemManager from './RedeemManager';
 import Wrap from '../../components/common/Wrap';
+import {useDaoTokenDetails} from '../../components/dao-token/hooks';
 
 type RedeemCouponType = {
   amount: number;
@@ -24,28 +22,13 @@ type RedeemCouponType = {
 
 export default function RedeemCoupon() {
   /**
-   * Selectors
-   */
-
-  const ERC20ExtensionContract = useSelector(
-    (state: StoreState) => state.contracts?.ERC20ExtensionContract
-  );
-
-  /**
    * State
    */
 
   const [redeemableCoupon, setReedemableCoupon] = useState<RedeemCouponType[]>(
     []
   );
-
   const [couponStatus, setCouponStatus] = useState<AsyncStatus>(
-    AsyncStatus.STANDBY
-  );
-
-  const [erc20Details, setERC20Details] = useState<ERC20RegisterDetails>();
-
-  const [erc20DetailsStatus, setERC20DetailsStatus] = useState<AsyncStatus>(
     AsyncStatus.STANDBY
   );
 
@@ -56,6 +39,7 @@ export default function RedeemCoupon() {
   const {connected, account} = useWeb3Modal();
   const {defaultChainError} = useIsDefaultChain();
   const {abortController, isMountedRef} = useAbortController();
+  const {daoTokenDetails, daoTokenDetailsStatus} = useDaoTokenDetails();
 
   /**
    * Their hooks
@@ -72,8 +56,8 @@ export default function RedeemCoupon() {
   const isInProcess =
     couponStatus === AsyncStatus.STANDBY ||
     couponStatus === AsyncStatus.PENDING ||
-    erc20DetailsStatus === AsyncStatus.STANDBY ||
-    erc20DetailsStatus === AsyncStatus.PENDING;
+    daoTokenDetailsStatus === AsyncStatus.STANDBY ||
+    daoTokenDetailsStatus === AsyncStatus.PENDING;
 
   /**
    * Cached callbacks
@@ -85,10 +69,6 @@ export default function RedeemCoupon() {
     isMountedRef,
   ]);
 
-  const getERC20DetailsCached = useCallback(getERC20Details, [
-    ERC20ExtensionContract,
-  ]);
-
   /**
    * Effects
    */
@@ -98,10 +78,6 @@ export default function RedeemCoupon() {
 
     checkBySigOrAddrCached();
   }, [account, connected, checkBySigOrAddrCached, defaultChainError]);
-
-  useEffect(() => {
-    getERC20DetailsCached();
-  }, [getERC20DetailsCached]);
 
   /**
    * Functions
@@ -136,34 +112,6 @@ export default function RedeemCoupon() {
       if (!isMountedRef.current) return;
 
       setCouponStatus(AsyncStatus.REJECTED);
-    }
-  }
-
-  async function getERC20Details() {
-    if (!ERC20ExtensionContract) return;
-
-    try {
-      setERC20DetailsStatus(AsyncStatus.PENDING);
-
-      const symbol = await ERC20ExtensionContract.instance.methods
-        .symbol()
-        .call();
-      const decimals = await ERC20ExtensionContract.instance.methods
-        .decimals()
-        .call();
-
-      setERC20Details({
-        address: ERC20ExtensionContract.contractAddress,
-        symbol,
-        decimals: Number(decimals),
-        image: `${window.location.origin}/favicon.ico`,
-      });
-
-      setERC20DetailsStatus(AsyncStatus.FULFILLED);
-    } catch (error) {
-      console.log(error);
-      setERC20Details(undefined);
-      setERC20DetailsStatus(AsyncStatus.REJECTED);
     }
   }
 
@@ -218,7 +166,7 @@ export default function RedeemCoupon() {
   return (
     <RenderWrapper>
       <RedeemManager
-        erc20Details={erc20Details}
+        daoTokenDetails={daoTokenDetails}
         redeemables={redeemableCoupon}
       />
     </RenderWrapper>

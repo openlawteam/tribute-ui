@@ -4,4 +4,3 @@ export * from './useDao';
 export * from './useIsMounted';
 export * from './useMemberActionDisabled';
 export * from './useRedeemCoupon';
-export * from './useTokenHolderBalances';
