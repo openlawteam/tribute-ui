@@ -12,11 +12,12 @@ import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderLarge from '../../components/feedback/LoaderLarge';
-import NotFound from '../subpages/NotFound';
 import useMembers from './hooks/useMembers';
 import Wrap from '../../components/common/Wrap';
 import {useDaoTokenDetails} from '../../components/dao-token/hooks';
 import DaoToken from '../../components/dao-token/DaoToken';
+import {useDaoTotalUnits} from '../../hooks';
+import Delegation from './Delegation';
 
 export default function MemberProfile() {
   /**
@@ -27,6 +28,7 @@ export default function MemberProfile() {
   const {defaultChainError} = useIsDefaultChain();
   const {account} = useWeb3Modal();
   const {daoTokenDetails, daoTokenDetailsStatus} = useDaoTokenDetails();
+  const {totalUnits, totalUnitsStatus} = useDaoTotalUnits();
 
   /**
    * Their hooks
@@ -68,15 +70,21 @@ export default function MemberProfile() {
     membersStatus === AsyncStatus.STANDBY ||
     membersStatus === AsyncStatus.PENDING ||
     daoTokenDetailsStatus === AsyncStatus.STANDBY ||
-    daoTokenDetailsStatus === AsyncStatus.PENDING;
+    daoTokenDetailsStatus === AsyncStatus.PENDING ||
+    totalUnitsStatus === AsyncStatus.STANDBY ||
+    totalUnitsStatus === AsyncStatus.PENDING;
   const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
   const error: Error | undefined = membersError || defaultChainError;
   const isCurrentMemberConnected: boolean =
     account &&
     memberDetails &&
-    normalizeString(account) === normalizeString(memberDetails?.address)
+    normalizeString(account) === normalizeString(memberDetails.address)
       ? true
       : false;
+  const votingWeight =
+    memberDetails && typeof totalUnits === 'number'
+      ? ((Number(memberDetails.units) / totalUnits) * 100).toFixed(2)
+      : '';
 
   /**
    * Functions
@@ -90,10 +98,10 @@ export default function MemberProfile() {
         <div className="memberprofile__info-item">
           {daoTokenDetails ? (
             <>
-              <span>Dao Tokens</span>
-              <span>{`${formatNumber(memberDetails.units)} ${
+              <div>Dao Tokens</div>
+              <div>{`${formatNumber(memberDetails.units)} ${
                 daoTokenDetails.symbol || 'tokens'
-              }`}</span>
+              }`}</div>
               {isCurrentMemberConnected && (
                 <small>
                   <DaoToken daoTokenDetails={daoTokenDetails} />
@@ -102,14 +110,28 @@ export default function MemberProfile() {
             </>
           ) : (
             <>
-              <span>Membership Units</span>
-              <span>{formatNumber(memberDetails.units)}</span>
+              <div>Membership Units</div>
+              <div>{formatNumber(memberDetails.units)}</div>
             </>
           )}
         </div>
         <div className="memberprofile__info-item">
-          <span>Voting Weight</span>
-          <span>TODO%</span>
+          <div>Voting Weight</div>
+          <div>{`${votingWeight}%`}</div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderMemberActions() {
+    return (
+      <div>
+        <div className="memberprofile__action">
+          <div className="memberprofile__action-header">Delegation</div>
+          <div className="memberprofile__action-description">
+            You can delegate your voting rights to a different ETH address.
+          </div>
+          <Delegation />
         </div>
       </div>
     );
@@ -144,11 +166,13 @@ export default function MemberProfile() {
     );
   }
 
-  // Render 404 no member found
+  // Render no member found
   if (memberNotFound && isLoadingDone) {
     return (
       <RenderWrapper>
-        <NotFound />
+        <div className="text-center error-message">
+          <p>Member not found.</p>
+        </div>
       </RenderWrapper>
     );
   }
@@ -171,7 +195,8 @@ export default function MemberProfile() {
 
             {/* RIGHT COLUMN */}
             <div className="memberprofile__right-column">
-              MemberProfile Actions @todo
+              {/* MEMBER ACTIONS */}
+              {renderMemberActions()}
             </div>
           </div>
         </>

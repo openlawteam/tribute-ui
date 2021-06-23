@@ -22,6 +22,8 @@ type UseMembersReturn = {
 /**
  * useMembers
  *
+ * Gets DAO members from subgraph with direct onchain fallback.
+ *
  * @returns {UseMembersReturn} An object with the members and the current async status.
  */
 export default function useMembers(): UseMembersReturn {

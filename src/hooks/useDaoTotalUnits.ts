@@ -6,7 +6,11 @@ import {AsyncStatus} from '../util/types';
 import {StoreState} from '../store/types';
 import {SubgraphNetworkStatus} from '../store/subgraphNetworkStatus/types';
 import {GET_DAO} from '../gql';
-import {GQL_QUERY_POLLING_INTERVAL} from '../config';
+import {
+  GQL_QUERY_POLLING_INTERVAL,
+  TOTAL_ADDRESS,
+  UNITS_ADDRESS,
+} from '../config';
 
 type UseDaoTotalUnitsReturn = {
   totalUnits: number | undefined;
@@ -14,6 +18,13 @@ type UseDaoTotalUnitsReturn = {
   totalUnitsStatus: AsyncStatus;
 };
 
+/**
+ * useDaoTotalUnits
+ *
+ * Gets DAO total units from subgraph with direct onchain fallback.
+ *
+ * @returns {UseDaoTotalUnitsReturn}
+ */
 export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
   /**
    * Selectors
@@ -59,12 +70,12 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
 
   const getTotalUnitsFromExtensionCached = useCallback(
     getTotalUnitsFromExtension,
-    []
+    [BankExtensionContract]
   );
 
   const getTotalUnitsFromSubgraphCached = useCallback(
     getTotalUnitsFromSubgraph,
-    []
+    [data, error, getTotalUnitsFromExtensionCached, loading, stopPolling]
   );
 
   /**
@@ -75,7 +86,7 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
     if (!called) {
       getDaoFromSubgraphResult();
     }
-  }, []);
+  }, [called, getDaoFromSubgraphResult]);
 
   useEffect(() => {
     if (subgraphNetworkStatus === SubgraphNetworkStatus.OK) {
@@ -88,7 +99,14 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
       stopPolling && stopPolling();
       getTotalUnitsFromExtensionCached();
     }
-  }, []);
+  }, [
+    DaoRegistryContract?.contractAddress,
+    getTotalUnitsFromExtensionCached,
+    getTotalUnitsFromSubgraphCached,
+    loading,
+    stopPolling,
+    subgraphNetworkStatus,
+  ]);
 
   /**
    * Functions
@@ -124,9 +142,18 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
 
     try {
       setTotalUnitsStatus(AsyncStatus.PENDING);
+
+      const totalUnits = await BankExtensionContract.instance.methods.balanceOf(
+        TOTAL_ADDRESS,
+        UNITS_ADDRESS
+      );
+
+      setTotalUnits(Number(totalUnits));
+      setTotalUnitsStatus(AsyncStatus.FULFILLED);
     } catch (error) {
+      console.log(error);
       setTotalUnits(undefined);
-      setTotalUnits(error);
+      setTotalUnitsError(error);
       setTotalUnitsStatus(AsyncStatus.REJECTED);
     }
   }

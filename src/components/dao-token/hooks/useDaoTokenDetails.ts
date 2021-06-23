@@ -11,6 +11,13 @@ type UseDaoTokenDetailsReturn = {
   daoTokenDetailsStatus: AsyncStatus;
 };
 
+/**
+ * useDaoTokenDetails
+ *
+ * Gets DAO token details from ERC20Extension contract.
+ *
+ * @returns {UseDaoTokenDetailsReturn}
+ */
 export function useDaoTokenDetails(): UseDaoTokenDetailsReturn {
   /**
    * Selectors
