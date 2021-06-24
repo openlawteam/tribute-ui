@@ -1,5 +1,6 @@
 @use "./variables" as *; /* load without namespace for convenience */
 @use "./mixins" as *; /* load without namespace for convenience */
+@use "./button";
 
 .memberprofile__header {
   display: inline-block;
@@ -129,4 +130,31 @@
       16px
     ); /* min font-size 0.875rem, max 1rem */
   }
+}
+
+.memberprofile__action-button {
+  @extend .button--secondary;
+
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    16px,
+    18px
+  ); /* min font-size 1rem, max 1.125rem */
+  width: 100%;
+  margin: 1.5rem 0;
+  display: block;
+  max-width: 20rem;
+}
+
+.memberprofile__actions-unavailable {
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    16px,
+    18px
+  ); /* min font-size 1rem, max 1.125rem */
+  height: 100%;
+  display: flex;
+  align-items: center;
 }

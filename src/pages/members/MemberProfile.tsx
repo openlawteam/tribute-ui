@@ -124,17 +124,23 @@ export default function MemberProfile() {
   }
 
   function renderMemberActions() {
-    return (
-      <div>
-        <div className="memberprofile__action">
-          <div className="memberprofile__action-header">Delegation</div>
-          <div className="memberprofile__action-description">
-            You can delegate your voting rights to a different ETH address.
+    if (isCurrentMemberConnected) {
+      return (
+        <div>
+          <div className="memberprofile__action">
+            <div className="memberprofile__action-header">Delegation</div>
+            <Delegation />
           </div>
-          <Delegation />
         </div>
-      </div>
-    );
+      );
+    } else {
+      return (
+        <div className="memberprofile__actions-unavailable">
+          Connect your wallet with this member address to view available
+          actions.
+        </div>
+      );
+    }
   }
 
   /**

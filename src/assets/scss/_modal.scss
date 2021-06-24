@@ -59,6 +59,12 @@
 
 .modal__subtitle {
   font-size: 1.125rem;
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    16px,
+    18px
+  ); /* min font-size 1rem, max 1.125rem */
   margin-bottom: 1.5rem;
 }
 
