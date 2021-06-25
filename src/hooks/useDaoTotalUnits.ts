@@ -6,11 +6,7 @@ import {AsyncStatus} from '../util/types';
 import {StoreState} from '../store/types';
 import {SubgraphNetworkStatus} from '../store/subgraphNetworkStatus/types';
 import {GET_DAO} from '../gql';
-import {
-  GQL_QUERY_POLLING_INTERVAL,
-  TOTAL_ADDRESS,
-  UNITS_ADDRESS,
-} from '../config';
+import {TOTAL_ADDRESS, UNITS_ADDRESS} from '../config';
 
 type UseDaoTotalUnitsReturn = {
   totalUnits: number | undefined;
@@ -44,15 +40,12 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
    * GQL Query
    */
 
-  const [
-    getDaoFromSubgraphResult,
-    {called, loading, data, error, stopPolling},
-  ] = useLazyQuery(GET_DAO, {
-    pollInterval: GQL_QUERY_POLLING_INTERVAL,
-    variables: {
-      id: DaoRegistryContract?.contractAddress.toLowerCase(),
-    },
-  });
+  const [getDaoFromSubgraphResult, {called, loading, data, error}] =
+    useLazyQuery(GET_DAO, {
+      variables: {
+        id: DaoRegistryContract?.contractAddress.toLowerCase(),
+      },
+    });
 
   /**
    * State
@@ -75,7 +68,7 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
 
   const getTotalUnitsFromSubgraphCached = useCallback(
     getTotalUnitsFromSubgraph,
-    [data, error, getTotalUnitsFromExtensionCached, loading, stopPolling]
+    [data, error, getTotalUnitsFromExtensionCached, loading]
   );
 
   /**
@@ -96,7 +89,6 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
     } else {
       // If there is a subgraph network error fallback to fetching totalUnits
       // directly from smart contract
-      stopPolling && stopPolling();
       getTotalUnitsFromExtensionCached();
     }
   }, [
@@ -104,7 +96,6 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
     getTotalUnitsFromExtensionCached,
     getTotalUnitsFromSubgraphCached,
     loading,
-    stopPolling,
     subgraphNetworkStatus,
   ]);
 
@@ -130,7 +121,6 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
       // If there is a subgraph query error fallback to fetching totalUnits
       // directly from smart contract
       console.log(`subgraph query error: ${error.message}`);
-      stopPolling && stopPolling();
       getTotalUnitsFromExtensionCached();
     }
   }
