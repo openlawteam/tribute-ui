@@ -68,9 +68,7 @@ export function NavHamburger() {
    * Selectors
    */
 
-  const isActiveMember = useSelector(
-    (s: StoreState) => s.connectedMember?.isActiveMember
-  );
+  const connectedMember = useSelector((s: StoreState) => s.connectedMember);
 
   /**
    * State
@@ -103,6 +101,19 @@ export function NavHamburger() {
       closeMenuRef.current && clearTimeout(closeMenuRef.current);
     };
   }, []);
+
+  /**
+   * Variables
+   */
+
+  const isCurrentMemberOrDelegateConnected: boolean =
+    account && connectedMember?.isActiveMember ? true : false;
+  const isCurrentMemberConnected: boolean =
+    account &&
+    connectedMember?.isActiveMember &&
+    account.toLowerCase() === connectedMember?.memberAddress.toLowerCase()
+      ? true
+      : false;
 
   /**
    * Functions
@@ -209,25 +220,27 @@ export function NavHamburger() {
                       <span>Tribute</span>
                     </NavLink>
                   </li>
-                  {account && isActiveMember && (
-                    <>
-                      <li
-                        onClick={() => {
-                          handleMenuModalClose(false);
-                        }}>
-                        <NavLink to={`/members/${account}`}>
-                          <span>Profile</span>
-                        </NavLink>
-                      </li>
-                      <li
-                        onClick={() => {
-                          handleMenuModalClose(false);
-                        }}>
-                        <NavLink to="/dao-manager">
-                          <span>Manage DAO</span>
-                        </NavLink>
-                      </li>
-                    </>
+                  {/* The Profile link is available to only the connected member user (not any delegate) because the profile exists for the member account. */}
+                  {isCurrentMemberConnected && (
+                    <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to={`/members/${account}`}>
+                        <span>Profile</span>
+                      </NavLink>
+                    </li>
+                  )}
+                  {/* The Manage DAO link is available to both connected member users and connected delegate users. */}
+                  {isCurrentMemberOrDelegateConnected && (
+                    <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to="/dao-manager">
+                        <span>Manage DAO</span>
+                      </NavLink>
+                    </li>
                   )}
                 </ul>
               </div>

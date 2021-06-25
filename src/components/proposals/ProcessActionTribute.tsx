@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {toBN, AbiItem} from 'web3-utils';
 
 import {CycleEllipsis} from '../feedback';
-import {ERC20RegisterDetails} from '../dao-token/DaoToken';
+import {useDaoTokenDetails} from '../dao-token/hooks';
 import {getConnectedMember} from '../../store/actions';
 import {ProposalData, SnapshotProposal} from './types';
 import {ReduxDispatch, StoreState} from '../../store/types';
@@ -65,6 +65,7 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
   const [submitError, setSubmitError] = useState<Error>();
   const [tributeProposalDetails, setTributeProposalDetails] =
     useState<TributeProposalDetails>();
+  const {daoTokenDetails} = useDaoTokenDetails();
 
   /**
    * Refs
@@ -84,15 +85,6 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
   );
-  const ERC20ExtensionContract = useSelector(
-    (state: StoreState) => state.contracts?.ERC20ExtensionContract
-  );
-
-  /**
-   * State
-   */
-
-  const [erc20Details, setERC20Details] = useState<ERC20RegisterDetails>();
 
   /**
    * Our hooks
@@ -142,9 +134,6 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
     getTributeProposalDetails,
     [TributeContract, daoRegistryContract?.contractAddress, snapshotProposal]
   );
-  const getERC20DetailsCached = useCallback(getERC20Details, [
-    ERC20ExtensionContract,
-  ]);
 
   /**
    * Effects
@@ -181,24 +170,6 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
     // 2. Set reasons
     setOtherDisabledReasons(Object.values(actionDisabledReasonsRef.current));
   }, [account, setOtherDisabledReasons, snapshotProposal]);
-
-  // Prepare DAO token info if original proposer is processing proposal
-  useEffect(() => {
-    // Proposals of this type will have this value stored in its snapshot
-    // metadata.
-    const {accountAuthorizedToProcessPassedProposal} = (
-      snapshotProposal as SnapshotProposal
-    ).msg.payload.metadata;
-
-    if (accountAuthorizedToProcessPassedProposal && account) {
-      if (
-        accountAuthorizedToProcessPassedProposal.toLowerCase() ===
-        account.toLowerCase()
-      ) {
-        getERC20DetailsCached();
-      }
-    }
-  }, [account, getERC20DetailsCached, snapshotProposal]);
 
   /**
    * Functions
@@ -349,42 +320,18 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
   }
 
   async function addTokenToWallet() {
-    if (!erc20Details) return;
+    if (!daoTokenDetails) return;
 
     try {
       await window.ethereum.request({
         method: 'wallet_watchAsset',
         params: {
           type: 'ERC20',
-          options: erc20Details,
+          options: daoTokenDetails,
         },
       });
     } catch (error) {
       console.log(error);
-    }
-  }
-
-  async function getERC20Details() {
-    if (!ERC20ExtensionContract) return;
-
-    try {
-      const address = ERC20ExtensionContract.contractAddress;
-      const symbol = await ERC20ExtensionContract.instance.methods
-        .symbol()
-        .call();
-      const decimals = await ERC20ExtensionContract.instance.methods
-        .decimals()
-        .call();
-      const image = `${window.location.origin}/favicon.ico`;
-      setERC20Details({
-        address,
-        symbol,
-        decimals: Number(decimals),
-        image,
-      });
-    } catch (error) {
-      console.log(error);
-      setERC20Details(undefined);
     }
   }
 

@@ -16,17 +16,17 @@ import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 
 type RedeemManagerProps = {
   redeemables: Record<string, any>;
-  erc20Details?: ERC20RegisterDetails;
+  daoTokenDetails?: ERC20RegisterDetails;
 };
 
 type RedeemCardProps = {
   redeemable: Record<string, any>;
-  erc20Details?: ERC20RegisterDetails;
+  daoTokenDetails?: ERC20RegisterDetails;
 };
 
 export default function RedeemManager({
   redeemables,
-  erc20Details,
+  daoTokenDetails,
 }: RedeemManagerProps) {
   /**
    *  RENDER
@@ -35,12 +35,15 @@ export default function RedeemManager({
   // show the redeem card, if only one coupon available
   return (
     <RenderWrapper>
-      <RedeemCard redeemable={redeemables[0]} erc20Details={erc20Details} />
+      <RedeemCard
+        redeemable={redeemables[0]}
+        daoTokenDetails={daoTokenDetails}
+      />
     </RenderWrapper>
   );
 }
 
-function RedeemCard({redeemable, erc20Details}: RedeemCardProps) {
+function RedeemCard({redeemable, daoTokenDetails}: RedeemCardProps) {
   /**
    * Our hooks
    */
@@ -126,11 +129,11 @@ function RedeemCard({redeemable, erc20Details}: RedeemCardProps) {
       <p className="redeemcard__unit">
         {formatNumber(redeemable.amount)}
         <sup>
-          <small>{erc20Details?.symbol || 'tokens'}</small>
+          <small>{daoTokenDetails?.symbol || 'tokens'}</small>
         </sup>
       </p>
 
-      <DaoToken erc20Details={erc20Details} />
+      <DaoToken daoTokenDetails={daoTokenDetails} />
 
       {isDone && (
         <p className="redeemcard__redeemed">
@@ -148,7 +151,7 @@ function RedeemCard({redeemable, erc20Details}: RedeemCardProps) {
         className="button"
         style={{marginTop: isDone ? '1rem' : '1.5rem'}}
         onClick={async () => {
-          await redeemCoupon(redeemable, erc20Details);
+          await redeemCoupon(redeemable, daoTokenDetails);
         }}
         disabled={isInProcessOrDone}>
         {isInProcess ? <Loader /> : isDone ? 'Redeemed!' : 'Redeem'}

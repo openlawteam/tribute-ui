@@ -1,9 +1,9 @@
 import {act, renderHook} from '@testing-library/react-hooks';
 import {createMockClient} from 'mock-apollo-client';
-import {GET_TOKEN_HOLDER_BALANCES} from '../gql';
-import {tokenHolderBalancesResponse} from '../test/gqlResponses';
+import {GET_TOKEN_HOLDER_BALANCES} from '../../../gql';
+import {tokenHolderBalancesResponse} from '../../../test/gqlResponses';
 import {useTokenHolderBalances} from './useTokenHolderBalances';
-import Wrapper from '../test/Wrapper';
+import Wrapper from '../../../test/Wrapper';
 
 const mockClient = createMockClient();
 
