@@ -56,7 +56,6 @@ export default function ProcessActionMembership(
   const [submitError, setSubmitError] = useState<Error>();
   const [membershipProposalAmount, setMembershipProposalAmount] =
     useState<string>();
-  const {daoTokenDetails} = useDaoTokenDetails();
 
   /**
    * Refs
@@ -90,6 +89,7 @@ export default function ProcessActionMembership(
     setOtherDisabledReasons,
   } = useMemberActionDisabled(useMemberActionDisabledProps);
   const gasPrices = useETHGasPrice();
+  const {daoTokenDetails} = useDaoTokenDetails();
 
   /**
    * Their hooks

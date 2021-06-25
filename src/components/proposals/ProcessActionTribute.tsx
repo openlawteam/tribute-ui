@@ -65,7 +65,6 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
   const [submitError, setSubmitError] = useState<Error>();
   const [tributeProposalDetails, setTributeProposalDetails] =
     useState<TributeProposalDetails>();
-  const {daoTokenDetails} = useDaoTokenDetails();
 
   /**
    * Refs
@@ -105,6 +104,7 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
     setOtherDisabledReasons,
   } = useMemberActionDisabled(useMemberActionDisabledProps);
   const gasPrices = useETHGasPrice();
+  const {daoTokenDetails} = useDaoTokenDetails();
 
   /**
    * Their hooks
