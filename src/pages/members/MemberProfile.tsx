@@ -98,7 +98,7 @@ export default function MemberProfile() {
         <div className="memberprofile__info-item">
           {daoTokenDetails ? (
             <>
-              <div>Dao Tokens</div>
+              <div>DAO Tokens</div>
               <div>{`${formatNumber(memberDetails.units)} ${
                 daoTokenDetails.symbol || 'tokens'
               }`}</div>
