@@ -1,6 +1,4 @@
 export const tokenHolderBalancesResponse = {
-  // data: {
-  // },
   tokens: [
     {
       holders: [
