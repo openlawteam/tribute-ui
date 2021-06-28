@@ -265,11 +265,9 @@ export default function Wrapper(
       <Web3ModalContext.Provider
         value={web3ModalContext || ({} as Web3ModalContextValue)}>
         <MemoryRouter>
-          {/* <MockedProvider mocks={[]} addTypename={false}> */}
           <ApolloProvider client={getApolloClient(store)}>
             {renderChildren(props.children)}
           </ApolloProvider>
-          {/* </MockedProvider> */}
         </MemoryRouter>
       </Web3ModalContext.Provider>
     </Provider>

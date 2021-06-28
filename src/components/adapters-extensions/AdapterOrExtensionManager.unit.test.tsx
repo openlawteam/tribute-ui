@@ -126,8 +126,6 @@ describe('<AdapterOrExtensionManager /> unit tests', () => {
           /If you're happy with your setup, you can finalize your DAO. After your DAO is finalized you will need to submit a proposal to make changes/i
         )
       ).toBeInTheDocument();
-
-      screen.debug();
     });
 
     const {web3} = getWeb3Instance();
