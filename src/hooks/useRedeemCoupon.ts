@@ -68,7 +68,7 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
    * Our hooks
    */
 
-  const gasPrices = useETHGasPrice();
+  const {fast: fastGasPrice} = useETHGasPrice();
   const {account, web3Instance} = useWeb3Modal();
   const {defaultChainError} = useIsDefaultChain();
   const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
@@ -142,8 +142,7 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
 
       const txArguments = {
         from: account || '',
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       // Execute contract call for `redeemCoupon`

@@ -103,7 +103,7 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
     WhyDisabledModal,
     setOtherDisabledReasons,
   } = useMemberActionDisabled(useMemberActionDisabledProps);
-  const gasPrices = useETHGasPrice();
+  const {fast: fastGasPrice} = useETHGasPrice();
   const {daoTokenDetails} = useDaoTokenDetails();
 
   /**
@@ -243,8 +243,7 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
           ];
           const txArguments = {
             from: account || '',
-            // Set a fast gas price
-            ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+            ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
           };
 
           // Execute contract call for `approve`
@@ -294,8 +293,7 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
       const txArguments = {
         from: account || '',
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       const tx = await txSend(

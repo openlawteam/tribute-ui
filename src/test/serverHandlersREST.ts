@@ -2,6 +2,7 @@ import {rest} from 'msw';
 
 import {SNAPSHOT_HUB_API_URL} from '../config';
 import {
+  ethGasStationResponse,
   snapshotAPIDraftResponse,
   snapshotAPIOffchainProofResponse,
   snapshotAPIProposalResponse,
@@ -50,10 +51,20 @@ const getSnapshotAPIOffchainProof = rest.get(
 );
 
 /**
+ * ETHGasStation
+ */
+
+const ethGasStationAPI = rest.get(
+  'https://ethgasstation.info/json/ethgasAPI.json',
+  (_req, res, ctx) => res(ctx.json(ethGasStationResponse))
+);
+
+/**
  * HANDLERS TO EXPORT
  */
 
 const handlers = [
+  ethGasStationAPI,
   getSnapshotAPIDraft,
   getSnapshotAPIOffchainProof,
   getSnapshotAPIProposal,

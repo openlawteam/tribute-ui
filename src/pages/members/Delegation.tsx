@@ -84,7 +84,7 @@ function DelegationModal({
    */
 
   const {account, web3Instance} = useWeb3Modal();
-  const gasPrices = useETHGasPrice();
+  const {fast: fastGasPrice} = useETHGasPrice();
   const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
     useContractSend();
 
@@ -318,8 +318,7 @@ function DelegationModal({
 
       const txArguments = {
         from: account || '',
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       // Execute contract call for `updateDelegateKey`
@@ -382,8 +381,7 @@ function DelegationModal({
 
       const txArguments = {
         from: account || '',
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       // Execute contract call for `updateDelegateKey`
