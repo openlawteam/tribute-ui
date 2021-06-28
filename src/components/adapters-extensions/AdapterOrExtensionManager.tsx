@@ -62,7 +62,7 @@ export default function AdapterOrExtensionManager() {
    * Selectors
    */
   const {DaoRegistryContract, DaoFactoryContract} = useSelector(
-    (state: StoreState) => state.contracts
+    (s: StoreState) => s.contracts
   );
   const isActiveMember = useSelector(
     (s: StoreState) => s.connectedMember?.isActiveMember
@@ -97,6 +97,7 @@ export default function AdapterOrExtensionManager() {
    */
   const {defaultChainError} = useIsDefaultChain();
   const {connected, account, web3Instance} = useWeb3Modal();
+  const {dao, gqlError} = useDao();
   const {
     adapterExtensionStatus,
     getAdapterOrExtensionFromRedux,
@@ -104,15 +105,8 @@ export default function AdapterOrExtensionManager() {
     unRegisteredAdaptersOrExtensions,
   } = useAdaptersOrExtensions();
   const {initAdapterExtensionContract} = useInitAdapterExtensionContracts();
-  const {dao, gqlError} = useDao();
 
-  const {
-    // txError,
-    // txEtherscanURL,
-    // txIsPromptOpen,
-    txSend,
-    // txStatus,
-  } = useContractSend();
+  const {txSend} = useContractSend();
   const gasPrices = useETHGasPrice();
   const {
     isDisabled,
@@ -132,7 +126,7 @@ export default function AdapterOrExtensionManager() {
     registeredAdaptersOrExtensions === undefined &&
     unRegisteredAdaptersOrExtensions === undefined;
   const isLoading: boolean = adapterExtensionStatus === AsyncStatus.PENDING;
-
+  const nothingToAdd = unRegisteredAdaptersOrExtensions?.length === 0;
   // @todo track the prior selection of a dropdown target
   // let priorSelectedTargetOption: DaoAdapterConstants | null = null;
 
@@ -638,6 +632,10 @@ export default function AdapterOrExtensionManager() {
     );
   }
 
+  /* @todo
+   * disable when selection is processing
+   * disable when there are no more unused adapters to select
+   */
   return (
     <RenderWrapper>
       <div className="adaptermanager">
@@ -651,20 +649,18 @@ export default function AdapterOrExtensionManager() {
         <div className="adapter-extension__selection">
           <div>
             <Checkbox
-              id="selectAll"
+              data-testid="selectall"
+              role="checkbox"
+              id="selectall"
               label={`${selectionCount} selected`}
               checked={selectAll === true}
               disabled={
-                isUnavailable ||
                 isDisabled || // connected user is not an active member
-                unRegisteredAdaptersOrExtensions?.length === 0 || // nothing left to register
+                isUnavailable ||
+                nothingToAdd || // nothing left to register
                 !isDAOExisting
-                /* @todo 
-              - disable when selection is processing 
-              - disable when there are no more unused adapters to select
-              */
               }
-              name="selectAll"
+              name="selectall"
               size={CheckboxSize.LARGE}
               onChange={handleOnChange}
             />
@@ -893,6 +889,7 @@ export default function AdapterOrExtensionManager() {
           </p>
           <div>
             <button
+              data-testid="finalizedao"
               className="button--secondary finalize"
               disabled={
                 isUnavailable || !isDAOExisting || isDAOReady

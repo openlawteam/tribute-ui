@@ -3,7 +3,6 @@ import {MemoryRouter} from 'react-router-dom';
 import {provider as Web3Provider} from 'web3-core/types';
 import {Provider} from 'react-redux';
 import {ApolloProvider} from '@apollo/react-hooks';
-import {createMockClient, MockApolloClient} from 'mock-apollo-client';
 import React, {useEffect, useMemo, useState} from 'react';
 import Web3 from 'web3';
 
@@ -19,6 +18,7 @@ import {VotingAdapterName} from '../components/adapters-extensions/enums';
 import App from '../App';
 import Init from '../Init';
 import InitError from '../InitError';
+import {getApolloClient} from '../index';
 
 export type WrapperReturnProps = {
   mockWeb3Provider: FakeHttpProvider;
@@ -47,10 +47,6 @@ type WrapperProps = {
    * Web3 modal manager context options
    */
   web3ModalContext?: Web3ModalContextValue;
-  /**
-   * Apollo mock client
-   */
-  mockApolloClient?: MockApolloClient;
 };
 
 /**
@@ -68,7 +64,6 @@ export default function Wrapper(
     useInit = false,
     useWallet = false,
     web3ModalContext,
-    mockApolloClient = createMockClient(),
   } = props;
 
   /**
@@ -270,9 +265,11 @@ export default function Wrapper(
       <Web3ModalContext.Provider
         value={web3ModalContext || ({} as Web3ModalContextValue)}>
         <MemoryRouter>
-          <ApolloProvider client={mockApolloClient}>
+          {/* <MockedProvider mocks={[]} addTypename={false}> */}
+          <ApolloProvider client={getApolloClient(store)}>
             {renderChildren(props.children)}
           </ApolloProvider>
+          {/* </MockedProvider> */}
         </MemoryRouter>
       </Web3ModalContext.Provider>
     </Provider>
