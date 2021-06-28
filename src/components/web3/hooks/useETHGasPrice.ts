@@ -1,5 +1,10 @@
-import {useEffect, useState, useRef} from 'react';
+import {useEffect, useState} from 'react';
+import {toWei} from 'web3-utils';
+import BigNumber from 'bignumber.js';
+
+import {AsyncStatus} from '../../../util/types';
 import {ENVIRONMENT} from '../../../config';
+import {useAbortController} from '../../../hooks';
 
 type GasStationResponse = {
   average: number;
@@ -10,112 +15,141 @@ type GasStationResponse = {
   fastest: number;
   fastestWait: number;
   fastWait: number;
+  gasPriceRange: Record<string, number>;
   safeLow: number;
   safeLowWait: number;
   speed: number;
-  standard: number;
 };
 
 type GasPrices = {
-  average?: string;
-  fast: string;
-  fastest: string;
-  safeLow: string;
-  standard?: string;
+  average: string | undefined;
+  fast: string | undefined;
+  fastest: string | undefined;
+  safeLow: string | undefined;
 };
 
-const REQUEST_TIMEOUT_MS = 5000;
+type UseETHGasPriceReturn = GasPrices & {
+  gasPriceError: Error | undefined;
+  gasPriceStatus: AsyncStatus;
+};
+
 const URL = 'https://ethgasstation.info/json/ethgasAPI.json';
-const SECONDARY_URL = 'https://www.etherchain.org/api/gasPriceOracle';
+
+/**
+ * To prepare the provided ETHGasStation values for conversion from Gwei->wei,
+ * first divide by `10`, per the API docs.
+ *
+ * @see https://docs.ethgasstation.info/gas-price#gas-price
+ */
+function convertGasToWEI(gasStationPrice: number) {
+  const gasPriceToWEI: string = toWei(
+    new BigNumber((gasStationPrice / 10).toFixed(4)).toString(),
+    'Gwei'
+  );
+
+  return gasPriceToWEI;
+}
+
+const INITIAL_GAS_PRICES: GasPrices = {
+  average: undefined,
+  fast: undefined,
+  fastest: undefined,
+  safeLow: undefined,
+};
 
 /**
  * useETHGasPrice
  *
- * Returns the latest mainnet gas prices, converted to WEI string.
- * If ETHGasStation is not returning quick enough (or fails), it tries etherchain's
- * gasPriceOracle API endpoint.
+ * Returns the latest mainnet gas prices, converted to WEI string from ETHGasStation.
  *
- * @returns {GasPrices}
+ * @returns {UseETHGasPriceReturn}
+ * @see https://ethgasstation.info/json/ethgasAPI.json
  */
-export function useETHGasPrice() {
+export function useETHGasPrice(props?: {
+  ignoreEnvironment?: boolean;
+}): UseETHGasPriceReturn {
+  const {ignoreEnvironment = false} = props || {};
+
   /**
    * State
    */
 
-  const [gasURL, setGasURL] = useState<string>(URL);
-  const [gasPrices, setGasPrices] = useState<GasPrices>();
+  const [gasPrices, setGasPrices] = useState<GasPrices>(INITIAL_GAS_PRICES);
+  const [gasPriceError, setGasPriceError] = useState<Error>();
 
-  const isMounted = useRef<boolean>();
+  const [gasPriceStatus, setGasPriceStatus] = useState<AsyncStatus>(
+    AsyncStatus.STANDBY
+  );
+
+  /**
+   * Our hooks
+   */
+
+  const {abortController, isMountedRef} = useAbortController();
+
+  /**
+   * Variables
+   */
+
+  /**
+   * Sometimes using mainnet gas prices for testnets won't work well with wallets.
+   */
+  const shouldExitIfNotProduction: boolean =
+    ignoreEnvironment === false && ENVIRONMENT !== 'production';
+
+  /**
+   * Effects
+   */
 
   useEffect(() => {
-    /**
-     * If the environment is not production, then exit.
-     * Sometimes using mainnet gas prices for Rinkeby won't work well with wallets.
-     */
-    if (ENVIRONMENT !== 'production') return;
+    if (!abortController?.signal) return;
+    if (shouldExitIfNotProduction) return;
 
-    isMounted.current = true;
+    setGasPriceError(undefined);
+    setGasPriceStatus(AsyncStatus.PENDING);
 
-    const abortController = new AbortController();
-    // If the request takes longer than 2 seconds,
-    // abort the request and try the secondary URL.
-    const timeoutId = setTimeout(() => {
-      abortController.abort();
-
-      setGasURL(SECONDARY_URL);
-    }, REQUEST_TIMEOUT_MS);
-
-    // To convert the provided values to gwei, divide by 10
-    const convertGasToWEI = (price: number) =>
-      ((gasURL === URL ? price / 10 : price) * 1000000000).toString();
-
-    fetch(gasURL, {signal: abortController.signal})
+    fetch(URL, {signal: abortController.signal})
       .then((response) => {
-        if (!isMounted.current) return;
+        if (!isMountedRef.current) return;
 
         if (!response.ok) {
-          // try a new endpoint
-          setGasURL(SECONDARY_URL);
-
           throw new Error(
             'Something went wrong while getting the latest gas price.'
           );
         }
 
-        clearTimeout(timeoutId);
+        setGasPriceStatus(AsyncStatus.FULFILLED);
 
         return response.json();
       })
       .then((jsonResponse: GasStationResponse) => {
-        if (!isMounted.current) return;
+        if (!isMountedRef.current) return;
 
-        const {average, fast, fastest, safeLow, standard} = jsonResponse;
+        const {average, fast, fastest, safeLow} = jsonResponse;
 
         setGasPrices({
-          average: convertGasToWEI(average || standard),
+          average: convertGasToWEI(average),
           fast: convertGasToWEI(fast),
           fastest: convertGasToWEI(fastest),
           safeLow: convertGasToWEI(safeLow),
         });
       })
-      .catch(() => {
-        clearTimeout(timeoutId);
+      .catch((error) => {
+        if (!isMountedRef.current) return;
 
-        if (!isMounted.current) return;
-
-        // try a new endpoint
-        setGasURL(SECONDARY_URL);
-        setGasPrices(undefined);
+        setGasPriceError(error);
+        setGasPrices(INITIAL_GAS_PRICES);
+        setGasPriceStatus(AsyncStatus.REJECTED);
       });
 
     return () => {
-      isMounted.current = false;
-
       abortController.abort();
-
-      clearTimeout(timeoutId);
     };
-  }, [gasURL]);
+  }, [abortController, isMountedRef, shouldExitIfNotProduction]);
 
-  return gasPrices;
+  /**
+   * Result
+   */
+
+  return {...gasPrices, gasPriceError, gasPriceStatus};
 }
