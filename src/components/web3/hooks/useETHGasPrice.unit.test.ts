@@ -4,6 +4,7 @@ import {AsyncStatus} from '../../../util/types';
 import {ethGasStationResponse} from '../../../test/restResponses';
 import {rest, server} from '../../../test/server';
 import {useETHGasPrice} from './useETHGasPrice';
+import {ENVIRONMENT} from '../../../config';
 
 describe('useETHGasPrice unit tests', () => {
   test('should return correct data', async () => {
@@ -99,6 +100,38 @@ describe('useETHGasPrice unit tests', () => {
         gasPriceError: undefined,
         gasPriceStatus: AsyncStatus.FULFILLED,
         safeLow: '7500000000',
+      });
+    });
+  });
+
+  test('should return correct data when using prop `ignoreEnvironment: false`', async () => {
+    await act(async () => {
+      const {result, waitForNextUpdate} = await renderHook(() =>
+        useETHGasPrice({ignoreEnvironment: false})
+      );
+
+      // Assert initial data
+      expect(result.current).toStrictEqual({
+        average: undefined,
+        fast: undefined,
+        fastest: undefined,
+        gasPriceError: undefined,
+        gasPriceStatus: AsyncStatus.STANDBY,
+        safeLow: undefined,
+      });
+
+      await waitForNextUpdate();
+
+      // Assert exit since the environment does not equal `"production"``
+      expect(ENVIRONMENT).toBe('localhost');
+
+      expect(result.current).toStrictEqual({
+        average: undefined,
+        fast: undefined,
+        fastest: undefined,
+        gasPriceError: undefined,
+        gasPriceStatus: AsyncStatus.STANDBY,
+        safeLow: undefined,
       });
     });
   });
