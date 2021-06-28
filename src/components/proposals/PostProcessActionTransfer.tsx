@@ -72,7 +72,7 @@ export default function PostProcessActionTransfer(
     WhyDisabledModal,
     setOtherDisabledReasons,
   } = useMemberActionDisabled();
-  const gasPrices = useETHGasPrice();
+  const {fast: fastGasPrice} = useETHGasPrice();
 
   /**
    * Their hooks
@@ -189,8 +189,7 @@ export default function PostProcessActionTransfer(
 
       const txArguments = {
         from: account || '',
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       const tx = await txSend(

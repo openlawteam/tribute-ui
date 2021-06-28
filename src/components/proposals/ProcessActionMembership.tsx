@@ -88,7 +88,7 @@ export default function ProcessActionMembership(
     WhyDisabledModal,
     setOtherDisabledReasons,
   } = useMemberActionDisabled(useMemberActionDisabledProps);
-  const gasPrices = useETHGasPrice();
+  const {fast: fastGasPrice} = useETHGasPrice();
   const {daoTokenDetails} = useDaoTokenDetails();
 
   /**
@@ -205,8 +205,7 @@ export default function ProcessActionMembership(
       const txArguments = {
         from: account || '',
         value: membershipProposalAmount,
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       const tx = await txSend(

@@ -103,7 +103,7 @@ export function useETHGasPrice(props?: {
 
   useEffect(() => {
     if (!abortController?.signal) return;
-    if (shouldExitIfNotProduction) return;
+    // if (shouldExitIfNotProduction) return;
 
     setGasPriceError(undefined);
     setGasPriceStatus(AsyncStatus.PENDING);

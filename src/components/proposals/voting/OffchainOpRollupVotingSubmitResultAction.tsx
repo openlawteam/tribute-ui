@@ -102,7 +102,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
   const {isDisabled, openWhyDisabledModal, WhyDisabledModal} =
     useMemberActionDisabled();
 
-  const gasPrices = useETHGasPrice();
+  const {fast: fastGasPrice} = useETHGasPrice();
 
   /**
    * Variables
@@ -294,8 +294,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
       const txArguments = {
         from: account || '',
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       // Send the tx

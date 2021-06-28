@@ -43,7 +43,7 @@ export default function FinalizeModal({
    */
   const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
     useContractSend();
-  const gasPrices = useETHGasPrice();
+  const {fast: fastGasPrice} = useETHGasPrice();
   const {dao} = useDao();
   const {connected, account} = useWeb3Modal();
 
@@ -129,8 +129,7 @@ export default function FinalizeModal({
 
       const txArguments = {
         from: account || '',
-        // Set a fast gas price
-        ...(gasPrices ? {gasPrice: gasPrices.fast} : null),
+        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       // Execute contract call for `finalizeDao`
