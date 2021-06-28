@@ -1,23 +1,20 @@
 import {act, renderHook} from '@testing-library/react-hooks';
-import {createMockClient} from 'mock-apollo-client';
 import {useDao} from './useDao';
-import {GET_DAO} from '../gql';
-import {daoResponse} from '../test/gqlResponses';
+import {server, graphql} from '../test/server';
 import Wrapper from '../test/Wrapper';
 
-const mockClient = createMockClient();
-
 describe('useDao unit tests', () => {
-  const queryHandler = jest.fn().mockResolvedValue(daoResponse);
-
-  mockClient.setRequestHandler(GET_DAO, queryHandler);
-
   test('should get inital dao state', async () => {
     await act(async () => {
-      const {result, waitForNextUpdate} = await renderHook(() => useDao(), {
+      server.use(
+        graphql.query('GetDao', (_, res, ctx) => {
+          return res(ctx.data({tributeDaos: []}));
+        })
+      );
+
+      const {result, waitForNextUpdate} = renderHook(() => useDao(), {
         initialProps: {
           useInit: true,
-          mockApolloClient: mockClient,
         },
         wrapper: Wrapper,
       });
@@ -27,9 +24,6 @@ describe('useDao unit tests', () => {
       // Assert initial state
       expect(result.current.dao).toBe(undefined);
       expect(result.current.gqlError).toBe(undefined);
-
-      expect(queryHandler).toBeCalledTimes(1);
-      expect(queryHandler).toBeCalledWith({id: undefined});
     });
   });
 });
