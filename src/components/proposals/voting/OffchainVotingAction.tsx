@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 
+import {truncateEthAddress} from '../../../util/helpers';
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {getVoteChosen} from '../helpers';
 import {ProposalData} from '../types';
@@ -23,7 +24,10 @@ type VotingDisabledReasons = {
 };
 
 const getDelegatedAddressMessage = (a: string) =>
-  `Your member address is delegated to ${a}. You must use that address to vote.`;
+  `Your member address is delegated to ${truncateEthAddress(
+    a,
+    7
+  )}. You must use that address to vote.`;
 
 /**
  * OffchainVotingAction

@@ -11,6 +11,10 @@
   &:hover {
     cursor: pointer;
   }
+
+  &--connected-account {
+    box-shadow: 0 2px 2px 0 $color-primary-hover;
+  }
 }
 
 .membercard__title {

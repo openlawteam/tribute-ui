@@ -21,6 +21,7 @@ import {
   useContractSend,
   useETHGasPrice,
   useIsDefaultChain,
+  useWeb3Modal,
 } from '../../components/web3/hooks';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
@@ -30,7 +31,6 @@ import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 import {multicall, MulticallTuple} from '../../components/web3/helpers';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
-import {useWeb3Modal} from '../../components/web3/hooks';
 import CycleMessage from '../../components/feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';

@@ -14,14 +14,13 @@ import {
   normalizeString,
   truncateEthAddress,
 } from '../../util/helpers';
-import {useIsDefaultChain} from '../../components/web3/hooks';
+import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
 import {UNITS_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
-import {useWeb3Modal} from '../../components/web3/hooks';
 import {CycleEllipsis} from '../../components/feedback';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';

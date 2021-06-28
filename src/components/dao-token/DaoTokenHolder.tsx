@@ -2,7 +2,7 @@ import {useCallback, useEffect, useState} from 'react';
 
 import FadeIn from '../../components/common/FadeIn';
 import {useWeb3Modal} from '../../components/web3/hooks';
-import {useTokenHolderBalances} from '../../hooks';
+import {useTokenHolderBalances} from './hooks';
 
 import {formatNumber} from '../../util/helpers';
 import {ETHERSCAN_URLS} from '../../config';
@@ -62,7 +62,7 @@ export default function DaoTokenHolder(
 
       const holderData = holders?.find(
         (holder: any) =>
-          holder.member?.delegateKey.toLowerCase() === account.toLowerCase()
+          holder.member?.id.toLowerCase() === account.toLowerCase()
       );
 
       holderData &&

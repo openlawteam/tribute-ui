@@ -29,6 +29,7 @@
 @use "./redeemcard"; /* redeem card styles */
 @use "./daotoken"; /* DAO token widget styles */
 @use "./daotokenholder"; /* DAO token holder widget styles */
+@use "./delegation"; /* delegation styles */
 
 html {
   height: 100%;

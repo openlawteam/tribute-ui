@@ -1,8 +1,7 @@
 import {act, renderHook} from '@testing-library/react-hooks';
 import {useTokenHolderBalances} from './useTokenHolderBalances';
-import Wrapper from '../test/Wrapper';
-
-import {server, graphql} from '../test/server';
+import Wrapper from '../../../test/Wrapper';
+import {server, graphql} from '../../../test/server';
 
 describe('useTokenHolderBalanceseDao unit tests', () => {
   test('should get initial token holder balances', async () => {
