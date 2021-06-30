@@ -16,6 +16,7 @@ import LoaderLarge from '../../components/feedback/LoaderLarge';
 import NotFound from '../subpages/NotFound';
 import ProcessActionMembership from '../../components/proposals/ProcessActionMembership';
 import ProposalActions from '../../components/proposals/ProposalActions';
+import SubmitAction from '../../components/proposals/SubmitAction';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
 import ProposalDetails from '../../components/proposals/ProposalDetails';
 import Wrap from '../../components/common/Wrap';
@@ -73,6 +74,14 @@ export default function MembershipDetails() {
     const {
       OffchainVotingContract: {daoProposalVoteResult, proposal, status},
     } = data;
+
+    // Submit/Sponsor button (for proposals that have not been submitted onchain yet)
+    if (status === ProposalFlowStatus.Submit) {
+      const {snapshotDraft} = proposal;
+      const applicant = snapshotDraft?.msg.payload.metadata.submitActionArgs[0];
+
+      return <SubmitAction checkApplicant={applicant} proposal={proposal} />;
+    }
 
     if (
       status === ProposalFlowStatus.Process ||
