@@ -1,3 +1,4 @@
+import {Link} from 'react-router-dom';
 import {Member} from './types';
 
 import {truncateEthAddress} from '../../util/helpers';
@@ -5,7 +6,7 @@ import {useWeb3Modal} from '../../components/web3/hooks';
 
 type MemberCardProps = {
   member: Member;
-  onClick: (ethereumAddress: string) => void;
+  to: string;
 };
 
 /**
@@ -15,7 +16,7 @@ type MemberCardProps = {
  * @returns {JSX.Element}
  */
 export default function MemberCard(props: MemberCardProps): JSX.Element {
-  const {member, onClick} = props;
+  const {member, to} = props;
 
   /**
    * Our hooks
@@ -24,31 +25,22 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
   const {account} = useWeb3Modal();
 
   /**
-   * Functions
-   */
-
-  function handleClick() {
-    const ethereumAddress = member.address;
-
-    onClick(ethereumAddress);
-  }
-
-  /**
    * Render
    */
 
   return (
-    <div
-      className={`membercard ${
-        account && account.toLowerCase() === member.address.toLowerCase()
-          ? `membercard--connected-account`
-          : ''
-      }`}
-      onClick={handleClick}>
-      {/* TITLE */}
-      <h3 className="membercard__title">
-        {truncateEthAddress(member.address, 7)}
-      </h3>
-    </div>
+    <Link className={'membercard__link'} to={to}>
+      <div
+        className={`membercard ${
+          account && account.toLowerCase() === member.address.toLowerCase()
+            ? `membercard--connected-account`
+            : ''
+        }`}>
+        {/* TITLE */}
+        <h3 className="membercard__title">
+          {truncateEthAddress(member.address, 7)}
+        </h3>
+      </div>
+    </Link>
   );
 }

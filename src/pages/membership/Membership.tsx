@@ -23,7 +23,7 @@ export default function Membership() {
     <RenderWrapper>
       <Proposals
         adapterName={DaoAdapterConstants.ONBOARDING}
-        goToProposal={goToProposalDetails}
+        onProposalClick={goToProposalDetails}
         includeProposalsExistingOnlyOffchain={true}
       />
     </RenderWrapper>
