@@ -34,6 +34,57 @@ describe('useCheckApplicant unit tests', () => {
     });
   });
 
+  test('should return correct data when applicant address is valid', async () => {
+    await act(async () => {
+      let mockWeb3Provider: any;
+      let web3Instance: any;
+
+      const address = DEFAULT_ETH_ADDRESS;
+
+      const {result} = await renderHook(() => useCheckApplicant(address), {
+        initialProps: {
+          useInit: true,
+          useWallet: true,
+          getProps: (p) => {
+            mockWeb3Provider = p.mockWeb3Provider;
+            web3Instance = p.web3Instance;
+          },
+        },
+        wrapper: Wrapper,
+      });
+
+      await waitFor(() => {
+        mockWeb3Provider.injectResult(
+          web3Instance.eth.abi.encodeParameters(
+            ['uint256', 'bytes[]'],
+            [
+              0,
+              [
+                // For `isNotReservedAddress` call
+                web3Instance.eth.abi.encodeParameter('bool', true),
+                // For `isNotZeroAddress` call
+                web3Instance.eth.abi.encodeParameter('bool', true),
+                // For `getAddressIfDelegated` call
+                web3Instance.eth.abi.encodeParameter(
+                  'address',
+                  DEFAULT_ETH_ADDRESS
+                ),
+              ],
+            ]
+          )
+        );
+      });
+
+      await waitFor(() => {
+        // assert FULFILLED state
+        expect(result.current.checkApplicantError).toBe(undefined);
+        expect(result.current.checkApplicantInvalidMsg).toBe(undefined);
+        expect(result.current.checkApplicantStatus).toBe(AsyncStatus.FULFILLED);
+        expect(result.current.isApplicantValid).toBe(true);
+      });
+    });
+  });
+
   test('should return correct data when applicant address is reserved', async () => {
     await act(async () => {
       let mockWeb3Provider: any;
