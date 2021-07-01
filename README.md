@@ -74,7 +74,7 @@ Follow the instructions [here](https://github.com/openlawteam/tribute-contracts/
 
 Deployments for the development environment are handled automatically with a GitHub Action:
 
-- `GitHub Pages development deployment`: push to `main` branch -> https://tributedao.com
+- `GitHub Pages development deployment`: push to `main` branch -> https://demo.tributedao.com
 
 ## Developer notes
 
