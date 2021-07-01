@@ -8,17 +8,11 @@ import Wrap from '../../components/common/Wrap';
 
 export default function Membership() {
   /**
-   * Their hooks
-   */
-
-  const history = useHistory();
-
-  /**
    * Functions
    */
 
-  function handleClickProposalDetails(proposalHash: string) {
-    proposalHash && history.push(`/membership/${proposalHash}`);
+  function goToProposalDetails(proposalHash: string) {
+    return `/membership/${proposalHash}`;
   }
 
   /**
@@ -29,7 +23,7 @@ export default function Membership() {
     <RenderWrapper>
       <Proposals
         adapterName={DaoAdapterConstants.ONBOARDING}
-        onProposalClick={handleClickProposalDetails}
+        goToProposal={goToProposalDetails}
         includeProposalsExistingOnlyOffchain={true}
       />
     </RenderWrapper>

@@ -17,6 +17,10 @@
   }
 }
 
+.membercard__link {
+  text-decoration: none;
+}
+
 .membercard__title {
   @include fluid-type(
     $bp-sm,
