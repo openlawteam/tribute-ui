@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState, useRef, useEffect} from 'react';
 import {useSelector} from 'react-redux';
 
 import {
@@ -11,13 +11,14 @@ import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
-import {useSignAndSubmitProposal} from './hooks';
+import {useCheckApplicant, useSignAndSubmitProposal} from './hooks';
 import {Web3TxStatus} from '../web3/types';
 import CycleMessage from '../feedback/CycleMessage';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import EtherscanURL from '../web3/EtherscanURL';
 import FadeIn from '../common/FadeIn';
 import Loader from '../feedback/Loader';
+import {AsyncStatus} from '../../util/types';
 
 type SubmitArguments = [
   string, // `dao`
@@ -27,11 +28,17 @@ type SubmitArguments = [
 ];
 
 type SubmitActionProps = {
+  checkApplicant?: string;
   proposal: ProposalData;
+};
+
+type ActionDisabledReasons = {
+  invalidApplicantMessage: string;
 };
 
 export default function SubmitAction(props: SubmitActionProps) {
   const {
+    checkApplicant,
     proposal: {snapshotDraft, refetchProposalOrDraft},
   } = props;
 
@@ -40,6 +47,14 @@ export default function SubmitAction(props: SubmitActionProps) {
    */
 
   const [submitError, setSubmitError] = useState<Error>();
+
+  /**
+   * Refs
+   */
+
+  const actionDisabledReasonsRef = useRef<ActionDisabledReasons>({
+    invalidApplicantMessage: '',
+  });
 
   /**
    * Selectors
@@ -58,13 +73,24 @@ export default function SubmitAction(props: SubmitActionProps) {
 
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
 
-  const {isDisabled, openWhyDisabledModal, WhyDisabledModal} =
-    useMemberActionDisabled();
+  const {
+    isDisabled,
+    openWhyDisabledModal,
+    WhyDisabledModal,
+    setOtherDisabledReasons,
+  } = useMemberActionDisabled();
 
   const {proposalSignAndSendStatus, signAndSendProposal} =
     useSignAndSubmitProposal<SnapshotType.proposal>();
 
   const {fast: fastGasPrice} = useETHGasPrice();
+
+  const {
+    checkApplicantError,
+    checkApplicantInvalidMsg,
+    checkApplicantStatus,
+    isApplicantValid,
+  } = useCheckApplicant(checkApplicant);
 
   /**
    * Variables
@@ -81,6 +107,46 @@ export default function SubmitAction(props: SubmitActionProps) {
     proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
 
   const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
+
+  /**
+   * Effects
+   */
+
+  useEffect(() => {
+    if (checkApplicant) {
+      // 1. Determine and set reasons why action would be disabled
+
+      // Reason: If the applicant address is invalid (see `useCheckApplicant`
+      // hook for reasons) the `submitProposal` smart contract transaction will
+      // fail.
+      if (checkApplicantError) {
+        console.log(
+          `Error checking if the applicant address is valid: ${checkApplicantError.message}`
+        );
+      }
+
+      if (
+        checkApplicantStatus === AsyncStatus.FULFILLED &&
+        !isApplicantValid &&
+        checkApplicantInvalidMsg
+      ) {
+        actionDisabledReasonsRef.current = {
+          ...actionDisabledReasonsRef.current,
+          invalidApplicantMessage: checkApplicantInvalidMsg,
+        };
+      }
+
+      // 2. Set reasons
+      setOtherDisabledReasons(Object.values(actionDisabledReasonsRef.current));
+    }
+  }, [
+    checkApplicant,
+    checkApplicantError,
+    checkApplicantInvalidMsg,
+    checkApplicantStatus,
+    isApplicantValid,
+    setOtherDisabledReasons,
+  ]);
 
   /**
    * Functions

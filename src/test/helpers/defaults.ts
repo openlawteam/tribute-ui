@@ -14,3 +14,5 @@ export const DEFAULT_SIG: string =
 export const DEFAULT_DAO_NAME: string = 'test-dao';
 export const DEFAULT_ADAPTER_OR_EXTENSION_ID: string =
   '0x86e4d415f8203aaabba34505e3ceb7b05f5255120bc6ae19dd5f4823ce4e1fb9';
+export const DEFAULT_DELEGATED_ADDRESS: string =
+  '0xA51086a07AE92Ae8c29E7CD34421c16fd666595c';

@@ -1,3 +1,4 @@
+export * from './useCheckApplicant';
 export * from './useOffchainVotingResults';
 export * from './useProposalOrDraft';
 export * from './useProposals';

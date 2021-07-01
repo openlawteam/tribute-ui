@@ -18,9 +18,13 @@ import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
+import {AsyncStatus} from '../../util/types';
 import {UNITS_ADDRESS} from '../../config';
 import {StoreState} from '../../store/types';
-import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
+import {
+  useCheckApplicant,
+  useSignAndSubmitProposal,
+} from '../../components/proposals/hooks';
 import {CycleEllipsis} from '../../components/feedback';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
@@ -104,9 +108,13 @@ export default function CreateTributeProposal() {
    */
 
   const {errors, getValues, setValue, register, trigger, watch} = form;
-  const erc20AddressValue = watch('erc20Address');
+
+  const erc20AddressValue = watch(Fields.erc20Address);
+
+  const applicantAddressValue = watch(Fields.applicantAddress);
 
   const createTributeError = submitError || proposalSignAndSendError;
+
   const isConnected = connected && account;
 
   const isInProcess =
@@ -116,6 +124,13 @@ export default function CreateTributeProposal() {
   const isDone = proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
 
   const isInProcessOrDone = isInProcess || isDone;
+
+  const {
+    checkApplicantError,
+    checkApplicantInvalidMsg,
+    checkApplicantStatus,
+    isApplicantValid,
+  } = useCheckApplicant(applicantAddressValue);
 
   /**
    * Cached callbacks
@@ -254,6 +269,23 @@ export default function CreateTributeProposal() {
 
       if (!erc20Details) {
         throw new Error('No ERC20 details found.');
+      }
+
+      if (checkApplicantError) {
+        // Just log the error (don't throw) because it is not a blocker for the
+        // snapshot draft to be submitted. The applicant address validity will
+        // be checked again when the proposal is submitted onchain.
+        console.log(
+          `Error checking if the applicant address is valid: ${checkApplicantError.message}`
+        );
+      }
+
+      if (
+        checkApplicantStatus === AsyncStatus.FULFILLED &&
+        !isApplicantValid &&
+        checkApplicantInvalidMsg
+      ) {
+        throw new Error(checkApplicantInvalidMsg);
       }
 
       const {

@@ -16,9 +16,13 @@ import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
+import {AsyncStatus} from '../../util/types';
 import {UNITS_ADDRESS} from '../../config';
 import {CycleEllipsis} from '../../components/feedback';
-import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
+import {
+  useCheckApplicant,
+  useSignAndSubmitProposal,
+} from '../../components/proposals/hooks';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
@@ -76,7 +80,9 @@ export default function CreateMembershipProposal() {
    * Variables
    */
 
-  const {errors, getValues, setValue, register, trigger} = form;
+  const {errors, getValues, setValue, register, trigger, watch} = form;
+
+  const ethAddressValue = watch(Fields.ethAddress);
 
   const createMemberError = submitError || proposalSignAndSendError;
   const isConnected = connected && account;
@@ -88,6 +94,13 @@ export default function CreateMembershipProposal() {
   const isDone = proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
 
   const isInProcessOrDone = isInProcess || isDone;
+
+  const {
+    checkApplicantError,
+    checkApplicantInvalidMsg,
+    checkApplicantStatus,
+    isApplicantValid,
+  } = useCheckApplicant(ethAddressValue);
 
   /**
    * Cached callbacks
@@ -142,6 +155,23 @@ export default function CreateMembershipProposal() {
 
       if (!account) {
         throw new Error('No account found.');
+      }
+
+      if (checkApplicantError) {
+        // Just log the error (don't throw) because it is not a blocker for the
+        // snapshot draft to be submitted. The applicant address validity will
+        // be checked again when the proposal is submitted onchain.
+        console.log(
+          `Error checking if the applicant address is valid: ${checkApplicantError.message}`
+        );
+      }
+
+      if (
+        checkApplicantStatus === AsyncStatus.FULFILLED &&
+        !isApplicantValid &&
+        checkApplicantInvalidMsg
+      ) {
+        throw new Error(checkApplicantInvalidMsg);
       }
 
       // Maybe set proposal ID from previous attempt
