@@ -4,6 +4,7 @@ import {useLocation} from 'react-router';
 
 import {AsyncStatus} from '../../util/types';
 import {CHAINS} from '../../config';
+import {CycleEllipsis} from '../feedback';
 import {svgWalletIcon} from './WalletIcons';
 import {truncateEthAddress} from '../../util/helpers';
 import {useIsDefaultChain} from './hooks';
@@ -246,7 +247,8 @@ function DisplayChainError({
         <LoaderLarge />
       </div>
       <div>
-        <small>Waiting for the right network&hellip;</small>
+        <small>Waiting for the right network</small>
+        <CycleEllipsis />
         <br />
         <small>Switch networks from your wallet</small>
       </div>
