@@ -5,10 +5,10 @@ import {useLocation} from 'react-router';
 import {AsyncStatus} from '../../util/types';
 import {CHAINS} from '../../config';
 import {CycleEllipsis} from '../feedback';
-import {svgWalletIcon} from './WalletIcons';
 import {truncateEthAddress} from '../../util/helpers';
 import {useIsDefaultChain} from './hooks';
 import {useWeb3Modal} from './hooks';
+import {WalletIcon} from './WalletIcon';
 import LoaderLarge from '../feedback/LoaderLarge';
 import Modal from '../common/Modal';
 
@@ -128,7 +128,7 @@ function ConnectWallet({
           disabled={isChainGanache && provider[0] === 'walletconnect'}>
           <span className="wallet-name">{provider[1].display.name}</span>
 
-          <ProviderSVG providerName={provider[0]} />
+          <WalletIcon providerName={provider[0]} />
         </button>
       )
     );
@@ -208,26 +208,12 @@ function ConnectWallet({
         )}
 
         {showWalletETHBadge && (
-          <ProviderSVG providerName={web3Modal?.cachedProvider} />
+          <WalletIcon providerName={web3Modal?.cachedProvider} />
         )}
       </button>
 
       {openModal && displayProviders()}
     </>
-  );
-}
-
-type ProviderSVGType = {
-  providerName: string | undefined;
-};
-
-function ProviderSVG({providerName}: ProviderSVGType): JSX.Element | null {
-  if (!providerName) return null;
-
-  return (
-    <span className="walletconnect__wallet-icon">
-      {svgWalletIcon[providerName]}
-    </span>
   );
 }
 
