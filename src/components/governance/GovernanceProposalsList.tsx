@@ -25,6 +25,10 @@ type GovernanceProposalsListProps = {
    */
   onProposalClick?: (id: string) => void;
   /**
+   * The path to link to. Defaults to `${location.pathname}/${proposalOnClickId}`.
+   */
+  proposalLinkPath?: Parameters<typeof ProposalCard>['0']['linkPath'];
+  /**
    * Optionally render a custom proposal card.
    */
   renderProposalCard?: (data: {
@@ -45,6 +49,7 @@ export default function GovernanceProposalsList(
   const {
     actionId = BURN_ADDRESS,
     onProposalClick = () => {},
+    proposalLinkPath,
     renderProposalCard,
   } = props;
 
@@ -199,6 +204,7 @@ export default function GovernanceProposalsList(
         <ProposalCard
           key={proposalId}
           name={proposalName}
+          linkPath={proposalLinkPath}
           onClick={onProposalClick}
           proposalOnClickId={proposalId}
           renderStatus={() => (

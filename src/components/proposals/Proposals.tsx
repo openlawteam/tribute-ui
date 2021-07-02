@@ -20,15 +20,15 @@ import ProposalCard from './ProposalCard';
 type ProposalsProps = {
   adapterName: DaoAdapterConstants;
   /**
-   * The path to link to. Defaults to `${location.pathname}/${proposalOnClickId}`.
-   */
-  proposalLinkPath?: Parameters<typeof ProposalCard>['0']['linkPath'];
-  /**
    * Optionally provide a click handler for `ProposalCard`.
    * The proposal's id (in the DAO) will be provided as an argument.
    * Defaults to noop: `() => {}`
    */
   onProposalClick?: (id: string) => void;
+  /**
+   * The path to link to. Defaults to `${location.pathname}/${proposalOnClickId}`.
+   */
+  proposalLinkPath?: Parameters<typeof ProposalCard>['0']['linkPath'];
   /**
    * Optionally render a custom proposal card.
    */
