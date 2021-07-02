@@ -23,7 +23,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
+          key: node-modules_deploy-dev-${{ hashFiles('package-lock.json') }}
 
       - name: Setup SSH to install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
@@ -53,4 +53,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
           commit_message: ${{ github.event.head_commit.message }}
-          cname: tributedao.com
+          cname: demo.tributedao.com
