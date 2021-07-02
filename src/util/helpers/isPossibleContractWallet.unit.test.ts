@@ -14,6 +14,7 @@ describe('isPossibleContractWallet unit tests', () => {
       web3.eth.abi.encodeParameter('uint256', 1337)
     );
 
+    // Mock call to `eth_getCode`
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameter(
         'bytes',
@@ -43,6 +44,7 @@ describe('isPossibleContractWallet unit tests', () => {
       web3.eth.abi.encodeParameter('uint256', 1337)
     );
 
+    // Mock call to `eth_getCode`
     mockWeb3Provider.injectResult(0);
 
     /**
@@ -67,6 +69,7 @@ describe('isPossibleContractWallet unit tests', () => {
       web3.eth.abi.encodeParameter('uint256', 1337)
     );
 
+    // Mock error
     mockWeb3Provider.injectError({code: 1234, message: 'Some bad error!'});
 
     /**
@@ -96,6 +99,7 @@ describe('isPossibleContractWallet unit tests', () => {
       web3.eth.abi.encodeParameter('uint256', 1337)
     );
 
+    // Mock call to `eth_getCode`
     mockWeb3Provider.injectResult(0);
 
     /**
@@ -125,6 +129,7 @@ describe('isPossibleContractWallet unit tests', () => {
       web3.eth.abi.encodeParameter('uint256', 1337)
     );
 
+    // Mock call to `eth_getCode`
     mockWeb3Provider.injectResult(0);
 
     /**
