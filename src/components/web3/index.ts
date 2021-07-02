@@ -1,1 +1,1 @@
-export * from './WalletIconsMap';
+export * from './WalletIcon';

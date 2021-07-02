@@ -8,7 +8,7 @@ import {CycleEllipsis} from '../feedback';
 import {truncateEthAddress} from '../../util/helpers';
 import {useIsDefaultChain} from './hooks';
 import {useWeb3Modal} from './hooks';
-import {WalletIcon} from './WalletIcon';
+import {WalletIcon} from './';
 import LoaderLarge from '../feedback/LoaderLarge';
 import Modal from '../common/Modal';
 
