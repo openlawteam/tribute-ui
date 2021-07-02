@@ -54,7 +54,7 @@
     "abi-decoder": "^2.4.0",
     "dotenv": "^10.0.0",
     "http-proxy-middleware": "^2.0.0",
-    "msw": "^0.30.0",
+    "msw": "^0.30.1",
     "np": "^7.5.0",
     "prettier": "^2.3.2",
     "react-test-renderer": "^17.0.2",
