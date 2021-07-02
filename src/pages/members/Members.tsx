@@ -1,5 +1,3 @@
-import {useHistory} from 'react-router-dom';
-
 import {AsyncStatus} from '../../util/types';
 import {Member} from './types';
 import {useIsDefaultChain} from '../../components/web3/hooks';
@@ -17,12 +15,6 @@ export default function Members() {
 
   const {members, membersError, membersStatus} = useMembers();
   const {defaultChainError} = useIsDefaultChain();
-
-  /**
-   * Their hooks
-   */
-
-  const history = useHistory();
 
   /**
    * Variables
@@ -45,19 +37,11 @@ export default function Members() {
       return (
         <MemberCard
           key={member.address}
-          onClick={handleClickMemberProfile(member.address)}
+          to={`/members/${member.address}`}
           member={member}
         />
       );
     });
-  }
-
-  function handleClickMemberProfile(ethereumAddress: string) {
-    return () => {
-      if (!ethereumAddress) return;
-
-      history.push(`/members/${ethereumAddress}`);
-    };
   }
 
   /**
