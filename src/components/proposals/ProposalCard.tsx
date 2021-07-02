@@ -1,3 +1,4 @@
+import {Link, useHistory} from 'react-router-dom';
 import LinesEllipsis from 'react-lines-ellipsis';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 
@@ -40,6 +41,12 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
   } = props;
 
   /**
+   * Their hooks
+   */
+
+  const {location} = useHistory();
+
+  /**
    * Functions
    */
 
@@ -68,17 +75,22 @@ export default function ProposalCard(props: ProposalCardProps): JSX.Element {
    */
 
   return (
-    <div className="proposalcard" onClick={handleClick}>
-      {/* TITLE */}
-      <h3 className="proposalcard__title">{renderName(name)}</h3>
+    <Link
+      className="proposalcard__link"
+      to={`${location.pathname}/${proposalOnClickId}`}
+      onClick={handleClick}>
+      <div className="proposalcard">
+        {/* TITLE */}
+        <h3 className="proposalcard__title">{renderName(name)}</h3>
 
-      {/* E.G. VOTING PROGRESS STATUS AND BAR */}
-      {renderStatus && renderStatus()}
+        {/* E.G. VOTING PROGRESS STATUS AND BAR */}
+        {renderStatus && renderStatus()}
 
-      {/* BUTTON (no click handler) */}
-      <button className="proposalcard__button">
-        {buttonText || DEFAULT_BUTTON_TEXT}
-      </button>
-    </div>
+        {/* BUTTON (no click handler) */}
+        <button className="proposalcard__button">
+          {buttonText || DEFAULT_BUTTON_TEXT}
+        </button>
+      </div>
+    </Link>
   );
 }
