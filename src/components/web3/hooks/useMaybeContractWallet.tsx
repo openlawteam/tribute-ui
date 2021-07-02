@@ -1,14 +1,16 @@
 import {provider} from 'web3-core/types';
 import {useEffect, useState} from 'react';
 import {Web3Provider} from '@ethersproject/providers';
-import usePrevious from 'react-use/lib/usePrevious';
 
 import {isPossibleContractWallet} from '../../../util/helpers';
-import {useWeb3Modal} from './useWeb3Modal';
+import Web3 from 'web3';
 
 const INITIAL_MAYBE_CONTRACT_WALLET_STATE: boolean = false;
 
-export function useMaybeContractWallet(): boolean {
+export function useMaybeContractWallet(
+  account: string | undefined,
+  web3Provider: Web3['currentProvider'] | undefined
+): boolean {
   /**
    * State
    */
@@ -18,30 +20,14 @@ export function useMaybeContractWallet(): boolean {
   );
 
   /**
-   * Our hooks
-   */
-
-  const {account, web3Instance} = useWeb3Modal();
-
-  /**
-   * Their hooks
-   */
-
-  const previousAccount = usePrevious<string | undefined>(account);
-
-  /**
    * Effects
    */
 
   useEffect(() => {
-    if (
-      web3Instance?.currentProvider &&
-      account &&
-      previousAccount !== account
-    ) {
-      handleIsPossibleContractWallet(account, web3Instance.currentProvider);
-    }
-  }, [account, previousAccount, web3Instance?.currentProvider]);
+    if (!web3Provider || !account) return;
+
+    handleIsPossibleContractWallet(account, web3Provider);
+  }, [account, web3Provider]);
 
   /**
    * Functions
