@@ -6,8 +6,10 @@ import {useWeb3Modal} from '../../components/web3/hooks';
 
 type MemberCardProps = {
   member: Member;
-  to: string;
+  to?: string;
 };
+
+const DEFAULT_CARD_LINK: string = '#';
 
 /**
  * Shows a preview of a members's profile
@@ -16,7 +18,7 @@ type MemberCardProps = {
  * @returns {JSX.Element}
  */
 export default function MemberCard(props: MemberCardProps): JSX.Element {
-  const {member, to} = props;
+  const {member, to = DEFAULT_CARD_LINK} = props;
 
   /**
    * Our hooks
