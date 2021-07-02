@@ -20,6 +20,10 @@ import ProposalCard from './ProposalCard';
 type ProposalsProps = {
   adapterName: DaoAdapterConstants;
   /**
+   * The path to link to. Defaults to `${location.pathname}/${proposalOnClickId}`.
+   */
+  proposalLinkPath?: Parameters<typeof ProposalCard>['0']['linkPath'];
+  /**
    * Optionally provide a click handler for `ProposalCard`.
    * The proposal's id (in the DAO) will be provided as an argument.
    * Defaults to noop: `() => {}`
@@ -47,6 +51,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
   const {
     adapterName,
     onProposalClick = () => {},
+    proposalLinkPath,
     renderProposalCard,
     includeProposalsExistingOnlyOffchain = false,
   } = props;
@@ -233,9 +238,10 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
       return (
         <ProposalCard
           key={proposalId}
+          linkPath={proposalLinkPath}
+          name={proposalName}
           onClick={onProposalClick}
           proposalOnClickId={proposalId}
-          name={proposalName}
           renderStatus={() => {
             switch (proposal.daoProposalVotingAdapter?.votingAdapterName) {
               case VotingAdapterName.OffchainVotingContract:

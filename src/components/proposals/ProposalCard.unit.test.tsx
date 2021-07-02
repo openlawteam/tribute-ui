@@ -6,6 +6,7 @@ import {OffchainVotingStatus} from './voting';
 import {ProposalData} from './types';
 import ProposalCard from './ProposalCard';
 import Wrapper from '../../test/Wrapper';
+import {useHistory, useLocation} from 'react-router';
 
 describe('ProposalCard unit tests', () => {
   const yesterday = Date.now() / 1000 - 86400;
@@ -74,11 +75,17 @@ describe('ProposalCard unit tests', () => {
     });
   });
 
-  test('can click a proposal card', async () => {
+  test('can click a proposal card (no `linkPath` set)', async () => {
     const spy = jest.fn();
 
-    render(
-      <Wrapper useInit useWallet>
+    let testLocation: any;
+
+    function TestApp() {
+      const location = useLocation();
+
+      testLocation = location;
+
+      return (
         <ProposalCard
           name={name}
           proposalOnClickId={fakeProposal.snapshotProposal?.idInDAO as string}
@@ -87,6 +94,12 @@ describe('ProposalCard unit tests', () => {
             <OffchainVotingStatus proposal={fakeProposal as ProposalData} />
           )}
         />
+      );
+    }
+
+    render(
+      <Wrapper useInit useWallet>
+        <TestApp />
       </Wrapper>
     );
 
@@ -97,8 +110,83 @@ describe('ProposalCard unit tests', () => {
     userEvent.click(screen.getByText(/view proposal/i));
 
     await waitFor(() => {
+      expect(testLocation.pathname).toMatch(/^\/abc123$/i);
       expect(spy.mock.calls.length).toBe(1);
       expect(spy.mock.calls[0][0]).toBe('abc123');
+    });
+  });
+
+  test('can set a `linkPath: string`', async () => {
+    let testLocation: any;
+
+    function TestApp() {
+      const location = useLocation();
+
+      testLocation = location;
+
+      return (
+        <ProposalCard
+          name={name}
+          proposalOnClickId={fakeProposal.snapshotProposal?.idInDAO as string}
+          linkPath="/some/path"
+          renderStatus={() => (
+            <OffchainVotingStatus proposal={fakeProposal as ProposalData} />
+          )}
+        />
+      );
+    }
+
+    render(
+      <Wrapper useInit useWallet>
+        <TestApp />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/view proposal/i)).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByText(/view proposal/i));
+
+    await waitFor(() => {
+      expect(testLocation.pathname).toBe('/some/path');
+    });
+  });
+
+  test('can set a `linkPath: (id: string) => string`', async () => {
+    let testLocation: any;
+
+    function TestApp() {
+      const location = useLocation();
+
+      testLocation = location;
+
+      return (
+        <ProposalCard
+          name={name}
+          proposalOnClickId={fakeProposal.snapshotProposal?.idInDAO as string}
+          linkPath={(id) => `/cool/${id}`}
+          renderStatus={() => (
+            <OffchainVotingStatus proposal={fakeProposal as ProposalData} />
+          )}
+        />
+      );
+    }
+
+    render(
+      <Wrapper useInit useWallet>
+        <TestApp />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/view proposal/i)).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByText(/view proposal/i));
+
+    await waitFor(() => {
+      expect(testLocation.pathname).toBe('/cool/abc123');
     });
   });
 

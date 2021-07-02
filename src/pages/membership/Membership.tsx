@@ -11,8 +11,8 @@ export default function Membership() {
    * Functions
    */
 
-  function handleClickProposalDetails(proposalHash: string) {
-    return `/membership/${proposalHash}`;
+  function proposalLinkPath(id: string) {
+    return `/membership/${id}`;
   }
 
   /**
@@ -23,7 +23,7 @@ export default function Membership() {
     <RenderWrapper>
       <Proposals
         adapterName={DaoAdapterConstants.ONBOARDING}
-        onProposalClick={handleClickProposalDetails}
+        proposalLinkPath={proposalLinkPath}
         includeProposalsExistingOnlyOffchain={true}
       />
     </RenderWrapper>
