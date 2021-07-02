@@ -7,14 +7,12 @@ import GovernanceProposalsList from '../../components/governance/GovernancePropo
 import Wrap from '../../components/common/Wrap';
 
 export default function GovernanceProposals() {
-  const history = useHistory();
-
   /**
    * Functions
    */
 
-  function handleClickProposalDetails(id: string) {
-    id && history.push(`/governance/${id}`);
+  function proposalLinkPath(id: string) {
+    return `/governance/${id}`;
   }
 
   /**
@@ -25,7 +23,7 @@ export default function GovernanceProposals() {
     <RenderWrapper>
       <GovernanceProposalsList
         actionId={BURN_ADDRESS}
-        onProposalClick={handleClickProposalDetails}
+        proposalLinkPath={proposalLinkPath}
       />
     </RenderWrapper>
   );

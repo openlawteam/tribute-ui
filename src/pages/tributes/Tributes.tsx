@@ -8,17 +8,11 @@ import Wrap from '../../components/common/Wrap';
 
 export default function Tributes() {
   /**
-   * Their hooks
-   */
-
-  const history = useHistory();
-
-  /**
    * Functions
    */
 
-  function handleClickProposalDetails(proposalHash: string) {
-    proposalHash && history.push(`/tributes/${proposalHash}`);
+  function proposalLinkPath(id: string) {
+    return `/tributes/${id}`;
   }
 
   /**
@@ -29,7 +23,7 @@ export default function Tributes() {
     <RenderWrapper>
       <Proposals
         adapterName={DaoAdapterConstants.TRIBUTE}
-        onProposalClick={handleClickProposalDetails}
+        proposalLinkPath={proposalLinkPath}
         includeProposalsExistingOnlyOffchain={true}
       />
     </RenderWrapper>

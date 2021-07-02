@@ -26,6 +26,10 @@ type ProposalsProps = {
    */
   onProposalClick?: (id: string) => void;
   /**
+   * The path to link to. Defaults to `${location.pathname}/${proposalOnClickId}`.
+   */
+  proposalLinkPath?: Parameters<typeof ProposalCard>['0']['linkPath'];
+  /**
    * Optionally render a custom proposal card.
    */
   renderProposalCard?: (data: {proposalData: ProposalData}) => React.ReactNode;
@@ -47,6 +51,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
   const {
     adapterName,
     onProposalClick = () => {},
+    proposalLinkPath,
     renderProposalCard,
     includeProposalsExistingOnlyOffchain = false,
   } = props;
@@ -233,9 +238,10 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
       return (
         <ProposalCard
           key={proposalId}
+          linkPath={proposalLinkPath}
+          name={proposalName}
           onClick={onProposalClick}
           proposalOnClickId={proposalId}
-          name={proposalName}
           renderStatus={() => {
             switch (proposal.daoProposalVotingAdapter?.votingAdapterName) {
               case VotingAdapterName.OffchainVotingContract:

@@ -8,17 +8,11 @@ import Wrap from '../../components/common/Wrap';
 
 export default function Transfers() {
   /**
-   * Their hooks
-   */
-
-  const history = useHistory();
-
-  /**
    * Functions
    */
 
-  function handleClickProposalDetails(proposalHash: string) {
-    proposalHash && history.push(`/transfers/${proposalHash}`);
+  function proposalLinkPath(id: string) {
+    return `/transfers/${id}`;
   }
 
   /**
@@ -29,7 +23,7 @@ export default function Transfers() {
     <RenderWrapper>
       <Proposals
         adapterName={DaoAdapterConstants.DISTRIBUTE}
-        onProposalClick={handleClickProposalDetails}
+        proposalLinkPath={proposalLinkPath}
       />
     </RenderWrapper>
   );
