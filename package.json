@@ -9,6 +9,10 @@
   "author": "OpenLaw Team",
   "license": "Apache-2.0",
   "description": "A modular DAO framework developed and coordinated by its members",
+  "engines": {
+    "node": "^14.0.0",
+    "npm": "^7.0.0"
+  },
   "dependencies": {
     "@apollo/client": "^3.3.17",
     "@apollo/react-hooks": "^4.0.0",
@@ -37,7 +41,7 @@
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.12.0",
-    "@testing-library/react": "^11.2.7",
+    "@testing-library/react": "^12.0.0",
     "@testing-library/react-hooks": "^7.0.0",
     "@testing-library/user-event": "^13.1.9",
     "@types/aos": "^3.0.3",
@@ -60,7 +64,6 @@
     "react-test-renderer": "^17.0.2",
     "redux-devtools-extension": "^2.13.9",
     "sass": "^1.35.1",
-    "ts-jest": "^27.0.2",
     "typescript": "^4.3.2"
   },
   "scripts": {
