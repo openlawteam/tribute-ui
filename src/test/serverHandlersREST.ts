@@ -1,6 +1,6 @@
 import {rest} from 'msw';
 
-import {SNAPSHOT_HUB_API_URL} from '../config';
+import {COUPON_API_URL, SNAPSHOT_HUB_API_URL} from '../config';
 import {
   ethGasStationResponse,
   snapshotAPIDraftResponse,
@@ -51,6 +51,16 @@ const getSnapshotAPIOffchainProof = rest.get(
 );
 
 /**
+ * Coupon Manager
+ */
+
+//
+const patchRedeemedCoupon = rest.patch(
+  `${COUPON_API_URL}/api/coupon/redeem`,
+  async (_req, res, ctx) => res(ctx.status(200))
+);
+
+/**
  * ETHGasStation
  */
 
@@ -72,6 +82,7 @@ const handlers = [
   getSnapshotAPISpace,
   postSnapshotAPIMessage,
   postSnapshotAPIOffchainProof,
+  patchRedeemedCoupon,
 ];
 
 export {handlers};
