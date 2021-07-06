@@ -125,7 +125,7 @@ function RedeemCard({redeemable, daoTokenDetails}: RedeemCardProps) {
       // fail.
       if (checkApplicantError) {
         console.log(
-          `Error checking if the applicant address is valid: ${checkApplicantError.message}`
+          `Error checking if the applicant address '${redeemable.recipient}' is valid: ${checkApplicantError.message}`
         );
       }
 

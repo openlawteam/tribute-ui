@@ -47,7 +47,7 @@ export async function multicall({
       .call({}, blockNumber);
 
     return returnData.map((hexString: string, i: number) => {
-      const outputsABIItem = calls[i][1].outputs || [];
+      const outputsABIItem = (calls[i] && calls[i][1].outputs) || [];
       const decodedOutputs = web3Instance.eth.abi.decodeParameters(
         outputsABIItem,
         hexString
