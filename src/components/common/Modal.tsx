@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactModal from 'react-modal';
 
 import FadeIn from './FadeIn';
@@ -14,11 +13,11 @@ type ModalProps = {
 
 export default function Modal({
   children,
-  keyProp,
   isOpen,
-  styleProps,
-  modalClassNames,
   isOpenHandler,
+  keyProp,
+  modalClassNames,
+  styleProps,
 }: ModalProps) {
   return (
     <ReactModal
