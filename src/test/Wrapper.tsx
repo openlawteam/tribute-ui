@@ -1,24 +1,24 @@
 import {Store} from 'redux';
 import {MemoryRouter} from 'react-router-dom';
+import type {LocationDescriptor} from 'history';
 import {provider as Web3Provider} from 'web3-core/types';
 import {Provider} from 'react-redux';
 import {ApolloProvider} from '@apollo/react-hooks';
 import React, {useEffect, useMemo, useState} from 'react';
 import Web3 from 'web3';
 
-import * as useWeb3ModalToMock from '../components/web3/hooks/useWeb3Modal';
 import {
   Web3ModalContext,
   Web3ModalContextValue,
 } from '../components/web3/Web3ModalManager';
 import {AsyncStatus} from '../util/types';
-import {CHAINS as mockChains} from '../config';
+import {CHAINS as mockChains, WALLETCONNECT_PROVIDER_OPTIONS} from '../config';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider, getNewStore} from './helpers';
+import {getApolloClient} from '../index';
 import {VotingAdapterName} from '../components/adapters-extensions/enums';
 import App from '../App';
 import Init from '../Init';
 import InitError from '../InitError';
-import {getApolloClient} from '../index';
 
 export type WrapperReturnProps = {
   mockWeb3Provider: FakeHttpProvider;
@@ -44,13 +44,13 @@ type WrapperProps = {
    */
   render?: (p: WrapperReturnProps) => React.ReactNode;
   /**
-   * Web3 modal manager context options
+   * Web3 modal manager context values
    */
-  web3ModalContext?: Web3ModalContextValue;
+  web3ModalContext?: Partial<Web3ModalContextValue>;
   /**
    * Initial entries for location path and search queries
    */
-  routeEntries?: any;
+  locationEntries?: LocationDescriptor[];
 };
 
 /**
@@ -68,7 +68,7 @@ export default function Wrapper(
     useInit = false,
     useWallet = false,
     web3ModalContext,
-    routeEntries,
+    locationEntries,
   } = props;
 
   /**
@@ -85,29 +85,28 @@ export default function Wrapper(
    * Cached values
    */
 
-  // @note We rename `web3->mockWeb3` due to Jest rule in `mockImplementation`.
-  const mockWeb3 = web3Instance;
+  const web3ContextValues = useMemo(
+    () =>
+      useWallet
+        ? {
+            account: DEFAULT_ETH_ADDRESS,
+            connected: true,
+            error: undefined,
+            initialCachedConnectorCheckStatus: AsyncStatus.FULFILLED,
+            providerOptions: WALLETCONNECT_PROVIDER_OPTIONS,
+            connectWeb3Modal: () => {},
+            disconnectWeb3Modal: () => {},
+            networkId: mockChains.GANACHE,
+            provider: mockWeb3Provider,
+            web3Instance,
+            web3Modal: null as any,
 
-  // If `useWallet` is enabled it will mock the `useWeb3Modal` response so we can test tx's.
-  const useWeb3ModalMock = useMemo(() => {
-    if (!useWallet) return;
-
-    return jest
-      .spyOn(useWeb3ModalToMock, 'useWeb3Modal')
-      .mockImplementation(() => ({
-        account: DEFAULT_ETH_ADDRESS,
-        connected: true,
-        error: undefined,
-        initialCachedConnectorCheckStatus: AsyncStatus.FULFILLED,
-        providerOptions: {},
-        connectWeb3Modal: () => {},
-        disconnectWeb3Modal: () => {},
-        networkId: mockChains.GANACHE,
-        provider: mockWeb3Provider,
-        web3Instance: mockWeb3,
-        web3Modal: null as any,
-      }));
-  }, [mockWeb3, mockWeb3Provider, useWallet]);
+            // Spread-in props
+            ...web3ModalContext,
+          }
+        : {},
+    [mockWeb3Provider, useWallet, web3Instance, web3ModalContext]
+  );
 
   // If `useWallet` is enabled it will mock the `getAdapterAddress` response so we can init contracts.
   const getAdapterAddressMock = useMemo(async () => {
@@ -157,13 +156,6 @@ export default function Wrapper(
   /**
    * Effects
    */
-
-  useEffect(() => {
-    return () => {
-      // When `<Wrapper />` unmounts, restore the original function.
-      useWeb3ModalMock?.mockRestore();
-    };
-  }, [useWeb3ModalMock]);
 
   useEffect(() => {
     return () => {
@@ -268,8 +260,8 @@ export default function Wrapper(
   return (
     <Provider store={store}>
       <Web3ModalContext.Provider
-        value={web3ModalContext || ({} as Web3ModalContextValue)}>
-        <MemoryRouter initialEntries={routeEntries || [{pathname: '/'}]}>
+        value={web3ContextValues as Web3ModalContextValue}>
+        <MemoryRouter initialEntries={locationEntries || [{pathname: '/'}]}>
           <ApolloProvider client={getApolloClient(store)}>
             {renderChildren(props.children)}
           </ApolloProvider>

@@ -1,8 +1,11 @@
-import {EnvironmentName} from './util/types';
 import {config as dotenvConfig} from 'dotenv';
 import {resolve} from 'path';
+import WalletConnectProvider from '@walletconnect/web3-provider';
+
+import {EnvironmentName} from './util/types';
 
 dotenvConfig({path: resolve(__dirname, '../.env')});
+
 /**
  * Global DApp Config
  */
@@ -107,6 +110,41 @@ export const ETHEREUM_PROVIDER_URL: string = INFURA_WS_URLS[DEFAULT_CHAIN]
      */
     'ws://127.0.0.1:7545'
   : '';
+
+/**
+ * Wallet Connect config
+ */
+
+/**
+ * Tell Web3modal what providers we have available.
+ *
+ * The built-in web browser provider (only one can exist at a time),
+ * MetaMask, Brave or Opera is added automatically by Web3modal
+ */
+export const WALLETCONNECT_PROVIDER_OPTIONS = {
+  // Injected providers
+  injected: {
+    display: {
+      name: 'MetaMask',
+      description: 'Connect with the provider in your Browser',
+    },
+    package: null,
+  },
+  // WalletConnect provider
+  walletconnect: {
+    display: {
+      name: 'WalletConnect',
+      description: 'Connect with your mobile wallet',
+    },
+    package: WalletConnectProvider,
+    options: {
+      infuraId: INFURA_PROJECT_ID, // required
+      qrcodeModalOptions: {
+        mobileLinks: ['rainbow', 'metamask', 'argent', 'trust'],
+      },
+    },
+  },
+};
 
 /**
  * CORE CONTRACTS

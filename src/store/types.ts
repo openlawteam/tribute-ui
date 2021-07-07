@@ -2,10 +2,12 @@ import {Action} from 'redux';
 import {ThunkDispatch} from 'redux-thunk';
 
 import {ConnectedMemberState} from './connectedMember/types';
+import {ConnectModalState} from './connectModal/types';
 import {ContractsState} from './contracts/types';
 import {SubgraphNetworkStatusState} from './subgraphNetworkStatus/types';
 
 export type StoreState = {
+  connectModal: ConnectModalState;
   connectedMember: ConnectedMemberState;
   contracts: ContractsState;
   subgraphNetworkStatus: SubgraphNetworkStatusState;

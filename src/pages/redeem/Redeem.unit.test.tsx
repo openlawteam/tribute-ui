@@ -61,7 +61,7 @@ describe('RedeemManager unit tests', () => {
       <Wrapper
         useWallet
         useInit
-        routeEntries={[{search: `?coupon=${DEFAULT_SIG}`}]}
+        locationEntries={[{search: `?coupon=${DEFAULT_SIG}`}]}
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
           web3Instance = p.web3Instance;

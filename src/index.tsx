@@ -10,12 +10,14 @@ import {
   NormalizedCacheObject,
   HttpLink,
 } from '@apollo/client';
-import WalletConnectProvider from '@walletconnect/web3-provider';
 
+import {
+  ENVIRONMENT,
+  GRAPH_API_URL,
+  WALLETCONNECT_PROVIDER_OPTIONS,
+} from './config';
 import {clearConnectedMember, clearContracts} from './store/actions';
-import {DefaultTheme} from './components/web3/hooks/useWeb3ModalManager';
 import {disableReactDevTools} from './util/helpers';
-import {ENVIRONMENT, INFURA_PROJECT_ID, GRAPH_API_URL} from './config';
 import {handleSubgraphError} from './gql';
 import {store} from './store';
 import App from './App';
@@ -36,36 +38,6 @@ ENVIRONMENT === 'production' && disableReactDevTools();
 window.ethereum &&
   window.ethereum.autoRefreshOnNetworkChange &&
   (window.ethereum.autoRefreshOnNetworkChange = false);
-
-// Tell Web3modal what providers we have available.
-// Built-in web browser provider (only one can exist at a time),
-// MetaMask, Brave or Opera is added automatically by Web3modal
-function getProviderOptions() {
-  return {
-    // Injected providers
-    injected: {
-      display: {
-        name: 'MetaMask',
-        description: 'Connect with the provider in your Browser',
-      },
-      package: null,
-    },
-    // WalletConnect provider
-    walletconnect: {
-      display: {
-        name: 'WalletConnect',
-        description: 'Connect with your mobile wallet',
-      },
-      package: WalletConnectProvider,
-      options: {
-        infuraId: INFURA_PROJECT_ID, // required
-        qrcodeModalOptions: {
-          mobileLinks: ['rainbow', 'metamask', 'argent', 'trust'],
-        },
-      },
-    },
-  };
-}
 
 // Create `ApolloClient`
 export const getApolloClient = (
@@ -122,8 +94,7 @@ if (root !== null) {
             // Clear out `contracts` Redux state
             store.dispatch(clearContracts());
           }}
-          providerOptions={getProviderOptions()}
-          defaultTheme={DefaultTheme.LIGHT}>
+          providerOptions={WALLETCONNECT_PROVIDER_OPTIONS}>
           <ApolloProvider client={getApolloClient(store)}>
             <Init
               render={({error, isInitComplete}) =>
