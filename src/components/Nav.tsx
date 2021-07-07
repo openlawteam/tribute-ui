@@ -185,7 +185,7 @@ export function NavHamburger() {
                 <ModalLogo />
 
                 <div className="nav-modal__walletconnect-button-container">
-                  <Web3ModalButton showWalletETHBadge />
+                  <Web3ModalButton />
                 </div>
                 <ul className="nav__list">
                   <li
@@ -267,7 +267,7 @@ export default function Nav() {
             <DaoTokenHolder border={'1px solid #c3d6dc'} />
             <NavHamburger />
             <div className="nav-header__walletconnect-button-container">
-              <Web3ModalButton showWalletETHBadge />
+              <Web3ModalButton />
             </div>
           </div>
         </div>

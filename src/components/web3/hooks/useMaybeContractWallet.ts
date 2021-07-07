@@ -1,9 +1,10 @@
 import {provider} from 'web3-core/types';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {Web3Provider} from '@ethersproject/providers';
 
 import {isPossibleContractWallet} from '../../../util/helpers';
 import Web3 from 'web3';
+import {useIsMounted} from '../../../hooks';
 
 const INITIAL_MAYBE_CONTRACT_WALLET_STATE: boolean = false;
 
@@ -20,14 +21,29 @@ export function useMaybeContractWallet(
   );
 
   /**
+   * Our hooks
+   */
+
+  const {isMountedRef} = useIsMounted();
+
+  /**
+   * Cached callbacks
+   */
+
+  const handleIsPossibleContractWalletCached = useCallback(
+    handleIsPossibleContractWallet,
+    [isMountedRef]
+  );
+
+  /**
    * Effects
    */
 
   useEffect(() => {
     if (!web3Provider || !account) return;
 
-    handleIsPossibleContractWallet(account, web3Provider);
-  }, [account, web3Provider]);
+    handleIsPossibleContractWalletCached(account, web3Provider);
+  }, [account, handleIsPossibleContractWalletCached, web3Provider]);
 
   /**
    * Functions
@@ -47,8 +63,12 @@ export function useMaybeContractWallet(
         new Web3Provider(web3Provider as any)
       );
 
+      if (!isMountedRef.current) return;
+
       setMaybeContractWallet(response);
     } catch (error) {
+      if (!isMountedRef.current) return;
+
       setMaybeContractWallet(INITIAL_MAYBE_CONTRACT_WALLET_STATE);
     }
   }

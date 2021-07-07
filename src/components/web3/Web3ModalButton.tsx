@@ -10,14 +10,21 @@ import {useIsDefaultChain, useMaybeContractWallet} from './hooks';
 import {useWeb3Modal} from './hooks';
 import {WalletIcon} from './';
 
+type CustomWalletTextProps = {
+  account: ReturnType<typeof useWeb3Modal>['account'];
+  connected: ReturnType<typeof useWeb3Modal>['connected'];
+  isMobile: typeof isMobile;
+};
+
 type ConnectWalletButtonProps = {
-  customWalletText?: string;
+  customWalletText?: ((o: CustomWalletTextProps) => string) | string;
   showWalletETHBadge?: boolean;
 };
 
 export default function ConnectWalletButton({
   customWalletText,
-  showWalletETHBadge,
+  // Defaults to `true`
+  showWalletETHBadge = true,
 }: ConnectWalletButtonProps): JSX.Element {
   /**
    * Our hooks
@@ -83,19 +90,17 @@ export default function ConnectWalletButton({
    */
 
   function getWalletText(): string {
-    if (isMobile) {
-      if (account) {
-        return truncateEthAddress(account);
-      }
-
-      return 'Connect';
+    if (customWalletText) {
+      return typeof customWalletText === 'function'
+        ? customWalletText({account, connected, isMobile})
+        : customWalletText;
     }
 
-    if (showWalletETHBadge && account) {
+    if (account) {
       return truncateEthAddress(account);
     }
 
-    return customWalletText || '';
+    return 'Connect';
   }
 
   /**
@@ -117,12 +122,10 @@ export default function ConnectWalletButton({
         className={`connect-button-text ${
           connected ? 'connect-button-text--ethAddress' : ''
         }`}>
-        {getWalletText() || 'Connect'}
+        {getWalletText()}
       </span>
 
-      {showWalletETHBadge && isWrongNetwork && connected && (
-        <span>Wrong Network</span>
-      )}
+      {isWrongNetwork && connected && <span>Wrong Network</span>}
 
       {showWalletETHBadge && (
         <WalletIcon providerName={web3Modal?.cachedProvider} />
