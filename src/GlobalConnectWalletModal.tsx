@@ -2,15 +2,15 @@ import {lazy, Suspense, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {useEffect} from 'react';
 
-import {connectModalClose, connectModalOpen} from './store/actions';
-import {StoreState} from './store/types';
-import {AsyncStatus} from './util/types';
-import {useLocation} from 'react-router-dom';
 import {
   useIsDefaultChain,
   useMaybeContractWallet,
   useWeb3Modal,
 } from './components/web3/hooks';
+import {AsyncStatus} from './util/types';
+import {connectModalClose, connectModalOpen} from './store/actions';
+import {StoreState} from './store/types';
+import {useLocation} from 'react-router-dom';
 
 /**
  * Lazy load ConnectWalletModal only when open

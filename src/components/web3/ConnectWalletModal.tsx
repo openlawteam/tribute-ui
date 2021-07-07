@@ -1,5 +1,7 @@
 import {isMobile} from 'react-device-detect';
-import {Link} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
+import {useEffect} from 'react';
+import {usePrevious} from 'react-use';
 import {useSelector} from 'react-redux';
 
 import {CHAINS} from '../../config';
@@ -65,11 +67,19 @@ export default function ConnectWalletModal(
   );
 
   /**
+   * Their hooks
+   */
+
+  const {pathname} = useLocation();
+  const previousPathname = usePrevious<string>(pathname);
+
+  /**
    * Variables
    */
 
   const isWrongNetwork: boolean = isDefaultChain === false;
   const isChainGanache = networkId === CHAINS.GANACHE;
+  const memberProfilePath: string = `/members/${connectedMemberAddress}`;
 
   const displayOptions: JSX.Element[] = Object.entries(providerOptions)
     // If mobile, filter-out `"injected"`
@@ -101,6 +111,26 @@ export default function ConnectWalletModal(
     });
 
   /**
+   * Effects
+   */
+
+  /**
+   * Automatically trigger the modal to close if we navigated from the
+   * "set a delegate" link in this component to the `memberProfilePath`.
+   */
+  useEffect(() => {
+    if (
+      isOpen &&
+      pathname === memberProfilePath &&
+      previousPathname &&
+      previousPathname !== memberProfilePath
+    ) {
+      // Run last in the queue, as it completes quicker than the global "open modal" action.
+      setTimeout(onRequestClose, 0);
+    }
+  }, [isOpen, memberProfilePath, onRequestClose, pathname, previousPathname]);
+
+  /**
    * Functions
    */
 
@@ -112,18 +142,30 @@ export default function ConnectWalletModal(
     const maybeMemberText: JSX.Element | null = isActiveMember ? (
       <>
         As a member, you can{' '}
-        <Link to={`/members/${connectedMemberAddress}`}>set a delegate</Link> to
-        a key-based wallet, like MetaMask.
+        <Link onClick={handleSetDelegateClicked} to={memberProfilePath}>
+          set a delegate
+        </Link>{' '}
+        to a key-based wallet, like MetaMask.
       </>
     ) : null;
 
     return (
-      <p className="error-message" style={{}}>
+      <p className="error-message">
         <small>
           Smart contract wallets are not currently supported. {maybeMemberText}
         </small>
       </p>
     );
+  }
+
+  /**
+   * Allow the modal to close if the previous path was already equal to
+   * `memberProfilePath` (e.g. navigated to it normally, loaded cold from brower)
+   */
+  function handleSetDelegateClicked() {
+    if (isOpen && previousPathname && previousPathname === memberProfilePath) {
+      onRequestClose();
+    }
   }
 
   return (

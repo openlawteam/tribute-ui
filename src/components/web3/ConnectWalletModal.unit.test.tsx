@@ -13,6 +13,9 @@ import {CHAINS} from '../../config';
 import {StoreState} from '../../store/types';
 import ConnectWalletModal from './ConnectWalletModal';
 import Wrapper from '../../test/Wrapper';
+import {useHistory, useLocation} from 'react-router';
+import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
+import {useEffect} from 'react';
 
 describe('ConnectWalletModal unit tests', () => {
   test('should open modal', async () => {
@@ -123,6 +126,185 @@ describe('ConnectWalletModal unit tests', () => {
 
     // Assert modal closed
     await waitFor(() => {
+      expect(() => screen.getByText(/^connect wallet$/i)).toThrow();
+      expect(() => screen.getByText(/^connect wallet$/i)).toThrow();
+      expect(() => screen.getByText(/^choose your wallet$/i)).toThrow();
+      expect(() => screen.getByText(/^0x04028/i)).toThrow();
+      expect(() => screen.getByText(/^metamask$/i)).toThrow();
+      expect(() => screen.getByText(/^walletconnect$/i)).toThrow();
+      expect(() => screen.getByText(/^disconnect wallet$/i)).toThrow();
+    });
+  });
+
+  test('should close modal after clicking "set a delegate" link, then navigating to member profile page', async () => {
+    let store: Store;
+    let pathname: string;
+
+    function TestApp() {
+      const dispatch = useDispatch();
+
+      const isOpen = useSelector(
+        ({connectModal}: StoreState) => connectModal.isOpen
+      );
+
+      const location = useLocation();
+
+      pathname = location.pathname;
+
+      return (
+        <ConnectWalletModal
+          modalProps={{
+            isOpen,
+            onRequestClose: () => {
+              dispatch(connectModalClose());
+            },
+          }}
+        />
+      );
+    }
+
+    render(
+      <Wrapper
+        useWallet
+        getProps={async (p) => {
+          store = p.store;
+
+          // Mock internal `ethers` call to `eth_chainId`
+          p.mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter('uint256', 1337)
+          );
+
+          // Mock call to `eth_getCode`
+          p.mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'bytes',
+              formatBytes32String('some code at an address')
+            )
+          );
+
+          // Set connected member to active
+          p.store.dispatch(
+            setConnectedMember({
+              ...p.store.getState().connectedMember,
+              isActiveMember: true,
+              memberAddress: DEFAULT_ETH_ADDRESS,
+            })
+          );
+        }}>
+        <TestApp />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      store.dispatch(connectModalOpen());
+    });
+
+    // Assert modal open
+    await waitFor(() => {
+      expect(
+        screen.getByRole('link', {name: /set a delegate/i})
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByRole('link', {name: /set a delegate/i}));
+
+    // Assert modal closed
+    await waitFor(() => {
+      expect(pathname).toBe(`/members/${DEFAULT_ETH_ADDRESS}`);
+
+      expect(() => screen.getByText(/^connect wallet$/i)).toThrow();
+      expect(() => screen.getByText(/^connect wallet$/i)).toThrow();
+      expect(() => screen.getByText(/^choose your wallet$/i)).toThrow();
+      expect(() => screen.getByText(/^0x04028/i)).toThrow();
+      expect(() => screen.getByText(/^metamask$/i)).toThrow();
+      expect(() => screen.getByText(/^walletconnect$/i)).toThrow();
+      expect(() => screen.getByText(/^disconnect wallet$/i)).toThrow();
+    });
+  });
+
+  test('should close modal after clicking "set a delegate" link when already on member profile page', async () => {
+    let store: Store;
+    let pathname: string;
+
+    function TestApp() {
+      const dispatch = useDispatch();
+
+      const isOpen = useSelector(
+        ({connectModal}: StoreState) => connectModal.isOpen
+      );
+
+      const history = useHistory();
+      const location = useLocation();
+
+      useEffect(() => {
+        history.push(`/members/${DEFAULT_ETH_ADDRESS}`);
+      }, [history]);
+
+      pathname = location.pathname;
+
+      return (
+        <ConnectWalletModal
+          modalProps={{
+            isOpen,
+            onRequestClose: () => {
+              dispatch(connectModalClose());
+            },
+          }}
+        />
+      );
+    }
+
+    render(
+      <Wrapper
+        useWallet
+        getProps={async (p) => {
+          store = p.store;
+
+          // Mock internal `ethers` call to `eth_chainId`
+          p.mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter('uint256', 1337)
+          );
+
+          // Mock call to `eth_getCode`
+          p.mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'bytes',
+              formatBytes32String('some code at an address')
+            )
+          );
+
+          // Set connected member to active
+          p.store.dispatch(
+            setConnectedMember({
+              ...p.store.getState().connectedMember,
+              isActiveMember: true,
+              memberAddress: DEFAULT_ETH_ADDRESS,
+            })
+          );
+        }}>
+        <TestApp />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      store.dispatch(connectModalOpen());
+    });
+
+    // Assert modal open
+    await waitFor(() => {
+      expect(pathname).toBe(`/members/${DEFAULT_ETH_ADDRESS}`);
+
+      expect(
+        screen.getByRole('link', {name: /set a delegate/i})
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByRole('link', {name: /set a delegate/i}));
+
+    // Assert modal closed
+    await waitFor(() => {
+      expect(pathname).toBe(`/members/${DEFAULT_ETH_ADDRESS}`);
+
       expect(() => screen.getByText(/^connect wallet$/i)).toThrow();
       expect(() => screen.getByText(/^connect wallet$/i)).toThrow();
       expect(() => screen.getByText(/^choose your wallet$/i)).toThrow();
@@ -306,8 +488,8 @@ describe('ConnectWalletModal unit tests', () => {
           // Set connected member to active
           p.store.dispatch(
             setConnectedMember({
-              isActiveMember: true,
               ...p.store.getState().connectedMember,
+              isActiveMember: true,
             })
           );
         }}>
