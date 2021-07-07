@@ -47,6 +47,10 @@ type WrapperProps = {
    * Web3 modal manager context options
    */
   web3ModalContext?: Web3ModalContextValue;
+  /**
+   * Initial entries for location path and search queries
+   */
+  routeEntries?: any;
 };
 
 /**
@@ -64,6 +68,7 @@ export default function Wrapper(
     useInit = false,
     useWallet = false,
     web3ModalContext,
+    routeEntries,
   } = props;
 
   /**
@@ -264,7 +269,7 @@ export default function Wrapper(
     <Provider store={store}>
       <Web3ModalContext.Provider
         value={web3ModalContext || ({} as Web3ModalContextValue)}>
-        <MemoryRouter>
+        <MemoryRouter initialEntries={routeEntries || [{pathname: '/'}]}>
           <ApolloProvider client={getApolloClient(store)}>
             {renderChildren(props.children)}
           </ApolloProvider>

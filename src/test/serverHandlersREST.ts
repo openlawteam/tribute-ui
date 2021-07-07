@@ -54,11 +54,17 @@ const getSnapshotAPIOffchainProof = rest.get(
  * Coupon Manager
  */
 
-//
 const patchRedeemedCoupon = rest.patch(
   `${COUPON_API_URL}/api/coupon/redeem`,
   async (_req, res, ctx) => res(ctx.status(200))
 );
+
+const postRedeemedCoupon = rest.post(
+  `${COUPON_API_URL}/api/coupon/redeem`,
+  async (_req, res, ctx) => res(ctx.status(200))
+);
+
+// const signature = 0xaa4348e5db63d132b1d0b23a3e2a2a047a657594a1f736e8c9574babf0f8890131bcb08b0eb26f1ec2926aee0a11f8f042dc3212aa05ee67245791ab52ec97581c
 
 /**
  * ETHGasStation
@@ -83,6 +89,7 @@ const handlers = [
   postSnapshotAPIMessage,
   postSnapshotAPIOffchainProof,
   patchRedeemedCoupon,
+  postRedeemedCoupon,
 ];
 
 export {handlers};
