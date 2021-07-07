@@ -8,7 +8,7 @@ import {CHAINS} from '../../config';
 import {CycleEllipsis} from '../feedback';
 import {StoreState} from '../../store/types';
 import {truncateEthAddress} from '../../util/helpers';
-import {useIsDefaultChain, useMaybeContractWallet} from './hooks';
+import {useIsDefaultChain} from './hooks';
 import {useWeb3Modal} from './hooks';
 import {WalletIcon} from '.';
 import LoaderLarge from '../feedback/LoaderLarge';
@@ -21,6 +21,8 @@ type ConnectWalletModalProps = {
     isOpen: Parameters<typeof Modal>[0]['isOpen'];
     onRequestClose: () => void;
   } & Partial<Parameters<typeof Modal>[0]>;
+  // @todo Look into more generic way to render errors in the modal
+  maybeContractWallet?: boolean;
 };
 
 export default function ConnectWalletModal(
@@ -28,6 +30,7 @@ export default function ConnectWalletModal(
 ): JSX.Element {
   const {
     modalProps: {isOpen, onRequestClose, ...restModalProps},
+    maybeContractWallet = false,
   } = props;
 
   /**
@@ -56,15 +59,9 @@ export default function ConnectWalletModal(
     networkId,
     providerOptions,
     web3Modal,
-    web3Instance,
   } = useWeb3Modal();
 
   const {defaultChainError, isDefaultChain} = useIsDefaultChain();
-
-  const maybeContractWallet = useMaybeContractWallet(
-    account,
-    web3Instance?.currentProvider
-  );
 
   /**
    * Their hooks
