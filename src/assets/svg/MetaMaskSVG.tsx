@@ -72,13 +72,15 @@ export default function MetaMaskSVG() {
 
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      x="0"
-      y="0"
+      aria-label="MetaMask logo"
       enableBackground="new 0 0 33.9 31.3"
+      role="img"
       version="1.1"
       viewBox="0 0 33.9 31.3"
-      xmlSpace="preserve">
+      x="0"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlSpace="preserve"
+      y="0">
       <path d="M32.1.1L18.9 9.8l2.4-5.7 10.8-4z" style={st0}></path>
       <path
         d="M1.8.1l13 9.8-2.3-5.8L1.8.1zM27.4 22.7L23.9 28l7.5 2.1 2.1-7.3-6.1-.1zM.4 22.8l2.1 7.3L10 28l-3.5-5.3-6.1.1z"

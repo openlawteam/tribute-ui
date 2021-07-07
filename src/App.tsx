@@ -1,6 +1,7 @@
 import {useLocation} from 'react-router-dom';
 
 import Footer from './components/Footer';
+import GlobalConnectWalletModal from './GlobalConnectWalletModal';
 import Head from './Head';
 import Header from './components/Header';
 import Routes from './Routes';
@@ -55,11 +56,14 @@ export default function App(props?: AppProps) {
 
   return (
     <>
-      {/* HEAD (react-helmet) */}
+      {/* HTML `<head>` (react-helmet) */}
       <Head />
 
       {/* CONTENT */}
       {renderContent()}
+
+      {/* GLOBAL MODALS */}
+      <GlobalConnectWalletModal />
     </>
   );
 }

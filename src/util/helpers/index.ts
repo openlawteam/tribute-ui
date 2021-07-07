@@ -4,6 +4,7 @@ export * from './dontCloseWindowWarning';
 export * from './formatDecimal';
 export * from './formatNumber';
 export * from './getValidationError';
+export * from './isPossibleContractWallet';
 export * from './normalizeString';
 export * from './numberRangeArray';
 export * from './stripFormatNumber';
