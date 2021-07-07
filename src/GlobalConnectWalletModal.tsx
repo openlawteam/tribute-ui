@@ -75,10 +75,9 @@ export default function GlobalConnectWalletModal() {
    */
 
   /**
-   * If the `web3Modal` is ready, and/or the `pathname` changes,
-   * then open or close the modal based on the current chain.
-   *
-   * When open, the user will be alerted to change chains.
+   * Will automatically re-show the modal (on app `pathname` change) only when:
+   *  - If wrong chain
+   *  - If smart contract wallet
    */
   useEffect(() => {
     if (initialCachedConnectorCheckStatus === AsyncStatus.FULFILLED) {
