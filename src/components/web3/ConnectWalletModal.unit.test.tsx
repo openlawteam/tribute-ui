@@ -153,6 +153,7 @@ describe('ConnectWalletModal unit tests', () => {
 
       return (
         <ConnectWalletModal
+          maybeContractWallet={true}
           modalProps={{
             isOpen,
             onRequestClose: () => {
@@ -168,19 +169,6 @@ describe('ConnectWalletModal unit tests', () => {
         useWallet
         getProps={async (p) => {
           store = p.store;
-
-          // Mock internal `ethers` call to `eth_chainId`
-          p.mockWeb3Provider.injectResult(
-            p.web3Instance.eth.abi.encodeParameter('uint256', 1337)
-          );
-
-          // Mock call to `eth_getCode`
-          p.mockWeb3Provider.injectResult(
-            p.web3Instance.eth.abi.encodeParameter(
-              'bytes',
-              formatBytes32String('some code at an address')
-            )
-          );
 
           // Set connected member to active
           p.store.dispatch(
@@ -244,6 +232,7 @@ describe('ConnectWalletModal unit tests', () => {
 
       return (
         <ConnectWalletModal
+          maybeContractWallet={true}
           modalProps={{
             isOpen,
             onRequestClose: () => {
@@ -259,19 +248,6 @@ describe('ConnectWalletModal unit tests', () => {
         useWallet
         getProps={async (p) => {
           store = p.store;
-
-          // Mock internal `ethers` call to `eth_chainId`
-          p.mockWeb3Provider.injectResult(
-            p.web3Instance.eth.abi.encodeParameter('uint256', 1337)
-          );
-
-          // Mock call to `eth_getCode`
-          p.mockWeb3Provider.injectResult(
-            p.web3Instance.eth.abi.encodeParameter(
-              'bytes',
-              formatBytes32String('some code at an address')
-            )
-          );
 
           // Set connected member to active
           p.store.dispatch(
@@ -392,6 +368,7 @@ describe('ConnectWalletModal unit tests', () => {
 
       return (
         <ConnectWalletModal
+          maybeContractWallet={true}
           modalProps={{
             isOpen,
             onRequestClose: () => {
@@ -407,19 +384,6 @@ describe('ConnectWalletModal unit tests', () => {
         useWallet
         getProps={async (p) => {
           store = p.store;
-
-          // Mock internal `ethers` call to `eth_chainId`
-          p.mockWeb3Provider.injectResult(
-            p.web3Instance.eth.abi.encodeParameter('uint256', 1337)
-          );
-
-          // Mock call to `eth_getCode`
-          p.mockWeb3Provider.injectResult(
-            p.web3Instance.eth.abi.encodeParameter(
-              'bytes',
-              formatBytes32String('some code at an address')
-            )
-          );
         }}>
         <TestApp />
       </Wrapper>
@@ -456,6 +420,7 @@ describe('ConnectWalletModal unit tests', () => {
 
       return (
         <ConnectWalletModal
+          maybeContractWallet={true}
           modalProps={{
             isOpen,
             onRequestClose: () => {
@@ -471,19 +436,6 @@ describe('ConnectWalletModal unit tests', () => {
         useWallet
         getProps={async (p) => {
           store = p.store;
-
-          // Mock internal `ethers` call to `eth_chainId`
-          p.mockWeb3Provider.injectResult(
-            p.web3Instance.eth.abi.encodeParameter('uint256', 1337)
-          );
-
-          // Mock call to `eth_getCode`
-          p.mockWeb3Provider.injectResult(
-            p.web3Instance.eth.abi.encodeParameter(
-              'bytes',
-              formatBytes32String('some code at an address')
-            )
-          );
 
           // Set connected member to active
           p.store.dispatch(

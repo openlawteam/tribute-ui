@@ -45,7 +45,7 @@ export default function GlobalConnectWalletModal() {
    * Our hooks
    */
 
-  const {account, initialCachedConnectorCheckStatus, web3Instance} =
+  const {account, connected, initialCachedConnectorCheckStatus, web3Instance} =
     useWeb3Modal();
 
   const {isDefaultChain} = useIsDefaultChain();
@@ -81,14 +81,15 @@ export default function GlobalConnectWalletModal() {
    */
   useEffect(() => {
     if (initialCachedConnectorCheckStatus === AsyncStatus.FULFILLED) {
-      const shouldShowModalAgain: boolean =
-        !isDefaultChain || maybeContractWallet ? true : false;
+      const shouldAutomaticallyOpenModal: boolean =
+        connected && (!isDefaultChain || maybeContractWallet) ? true : false;
 
-      shouldShowModalAgain
+      shouldAutomaticallyOpenModal
         ? dispatch(connectModalOpen())
         : dispatch(connectModalClose());
     }
   }, [
+    connected,
     dispatch,
     initialCachedConnectorCheckStatus,
     isDefaultChain,
@@ -104,7 +105,11 @@ export default function GlobalConnectWalletModal() {
 
   return (
     <Suspense fallback={null}>
-      <ConnectWalletModal modalProps={modalProps} />
+      <ConnectWalletModal
+        // @todo Look into more generic way to render errors in the modal
+        maybeContractWallet={maybeContractWallet}
+        modalProps={modalProps}
+      />
     </Suspense>
   );
 }
