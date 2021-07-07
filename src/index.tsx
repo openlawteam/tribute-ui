@@ -17,7 +17,6 @@ import {
   WALLETCONNECT_PROVIDER_OPTIONS,
 } from './config';
 import {clearConnectedMember, clearContracts} from './store/actions';
-import {DefaultTheme} from './components/web3/hooks/useWeb3ModalManager';
 import {disableReactDevTools} from './util/helpers';
 import {handleSubgraphError} from './gql';
 import {store} from './store';
