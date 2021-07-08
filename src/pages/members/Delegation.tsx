@@ -297,8 +297,6 @@ function DelegationModal({
         throw new Error('No DAO Registry contract was found.');
       }
 
-      
-
       if (!daoRegistryAdapterContract) {
         throw new Error('No DAO Registry Adapter contract was found.');
       }
@@ -367,8 +365,6 @@ function DelegationModal({
       if (!daoRegistryContract) {
         throw new Error('No DAO Registry contract was found.');
       }
-
-      
 
       if (!daoRegistryAdapterContract) {
         throw new Error('No DAO Registry Adapter contract was found.');
