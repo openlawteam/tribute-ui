@@ -124,7 +124,7 @@ function RedeemCard({redeemable, daoTokenDetails}: RedeemCardProps) {
       // hook for reasons) the `submitProposal` smart contract transaction will
       // fail.
       if (checkApplicantError) {
-        console.log(
+        console.warn(
           `Error checking if the applicant address '${redeemable.recipient}' is valid: ${checkApplicantError.message}`
         );
       }

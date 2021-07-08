@@ -1,4 +1,4 @@
-import {render, screen, waitFor, act} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Web3 from 'web3';
 
@@ -18,7 +18,6 @@ import {
 } from '../../test/web3Responses';
 import Redeem from './Redeem';
 import Wrapper from '../../test/Wrapper';
-import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 
 const redeemables = [
   {
@@ -32,19 +31,62 @@ const redeemables = [
 ];
 
 describe('RedeemManager unit tests', () => {
-  test('should render message when signature missing', async () => {
+  test("should check if user doesn't have a connected wallet", async () => {
+    render(
+      <Wrapper useInit>
+        <Redeem />
+      </Wrapper>
+    );
+
+    expect(
+      screen.getByText(/redeem coupon to issue the membership tokens/i)
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/connect your wallet to view the coupon/i)
+    ).toBeInTheDocument();
+  });
+
+  test('should render error message when signature missing', async () => {
     render(
       <Wrapper useWallet useInit>
         <Redeem />
       </Wrapper>
     );
 
-    await waitFor(() => {
-      expect(
-        screen.getByText(/redeem coupon to issue the membership tokens/i)
-      ).toBeInTheDocument();
-      expect(screen.getByText(/coupon signature missing/i)).toBeInTheDocument();
-    });
+    expect(
+      screen.getByText(/redeem coupon to issue the membership tokens/i)
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/checking… please wait/i)
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/coupon signature missing/i)
+    ).toBeInTheDocument();
+  });
+
+  test('should render error message when signature provided, but incorrect', async () => {
+    server.use(
+      rest.post(`${COUPON_API_URL}/api/coupon/redeem`, (_, res, ctx) => {
+        return res(ctx.status(500));
+      })
+    );
+
+    render(
+      <Wrapper
+        useWallet
+        useInit
+        locationEntries={[{search: `?coupon=${DEFAULT_SIG}`}]}>
+        <Redeem />
+      </Wrapper>
+    );
+
+    expect(
+      screen.getByText(/redeem coupon to issue the membership tokens/i)
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/checking… please wait/i)
+    ).toBeInTheDocument();
+    expect(await screen.findByText(/coupon not found/i)).toBeInTheDocument();
   });
 
   test('should redeem coupon', async () => {
@@ -70,22 +112,21 @@ describe('RedeemManager unit tests', () => {
       </Wrapper>
     );
 
-    await waitFor(() => {
-      expect(
-        screen.getByText(/redeem coupon to issue the membership tokens/i)
-      ).toBeInTheDocument();
-      expect(screen.getByText(/checking… please wait/i)).toBeInTheDocument();
-    });
+    expect(
+      screen.getByText(/redeem coupon to issue the membership tokens/i)
+    ).toBeInTheDocument();
+
+    expect(
+      await screen.findByText(/checking… please wait/i)
+    ).toBeInTheDocument();
+
+    expect(await screen.findByText(/recipient/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^0x04028/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^10,000/i)).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByText(/recipient/i)).toBeInTheDocument();
       expect(screen.getByRole('button', {name: /redeem/i})).toBeInTheDocument();
       expect(screen.getByRole('button', {name: /redeem/i})).toBeEnabled();
-    });
-
-    act(() => {
-      // Click to redeem coupon
-      userEvent.click(screen.getByRole('button', {name: /redeem/i}));
     });
 
     await waitFor(() => {
@@ -96,21 +137,13 @@ describe('RedeemManager unit tests', () => {
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
     });
 
+    // Click to redeem coupon
+    userEvent.click(screen.getByRole('button', {name: /redeem/i}));
+
     await waitFor(() => {
       expect(
         screen.getByText(/awaiting your confirmation/i)
       ).toBeInTheDocument();
-      expect(screen.getByRole('button', {name: /redeem/i})).toBeDisabled();
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText(/submitting/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', {name: /redeem/i})).toBeDisabled();
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText(TX_CYCLE_MESSAGES[0])).toBeInTheDocument();
-      expect(screen.getByText(/view progress/i)).toBeInTheDocument();
     });
 
     await waitFor(() => {
