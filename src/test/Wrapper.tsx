@@ -1,5 +1,6 @@
 import {Store} from 'redux';
 import {MemoryRouter} from 'react-router-dom';
+import type {LocationDescriptor} from 'history';
 import {provider as Web3Provider} from 'web3-core/types';
 import {Provider} from 'react-redux';
 import {ApolloProvider} from '@apollo/react-hooks';
@@ -46,6 +47,10 @@ type WrapperProps = {
    * Web3 modal manager context values
    */
   web3ModalContext?: Partial<Web3ModalContextValue>;
+  /**
+   * Initial entries for location path and search queries
+   */
+  locationEntries?: LocationDescriptor[];
 };
 
 /**
@@ -63,6 +68,7 @@ export default function Wrapper(
     useInit = false,
     useWallet = false,
     web3ModalContext,
+    locationEntries,
   } = props;
 
   /**
@@ -255,7 +261,7 @@ export default function Wrapper(
     <Provider store={store}>
       <Web3ModalContext.Provider
         value={web3ContextValues as Web3ModalContextValue}>
-        <MemoryRouter>
+        <MemoryRouter initialEntries={locationEntries || [{pathname: '/'}]}>
           <ApolloProvider client={getApolloClient(store)}>
             {renderChildren(props.children)}
           </ApolloProvider>

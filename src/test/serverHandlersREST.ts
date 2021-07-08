@@ -54,8 +54,12 @@ const getSnapshotAPIOffchainProof = rest.get(
  * Coupon Manager
  */
 
-//
 const patchRedeemedCoupon = rest.patch(
+  `${COUPON_API_URL}/api/coupon/redeem`,
+  async (_req, res, ctx) => res(ctx.status(200))
+);
+
+const postRedeemedCoupon = rest.post(
   `${COUPON_API_URL}/api/coupon/redeem`,
   async (_req, res, ctx) => res(ctx.status(200))
 );
@@ -83,6 +87,7 @@ const handlers = [
   postSnapshotAPIMessage,
   postSnapshotAPIOffchainProof,
   patchRedeemedCoupon,
+  postRedeemedCoupon,
 ];
 
 export {handlers};
