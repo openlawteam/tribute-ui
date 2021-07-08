@@ -15,4 +15,8 @@ export type ConnectedMemberState = {
    * A member's true address in the DAO.
    */
   memberAddress: string;
+  /**
+   * A member's UNITS balance in the DAO.
+   */
+  units: number;
 } | null;

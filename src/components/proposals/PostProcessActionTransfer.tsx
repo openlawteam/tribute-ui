@@ -54,10 +54,13 @@ export default function PostProcessActionTransfer(
    */
 
   const DistributeContract = useSelector(
-    (state: StoreState) => state.contracts?.DistributeContract
+    (s: StoreState) => s.contracts?.DistributeContract
   );
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
+  );
+  const bankExtensionContract = useSelector(
+    (s: StoreState) => s.contracts.BankExtensionContract
   );
 
   /**
@@ -152,6 +155,10 @@ export default function PostProcessActionTransfer(
         throw new Error('No DAO Registry contract was found.');
       }
 
+      if (!bankExtensionContract) {
+        throw new Error('No Bank Extension contract was found.');
+      }
+
       if (!snapshotProposal) {
         throw new Error('No Snapshot proposal was found.');
       }
@@ -202,7 +209,12 @@ export default function PostProcessActionTransfer(
       if (tx) {
         // re-fetch member
         await dispatch(
-          getConnectedMember({account, daoRegistryContract, web3Instance})
+          getConnectedMember({
+            account,
+            bankExtensionContract,
+            daoRegistryContract,
+            web3Instance,
+          })
         );
       }
     } catch (error) {

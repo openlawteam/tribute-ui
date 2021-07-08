@@ -7,6 +7,7 @@ import {ContractsStateEntry} from '../contracts/types';
 import {hasFlag, multicall} from '../../components/web3/helpers';
 import {MemberFlag} from '../../components/web3/types';
 import {normalizeString} from '../../util/helpers';
+import {UNITS_ADDRESS} from '../../config';
 
 export const SET_CONNECTED_MEMBER = 'SET_CONNECTED_MEMBER';
 export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
@@ -24,10 +25,12 @@ export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
  */
 export function getConnectedMember({
   account,
+  bankExtensionContract,
   daoRegistryContract,
   web3Instance,
 }: {
   account: string;
+  bankExtensionContract: ContractsStateEntry;
   daoRegistryContract: ContractsStateEntry;
   web3Instance: Web3;
 }) {
@@ -48,8 +51,13 @@ export function getConnectedMember({
       (ai) => ai.name === 'getCurrentDelegateKey'
     );
 
+    const bankExtensionMethods = bankExtensionContract?.instance.methods;
+    const bankExtensionAddress = bankExtensionContract?.contractAddress;
+
     if (
       !account ||
+      !bankExtensionAddress ||
+      !bankExtensionMethods ||
       !daoRegistryAddress ||
       !daoRegistryMethods ||
       !getAddressIfDelegatedABI ||
@@ -86,6 +94,10 @@ export function getConnectedMember({
         web3Instance,
       });
 
+      const unitsBalance = await bankExtensionMethods
+        .balanceOf(addressIfDelegated, UNITS_ADDRESS)
+        .call();
+
       // A member can exist in the DAO, yet not be an active member (has units > 0)
       const doesMemberExist: boolean = hasFlag(MemberFlag.EXISTS, memberFlag);
 
@@ -107,6 +119,7 @@ export function getConnectedMember({
           isAddressDelegated,
           isActiveMember,
           memberAddress,
+          units: Number(unitsBalance),
         })
       );
     } catch (error) {

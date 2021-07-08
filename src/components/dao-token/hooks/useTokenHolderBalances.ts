@@ -1,9 +1,8 @@
 import {useCallback, useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
 import {useLazyQuery} from '@apollo/react-hooks';
 
 import {StoreState} from '../../../store/types';
-import {useSelector} from 'react-redux';
-
 import {GET_TOKEN_HOLDER_BALANCES} from '../../../gql';
 
 type UseTokenHolderBalancesReturn = {
@@ -27,19 +26,29 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
     (state: StoreState) => state.contracts?.ERC20ExtensionContract
   );
 
-  const [getTokenHolderBalances, {called, loading, data, error}] = useLazyQuery(
-    GET_TOKEN_HOLDER_BALANCES,
-    {
+  const connectedMemberUnits = useSelector(
+    (s: StoreState) => s.connectedMember?.units
+  );
+
+  const [getTokenHolderBalances, {called, loading, data, error, refetch}] =
+    useLazyQuery(GET_TOKEN_HOLDER_BALANCES, {
       variables: {
         tokenAddress: erc20ExtensionContract?.contractAddress.toLowerCase(),
       },
-    }
-  );
+    });
+
+  /**
+   * State
+   */
 
   const [tokenHolderBalances, setTokenHolderBalances] = useState<
     Record<string, any> | undefined
   >();
   const [gqlError, setGqlError] = useState<Error>();
+
+  /**
+   * Cached callbacks
+   */
 
   const getTokenBalanceCallback = useCallback(getTokenBalance, [
     erc20ExtensionContract?.contractAddress,
@@ -47,6 +56,10 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
     error,
     loading,
   ]);
+
+  /**
+   * Effects
+   */
 
   useEffect(() => {
     if (!called) {
@@ -63,6 +76,17 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
     getTokenBalanceCallback,
     loading,
   ]);
+
+  // If the connected user's UNIT balance changes then refresh query result so
+  // the token holder balance is also updated without having to do a page
+  // reload.
+  useEffect(() => {
+    refetch && refetch();
+  }, [connectedMemberUnits, refetch]);
+
+  /**
+   * Functions
+   */
 
   function getTokenBalance() {
     try {

@@ -72,10 +72,13 @@ function DelegationModal({
    */
 
   const daoRegistryContract = useSelector(
-    (state: StoreState) => state.contracts.DaoRegistryContract
+    (s: StoreState) => s.contracts.DaoRegistryContract
+  );
+  const bankExtensionContract = useSelector(
+    (s: StoreState) => s.contracts.BankExtensionContract
   );
   const daoRegistryAdapterContract = useSelector(
-    (state: StoreState) => state.contracts.DaoRegistryAdapterContract
+    (s: StoreState) => s.contracts.DaoRegistryAdapterContract
   );
   const connectedMember = useSelector((s: StoreState) => s.connectedMember);
 
@@ -297,6 +300,10 @@ function DelegationModal({
         throw new Error('No DAO Registry contract was found.');
       }
 
+      if (!bankExtensionContract) {
+        throw new Error('No Bank Extension contract was found.');
+      }
+
       if (!daoRegistryAdapterContract) {
         throw new Error('No DAO Registry Adapter contract was found.');
       }
@@ -333,7 +340,12 @@ function DelegationModal({
         setTimeout(async () => {
           // re-fetch member
           await dispatch(
-            getConnectedMember({account, daoRegistryContract, web3Instance})
+            getConnectedMember({
+              account,
+              bankExtensionContract,
+              daoRegistryContract,
+              web3Instance,
+            })
           );
 
           closeHandler();
@@ -360,6 +372,10 @@ function DelegationModal({
     try {
       if (!daoRegistryContract) {
         throw new Error('No DAO Registry contract was found.');
+      }
+
+      if (!bankExtensionContract) {
+        throw new Error('No Bank Extension contract was found.');
       }
 
       if (!daoRegistryAdapterContract) {
@@ -396,7 +412,12 @@ function DelegationModal({
         setTimeout(async () => {
           // re-fetch member
           await dispatch(
-            getConnectedMember({account, daoRegistryContract, web3Instance})
+            getConnectedMember({
+              account,
+              bankExtensionContract,
+              daoRegistryContract,
+              web3Instance,
+            })
           );
 
           closeHandler();

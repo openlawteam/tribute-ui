@@ -51,6 +51,9 @@ export default function Init(props: InitProps) {
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
   );
+  const bankExtensionContract = useSelector(
+    (s: StoreState) => s.contracts.BankExtensionContract
+  );
 
   /**
    * State
@@ -91,6 +94,7 @@ export default function Init(props: InitProps) {
 
   const handleGetMemberCached = useCallback(handleGetMember, [
     account,
+    bankExtensionContract,
     daoRegistryContract,
     dispatch,
     isDefaultChain,
@@ -170,6 +174,7 @@ export default function Init(props: InitProps) {
     try {
       if (
         !account ||
+        !bankExtensionContract ||
         !daoRegistryContract ||
         !isDefaultChain ||
         !web3Instance
@@ -178,7 +183,12 @@ export default function Init(props: InitProps) {
       }
 
       await dispatch(
-        getConnectedMember({account, daoRegistryContract, web3Instance})
+        getConnectedMember({
+          account,
+          bankExtensionContract,
+          daoRegistryContract,
+          web3Instance,
+        })
       );
     } catch (error) {
       setError(error);

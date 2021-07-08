@@ -79,10 +79,13 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
    */
 
   const TributeContract = useSelector(
-    (state: StoreState) => state.contracts?.TributeContract
+    (s: StoreState) => s.contracts?.TributeContract
   );
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
+  );
+  const bankExtensionContract = useSelector(
+    (s: StoreState) => s.contracts.BankExtensionContract
   );
 
   /**
@@ -268,6 +271,10 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
         throw new Error('No DAO Registry contract was found.');
       }
 
+      if (!bankExtensionContract) {
+        throw new Error('No Bank Extension contract was found.');
+      }
+
       if (!snapshotProposal) {
         throw new Error('No Snapshot proposal was found.');
       }
@@ -304,13 +311,18 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
       );
 
       if (tx) {
-        // suggest adding DAO token to wallet
-        await addTokenToWallet();
-
         // re-fetch member
         await dispatch(
-          getConnectedMember({account, daoRegistryContract, web3Instance})
+          getConnectedMember({
+            account,
+            bankExtensionContract,
+            daoRegistryContract,
+            web3Instance,
+          })
         );
+
+        // suggest adding DAO token to wallet
+        await addTokenToWallet();
       }
     } catch (error) {
       setSubmitError(error);
