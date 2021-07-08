@@ -59,9 +59,6 @@ export default function PostProcessActionTransfer(
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
   );
-  const bankExtensionContract = useSelector(
-    (s: StoreState) => s.contracts.BankExtensionContract
-  );
 
   /**
    * Our hooks
@@ -155,10 +152,6 @@ export default function PostProcessActionTransfer(
         throw new Error('No DAO Registry contract was found.');
       }
 
-      if (!bankExtensionContract) {
-        throw new Error('No Bank Extension contract was found.');
-      }
-
       if (!snapshotProposal) {
         throw new Error('No Snapshot proposal was found.');
       }
@@ -211,7 +204,6 @@ export default function PostProcessActionTransfer(
         await dispatch(
           getConnectedMember({
             account,
-            bankExtensionContract,
             daoRegistryContract,
             web3Instance,
           })

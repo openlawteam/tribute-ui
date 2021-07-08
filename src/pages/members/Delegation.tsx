@@ -74,9 +74,6 @@ function DelegationModal({
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
   );
-  const bankExtensionContract = useSelector(
-    (s: StoreState) => s.contracts.BankExtensionContract
-  );
   const daoRegistryAdapterContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryAdapterContract
   );
@@ -300,9 +297,7 @@ function DelegationModal({
         throw new Error('No DAO Registry contract was found.');
       }
 
-      if (!bankExtensionContract) {
-        throw new Error('No Bank Extension contract was found.');
-      }
+      
 
       if (!daoRegistryAdapterContract) {
         throw new Error('No DAO Registry Adapter contract was found.');
@@ -342,7 +337,6 @@ function DelegationModal({
           await dispatch(
             getConnectedMember({
               account,
-              bankExtensionContract,
               daoRegistryContract,
               web3Instance,
             })
@@ -374,9 +368,7 @@ function DelegationModal({
         throw new Error('No DAO Registry contract was found.');
       }
 
-      if (!bankExtensionContract) {
-        throw new Error('No Bank Extension contract was found.');
-      }
+      
 
       if (!daoRegistryAdapterContract) {
         throw new Error('No DAO Registry Adapter contract was found.');
@@ -414,7 +406,6 @@ function DelegationModal({
           await dispatch(
             getConnectedMember({
               account,
-              bankExtensionContract,
               daoRegistryContract,
               web3Instance,
             })

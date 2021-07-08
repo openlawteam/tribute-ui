@@ -22,7 +22,6 @@ describe('connectedMember actions unit tests', () => {
     });
 
     // Setup for `getConnectedMember`
-
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -73,7 +72,6 @@ describe('connectedMember actions unit tests', () => {
     });
 
     // Setup for `getConnectedMember`
-
     const delegateAddress: string =
       '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1';
 
@@ -127,7 +125,6 @@ describe('connectedMember actions unit tests', () => {
     });
 
     // Setup for `getConnectedMember`
-
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -178,7 +175,6 @@ describe('connectedMember actions unit tests', () => {
     });
 
     // Setup for `getConnectedMember`
-
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -229,7 +225,6 @@ describe('connectedMember actions unit tests', () => {
     });
 
     // Setup for `getConnectedMember`
-
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -284,7 +279,6 @@ describe('connectedMember actions unit tests', () => {
     });
 
     // Setup for `getConnectedMember`
-
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],

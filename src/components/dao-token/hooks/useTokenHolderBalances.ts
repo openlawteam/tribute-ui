@@ -23,12 +23,14 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
    */
 
   const erc20ExtensionContract = useSelector(
-    (state: StoreState) => state.contracts?.ERC20ExtensionContract
+    (s: StoreState) => s.contracts?.ERC20ExtensionContract
   );
 
-  const connectedMemberUnits = useSelector(
-    (s: StoreState) => s.connectedMember?.units
-  );
+  const connectedMember = useSelector((s: StoreState) => s.connectedMember);
+
+  /**
+   * GQL Query
+   */
 
   const [getTokenHolderBalances, {called, loading, data, error, refetch}] =
     useLazyQuery(GET_TOKEN_HOLDER_BALANCES, {
@@ -77,12 +79,18 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
     loading,
   ]);
 
-  // If the connected user's UNIT balance changes then refresh query result so
-  // the token holder balance is also updated without having to do a page
-  // reload.
+  // When the `SET_CONNECTED_MEMBER` redux action is dispatched in other
+  // components (to refetch the connected user's member status info) the
+  // `useSelector` hook above will return a new `connectedMember` object. By
+  // default, the `useEffect` hook uses a strict equality comparison which will
+  // consider the new object a changed value (even if the individual fields are
+  // the same from the previous `connectedMember` store state). This change is
+  // used to trigger a refresh of the `GET_TOKEN_HOLDER_BALANCES` query result
+  // so any change to the connected token holder's balance can be shown in the
+  // nav badge without having to do a page reload.
   useEffect(() => {
     refetch && refetch();
-  }, [connectedMemberUnits, refetch]);
+  }, [connectedMember, refetch]);
 
   /**
    * Functions
