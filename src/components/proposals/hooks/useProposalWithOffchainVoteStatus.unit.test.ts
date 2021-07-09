@@ -233,7 +233,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(undefined);
 
       await waitForValueToChange(() => result.current.daoProposal);
@@ -247,7 +247,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       });
 
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(ProposalFlowStatus.Submit);
     });
   });
@@ -299,7 +299,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(undefined);
 
       await waitForValueToChange(() => result.current.daoProposal);
@@ -313,7 +313,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       });
 
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(ProposalFlowStatus.Sponsor);
     });
   });
@@ -377,7 +377,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(undefined);
 
       await waitForValueToChange(() => result.current.daoProposal);
@@ -397,7 +397,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject(
+      expect(result.current.daoProposalVote).toMatchObject(
         defaultNoVotesResult
       );
 
@@ -510,7 +510,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(undefined);
 
       await waitForValueToChange(() => result.current.daoProposal);
@@ -530,7 +530,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject(
+      expect(result.current.daoProposalVote).toMatchObject(
         defaultNoVotesResult
       );
 
@@ -614,7 +614,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(undefined);
 
       await waitForValueToChange(() => result.current.daoProposal);
@@ -634,7 +634,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject(defaultVotesResult);
+      expect(result.current.daoProposalVote).toMatchObject(defaultVotesResult);
 
       expect(result.current.status).toBe(undefined);
 
@@ -716,7 +716,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(undefined);
 
       await waitForValueToChange(() => result.current.daoProposal);
@@ -736,7 +736,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject(defaultVotesResult);
+      expect(result.current.daoProposalVote).toMatchObject(defaultVotesResult);
 
       expect(result.current.status).toBe(undefined);
 
@@ -816,7 +816,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(undefined);
 
       await waitForValueToChange(() => result.current.daoProposal);
@@ -836,7 +836,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject(defaultVotesResult);
+      expect(result.current.daoProposalVote).toMatchObject(defaultVotesResult);
 
       expect(result.current.status).toBe(ProposalFlowStatus.Completed);
     });
@@ -914,7 +914,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(undefined);
 
       await waitForValueToChange(() => result.current.daoProposal);
@@ -934,7 +934,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject(
+      expect(result.current.daoProposalVote).toMatchObject(
         defaultNoVotesResult
       );
 
@@ -1018,7 +1018,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(undefined);
 
       await waitForValueToChange(() => result.current.daoProposal);
@@ -1038,7 +1038,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject(
+      expect(result.current.daoProposalVote).toMatchObject(
         defaultNoVotesResult
       );
 
@@ -1137,7 +1137,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(undefined);
 
       await waitForValueToChange(() => result.current.daoProposal);
@@ -1157,7 +1157,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject(defaultVotesResult);
+      expect(result.current.daoProposalVote).toMatchObject(defaultVotesResult);
 
       expect(result.current.status).toBe(undefined);
 
@@ -1268,7 +1268,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(undefined);
 
       const defaultProcessedResult = web3Instance.eth.abi.encodeParameters(
@@ -1358,7 +1358,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toMatch(/submit/i);
       expect(result.current.proposalFlowStatusError).toBe(undefined);
 
@@ -1457,7 +1457,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       // Assert initial state
       expect(result.current.daoProposal).toBe(undefined);
       expect(result.current.daoProposalVoteResult).toBe(undefined);
-      expect(result.current.daoProposalVotes).toBe(undefined);
+      expect(result.current.daoProposalVote).toBe(undefined);
       expect(result.current.status).toBe(undefined);
 
       mockWeb3Provider.injectResult(
@@ -1509,7 +1509,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
         )
       ).toBe(true);
 
-      expect(result.current.daoProposalVotes).toMatchObject(defaultVotesResult);
+      expect(result.current.daoProposalVote).toMatchObject(defaultVotesResult);
 
       expect(result.current.status).toBe(undefined);
 

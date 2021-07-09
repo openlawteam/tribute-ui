@@ -44,7 +44,7 @@ export default function ProposalWithOffchainVoteActions(
 
   const {
     daoProposalVoteResult,
-    daoProposalVotes,
+    daoProposalVote,
     proposalFlowStatusError,
     status,
   } = useProposalWithOffchainVoteStatus(proposal);
@@ -67,8 +67,8 @@ export default function ProposalWithOffchainVoteActions(
    * start, as it requires any `Number` above `0`.
    */
   const gracePeriodStartMs: number =
-    daoProposalVotes && status === ProposalFlowStatus.OffchainVotingGracePeriod
-      ? Number(daoProposalVotes.gracePeriodStartingTime) * 1000 || Date.now()
+    daoProposalVote && status === ProposalFlowStatus.OffchainVotingGracePeriod
+      ? Number(daoProposalVote.gracePeriodStartingTime) * 1000 || Date.now()
       : 0;
 
   /**
@@ -81,7 +81,7 @@ export default function ProposalWithOffchainVoteActions(
       [VotingAdapterName.OffchainVotingContract]: {
         adapterName,
         daoProposalVoteResult,
-        daoProposalVotes,
+        daoProposalVote,
         gracePeriodStartMs,
         proposal,
         status,

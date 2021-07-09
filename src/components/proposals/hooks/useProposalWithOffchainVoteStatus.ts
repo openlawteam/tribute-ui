@@ -6,7 +6,7 @@ import {
   ProposalFlowStatus,
   ProposalData,
   ProposalFlag,
-  OffchainVotingAdapterVotes,
+  OffchainVotingAdapterVote,
 } from '../types';
 import {BURN_ADDRESS} from '../../../util/constants';
 import {ENVIRONMENT} from '../../../config';
@@ -22,7 +22,7 @@ import {VotingState} from '../voting/types';
 
 type UseProposalWithOffchainVoteStatusReturn = {
   daoProposal: {adapterAddress: string; flags: number} | undefined;
-  daoProposalVotes: OffchainVotingAdapterVotes | undefined;
+  daoProposalVote: OffchainVotingAdapterVote | undefined;
   /**
    * An enum name (`string`) of the DAO proposal's `VotingState` index
    */
@@ -61,8 +61,8 @@ export function useProposalWithOffchainVoteStatus(
 
   const [daoProposal, setDAOProposal] =
     useState<UseProposalWithOffchainVoteStatusReturn['daoProposal']>();
-  const [daoProposalVotes, setDAOProposalVotes] =
-    useState<UseProposalWithOffchainVoteStatusReturn['daoProposalVotes']>();
+  const [daoProposalVote, setDAOProposalVotes] =
+    useState<UseProposalWithOffchainVoteStatusReturn['daoProposalVote']>();
   const [daoProposalVoteResult, setDAOProposalVoteResult] =
     useState<
       UseProposalWithOffchainVoteStatusReturn['daoProposalVoteResult']
@@ -111,9 +111,9 @@ export function useProposalWithOffchainVoteStatus(
    * @see `submitVoteResult` in tribute-contracts off-chain voting adapters
    */
   const offchainResultSubmitted: boolean =
-    daoProposalVotes !== undefined &&
-    isAddress(daoProposalVotes.reporter) &&
-    normalizeString(daoProposalVotes.reporter) !== BURN_ADDRESS;
+    daoProposalVote !== undefined &&
+    isAddress(daoProposalVote.reporter) &&
+    normalizeString(daoProposalVote.reporter) !== BURN_ADDRESS;
 
   const isInVotingGracePeriod: boolean =
     daoProposalVoteResult !== undefined &&
@@ -197,7 +197,7 @@ export function useProposalWithOffchainVoteStatus(
     return {
       daoProposal,
       daoProposalVoteResult,
-      daoProposalVotes,
+      daoProposalVote,
       proposalFlowStatusError,
       status,
     };
@@ -346,8 +346,8 @@ export function useProposalWithOffchainVoteStatus(
   // Fallthrough
   return {
     daoProposal,
+    daoProposalVote,
     daoProposalVoteResult,
-    daoProposalVotes,
     proposalFlowStatusError,
     status: undefined,
   };

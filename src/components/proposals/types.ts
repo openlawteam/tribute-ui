@@ -80,7 +80,7 @@ export type RenderActionPropArguments = {
     adapterName: ContractAdapterNames;
     // An enum name (`string`) of the DAO proposal's `VotingState` index
     daoProposalVoteResult: typeof VotingState[any] | undefined;
-    daoProposalVotes: OffchainVotingAdapterVotes | undefined;
+    daoProposalVote: OffchainVotingAdapterVotes | undefined;
     gracePeriodStartMs: number;
     proposal: ProposalData;
     status: ProposalFlowStatus | undefined;
@@ -183,7 +183,7 @@ export type VotingAdapterVotes = {
  *
  * @link https://github.com/openlawteam/tribute-contracts/blob/master/contracts/adapters/voting/OffchainVoting.sol
  */
-export type OffchainVotingAdapterVotes = {
+export type OffchainVotingAdapterVote = {
   fallbackVotesCount: string;
   forceFailed: boolean;
   gracePeriodStartingTime: string;
