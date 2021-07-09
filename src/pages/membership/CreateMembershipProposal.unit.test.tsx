@@ -75,32 +75,31 @@ describe('CreateMembershipProposal unit tests', () => {
             ),
             {abiMethodName: 'eth_getBalance'}
           );
+
+          // Mock `multicall` in useCheckApplicant hook
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  // For `isNotReservedAddress` call
+                  web3Instance.eth.abi.encodeParameter('bool', true),
+                  // For `isNotZeroAddress` call
+                  web3Instance.eth.abi.encodeParameter('bool', true),
+                  // For `getAddressIfDelegated` call
+                  web3Instance.eth.abi.encodeParameter(
+                    'address',
+                    DEFAULT_ETH_ADDRESS
+                  ),
+                ],
+              ]
+            )
+          );
         }}>
         <CreateMembershipProposal />
       </Wrapper>
     );
-
-    await waitFor(() => {
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              // For `isNotReservedAddress` call
-              web3Instance.eth.abi.encodeParameter('bool', true),
-              // For `isNotZeroAddress` call
-              web3Instance.eth.abi.encodeParameter('bool', true),
-              // For `getAddressIfDelegated` call
-              web3Instance.eth.abi.encodeParameter(
-                'address',
-                DEFAULT_ETH_ADDRESS
-              ),
-            ],
-          ]
-        )
-      );
-    });
 
     await waitFor(() => {
       expect(screen.getByText(/123/i)).toBeInTheDocument();
