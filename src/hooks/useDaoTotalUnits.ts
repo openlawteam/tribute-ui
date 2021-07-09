@@ -133,10 +133,9 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
     try {
       setTotalUnitsStatus(AsyncStatus.PENDING);
 
-      const totalUnits = await BankExtensionContract.instance.methods.balanceOf(
-        TOTAL_ADDRESS,
-        UNITS_ADDRESS
-      );
+      const totalUnits = await BankExtensionContract.instance.methods
+        .balanceOf(TOTAL_ADDRESS, UNITS_ADDRESS)
+        .call();
 
       setTotalUnits(Number(totalUnits));
       setTotalUnitsStatus(AsyncStatus.FULFILLED);

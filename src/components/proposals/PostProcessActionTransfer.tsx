@@ -54,7 +54,7 @@ export default function PostProcessActionTransfer(
    */
 
   const DistributeContract = useSelector(
-    (state: StoreState) => state.contracts?.DistributeContract
+    (s: StoreState) => s.contracts?.DistributeContract
   );
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
@@ -202,7 +202,11 @@ export default function PostProcessActionTransfer(
       if (tx) {
         // re-fetch member
         await dispatch(
-          getConnectedMember({account, daoRegistryContract, web3Instance})
+          getConnectedMember({
+            account,
+            daoRegistryContract,
+            web3Instance,
+          })
         );
       }
     } catch (error) {

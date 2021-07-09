@@ -133,7 +133,11 @@ export default function ProcessAction(props: ProcessActionProps) {
       if (tx) {
         // re-fetch member
         await dispatch(
-          getConnectedMember({account, daoRegistryContract, web3Instance})
+          getConnectedMember({
+            account,
+            daoRegistryContract,
+            web3Instance,
+          })
         );
       }
     } catch (error) {

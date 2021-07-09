@@ -275,7 +275,7 @@ export default function CreateTributeProposal() {
         // Just log the error (don't throw) because it is not a blocker for the
         // snapshot draft to be submitted. The applicant address validity will
         // be checked again when the proposal is submitted onchain.
-        console.log(
+        console.warn(
           `Error checking if the applicant address is valid: ${checkApplicantError.message}`
         );
       }

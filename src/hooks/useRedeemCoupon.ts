@@ -89,10 +89,6 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
     submitStatus === FetchStatus.FULFILLED;
 
   /**
-   * Effects
-   */
-
-  /**
    * Functions
    */
 
@@ -172,13 +168,17 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
         if (
           redeemableCoupon.recipient.toLowerCase() === account.toLowerCase()
         ) {
-          // suggest adding DAO token to wallet
-          await addTokenToWallet(erc20Details);
-
           // re-fetch member
           await dispatch(
-            getConnectedMember({account, daoRegistryContract, web3Instance})
+            getConnectedMember({
+              account,
+              daoRegistryContract,
+              web3Instance,
+            })
           );
+
+          // suggest adding DAO token to wallet
+          await addTokenToWallet(erc20Details);
         }
       }
     } catch (error) {

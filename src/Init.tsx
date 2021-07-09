@@ -178,7 +178,11 @@ export default function Init(props: InitProps) {
       }
 
       await dispatch(
-        getConnectedMember({account, daoRegistryContract, web3Instance})
+        getConnectedMember({
+          account,
+          daoRegistryContract,
+          web3Instance,
+        })
       );
     } catch (error) {
       setError(error);
