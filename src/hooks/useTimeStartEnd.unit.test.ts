@@ -1,0 +1,156 @@
+import {act, renderHook} from '@testing-library/react-hooks';
+
+import {useTimeStartEnd} from './useTimeStartEnd';
+
+describe('useTimeStartEnd unit tests', () => {
+  test('hook returns correct data throughout the time period', async () => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+
+    await act(async () => {
+      const {result, waitFor} = await renderHook(() =>
+        useTimeStartEnd(nowSeconds, nowSeconds + 3)
+      );
+
+      // Assert initial state
+      expect(result.current.timeStartEndInitReady).toBe(false);
+      expect(result.current.hasTimeStarted).toBe(false);
+      expect(result.current.hasTimeEnded).toBe(false);
+
+      await waitFor(
+        () => {
+          expect(result.current.timeStartEndInitReady).toBe(true);
+          expect(result.current.hasTimeStarted).toBe(true);
+          expect(result.current.hasTimeEnded).toBe(false);
+        },
+        {timeout: 5000}
+      );
+
+      await waitFor(
+        () => {
+          expect(result.current.timeStartEndInitReady).toBe(true);
+          expect(result.current.hasTimeStarted).toBe(true);
+          expect(result.current.hasTimeEnded).toBe(true);
+        },
+        {timeout: 5000}
+      );
+    });
+  });
+
+  test('should provide "true" if time already started', async () => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+
+    await act(async () => {
+      const {result, waitFor} = await renderHook(() =>
+        useTimeStartEnd(nowSeconds - 1, nowSeconds + 3)
+      );
+
+      // Assert initial state
+      expect(result.current.timeStartEndInitReady).toBe(false);
+      expect(result.current.hasTimeStarted).toBe(false);
+      expect(result.current.hasTimeEnded).toBe(false);
+
+      await waitFor(
+        () => {
+          expect(result.current.timeStartEndInitReady).toBe(true);
+          expect(result.current.hasTimeStarted).toBe(true);
+          expect(result.current.hasTimeEnded).toBe(false);
+        },
+        {timeout: 5000}
+      );
+    });
+  });
+
+  test('should provide "true" if time already ended', async () => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+
+    await act(async () => {
+      const {result, waitFor} = await renderHook(() =>
+        useTimeStartEnd(nowSeconds - 180, nowSeconds - 5)
+      );
+
+      // Assert initial state
+      expect(result.current.timeStartEndInitReady).toBe(false);
+      expect(result.current.hasTimeStarted).toBe(false);
+      expect(result.current.hasTimeEnded).toBe(false);
+
+      await waitFor(
+        () => {
+          expect(result.current.timeStartEndInitReady).toBe(true);
+          expect(result.current.hasTimeStarted).toBe(true);
+          expect(result.current.hasTimeEnded).toBe(true);
+        },
+        {timeout: 5000}
+      );
+    });
+  });
+
+  test('should provide correct result if start and end seconds are both "undefined"', async () => {
+    await act(async () => {
+      const {result, waitFor} = await renderHook(() =>
+        useTimeStartEnd(undefined, undefined)
+      );
+
+      // Assert initial state
+      expect(result.current.timeStartEndInitReady).toBe(false);
+      expect(result.current.hasTimeStarted).toBe(false);
+      expect(result.current.hasTimeEnded).toBe(false);
+
+      await waitFor(
+        () => {
+          expect(result.current.timeStartEndInitReady).toBe(true);
+          expect(result.current.hasTimeStarted).toBe(false);
+          expect(result.current.hasTimeEnded).toBe(false);
+        },
+        {timeout: 5000}
+      );
+    });
+  });
+
+  test('should provide correct result if start seconds is "undefined"', async () => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+
+    await act(async () => {
+      const {result, waitFor} = await renderHook(() =>
+        useTimeStartEnd(undefined, nowSeconds - 1)
+      );
+
+      // Assert initial state
+      expect(result.current.timeStartEndInitReady).toBe(false);
+      expect(result.current.hasTimeStarted).toBe(false);
+      expect(result.current.hasTimeEnded).toBe(false);
+
+      await waitFor(
+        () => {
+          expect(result.current.timeStartEndInitReady).toBe(true);
+          expect(result.current.hasTimeStarted).toBe(false);
+          expect(result.current.hasTimeEnded).toBe(false);
+        },
+        {timeout: 5000}
+      );
+    });
+  });
+
+  test('should provide correct result if end seconds is "undefined"', async () => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+
+    await act(async () => {
+      const {result, waitFor} = await renderHook(() =>
+        useTimeStartEnd(nowSeconds - 1, undefined)
+      );
+
+      // Assert initial state
+      expect(result.current.timeStartEndInitReady).toBe(false);
+      expect(result.current.hasTimeStarted).toBe(false);
+      expect(result.current.hasTimeEnded).toBe(false);
+
+      await waitFor(
+        () => {
+          expect(result.current.timeStartEndInitReady).toBe(true);
+          expect(result.current.hasTimeStarted).toBe(false);
+          expect(result.current.hasTimeEnded).toBe(false);
+        },
+        {timeout: 5000}
+      );
+    });
+  });
+});

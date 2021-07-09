@@ -5,4 +5,4 @@ export * from './useDaoTotalUnits';
 export * from './useIsMounted';
 export * from './useMemberActionDisabled';
 export * from './useRedeemCoupon';
-export * from './useVotingTimeStartEnd';
+export * from './useTimeStartEnd';

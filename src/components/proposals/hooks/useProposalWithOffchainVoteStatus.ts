@@ -14,7 +14,7 @@ import {multicall, MulticallTuple} from '../../web3/helpers';
 import {normalizeString} from '../../../util/helpers';
 import {proposalHasFlag} from '../helpers';
 import {StoreState} from '../../../store/types';
-import {useVotingTimeStartEnd} from '../../../hooks';
+import {useTimeStartEnd} from '../../../hooks';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VotingState} from '../voting/types';
 
@@ -82,11 +82,7 @@ export function useProposalWithOffchainVoteStatus(
    * Our hooks
    */
 
-  const {
-    hasVotingTimeStarted,
-    hasVotingTimeEnded,
-    votingTimeStartEndInitReady,
-  } = useVotingTimeStartEnd(
+  const {hasTimeStarted, hasTimeEnded, timeStartEndInitReady} = useTimeStartEnd(
     proposal.snapshotProposal?.msg.payload.start,
     proposal.snapshotProposal?.msg.payload.end
   );
@@ -276,20 +272,20 @@ export function useProposalWithOffchainVoteStatus(
   }
 
   // Status: Submit
-  if (votingTimeStartEndInitReady && !hasVotingTimeStarted && !atExistsInDAO) {
+  if (timeStartEndInitReady && !hasTimeStarted && !atExistsInDAO) {
     return getReturnData(ProposalFlowStatus.Submit);
   }
 
   // Status: Sponsor
-  if (votingTimeStartEndInitReady && !hasVotingTimeStarted && atExistsInDAO) {
+  if (timeStartEndInitReady && !hasTimeStarted && atExistsInDAO) {
     return getReturnData(ProposalFlowStatus.Sponsor);
   }
 
   // Status: Off-chain Voting
   if (
-    votingTimeStartEndInitReady &&
-    hasVotingTimeStarted &&
-    !hasVotingTimeEnded &&
+    timeStartEndInitReady &&
+    hasTimeStarted &&
+    !hasTimeEnded &&
     atSponsoredInDAO
   ) {
     return getReturnData(ProposalFlowStatus.OffchainVoting);
@@ -297,8 +293,8 @@ export function useProposalWithOffchainVoteStatus(
 
   // Status: If no votes, skip `OffchainVotingSubmitResult` and set to `OffchainVotingGracePeriod` or `Process`
   if (
-    votingTimeStartEndInitReady &&
-    hasVotingTimeEnded &&
+    timeStartEndInitReady &&
+    hasTimeEnded &&
     atSponsoredInDAO &&
     !snapshotVotes?.length &&
     !offchainResultSubmitted
@@ -312,8 +308,8 @@ export function useProposalWithOffchainVoteStatus(
 
   // Status: Ready to Submit Vote Result
   if (
-    votingTimeStartEndInitReady &&
-    hasVotingTimeEnded &&
+    timeStartEndInitReady &&
+    hasTimeEnded &&
     atSponsoredInDAO &&
     !offchainResultSubmitted
   ) {
@@ -322,8 +318,8 @@ export function useProposalWithOffchainVoteStatus(
 
   // Status: Grace period
   if (
-    votingTimeStartEndInitReady &&
-    hasVotingTimeEnded &&
+    timeStartEndInitReady &&
+    hasTimeEnded &&
     atSponsoredInDAO &&
     offchainResultSubmitted &&
     isInVotingGracePeriod
@@ -334,8 +330,8 @@ export function useProposalWithOffchainVoteStatus(
   // Status: Process
   if (
     atSponsoredInDAO &&
-    votingTimeStartEndInitReady &&
-    hasVotingTimeEnded &&
+    timeStartEndInitReady &&
+    hasTimeEnded &&
     offchainResultSubmitted &&
     !isInVotingGracePeriod
   ) {

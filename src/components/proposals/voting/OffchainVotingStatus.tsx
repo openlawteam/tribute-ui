@@ -7,7 +7,7 @@ import {getDAOConfigEntry} from '../../web3/helpers';
 import {ProposalData, VotingResult} from '../types';
 import {StoreState} from '../../../store/types';
 import {useOffchainVotingResults} from '../hooks';
-import {useVotingTimeStartEnd} from '../../../hooks';
+import {useTimeStartEnd} from '../../../hooks';
 import {VotingStatus} from './VotingStatus';
 
 type OffchainVotingStatusProps = {
@@ -83,11 +83,7 @@ export function OffchainVotingStatus({
    * Our hooks
    */
 
-  const {
-    hasVotingTimeStarted,
-    hasVotingTimeEnded,
-    votingTimeStartEndInitReady,
-  } = useVotingTimeStartEnd(
+  const {hasTimeStarted, hasTimeEnded, timeStartEndInitReady} = useTimeStartEnd(
     proposal.snapshotProposal?.msg.payload.start,
     proposal.snapshotProposal?.msg.payload.end
   );
@@ -116,10 +112,10 @@ export function OffchainVotingStatus({
    */
 
   useEffect(() => {
-    if (!hasVotingTimeEnded) return;
+    if (!hasTimeEnded) return;
 
     setDidVotePass(yesUnits > noUnits);
-  }, [hasVotingTimeEnded, noUnits, yesUnits]);
+  }, [hasTimeEnded, noUnits, yesUnits]);
 
   // Determine grace period end
   useEffect(() => {
@@ -139,7 +135,7 @@ export function OffchainVotingStatus({
 
   function renderStatus() {
     // On loading
-    if (!votingTimeStartEndInitReady) {
+    if (!timeStartEndInitReady) {
       return (
         <CycleEllipsis
           ariaLabel="Getting off-chain voting status"
@@ -166,11 +162,7 @@ export function OffchainVotingStatus({
     >[0]
   ) {
     // Vote countdown timer
-    if (
-      votingTimeStartEndInitReady &&
-      hasVotingTimeStarted &&
-      !hasVotingTimeEnded
-    ) {
+    if (timeStartEndInitReady && hasTimeStarted && !hasTimeEnded) {
       return (
         <ProposalPeriodComponent
           startPeriodMs={votingStartSeconds * 1000}
@@ -200,7 +192,7 @@ export function OffchainVotingStatus({
     <VotingStatus
       renderTimer={renderTimer}
       renderStatus={renderStatus}
-      hasVotingEnded={hasVotingTimeEnded}
+      hasVotingEnded={hasTimeEnded}
       noUnits={noUnits}
       totalUnits={totalUnits}
       yesUnits={yesUnits}
