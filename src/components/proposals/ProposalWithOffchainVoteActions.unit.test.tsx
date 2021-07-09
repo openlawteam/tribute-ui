@@ -22,7 +22,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: ProposalFlowStatus.Submit,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
       }));
 
@@ -72,7 +72,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: ProposalFlowStatus.Sponsor,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
       }));
 
@@ -121,7 +121,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: ProposalFlowStatus.OffchainVoting,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
       }));
 
@@ -173,7 +173,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: ProposalFlowStatus.OffchainVotingSubmitResult,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
       }));
 
@@ -309,7 +309,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: ProposalFlowStatus.OffchainVotingGracePeriod,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: {
+        daoProposalVote: {
           gracePeriodStartingTime: Math.floor(
             (Date.now() - 1000) / 1000
           ).toString(),
@@ -370,7 +370,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: ProposalFlowStatus.OffchainVotingGracePeriod,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: {
+        daoProposalVote: {
           // Set to `"0"` to mimic on-chain response when no result submitted
           gracePeriodStartingTime: '0',
         } as any,
@@ -431,7 +431,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: ProposalFlowStatus.Process,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
       }));
 
@@ -480,7 +480,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: ProposalFlowStatus.Completed,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
       }));
 
@@ -536,7 +536,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: ProposalFlowStatus.OffchainVoting,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
       }));
 
@@ -596,7 +596,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: ProposalFlowStatus.OffchainVoting,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
       }));
 
@@ -660,7 +660,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: ProposalFlowStatus.OffchainVoting,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
       }));
 
@@ -723,7 +723,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         status: undefined,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: new Error('Something bad happened.'),
       }));
 
