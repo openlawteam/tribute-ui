@@ -8,6 +8,7 @@ import {
   ProposalFlowStatus,
   RenderActionPropArguments,
 } from './types';
+import {VotingState} from './voting/types';
 import {ContractAdapterNames} from '../web3/types';
 import {useProposalWithOffchainVoteStatus} from './hooks';
 import {VotingAdapterName} from '../adapters-extensions/enums';
@@ -110,6 +111,17 @@ export default function ProposalWithOffchainVoteActions(
 
     // Off-chain voting submit vote result
     if (status === ProposalFlowStatus.OffchainVotingSubmitResult) {
+      // Return a React.Fragment to hide the "Submit Vote Result" button if
+      // proposal failed. For now, we can assume across all adapters that a
+      // proposal with a failed vote does not need to have the vote result
+      // submitted.
+      if (
+        daoProposalVoteResult &&
+        VotingState[daoProposalVoteResult] !== VotingState[VotingState.PASS]
+      ) {
+        return <></>;
+      }
+
       return (
         <OffchainOpRollupVotingSubmitResultAction
           adapterName={adapterName}
