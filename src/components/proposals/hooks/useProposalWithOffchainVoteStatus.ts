@@ -14,7 +14,7 @@ import {multicall, MulticallTuple} from '../../web3/helpers';
 import {normalizeString} from '../../../util/helpers';
 import {proposalHasFlag} from '../helpers';
 import {StoreState} from '../../../store/types';
-import {useVotingTimeStartEnd} from '.';
+import {useVotingTimeStartEnd} from '../../../hooks';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VotingState} from '../voting/types';
 

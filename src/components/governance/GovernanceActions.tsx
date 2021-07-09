@@ -1,6 +1,6 @@
 import {OffchainVotingAction, OffchainVotingStatus} from '../proposals/voting';
 import {ProposalData} from '../proposals/types';
-import {useVotingTimeStartEnd} from '../proposals/hooks';
+import {useVotingTimeStartEnd} from '../../hooks';
 
 type GovernanceActionsProps = {
   proposal: ProposalData;

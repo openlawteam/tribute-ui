@@ -6,7 +6,8 @@ import {CycleEllipsis} from '../../feedback';
 import {getDAOConfigEntry} from '../../web3/helpers';
 import {ProposalData, VotingResult} from '../types';
 import {StoreState} from '../../../store/types';
-import {useOffchainVotingResults, useVotingTimeStartEnd} from '../hooks';
+import {useOffchainVotingResults} from '../hooks';
+import {useVotingTimeStartEnd} from '../../../hooks';
 import {VotingStatus} from './VotingStatus';
 
 type OffchainVotingStatusProps = {

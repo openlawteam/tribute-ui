@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 
-import {AsyncStatus} from '../../../util/types';
+import {AsyncStatus} from '../util/types';
 
 type UseVotingTimeStartEndReturn = {
   hasVotingTimeEnded: boolean;
