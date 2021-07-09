@@ -120,7 +120,7 @@ export default function SubmitAction(props: SubmitActionProps) {
       // hook for reasons) the `submitProposal` smart contract transaction will
       // fail.
       if (checkApplicantError) {
-        console.log(
+        console.warn(
           `Error checking if the applicant address is valid: ${checkApplicantError.message}`
         );
       }
