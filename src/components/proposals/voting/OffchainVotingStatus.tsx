@@ -83,7 +83,11 @@ export function OffchainVotingStatus({
    * Our hooks
    */
 
-  const {hasTimeStarted, hasTimeEnded, timeStartEndInitReady} = useTimeStartEnd(
+  const {
+    hasTimeStarted: hasVotingStarted,
+    hasTimeEnded: hasVotingEnded,
+    timeStartEndInitReady,
+  } = useTimeStartEnd(
     proposal.snapshotProposal?.msg.payload.start,
     proposal.snapshotProposal?.msg.payload.end
   );
@@ -112,10 +116,10 @@ export function OffchainVotingStatus({
    */
 
   useEffect(() => {
-    if (!hasTimeEnded) return;
+    if (!hasVotingEnded) return;
 
     setDidVotePass(yesUnits > noUnits);
-  }, [hasTimeEnded, noUnits, yesUnits]);
+  }, [hasVotingEnded, noUnits, yesUnits]);
 
   // Determine grace period end
   useEffect(() => {
@@ -139,8 +143,8 @@ export function OffchainVotingStatus({
       return (
         <CycleEllipsis
           ariaLabel="Getting off-chain voting status"
-          intervalMs={200}
           fadeInProps={cycleEllipsisFadeInProps}
+          intervalMs={200}
         />
       );
     }
@@ -162,11 +166,11 @@ export function OffchainVotingStatus({
     >[0]
   ) {
     // Vote countdown timer
-    if (timeStartEndInitReady && hasTimeStarted && !hasTimeEnded) {
+    if (timeStartEndInitReady && hasVotingStarted && !hasVotingEnded) {
       return (
         <ProposalPeriodComponent
-          startPeriodMs={votingStartSeconds * 1000}
           endPeriodMs={votingEndSeconds * 1000}
+          startPeriodMs={votingStartSeconds * 1000}
         />
       );
     }
@@ -175,10 +179,10 @@ export function OffchainVotingStatus({
     if (countdownGracePeriodStartMs && gracePeriodEndMs) {
       return (
         <ProposalPeriodComponent
-          startPeriodMs={countdownGracePeriodStartMs}
-          endLabel={gracePeriodEndLabel}
           endedLabel={gracePeriodEndedLabel}
+          endLabel={gracePeriodEndLabel}
           endPeriodMs={countdownGracePeriodStartMs + gracePeriodEndMs}
+          startPeriodMs={countdownGracePeriodStartMs}
         />
       );
     }
@@ -190,10 +194,10 @@ export function OffchainVotingStatus({
 
   return (
     <VotingStatus
-      renderTimer={renderTimer}
-      renderStatus={renderStatus}
-      hasVotingEnded={hasTimeEnded}
+      hasVotingEnded={hasVotingEnded}
       noUnits={noUnits}
+      renderStatus={renderStatus}
+      renderTimer={renderTimer}
       totalUnits={totalUnits}
       yesUnits={yesUnits}
     />

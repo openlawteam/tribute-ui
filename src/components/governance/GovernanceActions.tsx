@@ -13,7 +13,11 @@ export function GovernanceActions(props: GovernanceActionsProps) {
    * Our hooks
    */
 
-  const {hasTimeEnded, hasTimeStarted, timeStartEndInitReady} = useTimeStartEnd(
+  const {
+    hasTimeEnded: hasVotingEnded,
+    hasTimeStarted: hasVotingStarted,
+    timeStartEndInitReady,
+  } = useTimeStartEnd(
     proposal.snapshotProposal?.msg.payload.start,
     proposal.snapshotProposal?.msg.payload.end
   );
@@ -24,11 +28,11 @@ export function GovernanceActions(props: GovernanceActionsProps) {
 
   return (
     <>
-      {timeStartEndInitReady && hasTimeStarted && (
+      {timeStartEndInitReady && hasVotingStarted && (
         <OffchainVotingStatus proposal={proposal} />
       )}
 
-      {timeStartEndInitReady && hasTimeStarted && !hasTimeEnded && (
+      {timeStartEndInitReady && hasVotingStarted && !hasVotingEnded && (
         <OffchainVotingAction proposal={proposal} />
       )}
     </>
