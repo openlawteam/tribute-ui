@@ -7,7 +7,7 @@ describe('useTimeStartEnd unit tests', () => {
     const nowSeconds = Math.floor(Date.now() / 1000);
 
     await act(async () => {
-      const {result, waitFor} = await renderHook(() =>
+      const {result, waitForValueToChange} = await renderHook(() =>
         useTimeStartEnd(nowSeconds, nowSeconds + 3)
       );
 
@@ -16,23 +16,21 @@ describe('useTimeStartEnd unit tests', () => {
       expect(result.current.hasTimeStarted).toBe(false);
       expect(result.current.hasTimeEnded).toBe(false);
 
-      await waitFor(
-        () => {
-          expect(result.current.timeStartEndInitReady).toBe(true);
-          expect(result.current.hasTimeStarted).toBe(true);
-          expect(result.current.hasTimeEnded).toBe(false);
-        },
-        {timeout: 5000}
-      );
+      await waitForValueToChange(() => result.current.timeStartEndInitReady, {
+        timeout: 3000,
+      });
 
-      await waitFor(
-        () => {
-          expect(result.current.timeStartEndInitReady).toBe(true);
-          expect(result.current.hasTimeStarted).toBe(true);
-          expect(result.current.hasTimeEnded).toBe(true);
-        },
-        {timeout: 5000}
-      );
+      expect(result.current.timeStartEndInitReady).toBe(true);
+      expect(result.current.hasTimeStarted).toBe(true);
+      expect(result.current.hasTimeEnded).toBe(false);
+
+      await waitForValueToChange(() => result.current.hasTimeEnded, {
+        timeout: 3000,
+      });
+
+      expect(result.current.timeStartEndInitReady).toBe(true);
+      expect(result.current.hasTimeStarted).toBe(true);
+      expect(result.current.hasTimeEnded).toBe(true);
     });
   });
 
@@ -40,7 +38,7 @@ describe('useTimeStartEnd unit tests', () => {
     const nowSeconds = Math.floor(Date.now() / 1000);
 
     await act(async () => {
-      const {result, waitFor} = await renderHook(() =>
+      const {result, waitForValueToChange} = await renderHook(() =>
         useTimeStartEnd(nowSeconds - 1, nowSeconds + 3)
       );
 
@@ -49,14 +47,13 @@ describe('useTimeStartEnd unit tests', () => {
       expect(result.current.hasTimeStarted).toBe(false);
       expect(result.current.hasTimeEnded).toBe(false);
 
-      await waitFor(
-        () => {
-          expect(result.current.timeStartEndInitReady).toBe(true);
-          expect(result.current.hasTimeStarted).toBe(true);
-          expect(result.current.hasTimeEnded).toBe(false);
-        },
-        {timeout: 5000}
-      );
+      await waitForValueToChange(() => result.current.timeStartEndInitReady, {
+        timeout: 3000,
+      });
+
+      expect(result.current.timeStartEndInitReady).toBe(true);
+      expect(result.current.hasTimeStarted).toBe(true);
+      expect(result.current.hasTimeEnded).toBe(false);
     });
   });
 
@@ -64,7 +61,7 @@ describe('useTimeStartEnd unit tests', () => {
     const nowSeconds = Math.floor(Date.now() / 1000);
 
     await act(async () => {
-      const {result, waitFor} = await renderHook(() =>
+      const {result, waitForValueToChange} = await renderHook(() =>
         useTimeStartEnd(nowSeconds - 180, nowSeconds - 5)
       );
 
@@ -73,20 +70,19 @@ describe('useTimeStartEnd unit tests', () => {
       expect(result.current.hasTimeStarted).toBe(false);
       expect(result.current.hasTimeEnded).toBe(false);
 
-      await waitFor(
-        () => {
-          expect(result.current.timeStartEndInitReady).toBe(true);
-          expect(result.current.hasTimeStarted).toBe(true);
-          expect(result.current.hasTimeEnded).toBe(true);
-        },
-        {timeout: 5000}
-      );
+      await waitForValueToChange(() => result.current.timeStartEndInitReady, {
+        timeout: 3000,
+      });
+
+      expect(result.current.timeStartEndInitReady).toBe(true);
+      expect(result.current.hasTimeStarted).toBe(true);
+      expect(result.current.hasTimeEnded).toBe(true);
     });
   });
 
   test('should provide correct result if start and end seconds are both "undefined"', async () => {
     await act(async () => {
-      const {result, waitFor} = await renderHook(() =>
+      const {result, waitForValueToChange} = await renderHook(() =>
         useTimeStartEnd(undefined, undefined)
       );
 
@@ -95,14 +91,13 @@ describe('useTimeStartEnd unit tests', () => {
       expect(result.current.hasTimeStarted).toBe(false);
       expect(result.current.hasTimeEnded).toBe(false);
 
-      await waitFor(
-        () => {
-          expect(result.current.timeStartEndInitReady).toBe(true);
-          expect(result.current.hasTimeStarted).toBe(false);
-          expect(result.current.hasTimeEnded).toBe(false);
-        },
-        {timeout: 5000}
-      );
+      await waitForValueToChange(() => result.current.timeStartEndInitReady, {
+        timeout: 3000,
+      });
+
+      expect(result.current.timeStartEndInitReady).toBe(true);
+      expect(result.current.hasTimeStarted).toBe(false);
+      expect(result.current.hasTimeEnded).toBe(false);
     });
   });
 
@@ -110,7 +105,7 @@ describe('useTimeStartEnd unit tests', () => {
     const nowSeconds = Math.floor(Date.now() / 1000);
 
     await act(async () => {
-      const {result, waitFor} = await renderHook(() =>
+      const {result, waitForValueToChange} = await renderHook(() =>
         useTimeStartEnd(undefined, nowSeconds - 1)
       );
 
@@ -119,14 +114,13 @@ describe('useTimeStartEnd unit tests', () => {
       expect(result.current.hasTimeStarted).toBe(false);
       expect(result.current.hasTimeEnded).toBe(false);
 
-      await waitFor(
-        () => {
-          expect(result.current.timeStartEndInitReady).toBe(true);
-          expect(result.current.hasTimeStarted).toBe(false);
-          expect(result.current.hasTimeEnded).toBe(false);
-        },
-        {timeout: 5000}
-      );
+      await waitForValueToChange(() => result.current.timeStartEndInitReady, {
+        timeout: 3000,
+      });
+
+      expect(result.current.timeStartEndInitReady).toBe(true);
+      expect(result.current.hasTimeStarted).toBe(false);
+      expect(result.current.hasTimeEnded).toBe(false);
     });
   });
 
@@ -134,7 +128,7 @@ describe('useTimeStartEnd unit tests', () => {
     const nowSeconds = Math.floor(Date.now() / 1000);
 
     await act(async () => {
-      const {result, waitFor} = await renderHook(() =>
+      const {result, waitForValueToChange} = await renderHook(() =>
         useTimeStartEnd(nowSeconds - 1, undefined)
       );
 
@@ -143,14 +137,13 @@ describe('useTimeStartEnd unit tests', () => {
       expect(result.current.hasTimeStarted).toBe(false);
       expect(result.current.hasTimeEnded).toBe(false);
 
-      await waitFor(
-        () => {
-          expect(result.current.timeStartEndInitReady).toBe(true);
-          expect(result.current.hasTimeStarted).toBe(false);
-          expect(result.current.hasTimeEnded).toBe(false);
-        },
-        {timeout: 5000}
-      );
+      await waitForValueToChange(() => result.current.timeStartEndInitReady, {
+        timeout: 3000,
+      });
+
+      expect(result.current.timeStartEndInitReady).toBe(true);
+      expect(result.current.hasTimeStarted).toBe(false);
+      expect(result.current.hasTimeEnded).toBe(false);
     });
   });
 });

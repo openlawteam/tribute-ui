@@ -15,6 +15,10 @@ type UseTimeStartEndReturn = {
 
 type StartEndStatus = {start: AsyncStatus; end: AsyncStatus};
 
+function areAllAsyncReady(asyncMapping: Record<string, AsyncStatus>) {
+  return Object.values(asyncMapping).every((s) => s === AsyncStatus.FULFILLED);
+}
+
 export function useTimeStartEnd(
   startSeconds: number | undefined,
   endSeconds: number | undefined
@@ -37,7 +41,7 @@ export function useTimeStartEnd(
   const [hasTimeEnded, setHasTimeEnded] = useState<boolean>(false);
 
   const [timeStartEndInitReady, setTimeStartEndInitReady] = useState<boolean>(
-    isInitReady(startEndStatusRef.current)
+    areAllAsyncReady(startEndStatusRef.current)
   );
 
   /**
@@ -53,7 +57,7 @@ export function useTimeStartEnd(
     ) {
       setTimeStartEndInitReady(() => {
         startEndStatusRef.current.start = AsyncStatus.FULFILLED;
-        return isInitReady(startEndStatusRef.current);
+        return areAllAsyncReady(startEndStatusRef.current);
       });
 
       return;
@@ -61,7 +65,7 @@ export function useTimeStartEnd(
 
     setTimeStartEndInitReady(() => {
       startEndStatusRef.current.start = AsyncStatus.PENDING;
-      return isInitReady(startEndStatusRef.current);
+      return areAllAsyncReady(startEndStatusRef.current);
     });
 
     // Check if time has started every 1 second
@@ -69,10 +73,11 @@ export function useTimeStartEnd(
       // Async process ran
       setTimeStartEndInitReady(() => {
         startEndStatusRef.current.start = AsyncStatus.FULFILLED;
-        return isInitReady(startEndStatusRef.current);
+        return areAllAsyncReady(startEndStatusRef.current);
       });
 
-      const hasStartedCheck = Math.floor(Date.now() / 1000) > startSeconds;
+      const hasStartedCheck: boolean =
+        Math.floor(Date.now() / 1000) > startSeconds;
 
       if (!hasStartedCheck) return;
 
@@ -80,7 +85,9 @@ export function useTimeStartEnd(
     }, 1000);
 
     return () => {
-      clearInterval(intervalID);
+      if (intervalID) {
+        clearInterval(intervalID);
+      }
     };
   }, [endSeconds, hasTimeStarted, startSeconds]);
 
@@ -93,7 +100,7 @@ export function useTimeStartEnd(
     ) {
       setTimeStartEndInitReady(() => {
         startEndStatusRef.current.end = AsyncStatus.FULFILLED;
-        return isInitReady(startEndStatusRef.current);
+        return areAllAsyncReady(startEndStatusRef.current);
       });
 
       return;
@@ -101,7 +108,7 @@ export function useTimeStartEnd(
 
     setTimeStartEndInitReady(() => {
       startEndStatusRef.current.end = AsyncStatus.PENDING;
-      return isInitReady(startEndStatusRef.current);
+      return areAllAsyncReady(startEndStatusRef.current);
     });
 
     // Check if time has ended every 1 second
@@ -109,10 +116,10 @@ export function useTimeStartEnd(
       // Async process ran
       setTimeStartEndInitReady(() => {
         startEndStatusRef.current.end = AsyncStatus.FULFILLED;
-        return isInitReady(startEndStatusRef.current);
+        return areAllAsyncReady(startEndStatusRef.current);
       });
 
-      const hasEndedCheck = Math.ceil(Date.now() / 1000) > endSeconds;
+      const hasEndedCheck: boolean = Math.ceil(Date.now() / 1000) > endSeconds;
 
       if (!hasEndedCheck) return;
 
@@ -120,19 +127,11 @@ export function useTimeStartEnd(
     }, 1000);
 
     return () => {
-      clearInterval(intervalID);
+      if (intervalID) {
+        clearInterval(intervalID);
+      }
     };
   }, [endSeconds, hasTimeEnded, startSeconds]);
-
-  /**
-   * Functions
-   */
-
-  function isInitReady(timeStartEndInitReady: StartEndStatus) {
-    return Object.values(timeStartEndInitReady).every(
-      (s) => s === AsyncStatus.FULFILLED
-    );
-  }
 
   return {
     hasTimeStarted,
