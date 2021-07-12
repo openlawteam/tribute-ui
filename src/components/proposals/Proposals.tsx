@@ -137,7 +137,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
       const {
         daoProposal,
         daoProposalVotingState: voteState,
-        daoProposalVotes: votesData,
+        daoProposalVote: votesData,
       } = p;
 
       if (!daoProposal) return;

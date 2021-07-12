@@ -130,7 +130,7 @@ export type ProposalData = {
   // @todo Make non-nullable?
   daoProposalVotingAdapter?: ProposalVotingAdapterData;
   // @todo Make non-nullable?
-  daoProposalVotes?: ProposalVotesData;
+  daoProposalVote?: ProposalVotesData;
   // @todo Make non-nullable?
   daoProposalVotingState?: VotingState;
   daoProposal: Proposal | undefined;
