@@ -25,7 +25,7 @@ describe('GovernanceProposals unit tests', () => {
           type: SnapshotType.vote,
           payload: {
             choice: 1, // Yes
-            proposalHash:
+            proposalId:
               '0x1679cac3f54777f5d9c95efd83beff9f87ac55487311ecacd95827d267a15c4e',
             metadata: {
               memberAddress: DEFAULT_ETH_ADDRESS,

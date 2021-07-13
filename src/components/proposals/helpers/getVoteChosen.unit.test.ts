@@ -25,7 +25,7 @@ describe('getVoteChosen unit tests', () => {
           address: DEFAULT_ETH_ADDRESS,
           msg: {
             payload: {
-              proposalHash: '',
+              proposalId: '',
               choice: VoteChoicesIndex.Yes,
               metadata: {
                 memberAddress: DEFAULT_ETH_ADDRESS,
@@ -56,7 +56,7 @@ describe('getVoteChosen unit tests', () => {
           address: DEFAULT_ETH_ADDRESS,
           msg: {
             payload: {
-              proposalHash: '',
+              proposalId: '',
               choice: VoteChoicesIndex.No,
               metadata: {
                 memberAddress: DEFAULT_ETH_ADDRESS,
@@ -87,7 +87,7 @@ describe('getVoteChosen unit tests', () => {
           address: DEFAULT_ETH_ADDRESS,
           msg: {
             payload: {
-              proposalHash: '',
+              proposalId: '',
               choice: VoteChoicesIndex.No,
               metadata: {
                 memberAddress: DEFAULT_ETH_ADDRESS,
