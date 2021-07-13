@@ -16,6 +16,7 @@ type DaoTokenHolderProps = {
   backgroundColor?: string;
   border?: string;
   color?: string;
+  customStyles?: Record<string, string>;
 };
 
 const image = `${window.location.origin}/favicon.ico`;
@@ -33,9 +34,10 @@ const toDataURL = (url: string) =>
         })
     );
 
-export default function DaoTokenHolder(
-  badgeStyles: DaoTokenHolderProps
-): JSX.Element {
+export default function DaoTokenHolder({
+  customStyles,
+  ...badgeStyles
+}: DaoTokenHolderProps): JSX.Element {
   /**
    * State
    */
@@ -115,7 +117,7 @@ export default function DaoTokenHolder(
           rel="noopener noreferrer"
           target="_blank"
           href={tokenEtherscanURL}
-          style={{...badgeStyles}}>
+          style={{...badgeStyles, ...customStyles}}>
           <span className="daotokenholder__balance">
             {formatNumber(tokenHolder.balance)}
           </span>
