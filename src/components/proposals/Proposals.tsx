@@ -89,6 +89,8 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
     offchainVotingResultsStatus,
   } = useOffchainVotingResults(proposalsForVotingResults);
 
+  console.log({proposalsForVotingResults, offchainVotingResults});
+
   const {defaultChainError} = useIsDefaultChain();
 
   /**
@@ -113,13 +115,14 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
 
   const error: Error | undefined =
     proposalsError || offchainVotingResultsError || defaultChainError;
+  console.log({proposalsError, offchainVotingResultsError});
 
   /**
    * Effects
    */
 
   useEffect(() => {
-    setProposalsForVotingResults(proposals.map((gp) => gp.snapshotProposal));
+    setProposalsForVotingResults(proposals.map((p) => p.snapshotProposal));
   }, [proposals]);
 
   // Separate proposals into categories: non-sponsored, voting, passed, failed
@@ -177,7 +180,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
       const offchainResult = offchainVotingResults.find(
         ([proposalHash, _result]) =>
           normalizeString(proposalHash) ===
-          normalizeString(p.snapshotProposal?.idInSnapshot || '')
+          normalizeString(p.snapshotProposal?.idInDAO || '')
       )?.[1];
 
       if (!offchainResult) return;
