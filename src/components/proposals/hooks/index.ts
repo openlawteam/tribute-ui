@@ -1,4 +1,5 @@
 export * from './useCheckApplicant';
+export * from './useDaoProposals';
 export * from './useOffchainVotingResults';
 export * from './useProposalOrDraft';
 export * from './useProposals';
