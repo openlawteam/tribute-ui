@@ -313,8 +313,14 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
           })
         );
 
-        // suggest adding DAO token to wallet
-        await addTokenToWallet();
+        // if connected account is the applicant (the address that will receive
+        // the membership units) suggest adding DAO token to wallet
+        if (
+          account.toLowerCase() ===
+          snapshotProposal.msg.payload.metadata.submitActionArgs[0].toLowerCase()
+        ) {
+          await addTokenToWallet();
+        }
       }
     } catch (error) {
       setSubmitError(error);
