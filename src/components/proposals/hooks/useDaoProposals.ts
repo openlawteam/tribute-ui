@@ -25,10 +25,7 @@ const INITIAL_DAO_PROPOSALS: Proposal[] = [];
  * @param proposalIds
  * @returns `UseDaoProposalsReturn`
  */
-export function useDaoProposals(
-  proposalIds: string[],
-  options?: {filter?: (p: Proposal[]) => Proposal[]}
-): UseDaoProposalsReturn {
+export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
   /**
    * Selectors
    */
@@ -76,26 +73,23 @@ export function useDaoProposals(
     }
 
     handleGetDaoProposals({
-      options,
       proposalIds,
       proposalsAbi,
       registryAddress,
       web3Instance,
     });
-  }, [options, proposalIds, proposalsAbi, registryAddress, web3Instance]);
+  }, [proposalIds, proposalsAbi, registryAddress, web3Instance]);
 
   /**
    * Functions
    */
 
   async function handleGetDaoProposals({
-    options,
     proposalIds,
     proposalsAbi,
     registryAddress,
     web3Instance,
   }: {
-    options: Parameters<typeof useDaoProposals>['1'];
     proposalIds: string[];
     proposalsAbi: AbiItem;
     registryAddress: string;
@@ -114,13 +108,11 @@ export function useDaoProposals(
         [id],
       ]);
 
-      const proposals = await multicall({
-        calls,
-        web3Instance,
-      });
-
       setDaoProposals(
-        options?.filter ? options?.filter?.(proposals) : proposals
+        await multicall({
+          calls,
+          web3Instance,
+        })
       );
 
       setDaoProposalsStatus(AsyncStatus.FULFILLED);
