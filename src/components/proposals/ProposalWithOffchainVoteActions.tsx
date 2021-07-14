@@ -8,11 +8,12 @@ import {
   ProposalFlowStatus,
   RenderActionPropArguments,
 } from './types';
-import {ContractAdapterNames} from '../web3/types';
 import {
-  useProposalWithOffchainVoteStatus,
   useOffchainVotingResults,
+  useProposalWithOffchainVoteStatus,
 } from './hooks';
+import {ContractAdapterNames, ContractDAOConfigKeys} from '../web3/types';
+import {useDaoConfigurations} from '../../hooks';
 import {VotingAdapterName} from '../adapters-extensions/enums';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import ProcessAction from './ProcessAction';
@@ -33,6 +34,11 @@ type ProposalWithOffchainActionsProps = {
   renderAction?: (data: RenderActionPropArguments) => React.ReactNode;
 };
 
+const configurationKeysToGet: ContractDAOConfigKeys[] = [
+  ContractDAOConfigKeys.offchainVotingVotingPeriod,
+  ContractDAOConfigKeys.offchainVotingGracePeriod,
+];
+
 export default function ProposalWithOffchainVoteActions(
   props: ProposalWithOffchainActionsProps
 ) {
@@ -41,6 +47,10 @@ export default function ProposalWithOffchainVoteActions(
   /**
    * Our hooks
    */
+
+  const {
+    daoConfigurations: [offchainVotingPeriod, offchainGracePeriod],
+  } = useDaoConfigurations(configurationKeysToGet);
 
   const {
     daoProposalVoteResult,

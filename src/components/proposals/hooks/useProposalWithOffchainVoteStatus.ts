@@ -38,19 +38,16 @@ export function useProposalWithOffchainVoteStatus(
   proposal: ProposalData,
   options?: {pollInterval?: number}
 ): UseProposalWithOffchainVoteStatusReturn {
-  const {daoProposalVotingAdapter, snapshotDraft, snapshotProposal} = proposal;
-  const {votes: snapshotVotes} = snapshotProposal || {};
-  const proposalId = snapshotDraft?.idInDAO || snapshotProposal?.idInDAO;
-  const {pollInterval = DEFAULT_POLL_INTERVAL_MS} = options || {};
-
   /**
    * Selectors
    */
 
   const {web3Instance} = useWeb3Modal();
+
   const daoRegistryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
   );
+
   const daoRegistryABI = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.abi
   );
@@ -61,8 +58,10 @@ export function useProposalWithOffchainVoteStatus(
 
   const [daoProposal, setDAOProposal] =
     useState<UseProposalWithOffchainVoteStatusReturn['daoProposal']>();
+
   const [daoProposalVote, setDAOProposalVotes] =
     useState<UseProposalWithOffchainVoteStatusReturn['daoProposalVote']>();
+
   const [daoProposalVoteResult, setDAOProposalVoteResult] =
     useState<
       UseProposalWithOffchainVoteStatusReturn['daoProposalVoteResult']
@@ -95,12 +94,19 @@ export function useProposalWithOffchainVoteStatus(
    * Variables
    */
 
+  const {daoProposalVotingAdapter, snapshotDraft, snapshotProposal} = proposal;
+  const {votes: snapshotVotes} = snapshotProposal || {};
+  const proposalId = snapshotDraft?.idInDAO || snapshotProposal?.idInDAO;
+  const {pollInterval = DEFAULT_POLL_INTERVAL_MS} = options || {};
+
   const atExistsInDAO = daoProposal
     ? proposalHasFlag(ProposalFlag.EXISTS, daoProposal.flags)
     : false;
+
   const atSponsoredInDAO = daoProposal
     ? proposalHasFlag(ProposalFlag.SPONSORED, daoProposal.flags)
     : false;
+
   const atProcessedInDAO = daoProposal
     ? proposalHasFlag(ProposalFlag.PROCESSED, daoProposal.flags)
     : false;
