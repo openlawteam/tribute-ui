@@ -89,7 +89,8 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
     offchainVotingResultsStatus,
   } = useOffchainVotingResults(proposalsForVotingResults);
 
-  console.log({proposalsForVotingResults, offchainVotingResults});
+  // @todo remove
+  console.log({proposals, offchainVotingResults});
 
   const {defaultChainError} = useIsDefaultChain();
 
@@ -115,7 +116,9 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
 
   const error: Error | undefined =
     proposalsError || offchainVotingResultsError || defaultChainError;
-  console.log({proposalsError, offchainVotingResultsError});
+
+  // @todo remove
+  console.log({proposalsError});
 
   /**
    * Effects

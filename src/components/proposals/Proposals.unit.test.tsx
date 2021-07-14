@@ -20,7 +20,6 @@ import {rest, server} from '../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../config';
 import Proposals from './Proposals';
 import Wrapper, {WrapperReturnProps} from '../../test/Wrapper';
-import MulticallABI from '../../truffle-contracts/Multicall.json';
 
 describe('ProposalCard unit tests', () => {
   // Build our mock REST call responses for Snapshot Hub
@@ -361,61 +360,58 @@ describe('ProposalCard unit tests', () => {
       )
     );
 
-    // /**
-    //  * Inject voting results. The order should align with the order above of
-    //  * fake responses for proposals that have been sponsored.
-    //  */
+    /**
+     * Inject voting results. The order should align with the order above of
+     * fake responses for proposals that have been sponsored.
+     */
 
-    // // Inject passed result
-    // mockWeb3Provider.injectResult(
-    //   web3Instance.eth.abi.encodeParameters(
-    //     ['uint256', 'bytes[]'],
-    //     [
-    //       0,
-    //       [
-    //         web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-    //         web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-    //         web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-    //       ],
-    //     ]
-    //   ),
-    //   {abi: MulticallABI, abiMethodName: 'aggregate'}
-    // );
+    // Inject passed result
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
+        [
+          0,
+          [
+            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+          ],
+        ]
+      )
+    );
 
-    // // Inject failed result
-    // mockWeb3Provider.injectResult(
-    //   web3Instance.eth.abi.encodeParameters(
-    //     ['uint256', 'bytes[]'],
-    //     [
-    //       0,
-    //       [
-    //         web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-    //         web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-    //         web3Instance.eth.abi.encodeParameter('uint256', '300000'),
-    //       ],
-    //     ]
-    //   ),
-    //   {abi: MulticallABI, abiMethodName: 'aggregate'}
-    // );
+    // Inject failed result
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
+        [
+          0,
+          [
+            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '300000'),
+          ],
+        ]
+      )
+    );
 
-    // // Inject voting result
-    // mockWeb3Provider.injectResult(
-    //   web3Instance.eth.abi.encodeParameters(
-    //     ['uint256', 'bytes[]'],
-    //     [
-    //       0,
-    //       [
-    //         web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-    //         web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-    //         web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-    //       ],
-    //     ]
-    //   ),
-    //   {abi: MulticallABI, abiMethodName: 'aggregate'}
-    // );
+    // Inject voting result
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
+        [
+          0,
+          [
+            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+          ],
+        ]
+      )
+    );
   };
 
-  test('should render adapter proposal cards', async () => {
+  test.only('should render adapter proposal cards', async () => {
     const spy = jest.fn();
 
     server.use(
@@ -451,61 +447,6 @@ describe('ProposalCard unit tests', () => {
 
     await waitFor(() => {
       getWeb3Results({mockWeb3Provider, web3Instance} as WrapperReturnProps);
-    });
-
-    await waitFor(() => {
-      /**
-       * Inject voting results. The order should align with the order above of
-       * fake responses for proposals that have been sponsored.
-       */
-
-      // Inject passed result
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-            ],
-          ]
-        )
-        // {abi: MulticallABI, abiMethodName: 'aggregate'}
-      );
-
-      // Inject failed result
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '300000'),
-            ],
-          ]
-        )
-        // {abi: MulticallABI, abiMethodName: 'aggregate'}
-      );
-
-      // Inject voting result
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-            ],
-          ]
-        )
-        // {abi: MulticallABI, abiMethodName: 'aggregate'}
-      );
     });
 
     await waitFor(() => {
@@ -767,65 +708,6 @@ describe('ProposalCard unit tests', () => {
         )
       );
     });
-
-    await waitFor(() => {
-      /**
-       * Inject voting results. The order should align with the order above of
-       * fake responses for proposals that have been sponsored.
-       */
-
-      // Inject passed result
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-            ],
-          ]
-        ),
-        {abi: MulticallABI, abiMethodName: 'aggregate'}
-      );
-
-      // Inject failed result
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '300000'),
-            ],
-          ]
-        ),
-        {abi: MulticallABI, abiMethodName: 'aggregate'}
-      );
-
-      // Inject voting result
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-            ],
-          ]
-        ),
-        {abi: MulticallABI, abiMethodName: 'aggregate'}
-      );
-    });
-
-    // await waitFor(() => {
-    //   getWeb3Results({mockWeb3Provider, web3Instance} as WrapperReturnProps);
-    // });
 
     await waitFor(() => {
       expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();

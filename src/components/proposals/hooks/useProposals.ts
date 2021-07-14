@@ -102,6 +102,9 @@ export function useProposals({
   const {proposalsVotes, proposalsVotesError, proposalsVotesStatus} =
     useProposalsVotes(proposalsVotingAdapters);
 
+  // @todo remove
+  console.log({proposalsVotingAdapters, proposalsVotingState, proposalsVotes});
+
   /**
    * Their hooks
    */
