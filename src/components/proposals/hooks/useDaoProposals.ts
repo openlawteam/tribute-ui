@@ -9,7 +9,7 @@ import {Proposal} from '../types';
 import {StoreState} from '../../../store/types';
 import {useWeb3Modal} from '../../web3/hooks';
 
-type DaoProposalEntries = [proposalId: string, proposal: Proposal[]][];
+type DaoProposalEntries = [proposalId: string, proposal: Proposal][];
 
 type UseDaoProposalsReturn = {
   daoProposals: DaoProposalEntries;
