@@ -6,8 +6,10 @@ import {ProposalData, ProposalFlowStatus} from './types';
 import {VotingAdapterName} from '../adapters-extensions/enums';
 import * as getDAOConfigEntryToMock from '../web3/helpers/getDAOConfigEntry';
 import * as useProposalWithOffchainVoteStatusToMock from './hooks/useProposalWithOffchainVoteStatus';
+import * as useOffchainVotingResultsToMock from './hooks/useOffchainVotingResults';
 import ProposalWithOffchainVoteActions from './ProposalWithOffchainVoteActions';
 import Wrapper from '../../test/Wrapper';
+import {AsyncStatus} from '../../util/types';
 
 describe('ProposalWithOffchainVoteActions component unit tests', () => {
   test('should render default submit action', async () => {
@@ -161,8 +163,8 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     mock.mockRestore();
   });
 
-  test('should render default off-chain submit result action', async () => {
-    const mock = jest
+  test('should render default off-chain submit result action for passing vote', async () => {
+    const useProposalWithOffchainVoteStatusMock = jest
       .spyOn(
         useProposalWithOffchainVoteStatusToMock,
         'useProposalWithOffchainVoteStatus'
@@ -173,6 +175,23 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
         daoProposalVoteResult: undefined,
         daoProposalVotes: undefined,
         proposalFlowStatusError: undefined,
+      }));
+
+    const useOffchainVotingResultsMock = jest
+      .spyOn(useOffchainVotingResultsToMock, 'useOffchainVotingResults')
+      .mockImplementation(() => ({
+        offchainVotingResults: [
+          [
+            '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c1111',
+            {
+              Yes: {percentage: 0.02, units: 200000},
+              No: {percentage: 0.01, units: 100000},
+              totalUnits: 10000000,
+            },
+          ],
+        ],
+        offchainVotingResultsError: undefined,
+        offchainVotingResultsStatus: AsyncStatus.FULFILLED,
       }));
 
     render(
@@ -199,15 +218,85 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
 
     await waitFor(() => {
       // Status
-      expect(screen.getAllByText(/0%/i).length).toBe(2);
+      expect(screen.getAllByText(/2%/i).length).toBe(1);
+      expect(screen.getAllByText(/1%/i).length).toBe(1);
 
       expect(
         screen.getByRole('button', {name: /submit vote result/i})
       ).toBeInTheDocument();
     });
 
-    // Restore mock
-    mock.mockRestore();
+    // Restore mocks
+    useProposalWithOffchainVoteStatusMock.mockRestore();
+    useOffchainVotingResultsMock.mockRestore();
+  });
+
+  test('should not render off-chain submit result action for failing vote', async () => {
+    const useProposalWithOffchainVoteStatusMock = jest
+      .spyOn(
+        useProposalWithOffchainVoteStatusToMock,
+        'useProposalWithOffchainVoteStatus'
+      )
+      .mockImplementation(() => ({
+        status: ProposalFlowStatus.OffchainVotingSubmitResult,
+        daoProposal: undefined,
+        daoProposalVoteResult: undefined,
+        daoProposalVotes: undefined,
+        proposalFlowStatusError: undefined,
+      }));
+
+    const useOffchainVotingResultsMock = jest
+      .spyOn(useOffchainVotingResultsToMock, 'useOffchainVotingResults')
+      .mockImplementation(() => ({
+        offchainVotingResults: [
+          [
+            '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c1111',
+            {
+              Yes: {percentage: 0.01, units: 100000},
+              No: {percentage: 0.02, units: 200000},
+              totalUnits: 10000000,
+            },
+          ],
+        ],
+        offchainVotingResultsError: undefined,
+        offchainVotingResultsStatus: AsyncStatus.FULFILLED,
+      }));
+
+    render(
+      <Wrapper useInit useWallet>
+        <ProposalWithOffchainVoteActions
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={
+            {
+              snapshotProposal: {
+                msg: {
+                  payload: {
+                    name: 'Good Title',
+                    body: 'Coolness',
+                    metadata: {},
+                  },
+                  timestamp: Date.now().toString(),
+                },
+              },
+            } as ProposalData
+          }
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      // Status
+      expect(screen.getAllByText(/1%/i).length).toBe(1);
+      expect(screen.getAllByText(/2%/i).length).toBe(1);
+
+      expect(() =>
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toThrow();
+    });
+
+    // Restore mocks
+    useProposalWithOffchainVoteStatusMock.mockRestore();
+    useOffchainVotingResultsMock.mockRestore();
   });
 
   test('should render default process action when in grace period', async () => {
