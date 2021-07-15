@@ -98,8 +98,6 @@ async function getSnapshotProposalsByAdapterAddress(
 /**
  * useProposals
  *
- * @todo Clean up noop functions in setting ProposalData - need a cleaner way to fulfill type.
- *
  * @param {string} adapterName Name of the adapter contract to get proposals for.
  * @param {string} includeProposalsExistingOnlyOffchain To handle proposal types where the first step is creating a snapshot draft/offchain proposal only (no onchain proposal exists).
  * @returns `UseProposalsReturn` An object with the proposals, and the current async status.
