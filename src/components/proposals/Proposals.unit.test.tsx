@@ -1161,7 +1161,7 @@ describe('ProposalCard unit tests', () => {
 
       // Proposal names
       expect(() =>
-        screen.getByText(/a proposal with no snapshot votes/i)
+        screen.getByText(/a proposal with failed majority snapshot votes/i)
       ).toThrow();
 
       // In this test case, this is the only text on the screen
