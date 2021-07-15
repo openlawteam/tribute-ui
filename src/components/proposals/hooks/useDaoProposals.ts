@@ -9,13 +9,15 @@ import {Proposal} from '../types';
 import {StoreState} from '../../../store/types';
 import {useWeb3Modal} from '../../web3/hooks';
 
+type DaoProposalEntries = [proposalId: string, proposal: Proposal[]][];
+
 type UseDaoProposalsReturn = {
-  daoProposals: Proposal[];
+  daoProposals: DaoProposalEntries;
   daoProposalsStatus: AsyncStatus;
   daoProposalsError: Error | undefined;
 };
 
-const INITIAL_DAO_PROPOSALS: Proposal[] = [];
+const INITIAL_DAO_PROPOSAL_ENTRIES: DaoProposalEntries = [];
 
 /**
  * useDaoProposals
@@ -42,8 +44,8 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
    * State
    */
 
-  const [daoProposals, setDaoProposals] = useState<Proposal[]>(
-    INITIAL_DAO_PROPOSALS
+  const [daoProposals, setDaoProposals] = useState<DaoProposalEntries>(
+    INITIAL_DAO_PROPOSAL_ENTRIES
   );
 
   const [daoProposalsStatus, setDaoProposalsStatus] = useState<AsyncStatus>(
@@ -108,16 +110,15 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
         [id],
       ]);
 
-      setDaoProposals(
-        await multicall({
-          calls,
-          web3Instance,
-        })
-      );
+      const proposals = await multicall({
+        calls,
+        web3Instance,
+      });
 
+      setDaoProposals(proposalIds.map((id, i) => [id, proposals[i]]));
       setDaoProposalsStatus(AsyncStatus.FULFILLED);
     } catch (error) {
-      setDaoProposals(INITIAL_DAO_PROPOSALS);
+      setDaoProposals(INITIAL_DAO_PROPOSAL_ENTRIES);
       setDaoProposalsError(error);
       setDaoProposalsStatus(AsyncStatus.REJECTED);
     }

@@ -90,20 +90,26 @@ describe('useDaoProposals unit tests', () => {
 
       // Assert fulfilled
       expect(result.current.daoProposals).toEqual([
-        {
-          '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
-          '1': '1',
-          __length__: 2,
-          adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
-          flags: '1',
-        },
-        {
-          '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
-          '1': '3',
-          __length__: 2,
-          adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
-          flags: '3',
-        },
+        [
+          daoProposals[0],
+          {
+            '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+            '1': '1',
+            __length__: 2,
+            adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+            flags: '1',
+          },
+        ],
+        [
+          daoProposals[1],
+          {
+            '0': '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+            '1': '3',
+            __length__: 2,
+            adapterAddress: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
+            flags: '3',
+          },
+        ],
       ]);
       expect(result.current.daoProposalsError).toBe(undefined);
       expect(result.current.daoProposalsStatus).toStrictEqual(
