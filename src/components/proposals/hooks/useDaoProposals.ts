@@ -100,11 +100,23 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
     try {
       if (!proposalIds.length) return;
 
+      // Only use hex (more specifically `bytes32`) id's
+      const safeProposalIds = proposalIds.filter(
+        web3Instance.utils.isHexStrict
+      );
+
+      if (!safeProposalIds.length) {
+        setDaoProposalsStatus(AsyncStatus.FULFILLED);
+        setDaoProposals([]);
+
+        return;
+      }
+
       setDaoProposalsStatus(AsyncStatus.PENDING);
       // Reset error
       setDaoProposalsError(undefined);
 
-      const calls: MulticallTuple[] = proposalIds.map((id) => [
+      const calls: MulticallTuple[] = safeProposalIds.map((id) => [
         registryAddress,
         proposalsAbi,
         [id],
@@ -115,7 +127,7 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
         web3Instance,
       });
 
-      setDaoProposals(proposalIds.map((id, i) => [id, proposals[i]]));
+      setDaoProposals(safeProposalIds.map((id, i) => [id, proposals[i]]));
       setDaoProposalsStatus(AsyncStatus.FULFILLED);
     } catch (error) {
       setDaoProposals(INITIAL_DAO_PROPOSAL_ENTRIES);
