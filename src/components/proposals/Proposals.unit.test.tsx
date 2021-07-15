@@ -390,7 +390,7 @@ describe('ProposalCard unit tests', () => {
             // Total units
             web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
             // Units for "yes" voter
-            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '200000'),
             // Units for "no" voter
             web3Instance.eth.abi.encodeParameter('uint256', '100000'),
           ],
@@ -408,9 +408,9 @@ describe('ProposalCard unit tests', () => {
             // Total units
             web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
             // Units for "yes" voter
-            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '200000'),
             // Units for "no" voter
-            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '300000'),
           ],
         ]
       )
@@ -765,7 +765,7 @@ describe('ProposalCard unit tests', () => {
     });
   });
 
-  test('should not render failed adapter proposal cards when no Snapshot votes on proposal, and result not submitted', async () => {
+  test('should render failed adapter proposal cards when no Snapshot votes on proposal, and result not submitted', async () => {
     const spy = jest.fn();
 
     server.use(
@@ -791,7 +791,7 @@ describe('ProposalCard unit tests', () => {
                     },
                     data: {
                       erc712DraftHash:
-                        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434',
+                        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333',
                       authorIpfsHash: '',
                     },
                     // Define empty votes
@@ -821,10 +821,10 @@ describe('ProposalCard unit tests', () => {
       </Wrapper>
     );
 
-    /**
-     * Mock `useProposals` proposals response
-     */
     await waitFor(() => {
+      /**
+       * Mock `useProposals` proposals response
+       */
       mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameters(
           ['uint256', 'bytes[]'],
@@ -894,8 +894,8 @@ describe('ProposalCard unit tests', () => {
           [
             0,
             [
-              // VotingState.TIE
-              web3Instance.eth.abi.encodeParameter('uint8', '1'),
+              // VotingState.GRACE_PERIOD
+              web3Instance.eth.abi.encodeParameter('uint8', '5'),
             ],
           ]
         )
@@ -947,6 +947,20 @@ describe('ProposalCard unit tests', () => {
           ]
         )
       );
+
+      // Inject voting result with no voters
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              // Total units
+              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            ],
+          ]
+        )
+      );
     });
 
     await waitFor(() => {
@@ -955,19 +969,26 @@ describe('ProposalCard unit tests', () => {
 
     await waitFor(() => {
       // Proposal headers
-      expect(() => screen.getByText(/^failed$/i)).toThrow();
+      expect(screen.getByText(/^failed$/i)).toBeInTheDocument();
 
       // Proposal names
-      expect(() =>
+      expect(
         screen.getByText(/a proposal with no snapshot votes/i)
-      ).toThrow();
+      ).toBeInTheDocument();
+    });
 
-      // In this test case, this is the only text on the screen
-      expect(screen.getByText(/no proposals, yet!/i)).toBeInTheDocument();
+    // Click on a proposal
+    userEvent.click(screen.getByText(/a proposal with no snapshot votes/i));
+
+    // Expect correct proposal id to come through in function args
+    await waitFor(() => {
+      expect(spy.mock.calls[0][0]).toBe(
+        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333'
+      );
     });
   });
 
-  test('should not render failed adapter proposal cards when Snapshot majority vote fails on proposal, and result not submitted', async () => {
+  test('should render failed adapter proposal cards when Snapshot majority vote fails on proposal, and result not submitted', async () => {
     const spy = jest.fn();
 
     server.use(
@@ -993,9 +1014,10 @@ describe('ProposalCard unit tests', () => {
                     },
                     data: {
                       erc712DraftHash:
-                        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434',
+                        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333',
                       authorIpfsHash: '',
                     },
+                    votes: defaultProposalVotes,
                   },
               })
             )
@@ -1021,10 +1043,10 @@ describe('ProposalCard unit tests', () => {
       </Wrapper>
     );
 
-    /**
-     * Mock `useProposals` proposals response
-     */
     await waitFor(() => {
+      /**
+       * Mock `useProposals` proposals response
+       */
       mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameters(
           ['uint256', 'bytes[]'],
@@ -1094,8 +1116,8 @@ describe('ProposalCard unit tests', () => {
           [
             0,
             [
-              // VotingState.IN_PROGRESS
-              web3Instance.eth.abi.encodeParameter('uint8', '0'),
+              // VotingState.GRACE_PERIOD
+              web3Instance.eth.abi.encodeParameter('uint8', '5'),
             ],
           ]
         )
@@ -1148,7 +1170,23 @@ describe('ProposalCard unit tests', () => {
         )
       );
 
-      injectVotingWeightResults({web3Instance, mockWeb3Provider});
+      // Inject failed voting result
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              // Total units
+              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+              // Units for "yes" voter
+              web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+              // Units for "no" voter
+              web3Instance.eth.abi.encodeParameter('uint256', '300000'),
+            ],
+          ]
+        )
+      );
     });
 
     await waitFor(() => {
@@ -1157,15 +1195,24 @@ describe('ProposalCard unit tests', () => {
 
     await waitFor(() => {
       // Proposal headers
-      expect(() => screen.getByText(/^failed$/i)).toThrow();
+      expect(screen.getByText(/^failed$/i)).toBeInTheDocument();
 
       // Proposal names
-      expect(() =>
+      expect(
         screen.getByText(/a proposal with failed majority snapshot votes/i)
-      ).toThrow();
+      ).toBeInTheDocument();
+    });
 
-      // In this test case, this is the only text on the screen
-      expect(screen.getByText(/no proposals, yet!/i)).toBeInTheDocument();
+    // Click on a proposal
+    userEvent.click(
+      screen.getByText(/a proposal with failed majority snapshot votes/i)
+    );
+
+    // Expect correct proposal id to come through in function args
+    await waitFor(() => {
+      expect(spy.mock.calls[0][0]).toBe(
+        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333'
+      );
     });
   });
 
