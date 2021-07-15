@@ -49,7 +49,7 @@ const fakeSnapshotProposal: SnapshotProposal = {
           type: SnapshotType.vote,
           payload: {
             choice: 1, // Yes
-            proposalHash:
+            proposalId:
               '0x1679cac3f54777f5d9c95efd83beff9f87ac55487311ecacd95827d267a15c4e',
             metadata: {
               memberAddress: DEFAULT_ETH_ADDRESS,
@@ -73,7 +73,7 @@ const fakeSnapshotProposal: SnapshotProposal = {
           type: SnapshotType.vote,
           payload: {
             choice: 2, // No
-            proposalHash:
+            proposalId:
               '0x1679cac3f54777f5d9c95efd83beff9f87ac55487311ecacd95827d267a15c4e',
             metadata: {
               memberAddress: '0xc0437e11094275376defbe51dc6e04598403d276',

@@ -83,6 +83,7 @@ export default function TributeDetails() {
       return <SubmitAction checkApplicant={applicant} proposal={proposal} />;
     }
 
+    // Process button
     if (
       status === ProposalFlowStatus.Process ||
       status === ProposalFlowStatus.OffchainVotingGracePeriod

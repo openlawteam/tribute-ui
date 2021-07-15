@@ -21,6 +21,8 @@ type UseProposalsVotingAdapterReturn = {
   proposalsVotingAdaptersStatus: AsyncStatus;
 };
 
+const INITIAL_VOTING_ADAPTERS: ProposalVotingAdapterTuple[] = [];
+
 /**
  * Fetch voting adapter data for proposals by DAO proposal id.
  * Only returns data for proposals of which voting adapters have been assigned (i.e. sponsored).
@@ -53,16 +55,14 @@ export function useProposalsVotingAdapter(
    */
 
   const [proposalsVotingAdapters, setProposalsVotingAdapters] = useState<
-    UseProposalsVotingAdapterReturn['proposalsVotingAdapters']
-  >([]);
+    ProposalVotingAdapterTuple[]
+  >(INITIAL_VOTING_ADAPTERS);
 
   const [proposalsVotingAdaptersError, setProposalsVotingAdaptersError] =
-    useState<UseProposalsVotingAdapterReturn['proposalsVotingAdaptersError']>();
+    useState<Error | undefined>();
 
   const [proposalsVotingAdaptersStatus, setProposalsVotingAdaptersStatus] =
-    useState<UseProposalsVotingAdapterReturn['proposalsVotingAdaptersStatus']>(
-      AsyncStatus.STANDBY
-    );
+    useState<AsyncStatus>(AsyncStatus.STANDBY);
 
   /**
    * Cached callbacks
@@ -99,8 +99,8 @@ export function useProposalsVotingAdapter(
     const safeProposalIds = proposalIds.filter(web3Instance.utils.isHexStrict);
 
     if (!safeProposalIds.length) {
+      setProposalsVotingAdapters(INITIAL_VOTING_ADAPTERS);
       setProposalsVotingAdaptersStatus(AsyncStatus.FULFILLED);
-      setProposalsVotingAdapters([]);
 
       return;
     }
@@ -164,8 +164,8 @@ export function useProposalsVotingAdapter(
        * It means no proposals were found to be sponsored
        */
       if (!filteredVotingAdapterAddressResults.length) {
+        setProposalsVotingAdapters(INITIAL_VOTING_ADAPTERS);
         setProposalsVotingAdaptersStatus(AsyncStatus.FULFILLED);
-        setProposalsVotingAdapters([]);
 
         return;
       }
@@ -182,35 +182,33 @@ export function useProposalsVotingAdapter(
         web3Instance,
       });
 
-      setProposalsVotingAdaptersStatus(AsyncStatus.FULFILLED);
+      const votingAdaptersToSet = await Promise.all(
+        filteredProposalIds.map(
+          async (id, i): Promise<ProposalVotingAdapterTuple> => {
+            const votingAdapterABI = await getVotingAdapterABI(
+              adapterNameResults[i]
+            );
+            const votingAdapterAddress = filteredVotingAdapterAddressResults[i];
 
-      setProposalsVotingAdapters(
-        await Promise.all(
-          filteredProposalIds.map(
-            async (id, i): Promise<ProposalVotingAdapterTuple> => {
-              const votingAdapterABI = await getVotingAdapterABI(
-                adapterNameResults[i]
-              );
-              const votingAdapterAddress =
-                filteredVotingAdapterAddressResults[i];
-
-              return [
-                id,
-                {
-                  votingAdapterName: adapterNameResults[i],
-                  votingAdapterAddress,
-                  getVotingAdapterABI: () => votingAdapterABI,
-                  getWeb3VotingAdapterContract: () =>
-                    new web3Instance.eth.Contract(
-                      votingAdapterABI,
-                      votingAdapterAddress
-                    ),
-                },
-              ];
-            }
-          )
+            return [
+              id,
+              {
+                votingAdapterName: adapterNameResults[i],
+                votingAdapterAddress,
+                getVotingAdapterABI: () => votingAdapterABI,
+                getWeb3VotingAdapterContract: () =>
+                  new web3Instance.eth.Contract(
+                    votingAdapterABI,
+                    votingAdapterAddress
+                  ),
+              },
+            ];
+          }
         )
       );
+
+      setProposalsVotingAdapters(votingAdaptersToSet);
+      setProposalsVotingAdaptersStatus(AsyncStatus.FULFILLED);
     } catch (error) {
       setProposalsVotingAdaptersStatus(AsyncStatus.REJECTED);
       setProposalsVotingAdapters([]);

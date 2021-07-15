@@ -1,6 +1,10 @@
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Web3 from 'web3';
+import {
+  SnapshotProposalResponseData,
+  SnapshotType,
+} from '@openlaw/snapshot-js-erc712';
 
 import {
   snapshotAPIDraftResponse,
@@ -46,9 +50,60 @@ describe('ProposalCard unit tests', () => {
     },
   };
 
+  const defaultProposalVotes: SnapshotProposalResponseData['votes'] = [
+    {
+      DEFAULT_ETH_ADDRESS: {
+        address: DEFAULT_ETH_ADDRESS,
+        msg: {
+          version: '0.2.0',
+          timestamp: '1614264732',
+          token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
+          type: SnapshotType.vote,
+          payload: {
+            choice: 1, // Yes
+            proposalId:
+              '0x1679cac3f54777f5d9c95efd83beff9f87ac55487311ecacd95827d267a15c4e',
+            metadata: {
+              memberAddress: DEFAULT_ETH_ADDRESS,
+            },
+          },
+        },
+        sig: '0xdbdbf122734b34ed5b10542551636e4250e98f443e35bf5d625f284fe54dcaf80c5bc44be04fefed1e9e5f25a7c13809a5266fcdbdcd0b94c885f2128544e79a1b',
+        authorIpfsHash:
+          '0xfe8f864ef475f60c7e01d5425df332199c5ae7ab712b8545f07433c68f06c644',
+        relayerIpfsHash: '',
+        actionId: '0xFCB86F90bd7b30cDB8A2c43FB15bf5B33A70Ea4f',
+      },
+    },
+    {
+      '0xc0437e11094275376defbe51dc6e04598403d276': {
+        address: '0xc0437e11094275376defbe51dc6e04598403d276',
+        msg: {
+          version: '0.2.0',
+          timestamp: '1614264732',
+          token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
+          type: SnapshotType.vote,
+          payload: {
+            choice: 2, // No
+            proposalId:
+              '0x1679cac3f54777f5d9c95efd83beff9f87ac55487311ecacd95827d267a15c4e',
+            metadata: {
+              memberAddress: '0xc0437e11094275376defbe51dc6e04598403d276',
+            },
+          },
+        },
+        sig: '0xdbdbf122734b34ed5b10542551636e4250e98f443e35bf5d625f284fe54dcaf80c5bc44be04fefed1e9e5f25a7c13809a5266fcdbdcd0b94c885f2128544e79a1b',
+        authorIpfsHash:
+          '0xfe8f864ef475f60c7e01d5425df332199c5ae7ab712b8545f07433c68f06c644',
+        relayerIpfsHash: '',
+        actionId: '0xFCB86F90bd7b30cDB8A2c43FB15bf5B33A70Ea4f',
+      },
+    },
+  ];
+
   const defaultProposalBody = Object.values(snapshotAPIProposalResponse)[0];
   const proposalsResponse: typeof snapshotAPIProposalResponse = {
-    // Proposal 3
+    // Proposal 3 (passed)
     '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333': {
       ...defaultProposalBody,
       msg: {
@@ -60,11 +115,12 @@ describe('ProposalCard unit tests', () => {
       },
       data: {
         erc712DraftHash:
-          '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434',
+          '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333',
         authorIpfsHash: '',
       },
+      votes: defaultProposalVotes,
     },
-    // Proposal 4
+    // Proposal 4 (failed)
     '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c4444': {
       ...defaultProposalBody,
       msg: {
@@ -76,11 +132,12 @@ describe('ProposalCard unit tests', () => {
       },
       data: {
         erc712DraftHash:
-          '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c4545',
+          '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c4444',
         authorIpfsHash: '',
       },
+      votes: defaultProposalVotes,
     },
-    // Proposal 5
+    // Proposal 5 (voting)
     '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c5555': {
       ...defaultProposalBody,
       msg: {
@@ -94,9 +151,10 @@ describe('ProposalCard unit tests', () => {
       },
       data: {
         erc712DraftHash:
-          '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c5656',
+          '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c5555',
         authorIpfsHash: '',
       },
+      votes: defaultProposalVotes,
     },
   };
 
@@ -301,7 +359,81 @@ describe('ProposalCard unit tests', () => {
         ]
       )
     );
+
+    /**
+     * Inject voting results. The order should align with the order above of
+     * fake responses for proposals that have been sponsored.
+     */
+
+    injectVotingWeightResults({web3Instance, mockWeb3Provider});
   };
+
+  function injectVotingWeightResults({
+    mockWeb3Provider,
+    web3Instance,
+  }: {
+    mockWeb3Provider: FakeHttpProvider;
+    web3Instance: Web3;
+  }) {
+    /**
+     * Inject voting results. The order should align with the order above of
+     * fake responses for proposals that have been sponsored.
+     */
+
+    // Inject passed result
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
+        [
+          0,
+          [
+            // Total units
+            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            // Units for "yes" voter
+            web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+            // Units for "no" voter
+            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+          ],
+        ]
+      )
+    );
+
+    // Inject failed result
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
+        [
+          0,
+          [
+            // Total units
+            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            // Units for "yes" voter
+            web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+            // Units for "no" voter
+            web3Instance.eth.abi.encodeParameter('uint256', '300000'),
+          ],
+        ]
+      )
+    );
+
+    // Inject voting result
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
+        [
+          0,
+          [
+            // Total units
+            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            // Units for "yes" voter
+            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+            // Units for "no" voter
+            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+          ],
+        ]
+      )
+    );
+  }
 
   test('should render adapter proposal cards', async () => {
     const spy = jest.fn();
@@ -400,16 +532,16 @@ describe('ProposalCard unit tests', () => {
         }}>
         <Proposals
           adapterName={DaoAdapterConstants.ONBOARDING}
-          includeProposalsExistingOnlyOffchain={true}
+          includeProposalsExistingOnlyOffchain
           onProposalClick={spy}
         />
       </Wrapper>
     );
 
-    /**
-     * Mock `useProposals` proposals response
-     */
     await waitFor(() => {
+      /**
+       * Mock `useProposals` proposals response
+       */
       mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameters(
           ['uint256', 'bytes[]'],
@@ -599,10 +731,8 @@ describe('ProposalCard unit tests', () => {
           ]
         )
       );
-    });
 
-    await waitFor(() => {
-      getWeb3Results({mockWeb3Provider, web3Instance} as WrapperReturnProps);
+      injectVotingWeightResults({web3Instance, mockWeb3Provider});
     });
 
     await waitFor(() => {
@@ -635,266 +765,6 @@ describe('ProposalCard unit tests', () => {
     });
   });
 
-  test('should render correct adapter proposal cards when `includeProposalsExistingOnlyOffchain` is not defined or `false`', async () => {
-    const spy = jest.fn();
-
-    server.use(
-      ...[
-        rest.get(
-          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/drafts/:adapterAddress`,
-          async (_req, res, ctx) => res(ctx.json(draftsResponse))
-        ),
-        rest.get(
-          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
-          async (_req, res, ctx) => res(ctx.json(proposalsResponse))
-        ),
-      ]
-    );
-
-    let web3Instance: Web3;
-    let mockWeb3Provider: FakeHttpProvider;
-
-    render(
-      <Wrapper
-        useInit
-        useWallet
-        getProps={(p) => {
-          mockWeb3Provider = p.mockWeb3Provider;
-          web3Instance = p.web3Instance;
-        }}>
-        <Proposals
-          adapterName={DaoAdapterConstants.ONBOARDING}
-          includeProposalsExistingOnlyOffchain={false}
-          onProposalClick={spy}
-        />
-      </Wrapper>
-    );
-
-    /**
-     * Mock `useProposals` proposals response
-     */
-    await waitFor(() => {
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              web3Instance.eth.abi.encodeParameter(
-                {
-                  Proposal: {
-                    adapterAddress: 'address',
-                    flags: 'uint256',
-                  },
-                },
-                // Does not exist
-                {
-                  adapterAddress: BURN_ADDRESS,
-                  flags: '0',
-                }
-              ),
-              web3Instance.eth.abi.encodeParameter(
-                {
-                  Proposal: {
-                    adapterAddress: 'address',
-                    flags: 'uint256',
-                  },
-                },
-                {
-                  adapterAddress: DEFAULT_ETH_ADDRESS,
-                  // ProposalFlag.EXISTS
-                  flags: '1',
-                }
-              ),
-              web3Instance.eth.abi.encodeParameter(
-                {
-                  Proposal: {
-                    adapterAddress: 'address',
-                    flags: 'uint256',
-                  },
-                },
-                {
-                  adapterAddress: DEFAULT_ETH_ADDRESS,
-                  // ProposalFlag.PROCESSED
-                  flags: '7',
-                }
-              ),
-              web3Instance.eth.abi.encodeParameter(
-                {
-                  Proposal: {
-                    adapterAddress: 'address',
-                    flags: 'uint256',
-                  },
-                },
-                {
-                  adapterAddress: DEFAULT_ETH_ADDRESS,
-                  // ProposalFlag.PROCESSED
-                  flags: '7',
-                }
-              ),
-              web3Instance.eth.abi.encodeParameter(
-                {
-                  Proposal: {
-                    adapterAddress: 'address',
-                    flags: 'uint256',
-                  },
-                },
-                {
-                  adapterAddress: DEFAULT_ETH_ADDRESS,
-                  // ProposalFlag.SPONSORED
-                  flags: '3',
-                }
-              ),
-            ],
-          ]
-        )
-      );
-
-      /**
-       * Mock results for `useProposalsVotingAdapter`
-       */
-
-      const offchainVotingAdapterAddressResponse =
-        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS);
-      const noVotingAdapterAddressResponse =
-        web3Instance.eth.abi.encodeParameter('address', BURN_ADDRESS);
-
-      const offchainVotingAdapterNameResponse =
-        web3Instance.eth.abi.encodeParameter(
-          'string',
-          VotingAdapterName.OffchainVotingContract
-        );
-
-      // Mock `dao.votingAdapter` responses
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              noVotingAdapterAddressResponse,
-              offchainVotingAdapterAddressResponse,
-              offchainVotingAdapterAddressResponse,
-              offchainVotingAdapterAddressResponse,
-            ],
-          ]
-        )
-      );
-
-      // Mock `IVoting.getAdapterName` responses
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              offchainVotingAdapterNameResponse,
-              offchainVotingAdapterNameResponse,
-              offchainVotingAdapterNameResponse,
-            ],
-          ]
-        )
-      );
-
-      /**
-       * Mock results for `useProposalsVotingState`
-       */
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              // VotingState.PASS
-              web3Instance.eth.abi.encodeParameter('uint8', '2'),
-              // VotingState.NOT_PASS
-              web3Instance.eth.abi.encodeParameter('uint8', '3'),
-              // VotingState.IN_PROGRESS
-              web3Instance.eth.abi.encodeParameter('uint8', '4'),
-            ],
-          ]
-        )
-      );
-
-      /**
-       * Mock results for `useProposalsVotes`
-       */
-      const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
-        {
-          Voting: {
-            snapshot: 'uint256',
-            reporter: 'address',
-            resultRoot: 'bytes32',
-            nbYes: 'uint256',
-            nbNo: 'uint256',
-            startingTime: 'uint256',
-            gracePeriodStartingTime: 'uint256',
-            forceFailed: 'bool',
-            isChallenged: 'bool',
-            fallbackVotesCount: 'uint256',
-          },
-        },
-        {
-          snapshot: '8376297',
-          reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-          resultRoot:
-            '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-          nbYes: '1',
-          nbNo: '0',
-          startingTime: '1617878162',
-          gracePeriodStartingTime: '1617964640',
-          forceFailed: false,
-          isChallenged: false,
-          fallbackVotesCount: '0',
-        }
-      );
-
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              offchainVotesDataResponse,
-              offchainVotesDataResponse,
-              offchainVotesDataResponse,
-            ],
-          ]
-        )
-      );
-    });
-
-    await waitFor(() => {
-      expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();
-    });
-
-    await waitFor(() => {
-      // Proposal headers
-      expect(screen.getByText(/^proposals$/i)).toBeInTheDocument();
-      expect(screen.getByText(/^passed$/i)).toBeInTheDocument();
-      expect(screen.getByText(/^failed$/i)).toBeInTheDocument();
-      expect(screen.getByText(/^voting$/i)).toBeInTheDocument();
-
-      // Proposal names excluded
-      expect(() => screen.getByText(/another nice one/i)).toThrow();
-      // Proposal names
-      expect(screen.getByText(/another cool one/i)).toBeInTheDocument();
-      expect(screen.getByText(/another great one/i)).toBeInTheDocument();
-      expect(screen.getByText(/another rad one/i)).toBeInTheDocument();
-      expect(screen.getByText(/another awesome one/i)).toBeInTheDocument();
-    });
-
-    // Click on a proposal
-    userEvent.click(screen.getByText(/another cool one/i));
-
-    // Expect correct proposal id to come through in function args
-    await waitFor(() => {
-      expect(spy.mock.calls[0][0]).toBe(
-        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434'
-      );
-    });
-  });
-
   test('should render failed adapter proposal cards when no Snapshot votes on proposal, and result not submitted', async () => {
     const spy = jest.fn();
 
@@ -921,7 +791,7 @@ describe('ProposalCard unit tests', () => {
                     },
                     data: {
                       erc712DraftHash:
-                        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434',
+                        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333',
                       authorIpfsHash: '',
                     },
                     // Define empty votes
@@ -951,10 +821,10 @@ describe('ProposalCard unit tests', () => {
       </Wrapper>
     );
 
-    /**
-     * Mock `useProposals` proposals response
-     */
     await waitFor(() => {
+      /**
+       * Mock `useProposals` proposals response
+       */
       mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameters(
           ['uint256', 'bytes[]'],
@@ -1024,8 +894,8 @@ describe('ProposalCard unit tests', () => {
           [
             0,
             [
-              // VotingState.TIE
-              web3Instance.eth.abi.encodeParameter('uint8', '1'),
+              // VotingState.GRACE_PERIOD
+              web3Instance.eth.abi.encodeParameter('uint8', '5'),
             ],
           ]
         )
@@ -1077,6 +947,20 @@ describe('ProposalCard unit tests', () => {
           ]
         )
       );
+
+      // Inject voting result with no voters
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              // Total units
+              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            ],
+          ]
+        )
+      );
     });
 
     await waitFor(() => {
@@ -1099,7 +983,235 @@ describe('ProposalCard unit tests', () => {
     // Expect correct proposal id to come through in function args
     await waitFor(() => {
       expect(spy.mock.calls[0][0]).toBe(
-        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3434'
+        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333'
+      );
+    });
+  });
+
+  test('should render failed adapter proposal cards when Snapshot majority vote fails on proposal, and result not submitted', async () => {
+    const spy = jest.fn();
+
+    server.use(
+      ...[
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/drafts/:adapterAddress`,
+          async (_req, res, ctx) => res(ctx.json({}))
+        ),
+        rest.get(
+          `${SNAPSHOT_HUB_API_URL}/api/:spaceName/proposals/:adapterAddress`,
+          async (_req, res, ctx) =>
+            res(
+              ctx.json({
+                '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333':
+                  {
+                    ...defaultProposalBody,
+                    msg: {
+                      ...defaultProposalBody.msg,
+                      payload: {
+                        ...defaultProposalBody.msg.payload,
+                        name: 'A proposal with failed majority snapshot votes',
+                      },
+                    },
+                    data: {
+                      erc712DraftHash:
+                        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333',
+                      authorIpfsHash: '',
+                    },
+                    votes: defaultProposalVotes,
+                  },
+              })
+            )
+        ),
+      ]
+    );
+
+    let web3Instance: Web3;
+    let mockWeb3Provider: FakeHttpProvider;
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <Proposals
+          adapterName={DaoAdapterConstants.ONBOARDING}
+          onProposalClick={spy}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      /**
+       * Mock `useProposals` proposals response
+       */
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              web3Instance.eth.abi.encodeParameter(
+                {
+                  Proposal: {
+                    adapterAddress: 'address',
+                    flags: 'uint256',
+                  },
+                },
+                {
+                  adapterAddress: DEFAULT_ETH_ADDRESS,
+                  // ProposalFlag.SPONSORED
+                  flags: '3',
+                }
+              ),
+            ],
+          ]
+        )
+      );
+
+      /**
+       * Mock results for `useProposalsVotingAdapter`
+       */
+
+      // Mock `dao.votingAdapter` responses
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              web3Instance.eth.abi.encodeParameter(
+                'address',
+                DEFAULT_ETH_ADDRESS
+              ),
+            ],
+          ]
+        )
+      );
+
+      // Mock `IVoting.getAdapterName` responses
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              web3Instance.eth.abi.encodeParameter(
+                'string',
+                VotingAdapterName.OffchainVotingContract
+              ),
+            ],
+          ]
+        )
+      );
+
+      /**
+       * Mock results for `useProposalsVotingState`
+       */
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              // VotingState.GRACE_PERIOD
+              web3Instance.eth.abi.encodeParameter('uint8', '5'),
+            ],
+          ]
+        )
+      );
+
+      /**
+       * Mock results for `useProposalsVotes`
+       */
+
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              web3Instance.eth.abi.encodeParameter(
+                {
+                  Voting: {
+                    snapshot: 'uint256',
+                    proposalHash: 'bytes32',
+                    reporter: 'address',
+                    resultRoot: 'bytes32',
+                    nbVoters: 'uint256',
+                    nbYes: 'uint256',
+                    nbNo: 'uint256',
+                    startingTime: 'uint256',
+                    gracePeriodStartingTime: 'uint256',
+                    isChallenged: 'bool',
+                    fallbackVotesCount: 'uint256',
+                  },
+                },
+                {
+                  snapshot: '0',
+                  proposalHash:
+                    '0x0000000000000000000000000000000000000000000000000000000000000000',
+                  reporter: BURN_ADDRESS,
+                  resultRoot:
+                    '0x0000000000000000000000000000000000000000000000000000000000000000',
+                  nbVoters: '0',
+                  nbYes: '0',
+                  nbNo: '0',
+                  startingTime: '0',
+                  gracePeriodStartingTime: '0',
+                  isChallenged: false,
+                  fallbackVotesCount: '0',
+                }
+              ),
+            ],
+          ]
+        )
+      );
+
+      // Inject failed voting result
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              // Total units
+              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+              // Units for "yes" voter
+              web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+              // Units for "no" voter
+              web3Instance.eth.abi.encodeParameter('uint256', '300000'),
+            ],
+          ]
+        )
+      );
+    });
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Proposal headers
+      expect(screen.getByText(/^failed$/i)).toBeInTheDocument();
+
+      // Proposal names
+      expect(
+        screen.getByText(/a proposal with failed majority snapshot votes/i)
+      ).toBeInTheDocument();
+    });
+
+    // Click on a proposal
+    userEvent.click(
+      screen.getByText(/a proposal with failed majority snapshot votes/i)
+    );
+
+    // Expect correct proposal id to come through in function args
+    await waitFor(() => {
+      expect(spy.mock.calls[0][0]).toBe(
+        '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c3333'
       );
     });
   });

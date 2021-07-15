@@ -449,7 +449,7 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
                      */
                     memberAddress: '',
                   },
-                  proposalHash: '',
+                  proposalId: '',
                 },
               },
               sig: '',

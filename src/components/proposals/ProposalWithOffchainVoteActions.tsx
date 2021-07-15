@@ -9,7 +9,10 @@ import {
   RenderActionPropArguments,
 } from './types';
 import {ContractAdapterNames} from '../web3/types';
-import {useProposalWithOffchainVoteStatus} from './hooks';
+import {
+  useProposalWithOffchainVoteStatus,
+  useOffchainVotingResults,
+} from './hooks';
 import {VotingAdapterName} from '../adapters-extensions/enums';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import ProcessAction from './ProcessAction';
@@ -46,6 +49,10 @@ export default function ProposalWithOffchainVoteActions(
     status,
   } = useProposalWithOffchainVoteStatus(proposal);
 
+  const {offchainVotingResults} = useOffchainVotingResults(
+    proposal.snapshotProposal
+  );
+
   /**
    * Variables
    */
@@ -81,6 +88,11 @@ export default function ProposalWithOffchainVoteActions(
       },
     });
 
+  // There is only one vote result entry as we only passed a single proposal
+  const offchainVotingResult = offchainVotingResults[0]?.[1];
+  const yesUnits = offchainVotingResult?.Yes.units || 0;
+  const noUnits = offchainVotingResult?.No.units || 0;
+
   /**
    * Functions
    */
@@ -110,6 +122,13 @@ export default function ProposalWithOffchainVoteActions(
 
     // Off-chain voting submit vote result
     if (status === ProposalFlowStatus.OffchainVotingSubmitResult) {
+      // Return a React.Fragment to hide the "Submit Vote Result" button if vote
+      // did not pass. For now, we can assume across all adapters that if the
+      // vote did not pass then the vote result does not need to be submitted.
+      if (yesUnits <= noUnits) {
+        return <></>;
+      }
+
       return (
         <OffchainOpRollupVotingSubmitResultAction
           adapterName={adapterName}
@@ -149,6 +168,7 @@ export default function ProposalWithOffchainVoteActions(
         <OffchainVotingStatus
           countdownGracePeriodStartMs={gracePeriodStartMs}
           proposal={proposal}
+          votingResult={offchainVotingResult}
         />
       )}
 
