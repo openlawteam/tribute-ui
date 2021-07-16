@@ -32,12 +32,14 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
    * GQL Query
    */
 
-  const [getTokenHolderBalances, {called, loading, data, error, refetch}] =
-    useLazyQuery(GET_TOKEN_HOLDER_BALANCES, {
-      variables: {
-        tokenAddress: erc20ExtensionContract?.contractAddress.toLowerCase(),
-      },
-    });
+  const [
+    getTokenHolderBalances,
+    {called, loading, data, error, startPolling, stopPolling},
+  ] = useLazyQuery(GET_TOKEN_HOLDER_BALANCES, {
+    variables: {
+      tokenAddress: erc20ExtensionContract?.contractAddress.toLowerCase(),
+    },
+  });
 
   /**
    * State
@@ -89,8 +91,16 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
   // so any change to the connected token holder's balance can be shown in the
   // nav badge without having to do a page reload.
   useEffect(() => {
-    refetch && refetch();
-  }, [connectedMember, refetch]);
+    // a single refetch may not be enough to catch any token balance change so
+    // we poll but only for a short time period
+    connectedMember && startPolling && startPolling(2000);
+
+    const pollingTimeoutId = stopPolling && setTimeout(stopPolling, 10000);
+
+    return function cleanup() {
+      pollingTimeoutId && clearTimeout(pollingTimeoutId);
+    };
+  }, [connectedMember, startPolling, stopPolling]);
 
   /**
    * Functions

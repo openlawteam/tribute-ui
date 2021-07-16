@@ -10,7 +10,7 @@ import {multicall, MulticallTuple} from '../../../components/web3/helpers';
 import {normalizeString} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
 import {SubgraphNetworkStatus} from '../../../store/subgraphNetworkStatus/types';
-import {UNITS_ADDRESS, GQL_QUERY_POLLING_INTERVAL} from '../../../config';
+import {UNITS_ADDRESS} from '../../../config';
 import {useWeb3Modal} from '../../../components/web3/hooks';
 
 type UseMembersReturn = {
@@ -51,15 +51,12 @@ export default function useMembers(): UseMembersReturn {
    * GQL Query
    */
 
-  const [
-    getMembersFromSubgraphResult,
-    {called, loading, data, error, stopPolling},
-  ] = useLazyQuery(GET_MEMBERS, {
-    pollInterval: GQL_QUERY_POLLING_INTERVAL,
-    variables: {
-      daoAddress: DaoRegistryContract?.contractAddress.toLowerCase(),
-    },
-  });
+  const [getMembersFromSubgraphResult, {called, loading, data, error}] =
+    useLazyQuery(GET_MEMBERS, {
+      variables: {
+        daoAddress: DaoRegistryContract?.contractAddress.toLowerCase(),
+      },
+    });
 
   /**
    * State
@@ -86,7 +83,6 @@ export default function useMembers(): UseMembersReturn {
     error,
     getMembersFromRegistryCached,
     loading,
-    stopPolling,
   ]);
 
   /**
@@ -107,7 +103,6 @@ export default function useMembers(): UseMembersReturn {
     } else {
       // If there is a subgraph network error fallback to fetching members info
       // directly from smart contracts
-      stopPolling && stopPolling();
       getMembersFromRegistryCached();
     }
   }, [
@@ -115,7 +110,6 @@ export default function useMembers(): UseMembersReturn {
     getMembersFromRegistryCached,
     getMembersFromSubgraphCached,
     loading,
-    stopPolling,
     subgraphNetworkStatus,
   ]);
 
@@ -160,7 +154,6 @@ export default function useMembers(): UseMembersReturn {
       // If there is a subgraph query error fallback to fetching members info
       // directly from smart contracts
       console.log(`subgraph query error: ${error.message}`);
-      stopPolling && stopPolling();
       getMembersFromRegistryCached();
     }
   }
