@@ -3,11 +3,11 @@ import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import Web3 from 'web3';
 
+import {AsyncStatus} from '../util/types';
 import {ContractDAOConfigKeys} from '../components/web3/types';
 import {multicall, MulticallTuple} from '../components/web3/helpers';
 import {StoreState} from '../store/types';
 import {useWeb3Modal} from '../components/web3/hooks';
-import {AsyncStatus} from '../util/types';
 
 type ConfigEntriesReturn = {
   daoConfigurations: string[];
@@ -17,6 +17,15 @@ type ConfigEntriesReturn = {
 
 const INITIAL_CONFIG_ENTRIES: ConfigEntriesReturn['daoConfigurations'] = [];
 
+/**
+ * useDaoConfigurations
+ *
+ * Pass in an array of plain text DAO configuration names to get
+ * and the hook will return their values in an array, in the same order.
+ *
+ * @param configKeys
+ * @returns `ConfigEntriesReturn`
+ */
 export function useDaoConfigurations(
   /**
    * The keys of any configuration settings to get from the DAO.
