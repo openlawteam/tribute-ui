@@ -2,6 +2,7 @@ import {
   OffchainVotingStatus,
   OffchainVotingAction,
   OffchainOpRollupVotingSubmitResultAction,
+  OffchainVotingStatusRenderStatusProps,
 } from './voting';
 import {
   ProposalData,
@@ -13,6 +14,7 @@ import {
   useProposalWithOffchainVoteStatus,
 } from './hooks';
 import {ContractAdapterNames, ContractDAOConfigKeys} from '../web3/types';
+import {CycleEllipsis} from '../feedback';
 import {useDaoConfigurations} from '../../hooks';
 import {VotingAdapterName} from '../adapters-extensions/enums';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
@@ -67,19 +69,36 @@ export default function ProposalWithOffchainVoteActions(
    * Variables
    */
 
-  /**
-   * Set the grace period start milliseconds either by
-   *
-   * 1) the DAO's grace period start timestamp,
-   * 2) or by `Date.now()` (i.e. no result was submitted).
-   *
-   * We fall back to case 2 so that the grace period timer will
-   * start, as it requires any `Number` above `0`.
-   */
-  const gracePeriodStartMs: number =
-    daoProposalVote && status === ProposalFlowStatus.OffchainVotingGracePeriod
-      ? Number(daoProposalVote.gracePeriodStartingTime) * 1000 || Date.now()
-      : 0;
+  const {
+    Completed,
+    OffchainVotingGracePeriod,
+    OffchainVotingSubmitResult,
+    OffchainVoting,
+    Process,
+    Sponsor,
+    Submit,
+  } = ProposalFlowStatus;
+
+  const gracePeriodStartResultToMs: number =
+    Number(daoProposalVote?.gracePeriodStartingTime || 0) * 1000;
+
+  const gracePeriodStartMs: number | undefined = gracePeriodStartResultToMs;
+
+  const gracePeriodEndMs: number | undefined =
+    gracePeriodStartResultToMs + Number(offchainGracePeriod || 0) * 1000;
+
+  const votePeriodStartResultToMs: number =
+    Number(daoProposalVote?.startingTime || 0) * 1000;
+
+  const votePeriodStartMs: number | undefined = votePeriodStartResultToMs;
+
+  const votePeriodEndMs: number | undefined =
+    votePeriodStartResultToMs + Number(offchainVotingPeriod || 0) * 1000;
+
+  // There is only one vote result entry as we only passed a single proposal
+  const offchainVotingResult = offchainVotingResults[0]?.[1];
+  const yesUnits = offchainVotingResult?.Yes.units || 0;
+  const noUnits = offchainVotingResult?.No.units || 0;
 
   /**
    * If a render prop was provided it will render it and pass
@@ -90,18 +109,14 @@ export default function ProposalWithOffchainVoteActions(
     renderActionProp({
       [VotingAdapterName.OffchainVotingContract]: {
         adapterName,
-        daoProposalVoteResult,
         daoProposalVote,
+        daoProposalVoteResult,
+        gracePeriodEndMs,
         gracePeriodStartMs,
         proposal,
         status,
       },
     });
-
-  // There is only one vote result entry as we only passed a single proposal
-  const offchainVotingResult = offchainVotingResults[0]?.[1];
-  const yesUnits = offchainVotingResult?.Yes.units || 0;
-  const noUnits = offchainVotingResult?.No.units || 0;
 
   /**
    * Functions
@@ -114,24 +129,24 @@ export default function ProposalWithOffchainVoteActions(
     }
 
     // Submit/Sponsor button (for proposals that have not been submitted onchain yet)
-    if (status === ProposalFlowStatus.Submit) {
+    if (status === Submit) {
       return <SubmitAction proposal={proposal} />;
     }
 
     // Sponsor button
-    if (status === ProposalFlowStatus.Sponsor) {
+    if (status === Sponsor) {
       return <SponsorAction proposal={proposal} />;
     }
 
     // Off-chain voting buttons
-    if (status === ProposalFlowStatus.OffchainVoting) {
+    if (status === OffchainVoting) {
       return (
         <OffchainVotingAction adapterName={adapterName} proposal={proposal} />
       );
     }
 
     // Off-chain voting submit vote result
-    if (status === ProposalFlowStatus.OffchainVotingSubmitResult) {
+    if (status === OffchainVotingSubmitResult) {
       // Return a React.Fragment to hide the "Submit Vote Result" button if vote
       // did not pass. For now, we can assume across all adapters that if the
       // vote did not pass then the vote result does not need to be submitted.
@@ -148,16 +163,36 @@ export default function ProposalWithOffchainVoteActions(
     }
 
     // Process button
-    if (
-      status === ProposalFlowStatus.Process ||
-      status === ProposalFlowStatus.OffchainVotingGracePeriod
-    ) {
+    if (status === Process || status === OffchainVotingGracePeriod) {
       return (
         <ProcessAction
           // Show during DAO proposal grace period, but set to disabled
-          disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
+          disabled={status === OffchainVotingGracePeriod}
           proposal={proposal}
         />
+      );
+    }
+  }
+
+  function renderOffchainVotingStatus({
+    hasGracePeriodEnded,
+  }: OffchainVotingStatusRenderStatusProps) {
+    /**
+     * Grace period ended label
+     *
+     * There is a slight lag between the JS countdown time and when the
+     * contract's `block.timestamp` is updated. Therefore, the updated
+     * vote result is not instantaneous.
+     */
+    if (hasGracePeriodEnded && status === OffchainVotingGracePeriod) {
+      return (
+        <span>
+          Grace period ended <br />{' '}
+          <span style={{textTransform: 'none'}}>
+            Awaiting contract status
+            <CycleEllipsis />
+          </span>
+        </span>
       );
     }
   }
@@ -169,25 +204,26 @@ export default function ProposalWithOffchainVoteActions(
   return (
     <>
       {/* STATUS */}
-
-      {(status === ProposalFlowStatus.OffchainVoting ||
-        status === ProposalFlowStatus.OffchainVotingSubmitResult ||
-        status === ProposalFlowStatus.OffchainVotingGracePeriod ||
-        status === ProposalFlowStatus.Process ||
-        status === ProposalFlowStatus.Completed) && (
+      {(status === OffchainVoting ||
+        status === OffchainVotingSubmitResult ||
+        status === OffchainVotingGracePeriod ||
+        status === Process ||
+        status === Completed) && (
         <OffchainVotingStatus
+          countdownGracePeriodEndMs={gracePeriodEndMs}
           countdownGracePeriodStartMs={gracePeriodStartMs}
+          countdownVotingEndMs={votePeriodEndMs}
+          countdownVotingStartMs={votePeriodStartMs}
           proposal={proposal}
+          renderStatus={renderOffchainVotingStatus}
           votingResult={offchainVotingResult}
         />
       )}
 
       {/* ACTIONS */}
-
       <div className="proposaldetails__button-container">{renderActions()}</div>
 
       {/* ERROR */}
-
       <ErrorMessageWithDetails
         error={proposalFlowStatusError}
         renderText="Something went wrong while getting the proposal's status"
