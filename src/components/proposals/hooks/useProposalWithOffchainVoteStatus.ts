@@ -34,10 +34,18 @@ type UseProposalWithOffchainVoteStatusReturn = {
 const DEFAULT_POLL_INTERVAL_MS: number =
   ENVIRONMENT === 'production' ? 15000 : 5000;
 
-export function useProposalWithOffchainVoteStatus(
-  proposal: ProposalData,
-  options?: {pollInterval?: number}
-): UseProposalWithOffchainVoteStatusReturn {
+export function useProposalWithOffchainVoteStatus({
+  proposal,
+  pollInterval = DEFAULT_POLL_INTERVAL_MS,
+}: {
+  proposal: ProposalData;
+  /**
+   * Defaults to `DEFAULT_POLL_INTERVAL_MS`:
+   *  - Production: 15000ms
+   *  - Development: 5000ms
+   */
+  pollInterval?: number;
+}): UseProposalWithOffchainVoteStatusReturn {
   /**
    * Selectors
    */
@@ -97,7 +105,6 @@ export function useProposalWithOffchainVoteStatus(
   const {daoProposalVotingAdapter, snapshotDraft, snapshotProposal} = proposal;
   const {votes: snapshotVotes} = snapshotProposal || {};
   const proposalId = snapshotDraft?.idInDAO || snapshotProposal?.idInDAO;
-  const {pollInterval = DEFAULT_POLL_INTERVAL_MS} = options || {};
 
   const atExistsInDAO = daoProposal
     ? proposalHasFlag(ProposalFlag.EXISTS, daoProposal.flags)

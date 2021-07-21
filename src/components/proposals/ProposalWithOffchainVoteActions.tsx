@@ -1,3 +1,5 @@
+import {useMemo} from 'react';
+
 import {
   OffchainVotingStatus,
   OffchainVotingAction,
@@ -59,7 +61,9 @@ export default function ProposalWithOffchainVoteActions(
     daoProposalVote,
     proposalFlowStatusError,
     status,
-  } = useProposalWithOffchainVoteStatus(proposal);
+  } = useProposalWithOffchainVoteStatus(
+    useMemo(() => ({proposal}), [proposal])
+  );
 
   const {offchainVotingResults} = useOffchainVotingResults(
     proposal.snapshotProposal
