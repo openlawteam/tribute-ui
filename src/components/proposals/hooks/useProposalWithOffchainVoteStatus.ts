@@ -144,6 +144,10 @@ export function useProposalWithOffchainVoteStatus(
     web3Instance,
   ]);
 
+  /**
+   * Effects
+   */
+
   useEffect(() => {
     // Call as soon as possible.
     getStatusFromContractCached().catch((error) => {
