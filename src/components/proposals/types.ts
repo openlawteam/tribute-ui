@@ -81,7 +81,8 @@ export type RenderActionPropArguments = {
     // An enum name (`string`) of the DAO proposal's `VotingState` index
     daoProposalVoteResult: typeof VotingState[any] | undefined;
     daoProposalVote: OffchainVotingAdapterVote | undefined;
-    gracePeriodStartMs: number;
+    gracePeriodStartMs: number | undefined;
+    gracePeriodEndMs: number | undefined;
     proposal: ProposalData;
     status: ProposalFlowStatus | undefined;
   };
