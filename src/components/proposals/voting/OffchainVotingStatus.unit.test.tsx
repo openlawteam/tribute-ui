@@ -388,7 +388,7 @@ describe('OffchainVotingStatus unit tests', () => {
     });
   }, 10000);
 
-  test.only('should render correct content when voting period and grace period provided', async () => {
+  test('should render correct content when voting period and grace period provided', async () => {
     const timeNowMs: number = Date.now();
     const proposal = fakeProposal() as ProposalData;
 
