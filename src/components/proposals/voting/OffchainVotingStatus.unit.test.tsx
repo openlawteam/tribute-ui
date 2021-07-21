@@ -388,7 +388,7 @@ describe('OffchainVotingStatus unit tests', () => {
     });
   }, 10000);
 
-  test('should render correct content when voting period and grace period provided', async () => {
+  test.only('should render correct content when voting period and grace period provided', async () => {
     const timeNowMs: number = Date.now();
     const proposal = fakeProposal() as ProposalData;
 
@@ -405,9 +405,9 @@ describe('OffchainVotingStatus unit tests', () => {
         }}>
         <OffchainVotingStatus
           countdownVotingStartMs={timeNowMs}
-          countdownVotingEndMs={timeNowMs + 3000}
-          countdownGracePeriodStartMs={timeNowMs + 4000}
-          countdownGracePeriodEndMs={timeNowMs + 9000}
+          countdownVotingEndMs={timeNowMs + 4000}
+          countdownGracePeriodStartMs={timeNowMs + 5000}
+          countdownGracePeriodEndMs={timeNowMs + 8000}
           proposal={proposal}
         />
       </Wrapper>
@@ -454,7 +454,7 @@ describe('OffchainVotingStatus unit tests', () => {
         expect(() => screen.getByText(votingEndsRegex)).toThrow();
         expect(() => screen.getByLabelText(loadingRegex)).toThrow();
       },
-      {timeout: 5000}
+      {timeout: 10000}
     );
 
     // Assert vote approved (grace period is finished)
