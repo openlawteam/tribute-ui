@@ -20,20 +20,24 @@ export type OffchainVotingStatusRenderStatusProps = {
 
 type OffchainVotingStatusProps = {
   /**
-   * Will override the default Snapshot proposal's voting `start` time
+   * Voting start time
+   * i.e. calculated from the `OffchainVoting` contract's vote's start time, or Snapshot proposal's start time
    */
   countdownVotingStartMs?: number;
   /**
-   * Will override the default Snapshot proposal's voting `end` time
+   * Voting end time
+   * i.e. calculated from the `OffchainVoting` contract's vote's end time, or Snapshot proposal's end time
    */
   countdownVotingEndMs?: number;
   /**
-   * When the offchain grace period start seconds are provided the grace period timer
-   * will display.
-   *
-   * Be sure to unset this value (`0`, `undefined`) if the grace period should not show.
+   * Grace period start time
+   * i.e. calculated from the `OffchainVoting` contract's vote's start time, or Snapshot proposal's start time
    */
   countdownGracePeriodStartMs?: number;
+  /**
+   * Grace period end time
+   * i.e. calculated from the `OffchainVoting` contract's vote's end time, or Snapshot proposal's end time
+   */
   countdownGracePeriodEndMs?: number;
   proposal: ProposalData;
   renderStatus?: (p: OffchainVotingStatusRenderStatusProps) => React.ReactNode;
