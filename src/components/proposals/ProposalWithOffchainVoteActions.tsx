@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 
 import {
   OffchainVotingStatus,
@@ -62,7 +62,12 @@ export default function ProposalWithOffchainVoteActions(
     proposalFlowStatusError,
     status,
   } = useProposalWithOffchainVoteStatus(
-    useMemo(() => ({proposal}), [proposal])
+    useMemo(
+      () => ({
+        proposal,
+      }),
+      [proposal]
+    )
   );
 
   const {offchainVotingResults} = useOffchainVotingResults(
@@ -83,21 +88,17 @@ export default function ProposalWithOffchainVoteActions(
     Submit,
   } = ProposalFlowStatus;
 
-  const gracePeriodStartResultToMs: number =
+  const gracePeriodStartMs: number =
     Number(daoProposalVote?.gracePeriodStartingTime || 0) * 1000;
 
-  const gracePeriodStartMs: number | undefined = gracePeriodStartResultToMs;
-
   const gracePeriodEndMs: number | undefined =
-    gracePeriodStartResultToMs + Number(offchainGracePeriod || 0) * 1000;
+    gracePeriodStartMs + Number(offchainGracePeriod || 0) * 1000;
 
-  const votePeriodStartResultToMs: number =
+  const votePeriodStartMs: number =
     Number(daoProposalVote?.startingTime || 0) * 1000;
 
-  const votePeriodStartMs: number | undefined = votePeriodStartResultToMs;
-
-  const votePeriodEndMs: number | undefined =
-    votePeriodStartResultToMs + Number(offchainVotingPeriod || 0) * 1000;
+  const votePeriodEndMs: number =
+    votePeriodStartMs + Number(offchainVotingPeriod || 0) * 1000;
 
   // There is only one vote result entry as we only passed a single proposal
   const offchainVotingResult = offchainVotingResults[0]?.[1];
