@@ -60,6 +60,18 @@ type UseProposalWithOffchainVoteStatusProps = {
   useCountdownToCheckInVoting?: boolean;
 };
 
+const {
+  Completed,
+  OffchainVotingGracePeriod,
+  OffchainVotingSubmitResult,
+  OffchainVoting,
+  Process,
+  Sponsor,
+  Submit,
+} = ProposalFlowStatus;
+
+const {STANDBY, PENDING, FULFILLED, REJECTED} = AsyncStatus;
+
 const DEFAULT_POLL_INTERVAL_MS: number =
   ENVIRONMENT === 'production' ? 15000 : 5000;
 
@@ -114,9 +126,8 @@ export function useProposalWithOffchainVoteStatus({
   const [proposalFlowStatusError, setProposalFlowStatusError] =
     useState<Error>();
 
-  const [initialFetchStatus, setInitialFetchStatus] = useState<AsyncStatus>(
-    AsyncStatus.STANDBY
-  );
+  const [initialFetchStatus, setInitialFetchStatus] =
+    useState<AsyncStatus>(STANDBY);
 
   /**
    * Refs
@@ -139,18 +150,7 @@ export function useProposalWithOffchainVoteStatus({
    * Variables
    */
 
-  const {
-    Completed,
-    OffchainVoting,
-    OffchainVotingGracePeriod,
-    OffchainVotingSubmitResult,
-    Process,
-    Sponsor,
-    Submit,
-  } = ProposalFlowStatus;
-
-  const initialFetchFulfilled: boolean =
-    initialFetchStatus === AsyncStatus.FULFILLED;
+  const initialFetchFulfilled: boolean = initialFetchStatus === FULFILLED;
 
   const initialAsyncChecksCompleted: boolean =
     initialFetchFulfilled &&
@@ -216,16 +216,16 @@ export function useProposalWithOffchainVoteStatus({
 
   // Get status as soon as possible.
   useEffect(() => {
-    setInitialFetchStatus(AsyncStatus.PENDING);
+    setInitialFetchStatus(PENDING);
 
     getStatusFromContractCached()
       .then((result) => {
         // If data was returned initially, set the status to fulfilled.
-        result && setInitialFetchStatus(AsyncStatus.FULFILLED);
+        result && setInitialFetchStatus(FULFILLED);
       })
       .catch((error) => {
         setProposalFlowStatusError(error);
-        setInitialFetchStatus(AsyncStatus.REJECTED);
+        setInitialFetchStatus(REJECTED);
       });
   }, [getStatusFromContractCached]);
 

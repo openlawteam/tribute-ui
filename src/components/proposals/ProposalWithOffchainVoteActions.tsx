@@ -38,6 +38,16 @@ type ProposalWithOffchainActionsProps = {
   renderAction?: (data: RenderActionPropArguments) => React.ReactNode;
 };
 
+const {
+  Completed,
+  OffchainVotingGracePeriod,
+  OffchainVotingSubmitResult,
+  OffchainVoting,
+  Process,
+  Sponsor,
+  Submit,
+} = ProposalFlowStatus;
+
 const configurationKeysToGet: ContractDAOConfigKeys[] = [
   ContractDAOConfigKeys.offchainVotingVotingPeriod,
   ContractDAOConfigKeys.offchainVotingGracePeriod,
@@ -77,16 +87,6 @@ export default function ProposalWithOffchainVoteActions(
   /**
    * Variables
    */
-
-  const {
-    Completed,
-    OffchainVotingGracePeriod,
-    OffchainVotingSubmitResult,
-    OffchainVoting,
-    Process,
-    Sponsor,
-    Submit,
-  } = ProposalFlowStatus;
 
   const gracePeriodStartMs: number =
     Number(daoProposalVote?.gracePeriodStartingTime || 0) * 1000;
