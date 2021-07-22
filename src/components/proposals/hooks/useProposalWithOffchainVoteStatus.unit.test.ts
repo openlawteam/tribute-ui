@@ -24,6 +24,8 @@ import OffchainVotingABI from '../../../truffle-contracts/OffchainVotingContract
 import Wrapper from '../../../test/Wrapper';
 
 const nowSeconds = Date.now() / 1000;
+const defaultVoteStartTime: number = nowSeconds - 5;
+const defaultVoteEndTime: number = nowSeconds + 5;
 
 const fakeSnapshotProposal: SnapshotProposal = {
   msg: {
@@ -33,8 +35,8 @@ const fakeSnapshotProposal: SnapshotProposal = {
       body: '',
       choices: [VoteChoices.Yes, VoteChoices.No],
       metadata: {},
-      start: nowSeconds - 5,
-      end: nowSeconds + 5,
+      start: defaultVoteStartTime,
+      end: defaultVoteEndTime,
     },
     version: '',
     timestamp: '',
@@ -192,7 +194,11 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       snapshotDraft: fakeSnapshotDraft,
     };
 
-    const args = {proposal: proposalData as ProposalData};
+    const args = {
+      countdownVotingEndMs: 0,
+      countdownVotingStartMs: 0,
+      proposal: proposalData as ProposalData,
+    };
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
@@ -260,7 +266,11 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       snapshotDraft: fakeSnapshotDraft,
     };
 
-    const args = {proposal: proposalData as ProposalData};
+    const args = {
+      countdownVotingEndMs: 0,
+      countdownVotingStartMs: 0,
+      proposal: proposalData as ProposalData,
+    };
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
@@ -333,7 +343,11 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       snapshotProposal: fakeSnapshotProposal,
     };
 
-    const args = {proposal: proposalData as ProposalData};
+    const args = {
+      countdownVotingEndMs: defaultVoteEndTime,
+      countdownVotingStartMs: defaultVoteStartTime,
+      proposal: proposalData as ProposalData,
+    };
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
@@ -468,7 +482,12 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       },
     };
 
-    const args = {proposal: proposalData as ProposalData};
+    const args = {
+      // Set offchain voting time as ended
+      countdownVotingEndMs: nowSeconds - 50,
+      countdownVotingStartMs: nowSeconds - 100,
+      proposal: proposalData as ProposalData,
+    };
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
@@ -574,7 +593,12 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       },
     };
 
-    const args = {proposal: proposalData as ProposalData};
+    const args = {
+      // Set offchain voting time as ended
+      countdownVotingEndMs: nowSeconds - 50,
+      countdownVotingStartMs: nowSeconds - 100,
+      proposal: proposalData as ProposalData,
+    };
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
@@ -678,7 +702,12 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       },
     };
 
-    const args = {proposal: proposalData as ProposalData};
+    const args = {
+      // Set offchain voting time as ended
+      countdownVotingEndMs: nowSeconds - 50,
+      countdownVotingStartMs: nowSeconds - 100,
+      proposal: proposalData as ProposalData,
+    };
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
@@ -780,7 +809,12 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       },
     };
 
-    const args = {proposal: proposalData as ProposalData};
+    const args = {
+      // Set offchain voting time as ended
+      countdownVotingEndMs: nowSeconds - 50,
+      countdownVotingStartMs: nowSeconds - 100,
+      proposal: proposalData as ProposalData,
+    };
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
@@ -880,7 +914,12 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       },
     };
 
-    const args = {proposal: proposalData as ProposalData};
+    const args = {
+      // Set offchain voting time as ended
+      countdownVotingEndMs: nowSeconds - 50,
+      countdownVotingStartMs: nowSeconds - 100,
+      proposal: proposalData as ProposalData,
+    };
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
@@ -986,7 +1025,12 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       },
     };
 
-    const args = {proposal: proposalData as ProposalData};
+    const args = {
+      // Set offchain voting time as ended
+      countdownVotingEndMs: nowSeconds - 50,
+      countdownVotingStartMs: nowSeconds - 100,
+      proposal: proposalData as ProposalData,
+    };
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
@@ -1089,7 +1133,13 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       },
     };
 
-    const args = {proposal: proposalData as ProposalData, pollInterval: 2000};
+    const args = {
+      // Set offchain voting time as ended
+      countdownVotingEndMs: nowSeconds - 50,
+      countdownVotingStartMs: nowSeconds - 100,
+      proposal: proposalData as ProposalData,
+      pollInterval: 2000,
+    };
 
     let mockWeb3Provider: FakeHttpProvider;
     let web3Instance: Web3;
@@ -1243,7 +1293,13 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       },
     };
 
-    const args = {proposal: proposalData as ProposalData, pollInterval: 2000};
+    const args = {
+      // Set offchain voting time as ended
+      countdownVotingEndMs: nowSeconds - 50,
+      countdownVotingStartMs: nowSeconds - 100,
+      proposal: proposalData as ProposalData,
+      pollInterval: 2000,
+    };
 
     let web3Instance: Web3;
     let mockWeb3Provider: FakeHttpProvider;
@@ -1324,7 +1380,13 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       snapshotDraft: fakeSnapshotDraft,
     };
 
-    const args = {proposal: proposalData as ProposalData, pollInterval: 2000};
+    const args = {
+      // Set offchain voting time as ended
+      countdownVotingEndMs: 0,
+      countdownVotingStartMs: 0,
+      proposal: proposalData as ProposalData,
+      pollInterval: 2000,
+    };
 
     let web3Instance: Web3;
     let mockWeb3Provider: FakeHttpProvider;
@@ -1414,7 +1476,13 @@ describe('useProposalWithOffchainVoteStatus unit tests', () => {
       },
     };
 
-    const args = {proposal: proposalData as ProposalData, pollInterval: 2000};
+    const args = {
+      // Set offchain voting time as ended
+      countdownVotingEndMs: nowSeconds - 50,
+      countdownVotingStartMs: nowSeconds - 100,
+      proposal: proposalData as ProposalData,
+      pollInterval: 2000,
+    };
 
     let mockWeb3Provider: FakeHttpProvider;
     let web3Instance: Web3;
