@@ -19,6 +19,16 @@ function areAllAsyncReady(asyncMapping: Record<string, AsyncStatus>) {
   return Object.values(asyncMapping).every((s) => s === AsyncStatus.FULFILLED);
 }
 
+/**
+ * Provides `boolean` results when time starts and ends.
+ *
+ * If either `startSeconds` or `endSeconds` are `undefined`, or `<= 0`
+ * the checks will never run; only `timeStartEndInitReady` will ever be `true`.
+ *
+ * @param startSeconds
+ * @param endSeconds
+ * @returns `UseTimeStartEndReturn`
+ */
 export function useTimeStartEnd(
   startSeconds: number | undefined,
   endSeconds: number | undefined
@@ -37,7 +47,6 @@ export function useTimeStartEnd(
    */
 
   const [hasTimeStarted, setHasTimeStarted] = useState<boolean>(false);
-
   const [hasTimeEnded, setHasTimeEnded] = useState<boolean>(false);
 
   const [timeStartEndInitReady, setTimeStartEndInitReady] = useState<boolean>(
@@ -45,16 +54,22 @@ export function useTimeStartEnd(
   );
 
   /**
+   * Variables
+   */
+
+  const shouldNotCheck: boolean =
+    startSeconds === undefined ||
+    endSeconds === undefined ||
+    startSeconds <= 0 ||
+    endSeconds <= 0;
+
+  /**
    * Effects
    */
 
   // Actively check if time has started
   useEffect(() => {
-    if (
-      hasTimeStarted ||
-      startSeconds === undefined ||
-      endSeconds === undefined
-    ) {
+    if (hasTimeStarted || shouldNotCheck) {
       setTimeStartEndInitReady(() => {
         startEndStatusRef.current.start = AsyncStatus.FULFILLED;
         return areAllAsyncReady(startEndStatusRef.current);
@@ -77,7 +92,7 @@ export function useTimeStartEnd(
       });
 
       const hasStartedCheck: boolean =
-        Math.floor(Date.now() / 1000) > startSeconds;
+        Math.floor(Date.now() / 1000) > (startSeconds ?? 0);
 
       if (!hasStartedCheck) return;
 
@@ -89,15 +104,11 @@ export function useTimeStartEnd(
         clearInterval(intervalID);
       }
     };
-  }, [endSeconds, hasTimeStarted, startSeconds]);
+  }, [hasTimeStarted, shouldNotCheck, startSeconds]);
 
   // Actively check if time has ended
   useEffect(() => {
-    if (
-      hasTimeEnded ||
-      startSeconds === undefined ||
-      endSeconds === undefined
-    ) {
+    if (hasTimeEnded || shouldNotCheck) {
       setTimeStartEndInitReady(() => {
         startEndStatusRef.current.end = AsyncStatus.FULFILLED;
         return areAllAsyncReady(startEndStatusRef.current);
@@ -119,7 +130,8 @@ export function useTimeStartEnd(
         return areAllAsyncReady(startEndStatusRef.current);
       });
 
-      const hasEndedCheck: boolean = Math.ceil(Date.now() / 1000) > endSeconds;
+      const hasEndedCheck: boolean =
+        Math.ceil(Date.now() / 1000) > (endSeconds ?? 0);
 
       if (!hasEndedCheck) return;
 
@@ -131,7 +143,7 @@ export function useTimeStartEnd(
         clearInterval(intervalID);
       }
     };
-  }, [endSeconds, hasTimeEnded, startSeconds]);
+  }, [endSeconds, hasTimeEnded, shouldNotCheck]);
 
   return {
     hasTimeStarted,
