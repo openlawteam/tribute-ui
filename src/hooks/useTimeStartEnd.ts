@@ -84,7 +84,7 @@ export function useTimeStartEnd(
       setHasTimeStarted(hasStartedCheck);
     }, 1000);
 
-    return () => {
+    return function cleanup() {
       if (intervalID) {
         clearInterval(intervalID);
       }
@@ -126,7 +126,7 @@ export function useTimeStartEnd(
       setHasTimeEnded(hasEndedCheck);
     }, 1000);
 
-    return () => {
+    return function cleanup() {
       if (intervalID) {
         clearInterval(intervalID);
       }
