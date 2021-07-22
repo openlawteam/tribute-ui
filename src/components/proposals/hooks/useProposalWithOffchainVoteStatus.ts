@@ -216,6 +216,8 @@ export function useProposalWithOffchainVoteStatus({
 
   // Get status as soon as possible.
   useEffect(() => {
+    if (initialFetchStatus === FULFILLED) return;
+
     setInitialFetchStatus(PENDING);
 
     getStatusFromContractCached()
@@ -227,7 +229,7 @@ export function useProposalWithOffchainVoteStatus({
         setProposalFlowStatusError(error);
         setInitialFetchStatus(REJECTED);
       });
-  }, [getStatusFromContractCached]);
+  }, [getStatusFromContractCached, initialFetchStatus]);
 
   // Poll for status, etc.
   useEffect(() => {
