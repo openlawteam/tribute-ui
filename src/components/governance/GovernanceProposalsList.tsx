@@ -182,6 +182,12 @@ export default function GovernanceProposalsList(
       const proposalId = proposal.snapshotProposal?.idInSnapshot;
       const proposalName = proposal.snapshotProposal?.msg.payload.name || '';
 
+      const votingStartMs: number =
+        proposal.snapshotProposal?.msg.payload.start || 0;
+
+      const votingEndMs: number =
+        proposal.snapshotProposal?.msg.payload.end || 0;
+
       if (!proposalId) return null;
 
       const offchainResult = offchainVotingResults.find(
@@ -209,8 +215,9 @@ export default function GovernanceProposalsList(
           proposalOnClickId={proposalId}
           renderStatus={() => (
             <OffchainVotingStatus
-              proposal={proposal}
               votingResult={offchainResult}
+              countdownVotingEndMs={votingEndMs}
+              countdownVotingStartMs={votingStartMs}
             />
           )}
         />
