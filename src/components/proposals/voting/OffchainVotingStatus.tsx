@@ -2,6 +2,7 @@ import {CycleEllipsis} from '../../feedback';
 import {useTimeStartEnd} from '../../../hooks';
 import {VotingResult} from '../types';
 import {VotingStatus} from './VotingStatus';
+import {useEffect} from 'react';
 
 export type OffchainVotingStatusRenderStatusProps = {
   countdownGracePeriodEndMs: OffchainVotingStatusProps['countdownGracePeriodEndMs'];
@@ -14,6 +15,26 @@ export type OffchainVotingStatusRenderStatusProps = {
   hasGracePeriodStarted: boolean;
   hasVotingEnded: boolean;
   hasVotingStarted: boolean;
+  votingStartEndInitReady: boolean;
+};
+
+type OnGracePeriodChangeProps = {
+  hasGracePeriodEnded: boolean;
+  hasGracePeriodStarted: boolean;
+  /**
+   * Helpful if responding to events for multiple proposals
+   */
+  proposalId?: string;
+  gracePeriodStartEndInitReady: boolean;
+};
+
+type OnVotingPeriodChangeProps = {
+  hasVotingEnded: boolean;
+  hasVotingStarted: boolean;
+  /**
+   * Helpful if responding to events for multiple proposals
+   */
+  proposalId?: string;
   votingStartEndInitReady: boolean;
 };
 
@@ -38,6 +59,22 @@ type OffchainVotingStatusProps = {
    * i.e. calculated from the `OffchainVoting` contract's vote's end time, or Snapshot proposal's end time
    */
   countdownGracePeriodEndMs?: number;
+  /**
+   * An optional callback to run on grace period time changes
+   */
+  onGracePeriodChange?: (p: OnGracePeriodChangeProps) => void;
+  /**
+   * An optional callback to run on voting time changes
+   */
+  onVotingPeriodChange?: (p: OnVotingPeriodChangeProps) => void;
+  /**
+   * An optional proposal ID if working with multiple proposals (i.e. listing).
+   * Helps when repsonding to events from callbacks like `onVotingPeriodChange` and `onGracePeriodChange`.
+   */
+  proposalId?: string;
+  /**
+   * Render a custom status
+   */
   renderStatus?: (p: OffchainVotingStatusRenderStatusProps) => React.ReactNode;
   /**
    * A single proposal's `VotingResult` (i.e. as provided by `useOffchainVotingResults`)
@@ -68,6 +105,9 @@ export function OffchainVotingStatus({
   countdownGracePeriodStartMs,
   countdownVotingEndMs,
   countdownVotingStartMs,
+  onGracePeriodChange,
+  onVotingPeriodChange,
+  proposalId,
   renderStatus,
   votingResult,
 }: OffchainVotingStatusProps): JSX.Element {
@@ -136,6 +176,46 @@ export function OffchainVotingStatus({
     hasVotingStarted,
     votingStartEndInitReady,
   });
+
+  /**
+   * Effects
+   */
+
+  // When voting times are updated, call the `onVotingPeriodChange` callback
+  useEffect(() => {
+    if (!votingStartEndInitReady) return;
+
+    onVotingPeriodChange?.({
+      hasVotingStarted,
+      hasVotingEnded,
+      proposalId,
+      votingStartEndInitReady,
+    });
+  }, [
+    hasVotingEnded,
+    hasVotingStarted,
+    onVotingPeriodChange,
+    proposalId,
+    votingStartEndInitReady,
+  ]);
+
+  // When voting times are updated, call the `onGracePeriodChange` callback
+  useEffect(() => {
+    if (!gracePeriodStartEndInitReady) return;
+
+    onGracePeriodChange?.({
+      hasGracePeriodEnded,
+      hasGracePeriodStarted,
+      proposalId,
+      gracePeriodStartEndInitReady,
+    });
+  }, [
+    gracePeriodStartEndInitReady,
+    hasGracePeriodEnded,
+    hasGracePeriodStarted,
+    onGracePeriodChange,
+    proposalId,
+  ]);
 
   /**
    * Functions

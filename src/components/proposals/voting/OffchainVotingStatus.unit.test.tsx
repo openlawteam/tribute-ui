@@ -416,4 +416,96 @@ describe('OffchainVotingStatus unit tests', () => {
       ]);
     });
   });
+
+  test('should call `onVotingPeriodChange` throughout voting period', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs;
+    const votingEndMs: number = nowMs + 3000;
+    const spy = jest.fn();
+
+    render(
+      <Wrapper useInit useWallet>
+        <OffchainVotingStatus
+          countdownVotingEndMs={votingEndMs}
+          countdownVotingStartMs={votingStartMs}
+          onVotingPeriodChange={spy}
+          votingResult={defaultPassedVotingResult}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(
+      () => {
+        expect(spy.mock.calls[0]?.[0]).toEqual({
+          hasVotingEnded: false,
+          hasVotingStarted: true,
+          proposalId: undefined,
+          votingStartEndInitReady: true,
+        });
+      },
+      {timeout: 3000}
+    );
+
+    await waitFor(
+      () => {
+        expect(spy.mock.calls[1]?.[0]).toEqual({
+          hasVotingEnded: true,
+          hasVotingStarted: true,
+          proposalId: undefined,
+          votingStartEndInitReady: true,
+        });
+      },
+      {timeout: 3000}
+    );
+
+    expect(spy.mock.calls.length).toBe(2);
+  });
+
+  test('should call `onGracePeriodChange` throughout grace period', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs - 5000;
+    const votingEndMs: number = nowMs;
+    const gracePeriodStartMs: number = nowMs;
+    const gracePeriodEndMs: number = nowMs + 3000;
+    const spy = jest.fn();
+
+    render(
+      <Wrapper useInit useWallet>
+        <OffchainVotingStatus
+          countdownGracePeriodEndMs={gracePeriodEndMs}
+          countdownGracePeriodStartMs={gracePeriodStartMs}
+          countdownVotingEndMs={votingEndMs}
+          countdownVotingStartMs={votingStartMs}
+          onGracePeriodChange={spy}
+          votingResult={defaultPassedVotingResult}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(
+      () => {
+        expect(spy.mock.calls[0]?.[0]).toEqual({
+          gracePeriodStartEndInitReady: true,
+          hasGracePeriodEnded: false,
+          hasGracePeriodStarted: true,
+          proposalId: undefined,
+        });
+      },
+      {timeout: 3000}
+    );
+
+    await waitFor(
+      () => {
+        expect(spy.mock.calls[1]?.[0]).toEqual({
+          gracePeriodStartEndInitReady: true,
+          hasGracePeriodEnded: true,
+          hasGracePeriodStarted: true,
+          proposalId: undefined,
+        });
+      },
+      {timeout: 3000}
+    );
+
+    expect(spy.mock.calls.length).toBe(2);
+  });
 });
