@@ -1,7 +1,6 @@
 import {CycleEllipsis} from '../../feedback';
-import {ProposalData, VotingResult} from '../types';
-import {useOffchainVotingResults} from '../hooks';
 import {useTimeStartEnd} from '../../../hooks';
+import {VotingResult} from '../types';
 import {VotingStatus} from './VotingStatus';
 
 export type OffchainVotingStatusRenderStatusProps = {
@@ -9,7 +8,7 @@ export type OffchainVotingStatusRenderStatusProps = {
   countdownGracePeriodStartMs: OffchainVotingStatusProps['countdownGracePeriodStartMs'];
   countdownVotingEndMs: OffchainVotingStatusProps['countdownVotingEndMs'];
   countdownVotingStartMs: OffchainVotingStatusProps['countdownVotingStartMs'];
-  didVotePass: boolean | undefined;
+  didVotePassSimpleMajority: boolean | undefined;
   gracePeriodStartEndInitReady: boolean;
   hasGracePeriodEnded: boolean;
   hasGracePeriodStarted: boolean;
@@ -23,12 +22,12 @@ type OffchainVotingStatusProps = {
    * Voting start time
    * i.e. calculated from the `OffchainVoting` contract's vote's start time, or Snapshot proposal's start time
    */
-  countdownVotingStartMs?: number;
+  countdownVotingStartMs: number | undefined;
   /**
    * Voting end time
    * i.e. calculated from the `OffchainVoting` contract's vote's end time, or Snapshot proposal's end time
    */
-  countdownVotingEndMs?: number;
+  countdownVotingEndMs: number | undefined;
   /**
    * Grace period start time
    * i.e. calculated from the `OffchainVoting` contract's vote's start time, or Snapshot proposal's start time
@@ -39,16 +38,11 @@ type OffchainVotingStatusProps = {
    * i.e. calculated from the `OffchainVoting` contract's vote's end time, or Snapshot proposal's end time
    */
   countdownGracePeriodEndMs?: number;
-  proposal: ProposalData;
   renderStatus?: (p: OffchainVotingStatusRenderStatusProps) => React.ReactNode;
   /**
-   * If a fetched `VotingResult` is provided
-   * it will save the need to fetch inside of this component.
-   *
-   * e.g. Governance proposals listing may fetch all voting results
-   *   in order to filter the `ProposalCard`s and be able to provide the results.
+   * A single proposal's `VotingResult` (i.e. as provided by `useOffchainVotingResults`)
    */
-  votingResult?: VotingResult;
+  votingResult: VotingResult | undefined;
 };
 
 // Grace period label
@@ -74,28 +68,24 @@ export function OffchainVotingStatus({
   countdownGracePeriodStartMs,
   countdownVotingEndMs,
   countdownVotingStartMs,
-  proposal,
   renderStatus,
   votingResult,
 }: OffchainVotingStatusProps): JSX.Element {
-  const {snapshotProposal} = proposal;
-
-  const votingStartSecondsToUse: number | undefined = countdownVotingStartMs
+  const votingStartSecondsToUse: number = countdownVotingStartMs
     ? countdownVotingStartMs / 1000
-    : snapshotProposal?.msg.payload.start;
+    : 0;
 
-  const votingEndSecondsToUse: number | undefined = countdownVotingEndMs
+  const votingEndSecondsToUse: number = countdownVotingEndMs
     ? countdownVotingEndMs / 1000
-    : snapshotProposal?.msg.payload.end;
+    : 0;
 
-  const gracePeriodStartToSeconds: number | undefined =
-    countdownGracePeriodStartMs
-      ? countdownGracePeriodStartMs / 1000
-      : undefined;
+  const gracePeriodStartToSeconds: number = countdownGracePeriodStartMs
+    ? countdownGracePeriodStartMs / 1000
+    : 0;
 
-  const gracePeriodEndToSeconds: number | undefined = countdownGracePeriodEndMs
+  const gracePeriodEndToSeconds: number = countdownGracePeriodEndMs
     ? countdownGracePeriodEndMs / 1000
-    : undefined;
+    : 0;
 
   /**
    * Our hooks
@@ -113,31 +103,23 @@ export function OffchainVotingStatus({
     timeStartEndInitReady: gracePeriodStartEndInitReady,
   } = useTimeStartEnd(gracePeriodStartToSeconds, gracePeriodEndToSeconds);
 
-  const {offchainVotingResults} = useOffchainVotingResults(
-    votingResult ? undefined : snapshotProposal
-  );
-
   /**
    * Variables
    */
-
-  // There is only one vote result entry as we only passed a single proposal
-  const votingResultToUse: VotingResult = votingResult
-    ? votingResult
-    : offchainVotingResults[0]?.[1];
 
   const isGracePeriodActive: boolean =
     gracePeriodStartEndInitReady &&
     hasGracePeriodStarted &&
     !hasGracePeriodEnded;
 
-  const noUnits: number = votingResultToUse?.No.units || 0;
-  const totalUnits: number = votingResultToUse?.totalUnits;
+  const noUnits: number = votingResult?.No.units || 0;
+  const totalUnits: number = votingResult?.totalUnits || 0;
   const votingEndMs: number = (votingEndSecondsToUse || 0) * 1000;
   const votingStartMs: number = (votingStartSecondsToUse || 0) * 1000;
-  const yesUnits: number = votingResultToUse?.Yes.units || 0;
+  const yesUnits: number = votingResult?.Yes.units || 0;
+
   // We use `undefined` to indicate that the result has not yet been determined.
-  const didVotePass: boolean | undefined = hasVotingEnded
+  const didVotePassSimpleMajority: boolean | undefined = hasVotingEnded
     ? yesUnits > noUnits
     : undefined;
 
@@ -146,7 +128,7 @@ export function OffchainVotingStatus({
     countdownGracePeriodStartMs,
     countdownVotingEndMs: votingEndMs,
     countdownVotingStartMs: votingStartMs,
-    didVotePass,
+    didVotePassSimpleMajority,
     gracePeriodStartEndInitReady,
     hasGracePeriodEnded,
     hasGracePeriodStarted,
@@ -165,7 +147,7 @@ export function OffchainVotingStatus({
       return renderedStatusFromProp;
     }
 
-    // Default: loading
+    // Loading
     if (!votingStartEndInitReady) {
       return (
         <CycleEllipsis
@@ -176,14 +158,19 @@ export function OffchainVotingStatus({
       );
     }
 
-    // Default: If in grace period, do not show a label, as we will provide it to `ProposalPeriodComponent`.
+    // If in grace period, do not show a status.
     if (isGracePeriodActive) {
       return '';
     }
 
-    // Default: On voting period and grace period ended
-    if (hasVotingEnded) {
-      return yesUnits > noUnits ? 'Approved' : 'Failed';
+    // If passed on voting period ended
+    if (didVotePassSimpleMajority) {
+      return 'Approved';
+    }
+
+    // If failed on voting period ended
+    if (didVotePassSimpleMajority === false) {
+      return 'Failed';
     }
   }
 
