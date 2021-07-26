@@ -143,6 +143,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
       expect(
         screen.getByRole('button', {name: /^vote yes$/i})
       ).toBeInTheDocument();
+
       expect(
         screen.getByRole('button', {name: /^vote no$/i})
       ).toBeInTheDocument();

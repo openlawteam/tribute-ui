@@ -219,7 +219,6 @@ export default function ProposalWithOffchainVoteActions(
           countdownGracePeriodStartMs={gracePeriodStartMs}
           countdownVotingEndMs={votePeriodEndMs}
           countdownVotingStartMs={votePeriodStartMs}
-          proposal={proposal}
           renderStatus={renderOffchainVotingStatus}
           votingResult={offchainVotingResult}
         />
