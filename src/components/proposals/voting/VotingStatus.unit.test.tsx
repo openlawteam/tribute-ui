@@ -3,21 +3,22 @@ import {render, screen, waitFor} from '@testing-library/react';
 import {VotingStatus} from './VotingStatus';
 
 describe('VotingStatus unit tests', () => {
+  // @note This test uses an adjusted Jest timeout
   test('can render and show correct UI', async () => {
     const nowMs = Date.now();
 
     // Voting started
     const {rerender} = render(
       <VotingStatus
+        hasVotingEnded={false}
+        noUnits={100000}
+        renderStatus={() => 'You are in voting'}
         renderTimer={(ProposalPeriodComponent) => (
           <ProposalPeriodComponent
             startPeriodMs={nowMs}
             endPeriodMs={nowMs + 3000}
           />
         )}
-        renderStatus={() => 'You are in voting'}
-        hasVotingEnded={false}
-        noUnits={100000}
         totalUnits={10000000}
         yesUnits={500000}
       />
@@ -43,6 +44,9 @@ describe('VotingStatus unit tests', () => {
     // Grace period
     rerender(
       <VotingStatus
+        hasVotingEnded={true}
+        noUnits={100000}
+        renderStatus={() => null}
         renderTimer={(ProposalPeriodComponent) => (
           <ProposalPeriodComponent
             startPeriodMs={Date.now()}
@@ -50,9 +54,6 @@ describe('VotingStatus unit tests', () => {
             endLabel="Grace period:"
           />
         )}
-        renderStatus={() => null}
-        hasVotingEnded={true}
-        noUnits={100000}
         totalUnits={10000000}
         yesUnits={500000}
       />
@@ -64,6 +65,7 @@ describe('VotingStatus unit tests', () => {
       expect(screen.getByText(/grace period:/i)).toBeInTheDocument();
       expect(screen.getByText(/1 sec/i)).toBeInTheDocument();
     });
+
     // @note This label probably wouldn't show as we'd render `null` the timer after the grace period was over.
     await waitFor(() => {
       expect(screen.getByText(/ended/i)).toBeInTheDocument();
@@ -72,10 +74,10 @@ describe('VotingStatus unit tests', () => {
     // Voting passed
     rerender(
       <VotingStatus
-        renderTimer={() => null}
-        renderStatus={() => 'Approved'}
         hasVotingEnded={true}
         noUnits={100000}
+        renderStatus={() => 'Approved'}
+        renderTimer={() => null}
         totalUnits={10000000}
         yesUnits={500000}
       />
@@ -86,5 +88,5 @@ describe('VotingStatus unit tests', () => {
       // CheckSVG label
       expect(screen.getByLabelText(/vote has passed/i)).toBeInTheDocument();
     });
-  }, 10000); // long-running test
+  }, 10000);
 });
