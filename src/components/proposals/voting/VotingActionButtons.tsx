@@ -2,6 +2,7 @@ import React, {ButtonHTMLAttributes} from 'react';
 import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 
 import Loader from '../../feedback/Loader';
+import CheckSVG from '../../../assets/svg/CheckSVG';
 
 type VotingActionButtonsProps = {
   /**
@@ -19,9 +20,6 @@ type VotingActionButtonsProps = {
   voteProgress?: VoteChoices;
 };
 
-/**
- * @todo Implement vote chosen
- */
 export function VotingActionButtons(
   props: VotingActionButtonsProps
 ): JSX.Element {
@@ -31,10 +29,7 @@ export function VotingActionButtons(
    * Functions
    */
 
-  const getVotedClass = (choice: VoteChoices): string =>
-    voteChosen === choice ? 'votingbutton--voted' : '';
-
-  function getARIALabel(
+  function getButtonARIALabel(
     choice: VoteChoices
   ): Partial<React.HTMLAttributes<HTMLElement>> {
     return voteProgress === choice
@@ -42,7 +37,7 @@ export function VotingActionButtons(
       : {};
   }
 
-  function getVotingText(choice: VoteChoices): React.ReactNode {
+  function getButtonText(choice: VoteChoices): React.ReactNode {
     return voteProgress === choice ? (
       <Loader aria-label={`Voting ${choice} spinner image`} role="img" />
     ) : voteChosen === choice ? (
@@ -58,6 +53,19 @@ export function VotingActionButtons(
     };
   }
 
+  function renderVotedCheck(
+    choice: VoteChoices,
+    ariaLabel: string
+  ): React.ReactNode {
+    return voteChosen === choice ? (
+      <>
+        <CheckSVG aria-label={ariaLabel} />{' '}
+      </>
+    ) : (
+      ''
+    );
+  }
+
   /**
    * Render
    */
@@ -66,17 +74,22 @@ export function VotingActionButtons(
     <>
       <button
         {...buttonProps}
-        {...getARIALabel(VoteChoices.Yes)}
-        className={`proposaldetails__button ${getVotedClass(VoteChoices.Yes)}`}
+        {...getButtonARIALabel(VoteChoices.Yes)}
+        className={`proposaldetails__button`}
         onClick={handleClick(VoteChoices.Yes)}>
-        {getVotingText(VoteChoices.Yes)}
+        <>
+          {renderVotedCheck(VoteChoices.Yes, 'You voted yes')}
+          {getButtonText(VoteChoices.Yes)}
+        </>
       </button>
+
       <button
         {...buttonProps}
-        {...getARIALabel(VoteChoices.No)}
-        className={`proposaldetails__button ${getVotedClass(VoteChoices.No)}`}
+        {...getButtonARIALabel(VoteChoices.No)}
+        className={`proposaldetails__button`}
         onClick={handleClick(VoteChoices.No)}>
-        {getVotingText(VoteChoices.No)}
+        {renderVotedCheck(VoteChoices.No, 'You voted no')}
+        {getButtonText(VoteChoices.No)}
       </button>
     </>
   );
