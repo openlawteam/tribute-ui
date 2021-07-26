@@ -18,7 +18,7 @@ export type OffchainVotingStatusRenderStatusProps = {
   votingStartEndInitReady: boolean;
 };
 
-type OnGracePeriodChangeProps = {
+export type OnGracePeriodChangeProps = {
   hasGracePeriodEnded: boolean;
   hasGracePeriodStarted: boolean;
   /**
@@ -28,7 +28,7 @@ type OnGracePeriodChangeProps = {
   gracePeriodStartEndInitReady: boolean;
 };
 
-type OnVotingPeriodChangeProps = {
+export type OnVotingPeriodChangeProps = {
   hasVotingEnded: boolean;
   hasVotingStarted: boolean;
   /**
