@@ -1,5 +1,7 @@
 import {useEffect, useState} from 'react';
 
+import {getTimeRemaining} from '../../util/helpers';
+
 type ProposalPeriodProps = {
   endedLabel?: React.ReactNode;
   endLabel?: React.ReactNode;
@@ -50,24 +52,6 @@ function formatTimePeriod(time: number, period: string) {
   const formattedPeriod = time === 0 || time > 1 ? `${period}s` : period;
 
   return `${time} ${formattedPeriod}`;
-}
-
-function getTimeRemaining(endTime: Date) {
-  const total =
-    Date.parse(endTime.toString()) - Date.parse(new Date().toString());
-
-  const seconds = Math.floor((total / 1000) % 60);
-  const minutes = Math.floor((total / 1000 / 60) % 60);
-  const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
-  const days = Math.floor(total / (1000 * 60 * 60 * 24));
-
-  return {
-    days,
-    hours,
-    minutes,
-    seconds,
-    total,
-  };
 }
 
 export default function ProposalPeriod(props: ProposalPeriodProps) {
