@@ -66,11 +66,6 @@ describe('VotingStatus unit tests', () => {
       expect(screen.getByText(/1 sec/i)).toBeInTheDocument();
     });
 
-    // @note This label probably wouldn't show as we'd render `null` the timer after the grace period was over.
-    await waitFor(() => {
-      expect(screen.getByText(/ended/i)).toBeInTheDocument();
-    });
-
     // Voting passed
     rerender(
       <VotingStatus
