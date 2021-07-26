@@ -1,8 +1,8 @@
 import React, {ButtonHTMLAttributes} from 'react';
 import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 
-import Loader from '../../feedback/Loader';
 import CheckSVG from '../../../assets/svg/CheckSVG';
+import Loader from '../../feedback/Loader';
 
 type VotingActionButtonsProps = {
   /**
@@ -77,10 +77,8 @@ export function VotingActionButtons(
         {...getButtonARIALabel(VoteChoices.Yes)}
         className={`proposaldetails__button`}
         onClick={handleClick(VoteChoices.Yes)}>
-        <>
-          {renderVotedCheck(VoteChoices.Yes, 'You voted yes')}
-          {getButtonText(VoteChoices.Yes)}
-        </>
+        {renderVotedCheck(VoteChoices.Yes, 'You voted yes')}
+        {getButtonText(VoteChoices.Yes)}
       </button>
 
       <button
