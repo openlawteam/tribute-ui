@@ -1,8 +1,9 @@
+import {useEffect} from 'react';
+
 import {CycleEllipsis} from '../../feedback';
 import {useTimeStartEnd} from '../../../hooks';
 import {VotingResult} from '../types';
 import {VotingStatus} from './VotingStatus';
-import {useEffect} from 'react';
 
 export type OffchainVotingStatusRenderStatusProps = {
   countdownGracePeriodEndMs: OffchainVotingStatusProps['countdownGracePeriodEndMs'];
