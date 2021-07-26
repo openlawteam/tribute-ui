@@ -6,11 +6,13 @@ import {
 } from '../adapters-extensions/enums';
 import {AsyncStatus} from '../../util/types';
 import {BURN_ADDRESS} from '../../util/constants';
+import {ContractDAOConfigKeys} from '../web3/types';
 import {normalizeString} from '../../util/helpers';
+import {OffchainVotingAdapterVote, ProposalData, ProposalFlag} from './types';
 import {OffchainVotingStatus} from './voting';
-import {ProposalData, ProposalFlag, VotingResult} from './types';
 import {proposalHasFlag, proposalHasVotingState} from './helpers';
 import {ProposalHeaderNames} from '../../util/enums';
+import {useDaoConfigurations} from '../../hooks';
 import {useIsDefaultChain} from '../web3/hooks';
 import {useProposals, useOffchainVotingResults} from './hooks';
 import {VotingState} from './voting/types';
@@ -48,6 +50,41 @@ type FilteredProposals = {
   votingProposals: ProposalData[];
 };
 
+const configurationKeysToGet: ContractDAOConfigKeys[] = [
+  ContractDAOConfigKeys.offchainVotingVotingPeriod,
+  ContractDAOConfigKeys.offchainVotingGracePeriod,
+];
+
+function getOffchainContractVotingAndGracePeriodTimes({
+  daoProposalVote,
+  offchainGracePeriod,
+  offchainVotingPeriod,
+}: {
+  daoProposalVote: OffchainVotingAdapterVote | undefined;
+  offchainGracePeriod: number;
+  offchainVotingPeriod: number;
+}): {
+  voteEndMs: number;
+  voteStartMs: number;
+  gracePeriodEndMs: number;
+  gracePeriodStartMs: number;
+} {
+  const {gracePeriodStartingTime, startingTime} = daoProposalVote || {};
+
+  const gracePeriodStartMs: number =
+    Number(gracePeriodStartingTime || 0) * 1000;
+
+  const voteStartMs: number = Number(startingTime || 0) * 1000;
+
+  return {
+    voteEndMs: voteStartMs + Number(offchainVotingPeriod || 0) * 1000,
+    voteStartMs,
+    gracePeriodEndMs:
+      gracePeriodStartMs + Number(offchainGracePeriod || 0) * 1000,
+    gracePeriodStartMs,
+  };
+}
+
 export default function Proposals(props: ProposalsProps): JSX.Element {
   const {
     adapterName,
@@ -77,6 +114,10 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
   /**
    * Our hooks
    */
+
+  const {
+    daoConfigurations: [offchainVotingPeriod, offchainGracePeriod],
+  } = useDaoConfigurations(configurationKeysToGet);
 
   const {proposals, proposalsError, proposalsStatus} = useProposals({
     adapterName,
@@ -182,7 +223,8 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
 
       if (!offchainResult) return;
 
-      const didPass = didPassSimpleMajority(offchainResult);
+      // Did the vote pass by a simple majority?
+      const didPass = offchainResult.Yes.units > offchainResult.No.units;
 
       /**
        * Voting proposal: voting has ended, off-chain result was not submitted,
@@ -267,20 +309,47 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
    * Functions
    */
 
-  function didPassSimpleMajority(offchainVoteResult: VotingResult): boolean {
-    return offchainVoteResult.Yes.units > offchainVoteResult.No.units;
-  }
-
   function renderProposalCards(
     proposals: ProposalData[]
   ): React.ReactNode | null {
     return proposals.map((proposal) => {
-      const proposalId =
-        proposal.snapshotDraft?.idInDAO || proposal.snapshotProposal?.idInDAO;
-      const proposalName =
-        proposal.snapshotDraft?.msg.payload.name ||
-        proposal.snapshotProposal?.msg.payload.name ||
-        '';
+      const {
+        daoProposalVote,
+        daoProposalVotingAdapter,
+        snapshotDraft,
+        snapshotProposal,
+      } = proposal;
+
+      const proposalId = snapshotDraft?.idInDAO || snapshotProposal?.idInDAO;
+      const votingAdapterName = daoProposalVotingAdapter?.votingAdapterName;
+
+      let gracePeriodEndMs: number = 0;
+      let gracePeriodStartMs: number = 0;
+      let voteEndMs: number = 0;
+      let voteStartMs: number = 0;
+
+      switch (votingAdapterName) {
+        case VotingAdapterName.OffchainVotingContract:
+          const times = getOffchainContractVotingAndGracePeriodTimes({
+            offchainGracePeriod: Number(offchainGracePeriod || 0),
+            offchainVotingPeriod: Number(offchainVotingPeriod || 0),
+            daoProposalVote:
+              daoProposalVote?.[VotingAdapterName.OffchainVotingContract],
+          });
+
+          gracePeriodEndMs = times.gracePeriodEndMs;
+          gracePeriodStartMs = times.gracePeriodStartMs;
+          voteEndMs = times.voteEndMs;
+          voteStartMs = times.voteStartMs;
+
+          break;
+
+        // @todo On-chain Voting
+        // case VotingAdapterName.VotingContract:
+        //   return <></>
+        default:
+          break;
+      }
 
       if (!proposalId) return null;
 
@@ -292,6 +361,16 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
         );
       }
 
+      const proposalName =
+        snapshotDraft?.msg.payload.name ||
+        snapshotProposal?.msg.payload.name ||
+        '';
+
+      const votingResult = offchainVotingResults.find(
+        ([proposalHash, _result]) =>
+          normalizeString(proposalHash) === normalizeString(proposalId)
+      )?.[1];
+
       return (
         <ProposalCard
           key={proposalId}
@@ -300,9 +379,17 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
           onClick={onProposalClick}
           proposalOnClickId={proposalId}
           renderStatus={() => {
-            switch (proposal.daoProposalVotingAdapter?.votingAdapterName) {
+            switch (votingAdapterName) {
               case VotingAdapterName.OffchainVotingContract:
-                return <OffchainVotingStatus proposal={proposal} />;
+                return (
+                  <OffchainVotingStatus
+                    countdownGracePeriodEndMs={gracePeriodEndMs}
+                    countdownGracePeriodStartMs={gracePeriodStartMs}
+                    countdownVotingEndMs={voteEndMs}
+                    countdownVotingStartMs={voteStartMs}
+                    votingResult={votingResult}
+                  />
+                );
               // @todo On-chain Voting
               // case VotingAdapterName.VotingContract:
               //   return <></>
