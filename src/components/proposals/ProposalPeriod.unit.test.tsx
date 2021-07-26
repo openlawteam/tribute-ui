@@ -248,4 +248,87 @@ describe('ProposalPeriod unit tests', () => {
       expect(screen.getByText(/^\d{1,} sec?s$/i)).toBeInTheDocument();
     });
   });
+
+  test('should render custom countdown label using `renderCountdownText`', async () => {
+    const nowMs: number = Date.now();
+    const countdownVotingStartMs: number = nowMs;
+    const countdownVotingEndMs: number = nowMs + 86400 * 1000 * 3;
+
+    render(
+      <ProposalPeriod
+        renderCountdownText={({days, hours, formatTimePeriod: format}) => {
+          if (days > 0) {
+            return `${format(days, 'day')} : ${format(hours, 'hr')}`;
+          }
+        }}
+        endPeriodMs={countdownVotingEndMs}
+        startPeriodMs={countdownVotingStartMs}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/^ends:$/i)).toBeInTheDocument();
+      expect(screen.getByText(/^2 days : 23 hrs$/i)).toBeInTheDocument();
+    });
+  });
+
+  test('should fall back to default and not render custom countdown label using `renderCountdownText`, if returns falsy', async () => {
+    const nowMs: number = Date.now();
+    const countdownVotingStartMs: number = nowMs;
+    const countdownVotingEndMs: number = nowMs + 86400 * 1000 * 3;
+
+    render(
+      <ProposalPeriod
+        renderCountdownText={({days, hours, formatTimePeriod: format}) => {
+          // Example code; will not be run for this test
+          if (days > 10) {
+            return `${format(days, 'day')} : ${format(hours, 'hr')}`;
+          }
+
+          // Return a falsy value (e.g. '', false, null, undefined, 0)
+          return '';
+        }}
+        endPeriodMs={countdownVotingEndMs}
+        startPeriodMs={countdownVotingStartMs}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/^ends:$/i)).toBeInTheDocument();
+
+      expect(
+        screen.getByText(/^2 days : 23 hrs : 59 mins$/i)
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('should render no custom countdown label using `renderCountdownText`, if returns `<></>`', async () => {
+    const nowMs: number = Date.now();
+    const countdownVotingStartMs: number = nowMs;
+    const countdownVotingEndMs: number = nowMs + 86400 * 1000 * 3;
+
+    render(
+      <ProposalPeriod
+        renderCountdownText={({days, hours, formatTimePeriod: format}) => {
+          // Example code; will not be run for this test
+          if (days > 10) {
+            return `${format(days, 'day')} : ${format(hours, 'hr')}`;
+          }
+
+          // Return a `React.Fragment`
+          return <></>;
+        }}
+        endPeriodMs={countdownVotingEndMs}
+        startPeriodMs={countdownVotingStartMs}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/^ends:$/i)).toBeInTheDocument();
+
+      expect(() => screen.getByText(/days/i)).toThrow();
+      expect(() => screen.getByText(/hrs/i)).toThrow();
+      expect(() => screen.getByText(/mins/i)).toThrow();
+    });
+  });
 });

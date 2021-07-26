@@ -2,60 +2,92 @@ import {useEffect, useState} from 'react';
 
 import {getTimeRemaining} from '../../util/helpers';
 
+type RenderCountdownTextProps = {
+  formatTimePeriod: typeof formatTimePeriod;
+  showDaysOnly?: boolean;
+} & Pick<
+  ReturnType<typeof getTimeRemaining>,
+  'days' | 'hours' | 'minutes' | 'seconds'
+>;
+
 type ProposalPeriodProps = {
   endedLabel?: React.ReactNode;
   endLabel?: React.ReactNode;
   endPeriodMs: number;
+  renderCountdownText?: (p: RenderCountdownTextProps) => React.ReactNode;
   startLabel?: React.ReactNode;
   startPeriodMs: number;
 };
 
-function displayCountdown(
-  countdown: Date,
-  showDaysOnly?: boolean
-): string | React.ReactNode {
-  const {days, hours, minutes, seconds} = getTimeRemaining(countdown);
+function displayCountdown({
+  countdownFrom,
+  renderCountdownText,
+  showDaysOnly,
+}: {
+  countdownFrom: Date;
+  renderCountdownText?: ProposalPeriodProps['renderCountdownText'];
+  showDaysOnly?: boolean;
+}): string | React.ReactNode {
+  const {days, hours, minutes, seconds} = getTimeRemaining(countdownFrom);
 
+  const renderedCountdownText = renderCountdownText?.({
+    days,
+    formatTimePeriod,
+    hours,
+    minutes,
+    seconds,
+    showDaysOnly,
+  });
+
+  const format = formatTimePeriod;
+
+  // Custom
+  if (renderedCountdownText) {
+    return renderedCountdownText;
+  }
+
+  // days
   if (days > 2 && showDaysOnly) {
     return `~${days} days`;
   }
 
+  // days : hrs : min
   if (days > 0) {
-    return `${formatTimePeriod(days, 'day')} : ${formatTimePeriod(
-      hours,
-      'hr'
-    )} : ${formatTimePeriod(minutes, 'min')}`;
-  }
-
-  if (hours > 0) {
-    return `${formatTimePeriod(hours, 'hr')} : ${formatTimePeriod(
+    return `${format(days, 'day')} : ${format(hours, 'hr')} : ${format(
       minutes,
       'min'
     )}`;
   }
 
-  if (minutes > 0) {
-    return `${formatTimePeriod(minutes, 'min')} : ${formatTimePeriod(
-      seconds,
-      'sec'
-    )}`;
+  // hrs : min
+  if (hours > 0) {
+    return `${format(hours, 'hr')} : ${format(minutes, 'min')}`;
   }
 
-  return (
-    <span className="color-brightsalmon">
-      {formatTimePeriod(seconds, 'sec')}
-    </span>
-  );
+  // min : sec
+  if (minutes > 0) {
+    return `${format(minutes, 'min')} : ${format(seconds, 'sec')}`;
+  }
+
+  // sec
+  return <span className="color-brightsalmon">{format(seconds, 'sec')}</span>;
 }
 
-function formatTimePeriod(time: number, period: string) {
+function formatTimePeriod(time: number, period: 'day' | 'hr' | 'min' | 'sec') {
   const formattedPeriod = time === 0 || time > 1 ? `${period}s` : period;
 
   return `${time} ${formattedPeriod}`;
 }
 
 export default function ProposalPeriod(props: ProposalPeriodProps) {
-  const {startLabel, startPeriodMs, endLabel, endedLabel, endPeriodMs} = props;
+  const {
+    endedLabel,
+    endLabel,
+    endPeriodMs,
+    renderCountdownText,
+    startLabel,
+    startPeriodMs,
+  } = props;
 
   /**
    * State
@@ -98,7 +130,11 @@ export default function ProposalPeriod(props: ProposalPeriodProps) {
         <span>
           <span className="votingstatus">{startLabel || 'Starts:'}</span>{' '}
           <span className="votingstatus__timer">
-            {displayCountdown(startDate, true)}
+            {displayCountdown({
+              countdownFrom: startDate,
+              renderCountdownText,
+              showDaysOnly: true,
+            })}
           </span>
         </span>
       </div>
@@ -112,7 +148,7 @@ export default function ProposalPeriod(props: ProposalPeriodProps) {
         <span>
           <span className="votingstatus">{endLabel || 'Ends:'}</span>{' '}
           <span className="votingstatus__timer">
-            {displayCountdown(endDate)}
+            {displayCountdown({countdownFrom: endDate, renderCountdownText})}
           </span>
         </span>
       </div>
