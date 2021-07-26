@@ -168,7 +168,7 @@ describe('ProposalPeriod unit tests', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/^ends:/i)).toBeInTheDocument();
-      expect(screen.getByText(/^59 mins : 59 secs$/i)).toBeInTheDocument();
+      expect(screen.getByText(/^59 mins : 58 secs$/i)).toBeInTheDocument();
     });
   });
 
@@ -186,7 +186,7 @@ describe('ProposalPeriod unit tests', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/^ends:/i)).toBeInTheDocument();
-      expect(screen.getByText(/^59 secs$/i)).toBeInTheDocument();
+      expect(screen.getByText(/^58 secs$/i)).toBeInTheDocument();
     });
   });
 
