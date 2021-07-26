@@ -347,7 +347,7 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     // Status
     await waitFor(
       () => {
-        expect(screen.getByText(/^grace period ends:/i)).toBeInTheDocument();
+        expect(screen.getByText(/^grace period:/i)).toBeInTheDocument();
         expect(screen.getAllByText(/0%/i).length).toBe(2);
       },
       {timeout: 5000}

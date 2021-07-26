@@ -10,7 +10,7 @@ describe('OffchainVotingStatus unit tests', () => {
   const failedRegex: RegExp = /failed/i;
   const votingEndsRegex: RegExp = /^ends:/i;
   const gracePeriodEndedRegex: RegExp = /grace period ended/i;
-  const gracePeriodEndsRegex: RegExp = /grace period ends/i;
+  const gracePeriodRegex: RegExp = /grace period/i;
   const loadingRegex: RegExp = /getting off-chain voting status/i;
 
   const defaultPassedVotingResult: VotingResult = {
@@ -164,7 +164,7 @@ describe('OffchainVotingStatus unit tests', () => {
       expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
 
       expect(() => screen.getByText(approvedRegex)).toThrow();
-      expect(() => screen.getByText(gracePeriodEndsRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodRegex)).toThrow();
       expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
       expect(() => screen.getByText(votingEndsRegex)).toThrow();
     });
@@ -176,16 +176,16 @@ describe('OffchainVotingStatus unit tests', () => {
 
         expect(() => screen.getByLabelText(loadingRegex)).toThrow();
         expect(() => screen.getByText(approvedRegex)).toThrow();
-        expect(() => screen.getByText(gracePeriodEndsRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodRegex)).toThrow();
         expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
       },
       {timeout: 5000}
     );
 
-    // Grace period ends label
+    // Grace period label
     await waitFor(
       () => {
-        expect(screen.getByText(gracePeriodEndsRegex)).toBeInTheDocument();
+        expect(screen.getByText(gracePeriodRegex)).toBeInTheDocument();
 
         expect(() => screen.getByLabelText(loadingRegex)).toThrow();
         expect(() => screen.getByText(approvedRegex)).toThrow();
@@ -202,7 +202,7 @@ describe('OffchainVotingStatus unit tests', () => {
 
         expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
         expect(() => screen.getByLabelText(loadingRegex)).toThrow();
-        expect(() => screen.getByText(gracePeriodEndsRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodRegex)).toThrow();
         expect(() => screen.getByText(votingEndsRegex)).toThrow();
       },
       {timeout: 5000}
@@ -239,7 +239,7 @@ describe('OffchainVotingStatus unit tests', () => {
       expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
 
       expect(() => screen.getByText(approvedRegex)).toThrow();
-      expect(() => screen.getByText(gracePeriodEndsRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodRegex)).toThrow();
       expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
       expect(() => screen.getByText(votingEndsRegex)).toThrow();
     });
@@ -251,16 +251,16 @@ describe('OffchainVotingStatus unit tests', () => {
 
         expect(() => screen.getByLabelText(loadingRegex)).toThrow();
         expect(() => screen.getByText(approvedRegex)).toThrow();
-        expect(() => screen.getByText(gracePeriodEndsRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodRegex)).toThrow();
         expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
       },
       {timeout: 5000}
     );
 
-    // Grace period ends label
+    // Grace period label
     await waitFor(
       () => {
-        expect(screen.getByText(gracePeriodEndsRegex)).toBeInTheDocument();
+        expect(screen.getByText(gracePeriodRegex)).toBeInTheDocument();
 
         expect(() => screen.getByLabelText(loadingRegex)).toThrow();
         expect(() => screen.getByText(approvedRegex)).toThrow();
@@ -277,7 +277,7 @@ describe('OffchainVotingStatus unit tests', () => {
 
         expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
         expect(() => screen.getByLabelText(loadingRegex)).toThrow();
-        expect(() => screen.getByText(gracePeriodEndsRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodRegex)).toThrow();
         expect(() => screen.getByText(votingEndsRegex)).toThrow();
       },
       {timeout: 5000}
@@ -322,7 +322,7 @@ describe('OffchainVotingStatus unit tests', () => {
       expect(() => screen.getByText(customStatusRegex)).toThrow();
     });
 
-    // Grace period ends label
+    // Grace period label
     await waitFor(
       () => {
         expect(screen.getByText(customStatusRegex)).toBeInTheDocument();

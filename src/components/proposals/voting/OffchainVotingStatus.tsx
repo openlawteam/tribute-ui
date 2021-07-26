@@ -84,12 +84,7 @@ type OffchainVotingStatusProps = {
 };
 
 // Grace period label
-const gracePeriodEndLabel = (
-  <span>
-    Grace period ends:
-    <br />
-  </span>
-);
+const gracePeriodLabel = <span>Grace period:</span>;
 
 const cycleEllipsisFadeInProps = {duration: 150};
 
@@ -262,7 +257,7 @@ export function OffchainVotingStatus({
     if (isGracePeriodActive) {
       return (
         <ProposalPeriodComponent
-          endLabel={gracePeriodEndLabel}
+          endLabel={gracePeriodLabel}
           endPeriodMs={countdownGracePeriodEndMs || 0}
           startPeriodMs={countdownGracePeriodStartMs || 0}
         />

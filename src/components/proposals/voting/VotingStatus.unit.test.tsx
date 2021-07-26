@@ -47,7 +47,7 @@ describe('VotingStatus unit tests', () => {
           <ProposalPeriodComponent
             startPeriodMs={Date.now()}
             endPeriodMs={Date.now() + 2000}
-            endLabel="Grace period ends:"
+            endLabel="Grace period:"
           />
         )}
         renderStatus={() => null}
@@ -61,7 +61,7 @@ describe('VotingStatus unit tests', () => {
     // Assert changing timer and labels: grace period timer (example only, as it may not be how we use it)
     await waitFor(() => {
       expect(screen.getByLabelText(/vote has passed/i)).toBeInTheDocument();
-      expect(screen.getByText(/grace period ends:/i)).toBeInTheDocument();
+      expect(screen.getByText(/grace period:/i)).toBeInTheDocument();
       expect(screen.getByText(/1 sec/i)).toBeInTheDocument();
     });
     // @note This label probably wouldn't show as we'd render `null` the timer after the grace period was over.
