@@ -179,14 +179,15 @@ export default function GovernanceProposalsList(
     proposals: ProposalData[]
   ): React.ReactNode | null {
     return proposals.map((proposal) => {
-      const proposalId = proposal.snapshotProposal?.idInSnapshot;
-      const proposalName = proposal.snapshotProposal?.msg.payload.name || '';
+      const {snapshotProposal} = proposal;
+      const proposalId = snapshotProposal?.idInSnapshot;
+      const proposalName = snapshotProposal?.msg.payload.name || '';
 
       const votingStartMs: number =
-        proposal.snapshotProposal?.msg.payload.start || 0;
+        Number(snapshotProposal?.msg.payload.start || 0) * 1000;
 
       const votingEndMs: number =
-        proposal.snapshotProposal?.msg.payload.end || 0;
+        Number(snapshotProposal?.msg.payload.end || 0) * 1000;
 
       if (!proposalId) return null;
 
