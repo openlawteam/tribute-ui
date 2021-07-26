@@ -1,148 +1,144 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 type ProposalPeriodProps = {
+  endedLabel?: React.ReactNode;
+  endLabel?: React.ReactNode;
+  endPeriodMs: number;
   startLabel?: React.ReactNode;
   startPeriodMs: number;
-  endLabel?: React.ReactNode;
-  endedLabel?: React.ReactNode;
-  endPeriodMs: number;
 };
+
+function displayCountdown(
+  countdown: Date,
+  showDaysOnly?: boolean
+): string | React.ReactNode {
+  const {days, hours, minutes, seconds} = getTimeRemaining(countdown);
+
+  if (days > 2 && showDaysOnly) {
+    return `~${days} days`;
+  }
+
+  if (days > 0) {
+    return `${formatTimePeriod(days, 'day')} : ${formatTimePeriod(
+      hours,
+      'hr'
+    )} : ${formatTimePeriod(minutes, 'min')}`;
+  }
+
+  if (hours > 0) {
+    return `${formatTimePeriod(hours, 'hr')} : ${formatTimePeriod(
+      minutes,
+      'min'
+    )}`;
+  }
+
+  if (minutes > 0) {
+    return `${formatTimePeriod(minutes, 'min')} : ${formatTimePeriod(
+      seconds,
+      'sec'
+    )}`;
+  }
+
+  return (
+    <span className="color-brightsalmon">
+      {formatTimePeriod(seconds, 'sec')}
+    </span>
+  );
+}
+
+function formatTimePeriod(time: number, period: string) {
+  const formattedPeriod = time === 0 || time > 1 ? `${period}s` : period;
+
+  return `${time} ${formattedPeriod}`;
+}
+
+function getTimeRemaining(endTime: Date) {
+  const total =
+    Date.parse(endTime.toString()) - Date.parse(new Date().toString());
+
+  const seconds = Math.floor((total / 1000) % 60);
+  const minutes = Math.floor((total / 1000 / 60) % 60);
+  const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+  const days = Math.floor(total / (1000 * 60 * 60 * 24));
+
+  return {
+    days,
+    hours,
+    minutes,
+    seconds,
+    total,
+  };
+}
 
 export default function ProposalPeriod(props: ProposalPeriodProps) {
   const {startLabel, startPeriodMs, endLabel, endedLabel, endPeriodMs} = props;
 
   /**
-   * Variables
-   */
-
-  const getTimeRemaining = (endtime: Date) => {
-    const t =
-      Date.parse(endtime.toString()) - Date.parse(new Date().toString());
-    const seconds = Math.floor((t / 1000) % 60);
-    const minutes = Math.floor((t / 1000 / 60) % 60);
-    const hours = Math.floor((t / (1000 * 60 * 60)) % 24);
-    const days = Math.floor(t / (1000 * 60 * 60 * 24));
-
-    return {
-      total: t,
-      days: days,
-      hours: hours,
-      minutes: minutes,
-      seconds: seconds,
-    };
-  };
-
-  /**
    * State
    */
 
-  const [proposalPeriod, setProposalPeriod] = useState<React.ReactNode>(null);
+  const [currentDate, setCurrentDate] = useState<Date>();
 
   /**
-   * Cached callbacks
+   * Variables
    */
 
-  const displayCountdownCached = useCallback(displayCountdown, []);
+  const startDate: Date = new Date(startPeriodMs);
+  const endDate: Date = new Date(endPeriodMs);
 
   /**
    * Effects
    */
 
+  // Every current `Date` each 1000ms (1 second)
   useEffect(() => {
     const interval = setInterval(() => {
-      const currentDate = new Date();
-      const startDate = new Date(startPeriodMs);
-      const endDate = new Date(endPeriodMs);
-
-      if (currentDate < startDate) {
-        const start = (
-          <span>
-            <span className="votingstatus">{startLabel || 'Starts:'}</span>{' '}
-            <span className="votingstatus__timer">
-              {displayCountdownCached(startDate, true)}
-            </span>
-          </span>
-        );
-
-        setProposalPeriod(start);
-      } else if (currentDate < endDate) {
-        const end = (
-          <span>
-            <span className="votingstatus">{endLabel || 'Ends:'}</span>{' '}
-            <span className="votingstatus__timer">
-              {displayCountdownCached(endDate)}
-            </span>
-          </span>
-        );
-
-        setProposalPeriod(end);
-      } else {
-        const ended = (
-          <span className="votingstatus">{endedLabel || 'Ended'}</span>
-        );
-
-        setProposalPeriod(ended);
-        clearInterval(interval);
-      }
+      setCurrentDate(new Date());
     }, 1000);
 
-    return () => {
+    return function cleanup() {
       clearInterval(interval);
     };
-  }, [
-    displayCountdownCached,
-    endLabel,
-    endPeriodMs,
-    endedLabel,
-    startLabel,
-    startPeriodMs,
-  ]);
-
-  /**
-   * Functions
-   */
-
-  function displayCountdown(
-    countdown: Date,
-    showDaysOnly?: boolean
-  ): string | React.ReactNode {
-    const {days, hours, minutes, seconds} = getTimeRemaining(countdown);
-
-    if (days > 2 && showDaysOnly) {
-      return `~${days} days`;
-    } else if (days > 0) {
-      return `${formatTimePeriod(days, 'day')} : ${formatTimePeriod(
-        hours,
-        'hr'
-      )} : ${formatTimePeriod(minutes, 'min')}`;
-    } else if (hours > 0) {
-      return `${formatTimePeriod(hours, 'hr')} : ${formatTimePeriod(
-        minutes,
-        'min'
-      )}`;
-    } else if (minutes > 0) {
-      return `${formatTimePeriod(minutes, 'min')} : ${formatTimePeriod(
-        seconds,
-        'sec'
-      )}`;
-    } else {
-      return (
-        <span className="color-brightsalmon">
-          {formatTimePeriod(seconds, 'sec')}
-        </span>
-      );
-    }
-  }
-
-  function formatTimePeriod(time: number, period: string) {
-    const formattedPeriod = time === 0 || time > 1 ? `${period}s` : period;
-
-    return `${time} ${formattedPeriod}`;
-  }
+  }, []);
 
   /**
    * Render
    */
 
-  return <div>{proposalPeriod}</div>;
+  if (!currentDate) return null;
+
+  // If time period has not yet started
+  if (currentDate < startDate) {
+    return (
+      <div>
+        <span>
+          <span className="votingstatus">{startLabel || 'Starts:'}</span>{' '}
+          <span className="votingstatus__timer">
+            {displayCountdown(startDate, true)}
+          </span>
+        </span>
+      </div>
+    );
+  }
+
+  // If time period is happening now
+  if (currentDate < endDate) {
+    return (
+      <div>
+        <span>
+          <span className="votingstatus">{endLabel || 'Ends:'}</span>{' '}
+          <span className="votingstatus__timer">
+            {displayCountdown(endDate)}
+          </span>
+        </span>
+      </div>
+    );
+  }
+
+  // Default fallthrough: time period has ended
+  return (
+    <div>
+      <span className="votingstatus">{endedLabel || 'Ended'}</span>
+    </div>
+  );
 }
