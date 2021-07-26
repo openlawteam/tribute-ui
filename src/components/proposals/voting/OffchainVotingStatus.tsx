@@ -102,32 +102,16 @@ const cycleEllipsisFadeInProps = {duration: 150};
  * @returns {JSX.Element}
  */
 export function OffchainVotingStatus({
-  countdownGracePeriodEndMs,
-  countdownGracePeriodStartMs,
-  countdownVotingEndMs,
-  countdownVotingStartMs,
+  countdownGracePeriodEndMs = 0,
+  countdownGracePeriodStartMs = 0,
+  countdownVotingEndMs = 0,
+  countdownVotingStartMs = 0,
   onGracePeriodChange,
   onVotingPeriodChange,
   proposalId,
   renderStatus,
   votingResult,
 }: OffchainVotingStatusProps): JSX.Element {
-  const votingStartSecondsToUse: number = countdownVotingStartMs
-    ? countdownVotingStartMs / 1000
-    : 0;
-
-  const votingEndSecondsToUse: number = countdownVotingEndMs
-    ? countdownVotingEndMs / 1000
-    : 0;
-
-  const gracePeriodStartToSeconds: number = countdownGracePeriodStartMs
-    ? countdownGracePeriodStartMs / 1000
-    : 0;
-
-  const gracePeriodEndToSeconds: number = countdownGracePeriodEndMs
-    ? countdownGracePeriodEndMs / 1000
-    : 0;
-
   /**
    * Our hooks
    */
@@ -136,13 +120,19 @@ export function OffchainVotingStatus({
     hasTimeEnded: hasVotingEnded,
     hasTimeStarted: hasVotingStarted,
     timeStartEndInitReady: votingStartEndInitReady,
-  } = useTimeStartEnd(votingStartSecondsToUse, votingEndSecondsToUse);
+  } = useTimeStartEnd(
+    countdownVotingStartMs / 1000,
+    countdownVotingEndMs / 1000
+  );
 
   const {
     hasTimeEnded: hasGracePeriodEnded,
     hasTimeStarted: hasGracePeriodStarted,
     timeStartEndInitReady: gracePeriodStartEndInitReady,
-  } = useTimeStartEnd(gracePeriodStartToSeconds, gracePeriodEndToSeconds);
+  } = useTimeStartEnd(
+    countdownGracePeriodStartMs / 1000,
+    countdownGracePeriodEndMs / 1000
+  );
 
   /**
    * Variables
@@ -155,8 +145,6 @@ export function OffchainVotingStatus({
 
   const noUnits: number = votingResult?.No.units || 0;
   const totalUnits: number = votingResult?.totalUnits || 0;
-  const votingEndMs: number = (votingEndSecondsToUse || 0) * 1000;
-  const votingStartMs: number = (votingStartSecondsToUse || 0) * 1000;
   const yesUnits: number = votingResult?.Yes.units || 0;
 
   // We use `undefined` to indicate that the result has not yet been determined.
@@ -167,8 +155,8 @@ export function OffchainVotingStatus({
   const renderedStatusFromProp = renderStatus?.({
     countdownGracePeriodEndMs,
     countdownGracePeriodStartMs,
-    countdownVotingEndMs: votingEndMs,
-    countdownVotingStartMs: votingStartMs,
+    countdownVotingEndMs,
+    countdownVotingStartMs,
     didVotePassSimpleMajority,
     gracePeriodStartEndInitReady,
     hasGracePeriodEnded,
@@ -264,8 +252,8 @@ export function OffchainVotingStatus({
     if (votingStartEndInitReady && hasVotingStarted && !hasVotingEnded) {
       return (
         <ProposalPeriodComponent
-          endPeriodMs={votingEndMs}
-          startPeriodMs={votingStartMs}
+          endPeriodMs={countdownVotingEndMs}
+          startPeriodMs={countdownVotingStartMs}
         />
       );
     }
