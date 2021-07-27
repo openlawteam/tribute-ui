@@ -6,12 +6,15 @@ import Wrapper from '../../../test/Wrapper';
 
 describe('OffchainVotingStatus unit tests', () => {
   const nowMilliseconds = () => Date.now();
-  const approvedRegex: RegExp = /approved/i;
-  const failedRegex: RegExp = /failed/i;
-  const votingEndsRegex: RegExp = /^ends:/i;
-  const gracePeriodEndedRegex: RegExp = /grace period ended/i;
-  const gracePeriodRegex: RegExp = /grace period/i;
-  const loadingRegex: RegExp = /getting off-chain voting status/i;
+  const ONE_DAY_MS: number = 86400 * 1000;
+  const approvedRegex: RegExp = /^approved$/i;
+  const failedRegex: RegExp = /^failed$/i;
+  const votingEndsRegex: RegExp = /^ends:$/i;
+  const gracePeriodEndedRegex: RegExp = /^grace period ended$/i;
+  const gracePeriodRegex: RegExp = /^grace period:$/i;
+  const daysCountdownRegex: RegExp = /^\d{1,} days? : \d{1,} hrs?$/i;
+  const secondsCountdownRegex: RegExp = /^\d{1,} secs?$/i;
+  const loadingRegex: RegExp = /^getting off-chain voting status$/i;
 
   const defaultPassedVotingResult: VotingResult = {
     Yes: {
@@ -51,39 +54,40 @@ describe('OffchainVotingStatus unit tests', () => {
           />
         </Wrapper>
       );
+    });
 
-      // Percentages
-      await waitFor(() => {
-        expect(screen.getByText(/1%/i)).toBeInTheDocument();
-        expect(screen.getByText(/0%/i)).toBeInTheDocument();
-      });
+    // Percentages
+    await waitFor(() => {
+      expect(screen.getByText(/1%/i)).toBeInTheDocument();
+      expect(screen.getByText(/0%/i)).toBeInTheDocument();
+    });
 
-      // Status: loader
-      await waitFor(() => {
-        expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
+    });
+
+    // Status: voting
+    await waitFor(
+      () => {
+        expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
+        expect(screen.getByText(secondsCountdownRegex)).toBeInTheDocument();
 
         expect(() => screen.getByText(approvedRegex)).toThrow();
-        expect(() => screen.getByText(votingEndsRegex)).toThrow();
-      });
-
-      // Status: voting
-      await waitFor(
-        () => {
-          expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
-
-          expect(() => screen.getByText(approvedRegex)).toThrow();
-          expect(() => screen.getByText(loadingRegex)).toThrow();
-        },
-        {timeout: 5000}
-      );
-
-      // Status: approved
-      await waitFor(() => {
-        expect(screen.getByText(approvedRegex)).toBeInTheDocument();
-
         expect(() => screen.getByText(loadingRegex)).toThrow();
-        expect(() => screen.getByText(votingEndsRegex)).toThrow();
-      });
+      },
+      {timeout: 5000}
+    );
+
+    // Status: approved
+    await waitFor(() => {
+      expect(screen.getByText(approvedRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(loadingRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
     });
   });
 
@@ -101,39 +105,40 @@ describe('OffchainVotingStatus unit tests', () => {
           />
         </Wrapper>
       );
+    });
 
-      // Percentages
-      await waitFor(() => {
-        expect(screen.getByText(/1%/i)).toBeInTheDocument();
-        expect(screen.getByText(/0%/i)).toBeInTheDocument();
-      });
+    // Percentages
+    await waitFor(() => {
+      expect(screen.getByText(/1%/i)).toBeInTheDocument();
+      expect(screen.getByText(/0%/i)).toBeInTheDocument();
+    });
 
-      // Status: loader
-      await waitFor(() => {
-        expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
+    });
+
+    // Status: voting
+    await waitFor(
+      () => {
+        expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
+        expect(screen.getByText(secondsCountdownRegex)).toBeInTheDocument();
 
         expect(() => screen.getByText(approvedRegex)).toThrow();
-        expect(() => screen.getByText(votingEndsRegex)).toThrow();
-      });
-
-      // Status: voting
-      await waitFor(
-        () => {
-          expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
-
-          expect(() => screen.getByText(approvedRegex)).toThrow();
-          expect(() => screen.getByText(loadingRegex)).toThrow();
-        },
-        {timeout: 5000}
-      );
-
-      // Status: failed
-      await waitFor(() => {
-        expect(screen.getByText(failedRegex)).toBeInTheDocument();
-
         expect(() => screen.getByText(loadingRegex)).toThrow();
-        expect(() => screen.getByText(votingEndsRegex)).toThrow();
-      });
+      },
+      {timeout: 5000}
+    );
+
+    // Status: failed
+    await waitFor(() => {
+      expect(screen.getByText(failedRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(loadingRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
     });
   });
 
@@ -157,62 +162,64 @@ describe('OffchainVotingStatus unit tests', () => {
           />
         </Wrapper>
       );
+    });
 
-      // Percentages
-      await waitFor(() => {
-        expect(screen.getByText(/1%/i)).toBeInTheDocument();
-        expect(screen.getByText(/0%/i)).toBeInTheDocument();
-      });
+    // Percentages
+    await waitFor(() => {
+      expect(screen.getByText(/1%/i)).toBeInTheDocument();
+      expect(screen.getByText(/0%/i)).toBeInTheDocument();
+    });
 
-      // Status: loader
-      await waitFor(() => {
-        expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
 
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
+    });
+
+    // Status: voting
+    await waitFor(
+      () => {
+        expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
+        expect(screen.getByText(secondsCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
         expect(() => screen.getByText(approvedRegex)).toThrow();
         expect(() => screen.getByText(gracePeriodRegex)).toThrow();
         expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+
+    // Grace period label
+    await waitFor(
+      () => {
+        expect(screen.getByText(gracePeriodRegex)).toBeInTheDocument();
+        expect(screen.getByText(secondsCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
         expect(() => screen.getByText(votingEndsRegex)).toThrow();
-      });
+      },
+      {timeout: 5000}
+    );
 
-      // Status: voting
-      await waitFor(
-        () => {
-          expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
+    // Assert vote approved
+    await waitFor(
+      () => {
+        expect(screen.getByText(approvedRegex)).toBeInTheDocument();
 
-          expect(() => screen.getByLabelText(loadingRegex)).toThrow();
-          expect(() => screen.getByText(approvedRegex)).toThrow();
-          expect(() => screen.getByText(gracePeriodRegex)).toThrow();
-          expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
-        },
-        {timeout: 5000}
-      );
-
-      // Grace period label
-      await waitFor(
-        () => {
-          expect(screen.getByText(gracePeriodRegex)).toBeInTheDocument();
-
-          expect(() => screen.getByLabelText(loadingRegex)).toThrow();
-          expect(() => screen.getByText(approvedRegex)).toThrow();
-          expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
-          expect(() => screen.getByText(votingEndsRegex)).toThrow();
-        },
-        {timeout: 5000}
-      );
-
-      // Assert vote approved
-      await waitFor(
-        () => {
-          expect(screen.getByText(approvedRegex)).toBeInTheDocument();
-
-          expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
-          expect(() => screen.getByLabelText(loadingRegex)).toThrow();
-          expect(() => screen.getByText(gracePeriodRegex)).toThrow();
-          expect(() => screen.getByText(votingEndsRegex)).toThrow();
-        },
-        {timeout: 5000}
-      );
-    });
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+        expect(() => screen.getByText(votingEndsRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
   }, 10000);
 
   // @note This test uses an adjusted Jest timeout
@@ -235,74 +242,185 @@ describe('OffchainVotingStatus unit tests', () => {
           />
         </Wrapper>
       );
+    });
 
-      // Percentages
-      await waitFor(() => {
-        expect(screen.getByText(/1%/i)).toBeInTheDocument();
-        expect(screen.getByText(/0%/i)).toBeInTheDocument();
-      });
+    // Percentages
+    await waitFor(() => {
+      expect(screen.getByText(/1%/i)).toBeInTheDocument();
+      expect(screen.getByText(/0%/i)).toBeInTheDocument();
+    });
 
-      // Status: loader
-      await waitFor(() => {
-        expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
 
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
+    });
+
+    // Status: voting
+    await waitFor(
+      () => {
+        expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
+        expect(screen.getByText(secondsCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
         expect(() => screen.getByText(approvedRegex)).toThrow();
         expect(() => screen.getByText(gracePeriodRegex)).toThrow();
         expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+
+    // Grace period label
+    await waitFor(
+      () => {
+        expect(screen.getByText(gracePeriodRegex)).toBeInTheDocument();
+        expect(screen.getByText(secondsCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
         expect(() => screen.getByText(votingEndsRegex)).toThrow();
-      });
+      },
+      {timeout: 5000}
+    );
 
-      // Status: voting
-      await waitFor(
-        () => {
-          expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
+    // Assert vote approved
+    await waitFor(
+      () => {
+        expect(screen.getByText(failedRegex)).toBeInTheDocument();
 
-          expect(() => screen.getByLabelText(loadingRegex)).toThrow();
-          expect(() => screen.getByText(approvedRegex)).toThrow();
-          expect(() => screen.getByText(gracePeriodRegex)).toThrow();
-          expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
-        },
-        {timeout: 5000}
-      );
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+        expect(() => screen.getByText(votingEndsRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+  }, 10000);
 
-      // Grace period label
-      await waitFor(
-        () => {
-          expect(screen.getByText(gracePeriodRegex)).toBeInTheDocument();
+  // @note This test uses an adjusted Jest timeout
+  test('should render correct content for voting period status when `days > 0`', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs;
+    const votingEndMs: number = nowMs + ONE_DAY_MS * 2;
+    const gracePeriodStartMs: number = nowMs + ONE_DAY_MS * 2;
+    const gracePeriodEndMs: number = nowMs + ONE_DAY_MS * 3;
 
-          expect(() => screen.getByLabelText(loadingRegex)).toThrow();
-          expect(() => screen.getByText(approvedRegex)).toThrow();
-          expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
-          expect(() => screen.getByText(votingEndsRegex)).toThrow();
-        },
-        {timeout: 5000}
-      );
-
-      // Assert vote approved
-      await waitFor(
-        () => {
-          expect(screen.getByText(failedRegex)).toBeInTheDocument();
-
-          expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
-          expect(() => screen.getByLabelText(loadingRegex)).toThrow();
-          expect(() => screen.getByText(gracePeriodRegex)).toThrow();
-          expect(() => screen.getByText(votingEndsRegex)).toThrow();
-        },
-        {timeout: 5000}
+    await act(async () => {
+      render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownGracePeriodEndMs={gracePeriodEndMs}
+            countdownGracePeriodStartMs={gracePeriodStartMs}
+            votingResult={defaultPassedVotingResult}
+            countdownVotingEndMs={votingEndMs}
+            countdownVotingStartMs={votingStartMs}
+          />
+        </Wrapper>
       );
     });
+
+    // Percentages
+    await waitFor(() => {
+      expect(screen.getByText(/1%/i)).toBeInTheDocument();
+      expect(screen.getByText(/0%/i)).toBeInTheDocument();
+    });
+
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
+    });
+
+    // Voting period label
+    await waitFor(
+      () => {
+        expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
+        expect(screen.getByText(daysCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodEndMs)).toThrow();
+      },
+      {timeout: 5000}
+    );
+  }, 10000);
+
+  // @note This test uses an adjusted Jest timeout
+  test('should render correct content for grace period status when `days > 0`', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs - ONE_DAY_MS;
+    const votingEndMs: number = nowMs;
+    const gracePeriodStartMs: number = nowMs;
+    const gracePeriodEndMs: number = nowMs + ONE_DAY_MS * 2;
+
+    await act(async () => {
+      render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownGracePeriodEndMs={gracePeriodEndMs}
+            countdownGracePeriodStartMs={gracePeriodStartMs}
+            votingResult={defaultPassedVotingResult}
+            countdownVotingEndMs={votingEndMs}
+            countdownVotingStartMs={votingStartMs}
+          />
+        </Wrapper>
+      );
+    });
+
+    // Percentages
+    await waitFor(() => {
+      expect(screen.getByText(/1%/i)).toBeInTheDocument();
+      expect(screen.getByText(/0%/i)).toBeInTheDocument();
+    });
+
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
+    });
+
+    // Grace period label
+    await waitFor(
+      () => {
+        expect(screen.getByText(gracePeriodRegex)).toBeInTheDocument();
+
+        expect(screen.getByText(daysCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+        expect(() => screen.getByText(votingEndsRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
   }, 10000);
 
   test('should render correct content when `renderStatus` provided', async () => {
     const nowMs = nowMilliseconds();
-    const votingStartMs: number = nowMs;
-    const votingEndMs: number = nowMs + 3000;
-    const gracePeriodStartMs: number = nowMs + 3000;
-    const gracePeriodEndMs: number = nowMs + 9000;
+    const votingStartMs: number = nowMs - 5000;
+    const votingEndMs: number = nowMs;
+    const gracePeriodStartMs: number = nowMs;
+    const gracePeriodEndMs: number = nowMs + 3000;
     const customStatusRegex: RegExp = /what a great status!/i;
 
+    let rerender: ReturnType<typeof render>['rerender'];
+
     await act(async () => {
-      const {rerender} = render(
+      const {rerender: rr} = render(
         <Wrapper useInit useWallet>
           <OffchainVotingStatus
             countdownVotingStartMs={votingStartMs}
@@ -328,26 +446,32 @@ describe('OffchainVotingStatus unit tests', () => {
         </Wrapper>
       );
 
-      // Status: loader
-      await waitFor(() => {
-        expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+      rerender = rr;
+    });
+
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(customStatusRegex)).toThrow();
+    });
+
+    // Custom label
+    await waitFor(
+      () => {
+        expect(screen.getByText(customStatusRegex)).toBeInTheDocument();
 
         expect(() => screen.getByText(approvedRegex)).toThrow();
-        expect(() => screen.getByText(customStatusRegex)).toThrow();
-      });
+        expect(() => screen.getByText(loadingRegex)).toThrow();
+      }
+      // {timeout: 5000}
+    );
 
-      // Grace period label
-      await waitFor(
-        () => {
-          expect(screen.getByText(customStatusRegex)).toBeInTheDocument();
+    const renderStatusSpy = jest.fn();
 
-          expect(() => screen.getByText(approvedRegex)).toThrow();
-          expect(() => screen.getByText(loadingRegex)).toThrow();
-        },
-        {timeout: 5000}
-      );
-
-      // Re-render with custom status for when grace period ended and waiting on contract
+    // Re-render with custom status for when grace period ended and waiting on contract
+    await act(async () => {
       rerender(
         <Wrapper useInit useWallet>
           <OffchainVotingStatus
@@ -355,23 +479,82 @@ describe('OffchainVotingStatus unit tests', () => {
             countdownVotingEndMs={votingEndMs}
             countdownGracePeriodStartMs={gracePeriodStartMs}
             countdownGracePeriodEndMs={gracePeriodEndMs}
-            // Return falsy value, or do not provide a prop, in order to reset back to defaults
+            // Use a spy to assert the correct arguments were provided to `renderStatus`
+            renderStatus={renderStatusSpy}
+            votingResult={defaultPassedVotingResult}
+          />
+        </Wrapper>
+      );
+    });
+
+    // Assert spy calls
+    await waitFor(() => {
+      expect(renderStatusSpy.mock.calls.length > 0).toBe(true);
+
+      expect(Object.keys(renderStatusSpy.mock.calls[0][0])).toEqual([
+        'countdownGracePeriodEndMs',
+        'countdownGracePeriodStartMs',
+        'countdownVotingEndMs',
+        'countdownVotingStartMs',
+        'didVotePassSimpleMajority',
+        'gracePeriodStartEndInitReady',
+        'hasGracePeriodEnded',
+        'hasGracePeriodStarted',
+        'hasVotingEnded',
+        'hasVotingStarted',
+        'votingStartEndInitReady',
+      ]);
+    });
+  });
+
+  test('should render correct content when `renderStatus` returns falsy or `Fragment`', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs - 5000;
+    const votingEndMs: number = nowMs;
+    const gracePeriodStartMs: number = nowMs;
+    const gracePeriodEndMs: number = nowMs + 3000;
+
+    let rerender: ReturnType<typeof render>['rerender'];
+
+    await act(async () => {
+      const {rerender: rr} = render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownVotingStartMs={votingStartMs}
+            countdownVotingEndMs={votingEndMs}
+            countdownGracePeriodStartMs={gracePeriodStartMs}
+            countdownGracePeriodEndMs={gracePeriodEndMs}
+            // Render a falsy (e.g. `false`, `undefined`, `0`, etc.)status
             renderStatus={() => {
-              return undefined;
+              return '';
             }}
             votingResult={defaultPassedVotingResult}
           />
         </Wrapper>
       );
 
-      await waitFor(() => {
+      rerender = rr;
+    });
+
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+    });
+
+    // Custom label
+    await waitFor(
+      () => {
         expect(screen.getByText(approvedRegex)).toBeInTheDocument();
 
         expect(() => screen.getByText(loadingRegex)).toThrow();
-        expect(() => screen.getByText(customStatusRegex)).toThrow();
-      });
+      }
+      // {timeout: 5000}
+    );
 
-      // Re-render with custom status for when grace period ended and waiting on contract
+    // Re-render with custom status for when grace period ended and waiting on contract
+    await act(async () => {
       rerender(
         <Wrapper useInit useWallet>
           <OffchainVotingStatus
@@ -387,48 +570,11 @@ describe('OffchainVotingStatus unit tests', () => {
           />
         </Wrapper>
       );
+    });
 
-      await waitFor(() => {
-        expect(() => screen.getByText(approvedRegex)).toThrow();
-        expect(() => screen.getByText(loadingRegex)).toThrow();
-        expect(() => screen.getByText(customStatusRegex)).toThrow();
-      });
-
-      const renderStatusSpy = jest.fn();
-
-      // Re-render with custom status for when grace period ended and waiting on contract
-      rerender(
-        <Wrapper useInit useWallet>
-          <OffchainVotingStatus
-            countdownVotingStartMs={votingStartMs}
-            countdownVotingEndMs={votingEndMs}
-            countdownGracePeriodStartMs={gracePeriodStartMs}
-            countdownGracePeriodEndMs={gracePeriodEndMs}
-            // Use a spy to assert the correct arguments were provided to `renderStatus`
-            renderStatus={renderStatusSpy}
-            votingResult={defaultPassedVotingResult}
-          />
-        </Wrapper>
-      );
-
-      // Assert spy calls
-      await waitFor(() => {
-        expect(renderStatusSpy.mock.calls.length > 0).toBe(true);
-
-        expect(Object.keys(renderStatusSpy.mock.calls[0][0])).toEqual([
-          'countdownGracePeriodEndMs',
-          'countdownGracePeriodStartMs',
-          'countdownVotingEndMs',
-          'countdownVotingStartMs',
-          'didVotePassSimpleMajority',
-          'gracePeriodStartEndInitReady',
-          'hasGracePeriodEnded',
-          'hasGracePeriodStarted',
-          'hasVotingEnded',
-          'hasVotingStarted',
-          'votingStartEndInitReady',
-        ]);
-      });
+    await waitFor(() => {
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(loadingRegex)).toThrow();
     });
   });
 

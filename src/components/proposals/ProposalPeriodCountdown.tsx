@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 
 import {getTimeRemaining} from '../../util/helpers';
 
-type RenderCountdownTextProps = {
+export type RenderCountdownTextProps = {
   formatTimePeriod: typeof formatTimePeriod;
   showDaysOnly?: boolean;
 } & Pick<

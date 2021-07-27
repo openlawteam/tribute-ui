@@ -1,6 +1,7 @@
 import {useEffect} from 'react';
 
 import {CycleEllipsis} from '../../feedback';
+import {RenderCountdownTextProps} from '../ProposalPeriodCountdown';
 import {useTimeStartEnd} from '../../../hooks';
 import {VotingResult} from '../types';
 import {VotingStatus} from './VotingStatus';
@@ -82,6 +83,16 @@ type OffchainVotingStatusProps = {
    */
   votingResult: VotingResult | undefined;
 };
+
+function renderCountdownText({
+  days,
+  hours,
+  formatTimePeriod: format,
+}: RenderCountdownTextProps) {
+  if (days > 0) {
+    return `${format(days, 'day')} : ${format(hours, 'hr')}`;
+  }
+}
 
 // Grace period label
 const gracePeriodLabel = <span>Grace period:</span>;
@@ -248,6 +259,7 @@ export function OffchainVotingStatus({
       return (
         <ProposalPeriodComponent
           endPeriodMs={countdownVotingEndMs}
+          renderCountdownText={renderCountdownText}
           startPeriodMs={countdownVotingStartMs}
         />
       );
@@ -259,6 +271,7 @@ export function OffchainVotingStatus({
         <ProposalPeriodComponent
           endLabel={gracePeriodLabel}
           endPeriodMs={countdownGracePeriodEndMs || 0}
+          renderCountdownText={renderCountdownText}
           startPeriodMs={countdownGracePeriodStartMs || 0}
         />
       );
