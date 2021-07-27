@@ -1,24 +1,24 @@
 import {useState, useRef, useEffect} from 'react';
 import {useSelector} from 'react-redux';
-
 import {
   prepareVoteProposalData,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
+
+import {AsyncStatus} from '../../util/types';
 import {getContractByAddress} from '../web3/helpers';
 import {ProposalData} from './types';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
+import {useCheckApplicant, useSignAndSubmitProposal} from './hooks';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
-import {useCheckApplicant, useSignAndSubmitProposal} from './hooks';
 import {Web3TxStatus} from '../web3/types';
 import CycleMessage from '../feedback/CycleMessage';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import EtherscanURL from '../web3/EtherscanURL';
 import FadeIn from '../common/FadeIn';
 import Loader from '../feedback/Loader';
-import {AsyncStatus} from '../../util/types';
 
 type SubmitArguments = [
   string, // `dao`
@@ -35,6 +35,9 @@ type SubmitActionProps = {
 type ActionDisabledReasons = {
   invalidApplicantMessage: string;
 };
+
+const {FULFILLED} = AsyncStatus;
+const {AWAITING_CONFIRM, FULFILLED: WEB3_TX_FULFILLED, PENDING} = Web3TxStatus;
 
 export default function SubmitAction(props: SubmitActionProps) {
   const {
@@ -97,14 +100,14 @@ export default function SubmitAction(props: SubmitActionProps) {
    */
 
   const isInProcess =
-    txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-    txStatus === Web3TxStatus.PENDING ||
-    proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM ||
-    proposalSignAndSendStatus === Web3TxStatus.PENDING;
+    txStatus === AWAITING_CONFIRM ||
+    txStatus === PENDING ||
+    proposalSignAndSendStatus === AWAITING_CONFIRM ||
+    proposalSignAndSendStatus === PENDING;
 
   const isDone =
-    txStatus === Web3TxStatus.FULFILLED &&
-    proposalSignAndSendStatus === Web3TxStatus.FULFILLED;
+    txStatus === WEB3_TX_FULFILLED &&
+    proposalSignAndSendStatus === WEB3_TX_FULFILLED;
 
   const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
 
@@ -126,7 +129,7 @@ export default function SubmitAction(props: SubmitActionProps) {
       }
 
       if (
-        checkApplicantStatus === AsyncStatus.FULFILLED &&
+        checkApplicantStatus === FULFILLED &&
         !isApplicantValid &&
         checkApplicantInvalidMsg
       ) {
@@ -239,15 +242,15 @@ export default function SubmitAction(props: SubmitActionProps) {
   function renderSubmitStatus(): React.ReactNode {
     // Either Snapshot or chain tx
     if (
-      txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-      proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM
+      txStatus === AWAITING_CONFIRM ||
+      proposalSignAndSendStatus === AWAITING_CONFIRM
     ) {
       return 'Awaiting your confirmation\u2026';
     }
 
     // Only for chain tx
     switch (txStatus) {
-      case Web3TxStatus.PENDING:
+      case PENDING:
         return (
           <>
             <CycleMessage
@@ -262,7 +265,7 @@ export default function SubmitAction(props: SubmitActionProps) {
             <EtherscanURL url={txEtherscanURL} isPending />
           </>
         );
-      case Web3TxStatus.FULFILLED:
+      case WEB3_TX_FULFILLED:
         return (
           <>
             <div>Proposal submitted!</div>
