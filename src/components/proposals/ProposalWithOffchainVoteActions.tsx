@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 
 import {
   OffchainVotingStatus,
@@ -71,6 +71,7 @@ export default function ProposalWithOffchainVoteActions(
     daoProposalVote,
     proposalFlowStatusError,
     status,
+    stopPollingForStatus,
   } = useProposalWithOffchainVoteStatus(
     useMemo(
       () => ({
@@ -122,6 +123,15 @@ export default function ProposalWithOffchainVoteActions(
         status,
       },
     });
+
+  /**
+   * Stop polling for the status, if the off-chain vote has failed and the result is not yet submitted.
+   */
+  useEffect(() => {
+    if (status === OffchainVotingSubmitResult && yesUnits <= noUnits) {
+      stopPollingForStatus();
+    }
+  }, [noUnits, status, stopPollingForStatus, yesUnits]);
 
   /**
    * Functions
