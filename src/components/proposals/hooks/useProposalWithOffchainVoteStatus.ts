@@ -230,22 +230,18 @@ export function useProposalWithOffchainVoteStatus({
     }
 
     // Clear any previous intervals
-    if (pollingIntervalIdRef.current) {
-      clearInterval(pollingIntervalIdRef.current);
-    }
+    handleStopPollingForStatus();
 
     // Then, poll every `x` Ms
     const intervalId = setInterval(async () => {
       try {
-        if (stopPollingRef.current && pollingIntervalIdRef.current) {
-          clearInterval(pollingIntervalIdRef.current);
+        if (stopPollingRef.current) {
+          handleStopPollingForStatus();
         }
 
         await getStatusFromContractCached();
       } catch (error) {
-        if (pollingIntervalIdRef.current) {
-          clearInterval(pollingIntervalIdRef.current);
-        }
+        handleStopPollingForStatus();
 
         setProposalFlowStatusError(error);
       }
@@ -256,15 +252,13 @@ export function useProposalWithOffchainVoteStatus({
 
   // Stop polling if propsal is processed, or on unmount.
   useEffect(() => {
-    if (atProcessedInDAO && pollingIntervalIdRef.current) {
-      clearInterval(pollingIntervalIdRef.current);
+    if (atProcessedInDAO) {
+      handleStopPollingForStatus();
     }
 
     // Cleanup polling on unmount
     return function cleanup() {
-      if (pollingIntervalIdRef.current) {
-        clearInterval(pollingIntervalIdRef.current);
-      }
+      handleStopPollingForStatus();
     };
   }, [atProcessedInDAO]);
 
@@ -374,6 +368,8 @@ export function useProposalWithOffchainVoteStatus({
   function handleStopPollingForStatus() {
     if (pollingIntervalIdRef.current) {
       clearInterval(pollingIntervalIdRef.current);
+
+      pollingIntervalIdRef.current = undefined;
     }
   }
 

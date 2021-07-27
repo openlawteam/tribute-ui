@@ -23,6 +23,7 @@ import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import ProcessAction from './ProcessAction';
 import SponsorAction from './SponsorAction';
 import SubmitAction from './SubmitAction';
+import {AsyncStatus} from '../../util/types';
 
 type ProposalWithOffchainActionsProps = {
   adapterName: ContractAdapterNames;
@@ -47,6 +48,8 @@ const {
   Sponsor,
   Submit,
 } = ProposalFlowStatus;
+
+const {FULFILLED} = AsyncStatus;
 
 const configurationKeysToGet: ContractDAOConfigKeys[] = [
   ContractDAOConfigKeys.offchainVotingVotingPeriod,
@@ -81,9 +84,8 @@ export default function ProposalWithOffchainVoteActions(
     )
   );
 
-  const {offchainVotingResults} = useOffchainVotingResults(
-    proposal.snapshotProposal
-  );
+  const {offchainVotingResults, offchainVotingResultsStatus} =
+    useOffchainVotingResults(proposal.snapshotProposal);
 
   /**
    * Variables
@@ -125,13 +127,24 @@ export default function ProposalWithOffchainVoteActions(
     });
 
   /**
-   * Stop polling for the status, if the off-chain vote has failed and the result is not yet submitted.
+   * Stop polling for the status, if the off-chain vote has failed
+   * and the result is not yet submitted.
    */
   useEffect(() => {
-    if (status === OffchainVotingSubmitResult && yesUnits <= noUnits) {
+    if (
+      status === OffchainVotingSubmitResult &&
+      offchainVotingResultsStatus === FULFILLED &&
+      yesUnits <= noUnits
+    ) {
       stopPollingForStatus();
     }
-  }, [noUnits, status, stopPollingForStatus, yesUnits]);
+  }, [
+    noUnits,
+    offchainVotingResultsStatus,
+    status,
+    stopPollingForStatus,
+    yesUnits,
+  ]);
 
   /**
    * Functions
@@ -165,7 +178,7 @@ export default function ProposalWithOffchainVoteActions(
       // Return a React.Fragment to hide the "Submit Vote Result" button if vote
       // did not pass. For now, we can assume across all adapters that if the
       // vote did not pass then the vote result does not need to be submitted.
-      if (yesUnits <= noUnits) {
+      if (offchainVotingResultsStatus === FULFILLED && yesUnits <= noUnits) {
         return <></>;
       }
 
