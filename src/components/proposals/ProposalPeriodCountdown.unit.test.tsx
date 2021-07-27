@@ -1,15 +1,15 @@
 import {render, screen, waitFor} from '@testing-library/react';
 
-import ProposalPeriod from './ProposalPeriod';
+import ProposalPeriodCountdown from './ProposalPeriodCountdown';
 
-describe('ProposalPeriod unit tests', () => {
+describe('ProposalPeriodCountdown unit tests', () => {
   test('should render countdown when started', async () => {
     const nowMs: number = Date.now();
     const countdownVotingStartMs: number = nowMs;
     const countdownVotingEndMs: number = nowMs + 10000;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         endPeriodMs={countdownVotingEndMs}
         startPeriodMs={countdownVotingStartMs}
       />
@@ -46,7 +46,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs - 5000;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         endPeriodMs={countdownVotingEndMs}
         startPeriodMs={countdownVotingStartMs}
       />
@@ -66,7 +66,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs + 15000;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         endPeriodMs={countdownVotingEndMs}
         startPeriodMs={countdownVotingStartMs}
       />
@@ -103,7 +103,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs + 86400 * 1000 * 8;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         endPeriodMs={countdownVotingEndMs}
         startPeriodMs={countdownVotingStartMs}
       />
@@ -121,7 +121,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs + 86400 * 1000 * 3;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         endPeriodMs={countdownVotingEndMs}
         startPeriodMs={countdownVotingStartMs}
       />
@@ -142,7 +142,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs + 86400 * 1000;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         endPeriodMs={countdownVotingEndMs}
         startPeriodMs={countdownVotingStartMs}
       />
@@ -160,7 +160,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs + 3600 * 1000;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         endPeriodMs={countdownVotingEndMs}
         startPeriodMs={countdownVotingStartMs}
       />
@@ -178,7 +178,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs + 60 * 1000;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         endPeriodMs={countdownVotingEndMs}
         startPeriodMs={countdownVotingStartMs}
       />
@@ -196,7 +196,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs - 5000;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         endPeriodMs={countdownVotingEndMs}
         startPeriodMs={countdownVotingStartMs}
         endedLabel="So0o ended!"
@@ -217,7 +217,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs + 10000;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         endLabel="Neva gunna end!"
         endPeriodMs={countdownVotingEndMs}
         startPeriodMs={countdownVotingStartMs}
@@ -236,7 +236,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs + 15000;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         startLabel="Neva gunna start!"
         endPeriodMs={countdownVotingEndMs}
         startPeriodMs={countdownVotingStartMs}
@@ -255,7 +255,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs + 86400 * 1000 * 3;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         renderCountdownText={({days, hours, formatTimePeriod: format}) => {
           if (days > 0) {
             return `${format(days, 'day')} : ${format(hours, 'hr')}`;
@@ -278,7 +278,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs + 86400 * 1000 * 3;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         renderCountdownText={({days, hours, formatTimePeriod: format}) => {
           // Example code; will not be run for this test
           if (days > 10) {
@@ -308,7 +308,7 @@ describe('ProposalPeriod unit tests', () => {
     const countdownVotingEndMs: number = nowMs + 86400 * 1000 * 3;
 
     render(
-      <ProposalPeriod
+      <ProposalPeriodCountdown
         renderCountdownText={({days, hours, formatTimePeriod: format}) => {
           // Example code; will not be run for this test
           if (days > 10) {

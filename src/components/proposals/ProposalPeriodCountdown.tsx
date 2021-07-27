@@ -10,7 +10,7 @@ type RenderCountdownTextProps = {
   'days' | 'hours' | 'minutes' | 'seconds'
 >;
 
-type ProposalPeriodProps = {
+type ProposalPeriodCountdownProps = {
   endedLabel?: React.ReactNode;
   endLabel?: React.ReactNode;
   endPeriodMs: number;
@@ -25,7 +25,7 @@ function displayCountdown({
   showDaysOnly,
 }: {
   countdownFrom: Date;
-  renderCountdownText?: ProposalPeriodProps['renderCountdownText'];
+  renderCountdownText?: ProposalPeriodCountdownProps['renderCountdownText'];
   showDaysOnly?: boolean;
 }): string | React.ReactNode {
   const {days, hours, minutes, seconds} = getTimeRemaining(countdownFrom);
@@ -79,7 +79,9 @@ function formatTimePeriod(time: number, period: 'day' | 'hr' | 'min' | 'sec') {
   return `${time} ${formattedPeriod}`;
 }
 
-export default function ProposalPeriod(props: ProposalPeriodProps) {
+export default function ProposalPeriodCountdown(
+  props: ProposalPeriodCountdownProps
+) {
   const {
     endedLabel,
     endLabel,
