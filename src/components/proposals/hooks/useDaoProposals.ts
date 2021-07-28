@@ -145,7 +145,10 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
 
       const proposals = await queryClient.fetchQuery(
         ['daoProposals', calls],
-        async () => await multicall({calls, web3Instance})
+        async () => await multicall({calls, web3Instance}),
+        {
+          staleTime: 60000,
+        }
       );
 
       setDaoProposals(safeProposalIds.map((id, i) => [id, proposals[i]]));

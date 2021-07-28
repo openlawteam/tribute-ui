@@ -459,12 +459,18 @@ export function useProposals({
 
       const snapshotDraftEntries = await queryClient.fetchQuery(
         ['snapshotDraftsByAdapterAddress', adapterAddress],
-        async () => await getSnapshotDraftsByAdapterAddress(adapterAddress)
+        async () => await getSnapshotDraftsByAdapterAddress(adapterAddress),
+        {
+          staleTime: 60000,
+        }
       );
 
       const snapshotProposalEntries = await queryClient.fetchQuery(
         ['snapshotProposalsByAdapterAddress', adapterAddress],
-        async () => await getSnapshotProposalsByAdapterAddress(adapterAddress)
+        async () => await getSnapshotProposalsByAdapterAddress(adapterAddress),
+        {
+          staleTime: 60000,
+        }
       );
 
       const mergedEntries = [

@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
+import {useQueryClient} from 'react-query';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
@@ -42,6 +43,12 @@ export function useProposalsVotingState(
   const {web3Instance} = useWeb3Modal();
 
   /**
+   * Their hooks
+   */
+
+  const queryClient = useQueryClient();
+
+  /**
    * State
    */
 
@@ -60,7 +67,7 @@ export function useProposalsVotingState(
 
   const getProposalsVotingStateOnchainCached = useCallback(
     getProposalsVotingStateOnchain,
-    [proposalVotingAdapters, registryAddress, web3Instance]
+    [proposalVotingAdapters, queryClient, registryAddress, web3Instance]
   );
 
   /**
@@ -115,10 +122,13 @@ export function useProposalsVotingState(
 
       setProposalsVotingStateStatus(AsyncStatus.PENDING);
 
-      const proposalsVotingStateResult = await multicall({
-        calls,
-        web3Instance,
-      });
+      const proposalsVotingStateResult = await queryClient.fetchQuery(
+        ['proposalsVotingStateResult', calls],
+        async () => await multicall({calls, web3Instance}),
+        {
+          staleTime: 60000,
+        }
+      );
 
       setProposalsVotingStateStatus(AsyncStatus.FULFILLED);
       setProposaslsVotingState(

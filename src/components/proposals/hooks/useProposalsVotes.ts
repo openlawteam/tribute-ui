@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
+import {useQueryClient} from 'react-query';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
@@ -48,6 +49,12 @@ export function useProposalsVotes(
   const {web3Instance} = useWeb3Modal();
 
   /**
+   * Their hooks
+   */
+
+  const queryClient = useQueryClient();
+
+  /**
    * State
    */
 
@@ -65,6 +72,7 @@ export function useProposalsVotes(
 
   const getProposalsVotesOnchainCached = useCallback(getProposalsVotesOnchain, [
     proposalVotingAdapters,
+    queryClient,
     registryABI,
     registryAddress,
     web3Instance,
@@ -108,27 +116,37 @@ export function useProposalsVotes(
       setProposalsVotesStatus(AsyncStatus.PENDING);
 
       // Build votes results
-      const votesDataCalls: MulticallTuple[] = await Promise.all(
-        safeProposalVotingAdapters.map(
-          async ([
-            proposalId,
-            {votingAdapterAddress, getVotingAdapterABI, votingAdapterName},
-          ]): Promise<MulticallTuple> => [
-            votingAdapterAddress,
-            await getVotesDataABI(votingAdapterName, getVotingAdapterABI()),
-            /**
-             * We build the call arguments the same way for the different voting adapters
-             * (i.e. [dao, proposalId]). If we need to change this we can move it to another function.
-             */
-            [registryAddress, proposalId],
-          ]
-        )
+      const votesDataCalls: MulticallTuple[] = await queryClient.fetchQuery(
+        ['votesDataCalls', safeProposalVotingAdapters],
+        async () =>
+          await Promise.all(
+            safeProposalVotingAdapters.map(
+              async ([
+                proposalId,
+                {votingAdapterAddress, getVotingAdapterABI, votingAdapterName},
+              ]): Promise<MulticallTuple> => [
+                votingAdapterAddress,
+                await getVotesDataABI(votingAdapterName, getVotingAdapterABI()),
+                /**
+                 * We build the call arguments the same way for the different voting adapters
+                 * (i.e. [dao, proposalId]). If we need to change this we can move it to another function.
+                 */
+                [registryAddress, proposalId],
+              ]
+            )
+          ),
+        {
+          staleTime: 60000,
+        }
       );
 
-      const votesDataResults = await multicall({
-        calls: votesDataCalls,
-        web3Instance,
-      });
+      const votesDataResults = await queryClient.fetchQuery(
+        ['votesDataResults', votesDataCalls],
+        async () => await multicall({calls: votesDataCalls, web3Instance}),
+        {
+          staleTime: 60000,
+        }
+      );
 
       setProposalsVotesStatus(AsyncStatus.FULFILLED);
       setProposalsVotes(

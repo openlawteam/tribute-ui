@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
+import {useQueryClient} from 'react-query';
 
 import {AsyncStatus} from '../../../util/types';
 import {BURN_ADDRESS} from '../../../util/constants';
@@ -51,6 +52,12 @@ export function useProposalsVotingAdapter(
   const {web3Instance} = useWeb3Modal();
 
   /**
+   * Their hooks
+   */
+
+  const queryClient = useQueryClient();
+
+  /**
    * State
    */
 
@@ -70,7 +77,7 @@ export function useProposalsVotingAdapter(
 
   const getProposalsVotingAdaptersOnchainCached = useCallback(
     getProposalsVotingAdaptersOnchain,
-    [proposalIds, registryABI, registryAddress, web3Instance]
+    [proposalIds, queryClient, registryABI, registryAddress, web3Instance]
   );
 
   /**
@@ -125,10 +132,15 @@ export function useProposalsVotingAdapter(
 
       setProposalsVotingAdaptersStatus(AsyncStatus.PENDING);
 
-      const votingAdapterAddressResults: string[] = await multicall({
-        calls: votingAdapterCalls,
-        web3Instance,
-      });
+      const votingAdapterAddressResults: string[] =
+        await queryClient.fetchQuery(
+          ['votingAdapterAddressResults', votingAdapterCalls],
+          async () =>
+            await multicall({calls: votingAdapterCalls, web3Instance}),
+          {
+            staleTime: 60000,
+          }
+        );
 
       const {default: lazyIVotingABI} = await import(
         '../../../abis/IVoting.json'
@@ -177,35 +189,49 @@ export function useProposalsVotingAdapter(
           [],
         ]);
 
-      const adapterNameResults: VotingAdapterName[] = await multicall({
-        calls: votingAdapterNameCalls,
-        web3Instance,
-      });
-
-      const votingAdaptersToSet = await Promise.all(
-        filteredProposalIds.map(
-          async (id, i): Promise<ProposalVotingAdapterTuple> => {
-            const votingAdapterABI = await getVotingAdapterABI(
-              adapterNameResults[i]
-            );
-            const votingAdapterAddress = filteredVotingAdapterAddressResults[i];
-
-            return [
-              id,
-              {
-                votingAdapterName: adapterNameResults[i],
-                votingAdapterAddress,
-                getVotingAdapterABI: () => votingAdapterABI,
-                getWeb3VotingAdapterContract: <T>() =>
-                  new web3Instance.eth.Contract(
-                    votingAdapterABI,
-                    votingAdapterAddress
-                  ) as any as T,
-              },
-            ];
+      const adapterNameResults: VotingAdapterName[] =
+        await queryClient.fetchQuery(
+          ['adapterNameResults', votingAdapterNameCalls],
+          async () =>
+            await multicall({calls: votingAdapterNameCalls, web3Instance}),
+          {
+            staleTime: 60000,
           }
-        )
-      );
+        );
+
+      const votingAdaptersToSet: ProposalVotingAdapterTuple[] =
+        await queryClient.fetchQuery(
+          ['votingAdaptersToSet', filteredProposalIds],
+          async () =>
+            await Promise.all(
+              filteredProposalIds.map(
+                async (id, i): Promise<ProposalVotingAdapterTuple> => {
+                  const votingAdapterABI = await getVotingAdapterABI(
+                    adapterNameResults[i]
+                  );
+                  const votingAdapterAddress =
+                    filteredVotingAdapterAddressResults[i];
+
+                  return [
+                    id,
+                    {
+                      votingAdapterName: adapterNameResults[i],
+                      votingAdapterAddress,
+                      getVotingAdapterABI: () => votingAdapterABI,
+                      getWeb3VotingAdapterContract: <T>() =>
+                        new web3Instance.eth.Contract(
+                          votingAdapterABI,
+                          votingAdapterAddress
+                        ) as any as T,
+                    },
+                  ];
+                }
+              )
+            ),
+          {
+            staleTime: 60000,
+          }
+        );
 
       setProposalsVotingAdapters(votingAdaptersToSet);
       setProposalsVotingAdaptersStatus(AsyncStatus.FULFILLED);
