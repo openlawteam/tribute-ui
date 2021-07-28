@@ -15,15 +15,14 @@ import {
   useOffchainVotingResults,
   useProposalWithOffchainVoteStatus,
 } from './hooks';
+import {AsyncStatus} from '../../util/types';
 import {ContractAdapterNames, ContractDAOConfigKeys} from '../web3/types';
 import {CycleEllipsis} from '../feedback';
 import {useDaoConfigurations} from '../../hooks';
 import {VotingAdapterName} from '../adapters-extensions/enums';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import ProcessAction from './ProcessAction';
-import SponsorAction from './SponsorAction';
 import SubmitAction from './SubmitAction';
-import {AsyncStatus} from '../../util/types';
 
 type ProposalWithOffchainActionsProps = {
   adapterName: ContractAdapterNames;
@@ -45,7 +44,6 @@ const {
   OffchainVotingSubmitResult,
   OffchainVoting,
   Process,
-  Sponsor,
   Submit,
 } = ProposalFlowStatus;
 
