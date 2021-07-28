@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState, useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import {
   SnapshotDraftResponse,
@@ -7,6 +7,7 @@ import {
   SnapshotProposalResponseData,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
+import {useQueryClient} from 'react-query';
 
 import {AsyncStatus} from '../../../util/types';
 import {DaoAdapterConstants} from '../../adapters-extensions/enums';
@@ -196,6 +197,21 @@ export function useProposals({
     useProposalsVotes(proposalsVotingAdapters);
 
   /**
+   * Their hooks
+   */
+
+  const queryClient = useQueryClient();
+
+  /**
+   * Cached callbacks
+   */
+
+  const handleGetAllSnapshotDraftsAndProposalsCached = useCallback(
+    handleGetAllSnapshotDraftsAndProposals,
+    [queryClient]
+  );
+
+  /**
    * Effects
    */
 
@@ -213,8 +229,8 @@ export function useProposals({
   useEffect(() => {
     if (!adapterAddress) return;
 
-    handleGetAllSnapshotDraftsAndProposals(adapterAddress);
-  }, [adapterAddress]);
+    handleGetAllSnapshotDraftsAndProposalsCached(adapterAddress);
+  }, [adapterAddress, handleGetAllSnapshotDraftsAndProposalsCached]);
 
   // Set the DAO proposal IDs we want to work with
   useEffect(() => {
@@ -441,12 +457,15 @@ export function useProposals({
       // Reset error
       setSnapshotDraftAndProposalsError(undefined);
 
-      const snapshotDraftEntries = await getSnapshotDraftsByAdapterAddress(
-        adapterAddress
+      const snapshotDraftEntries = await queryClient.fetchQuery(
+        ['snapshotDraftsByAdapterAddress', adapterAddress],
+        async () => await getSnapshotDraftsByAdapterAddress(adapterAddress)
       );
 
-      const snapshotProposalEntries =
-        await getSnapshotProposalsByAdapterAddress(adapterAddress);
+      const snapshotProposalEntries = await queryClient.fetchQuery(
+        ['snapshotProposalsByAdapterAddress', adapterAddress],
+        async () => await getSnapshotProposalsByAdapterAddress(adapterAddress)
+      );
 
       const mergedEntries = [
         ...snapshotDraftEntries,

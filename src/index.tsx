@@ -10,6 +10,9 @@ import {
   NormalizedCacheObject,
   HttpLink,
 } from '@apollo/client';
+import {QueryClient, QueryClientProvider} from 'react-query';
+// @todo Remove react-query dev tools before merging
+import {ReactQueryDevtools} from 'react-query/devtools';
 
 import {
   ENVIRONMENT,
@@ -80,6 +83,15 @@ export const getApolloClient = (
     }),
   });
 
+// Create `QueryClient`
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 if (root !== null) {
   render(
     <Provider store={store}>
@@ -96,15 +108,21 @@ if (root !== null) {
           }}
           providerOptions={WALLETCONNECT_PROVIDER_OPTIONS}>
           <ApolloProvider client={getApolloClient(store)}>
-            <Init
-              render={({error, isInitComplete}) =>
-                error ? (
-                  <App renderMainContent={() => <InitError error={error} />} />
-                ) : isInitComplete ? (
-                  <App />
-                ) : null
-              }
-            />
+            <QueryClientProvider client={queryClient}>
+              <Init
+                render={({error, isInitComplete}) =>
+                  error ? (
+                    <App
+                      renderMainContent={() => <InitError error={error} />}
+                    />
+                  ) : isInitComplete ? (
+                    <App />
+                  ) : null
+                }
+              />
+              {/* @todo Remove react-query dev tools before merging */}
+              <ReactQueryDevtools initialIsOpen={false} />
+            </QueryClientProvider>
           </ApolloProvider>
         </Web3ModalManager>
       </BrowserRouter>

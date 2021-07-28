@@ -1,7 +1,8 @@
-import {AbiItem} from 'web3-utils/types';
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import Web3 from 'web3';
+import {AbiItem} from 'web3-utils/types';
+import {useQueryClient} from 'react-query';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
@@ -61,6 +62,20 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
   const {web3Instance} = useWeb3Modal();
 
   /**
+   * Their hooks
+   */
+
+  const queryClient = useQueryClient();
+
+  /**
+   * Cached callbacks
+   */
+
+  const handleGetDaoProposalsCached = useCallback(handleGetDaoProposals, [
+    queryClient,
+  ]);
+
+  /**
    * Effects
    */
 
@@ -74,13 +89,19 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
       return;
     }
 
-    handleGetDaoProposals({
+    handleGetDaoProposalsCached({
       proposalIds,
       proposalsAbi,
       registryAddress,
       web3Instance,
     });
-  }, [proposalIds, proposalsAbi, registryAddress, web3Instance]);
+  }, [
+    handleGetDaoProposalsCached,
+    proposalIds,
+    proposalsAbi,
+    registryAddress,
+    web3Instance,
+  ]);
 
   /**
    * Functions
@@ -122,10 +143,10 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
         [id],
       ]);
 
-      const proposals = await multicall({
-        calls,
-        web3Instance,
-      });
+      const proposals = await queryClient.fetchQuery(
+        ['daoProposals', calls],
+        async () => await multicall({calls, web3Instance})
+      );
 
       setDaoProposals(safeProposalIds.map((id, i) => [id, proposals[i]]));
       setDaoProposalsStatus(AsyncStatus.FULFILLED);

@@ -6,6 +6,7 @@ import {Provider} from 'react-redux';
 import {ApolloProvider} from '@apollo/react-hooks';
 import React, {useEffect, useMemo, useState} from 'react';
 import Web3 from 'web3';
+import {QueryClientProvider} from 'react-query';
 
 import {
   Web3ModalContext,
@@ -14,7 +15,7 @@ import {
 import {AsyncStatus} from '../util/types';
 import {CHAINS as mockChains, WALLETCONNECT_PROVIDER_OPTIONS} from '../config';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider, getNewStore} from './helpers';
-import {getApolloClient} from '../index';
+import {getApolloClient, queryClient} from '../index';
 import {VotingAdapterName} from '../components/adapters-extensions/enums';
 import App from '../App';
 import Init from '../Init';
@@ -257,7 +258,9 @@ export default function Wrapper(
         value={web3ContextValues as Web3ModalContextValue}>
         <MemoryRouter initialEntries={locationEntries || [{pathname: '/'}]}>
           <ApolloProvider client={getApolloClient(store)}>
-            {renderChildren(props.children)}
+            <QueryClientProvider client={queryClient}>
+              {renderChildren(props.children)}
+            </QueryClientProvider>
           </ApolloProvider>
         </MemoryRouter>
       </Web3ModalContext.Provider>
