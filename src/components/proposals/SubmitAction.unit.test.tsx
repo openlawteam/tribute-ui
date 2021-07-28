@@ -23,8 +23,9 @@ import {
   FakeHttpProvider,
 } from '../../test/helpers';
 import {ProposalData} from './types';
+import {server, rest} from '../../test/server';
+import {SNAPSHOT_HUB_API_URL, UNITS_ADDRESS} from '../../config';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
-import {UNITS_ADDRESS} from '../../config';
 import SubmitAction from './SubmitAction';
 import Wrapper from '../../test/Wrapper';
 
@@ -38,7 +39,7 @@ describe('SubmitAction unit tests', () => {
   const whyIsDisabledRegex: RegExp = /^why is sponsoring disabled\?$/i;
   const actionId: string = '0xa8ED02b24B4E9912e39337322885b65b23CdF188';
 
-  // Provide bare minimum proposal data needed for processing
+  // Provide bare minimum draft data needed for processing
   const defaultDraftData = (refetchSpy?: ReturnType<typeof jest.fn>) =>
     ({
       snapshotDraft: {
@@ -47,6 +48,33 @@ describe('SubmitAction unit tests', () => {
           payload: {
             name: 'Some proposal',
             body: 'Another great proposal!',
+            metadata: {
+              submitActionArgs: [
+                DEFAULT_ETH_ADDRESS,
+                UNITS_ADDRESS,
+                '100000000000000000', // .1 ETH
+              ],
+            },
+          },
+          timestamp: (Date.now() / 1000).toFixed(),
+        },
+        sig: DEFAULT_SIG,
+        actionId,
+      } as any,
+      refetchProposalOrDraft: refetchSpy || (() => {}),
+    } as Partial<ProposalData>);
+
+  // Provide bare minimum proposal data needed for processing
+  const defaultProposalData = (refetchSpy?: ReturnType<typeof jest.fn>) =>
+    ({
+      snapshotProposal: {
+        idInDAO: DEFAULT_PROPOSAL_HASH,
+        msg: {
+          payload: {
+            name: 'Some proposal',
+            body: 'Another great proposal!',
+            start: Math.floor(Date.now() / 1000),
+            end: Math.floor(Date.now() / 1000) + 120,
             metadata: {
               submitActionArgs: [
                 DEFAULT_ETH_ADDRESS,
@@ -125,6 +153,86 @@ describe('SubmitAction unit tests', () => {
       mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
 
       // Mock rest of transaction responses
+      mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
+      mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
+      mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
+    });
+
+    userEvent.click(screen.getByRole('button', {name: sponsorButtonRegex}));
+
+    expect(screen.getByText(awaitingConfirmationRegex)).toBeInTheDocument();
+
+    await waitFor(() => {
+      // Rotating message (`SubmitAction` starts with first)
+      expect(screen.getByText(TX_CYCLE_MESSAGES[0])).toBeInTheDocument();
+
+      // Etherscan link
+      expect(
+        screen.getByRole('link', {name: viewProgressRegex})
+      ).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: doneRegex})).toBeInTheDocument();
+      expect(screen.getByText(proposalSubmittedRegex)).toBeInTheDocument();
+      // Etherscan link
+      expect(screen.getByRole('link', {name: viewTxRegex})).toBeInTheDocument();
+    });
+
+    expect(refetchSpy.mock.calls.length).toBe(1);
+  });
+
+  test('can submit a proposal to DAO if Snapshot Proposal already exists', async () => {
+    const refetchSpy = jest.fn();
+    const proposalData = defaultProposalData(refetchSpy);
+
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+    let wrapperStore: Store;
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+          wrapperStore = p.store;
+        }}>
+        <SubmitAction proposal={proposalData as ProposalData} />
+      </Wrapper>
+    );
+
+    expect(
+      screen.getByRole('button', {name: sponsorButtonRegex})
+    ).toBeInTheDocument();
+
+    // Wait for the adapter to init
+    await waitFor(() => {
+      expect(
+        wrapperStore.getState().contracts.OnboardingContract.contractAddress
+      ).toBeDefined();
+    });
+
+    /**
+     * Setup: change address of onboarding adapter so `SubmitAction` can find it specifically,
+     * as all the test contracts use the same address.
+     */
+    await waitFor(async () => {
+      await wrapperStore.dispatch<any>(
+        initContractOnboarding(web3Instance, actionId)
+      );
+    });
+
+    await waitFor(() => {
+      expect(
+        wrapperStore.getState().contracts.OnboardingContract.contractAddress
+      ).toBe(actionId);
+    });
+
+    // Setup: Mock RPC calls for `submitProposal`
+    await waitFor(() => {
       mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
       mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
@@ -322,6 +430,86 @@ describe('SubmitAction unit tests', () => {
 
       expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
       expect(screen.getByText(/estimating gas failed/i)).toBeInTheDocument();
+    });
+  });
+
+  test('can display error message if Snapshot Hub error', async () => {
+    // Mock Snapshot Hub error repsonse
+    server.use(
+      rest.post(`${SNAPSHOT_HUB_API_URL}/api/message`, async (_req, res, ctx) =>
+        res(ctx.status(500))
+      )
+    );
+
+    const proposalData = defaultDraftData();
+
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+    let wrapperStore: Store;
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+          wrapperStore = p.store;
+        }}>
+        <SubmitAction proposal={proposalData as ProposalData} />
+      </Wrapper>
+    );
+
+    expect(
+      screen.getByRole('button', {name: sponsorButtonRegex})
+    ).toBeInTheDocument();
+
+    // Wait for the adapter to init
+    await waitFor(() => {
+      expect(
+        wrapperStore.getState().contracts.OnboardingContract.contractAddress
+      ).toBeDefined();
+    });
+
+    /**
+     * Setup: change address of onboarding adapter so `SubmitAction` can find it specifically,
+     * as all the test contracts use the same address.
+     */
+    await waitFor(async () => {
+      await wrapperStore.dispatch<any>(
+        initContractOnboarding(web3Instance, actionId)
+      );
+    });
+
+    await waitFor(() => {
+      expect(
+        wrapperStore.getState().contracts.OnboardingContract.contractAddress
+      ).toBe(actionId);
+    });
+
+    await waitFor(() => {
+      // Mock block number response from `useSignAndSubmitProposal`
+      mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
+
+      // Mock voting period seconds response from `useSignAndSubmitProposal`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('uint256', '120')
+      );
+
+      // Mock signature response
+      mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+    });
+
+    userEvent.click(screen.getByRole('button', {name: sponsorButtonRegex}));
+
+    expect(screen.getByText(awaitingConfirmationRegex)).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: sponsorButtonRegex})
+      ).toBeEnabled();
+
+      expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
     });
   });
 

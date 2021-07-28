@@ -155,9 +155,10 @@ export default function SubmitAction(props: SubmitActionProps) {
     proposalSignAndSendStatus === AWAITING_CONFIRM ||
     proposalSignAndSendStatus === PENDING;
 
-  const isDone =
-    txStatus === WEB3_TX_FULFILLED &&
-    proposalSignAndSendStatus === WEB3_TX_FULFILLED;
+  const isDone = snapshotProposalSubmitted
+    ? txStatus === WEB3_TX_FULFILLED
+    : txStatus === WEB3_TX_FULFILLED &&
+      proposalSignAndSendStatus === WEB3_TX_FULFILLED;
 
   const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
 
@@ -166,23 +167,15 @@ export default function SubmitAction(props: SubmitActionProps) {
    */
 
   useEffect(() => {
-    if (checkApplicant) {
+    if (checkApplicant && checkApplicantStatus === FULFILLED) {
       // 1. Determine and set reasons why action would be disabled
 
-      // Reason: If the applicant address is invalid (see `useCheckApplicant`
-      // hook for reasons) the `submitProposal` smart contract transaction will
-      // fail.
-      if (checkApplicantError) {
-        console.warn(
-          `Error checking if the applicant address is valid: ${checkApplicantError.message}`
-        );
-      }
-
-      if (
-        checkApplicantStatus === FULFILLED &&
-        !isApplicantValid &&
-        checkApplicantInvalidMsg
-      ) {
+      /**
+       * Reason: If the applicant address is invalid (see `useCheckApplicant`
+       * hook for reasons) the `submitProposal` smart contract transaction will
+       * fail.
+       */
+      if (!isApplicantValid && checkApplicantInvalidMsg) {
         actionDisabledReasonsRef.current = {
           ...actionDisabledReasonsRef.current,
           invalidApplicantMessage: checkApplicantInvalidMsg,
@@ -194,7 +187,6 @@ export default function SubmitAction(props: SubmitActionProps) {
     }
   }, [
     checkApplicant,
-    checkApplicantError,
     checkApplicantInvalidMsg,
     checkApplicantStatus,
     isApplicantValid,
@@ -361,6 +353,17 @@ export default function SubmitAction(props: SubmitActionProps) {
       default:
         return null;
     }
+  }
+
+  /**
+   * Log-out check applicant error
+   *
+   * @todo Use logging service
+   */
+  if (checkApplicantError) {
+    console.warn(
+      `Error checking if the applicant address is valid: ${checkApplicantError.message}`
+    );
   }
 
   return (
