@@ -298,6 +298,74 @@ describe('ProposalWithOffchainVoteActions component unit tests', () => {
     useOffchainVotingResultsMock.mockRestore();
   });
 
+  test('should not render off-chain submit result action until vote tallies fulfilled', async () => {
+    const proposal = {
+      snapshotProposal: {
+        msg: {
+          payload: {
+            name: 'Good Title',
+            body: 'Coolness',
+            metadata: {},
+          },
+          timestamp: Date.now().toString(),
+        },
+      },
+    } as ProposalData;
+
+    const useProposalWithOffchainVoteStatusMock = jest
+      .spyOn(
+        useProposalWithOffchainVoteStatusToMock,
+        'useProposalWithOffchainVoteStatus'
+      )
+      .mockImplementation(() => ({
+        status: ProposalFlowStatus.OffchainVotingSubmitResult,
+        daoProposal: undefined,
+        daoProposalVoteResult: undefined,
+        daoProposalVote: undefined,
+        proposalFlowStatusError: undefined,
+        stopPollingForStatus: () => {},
+      }));
+
+    const useOffchainVotingResultsMock = jest
+      .spyOn(useOffchainVotingResultsToMock, 'useOffchainVotingResults')
+      .mockImplementation(() => ({
+        offchainVotingResults: [
+          [
+            '0xb22ca9af120bfddfc2071b5e86a9edee6e0e2ab76399e7c2d96a9d502f5c1111',
+            {
+              Yes: {percentage: 0.01, units: 100000},
+              No: {percentage: 0.02, units: 200000},
+              totalUnits: 10000000,
+            },
+          ],
+        ],
+        offchainVotingResultsError: undefined,
+        offchainVotingResultsStatus: AsyncStatus.PENDING,
+      }));
+
+    render(
+      <Wrapper useInit useWallet>
+        <ProposalWithOffchainVoteActions
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposal}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      // Status
+      expect(screen.getAllByText(/1%/i).length).toBe(1);
+      expect(screen.getAllByText(/2%/i).length).toBe(1);
+
+      expect(() =>
+        screen.getByRole('button', {name: /submit vote result/i})
+      ).toThrow();
+    });
+    // Restore mocks
+    useProposalWithOffchainVoteStatusMock.mockRestore();
+    useOffchainVotingResultsMock.mockRestore();
+  });
+
   test('should call `stopPollingForStatus` if off-chain submit result action and failing vote', async () => {
     const stopPollingForStatusSpy = jest.fn();
 

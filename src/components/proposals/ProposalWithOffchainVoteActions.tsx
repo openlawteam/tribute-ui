@@ -161,11 +161,6 @@ export default function ProposalWithOffchainVoteActions(
       return <SubmitAction proposal={proposal} />;
     }
 
-    // Sponsor button
-    if (status === Sponsor) {
-      return <SponsorAction proposal={proposal} />;
-    }
-
     // Off-chain voting buttons
     if (status === OffchainVoting) {
       return (
@@ -175,11 +170,16 @@ export default function ProposalWithOffchainVoteActions(
 
     // Off-chain voting submit vote result
     if (status === OffchainVotingSubmitResult) {
+      // Wait for the the off-chain voting tallies to be fetched
+      if (offchainVotingResultsStatus !== FULFILLED) {
+        return null;
+      }
+
       // Return a React.Fragment to hide the "Submit Vote Result" button if vote
       // did not pass. For now, we can assume across all adapters that if the
       // vote did not pass then the vote result does not need to be submitted.
-      if (offchainVotingResultsStatus === FULFILLED && yesUnits <= noUnits) {
-        return <></>;
+      if (yesUnits <= noUnits) {
+        return null;
       }
 
       return (
