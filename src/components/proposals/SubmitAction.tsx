@@ -1,6 +1,7 @@
 import {useState, useRef, useEffect} from 'react';
 import {useSelector} from 'react-redux';
 import {
+  CoreProposalVoteChoices,
   prepareVoteProposalData,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
@@ -8,8 +9,9 @@ import {
 import {AsyncStatus} from '../../util/types';
 import {getContractByAddress} from '../web3/helpers';
 import {ProposalData} from './types';
+import {SPACE} from '../../config';
 import {StoreState} from '../../store/types';
-import {TX_CYCLE_MESSAGES} from '../web3/config';
+import {TX_CYCLE_MESSAGES, VOTE_CHOICES} from '../web3/config';
 import {useCheckApplicant, useSignAndSubmitProposal} from './hooks';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
@@ -36,18 +38,65 @@ type ActionDisabledReasons = {
   invalidApplicantMessage: string;
 };
 
+type ProposalDataForDao = {
+  body: string;
+  choices: CoreProposalVoteChoices;
+  end: number;
+  name: string;
+  sig: string;
+  snapshot: number;
+  space: string;
+  start: number;
+  timestamp: string;
+};
+
 const {FULFILLED} = AsyncStatus;
 const {AWAITING_CONFIRM, FULFILLED: WEB3_TX_FULFILLED, PENDING} = Web3TxStatus;
+const defaultChoices: CoreProposalVoteChoices = VOTE_CHOICES;
 
 export default function SubmitAction(props: SubmitActionProps) {
   const {
     checkApplicant,
-    proposal: {snapshotDraft, refetchProposalOrDraft},
+    proposal: {snapshotDraft, snapshotProposal, refetchProposalOrDraft},
   } = props;
+
+  /**
+   * Default proposal data for submission to the DAO.
+   * This will be used for `proposalDataForDaoRef`.
+   */
+  const {
+    msg: {
+      payload: {
+        choices: proposalChoices = defaultChoices,
+        name: proposalName = '',
+        body: proposalBody = '',
+        start: proposalStart = 0,
+        end: proposalEnd = 0,
+        snapshot: proposalSnapshot = 0,
+      },
+      timestamp: proposalTimestamp = '',
+    },
+    sig: proposalSig = '',
+  } = snapshotProposal || {msg: {payload: {}}};
 
   /**
    * State
    */
+
+  const [snapshotProposalSubmitted, setSnapshotProposalSubmitted] =
+    useState<boolean>((snapshotProposal?.sig.length || '') > 0);
+
+  const proposalDataForDaoRef = useRef<ProposalDataForDao>({
+    body: proposalBody,
+    choices: proposalChoices,
+    end: proposalEnd,
+    name: proposalName,
+    sig: proposalSig,
+    snapshot: proposalSnapshot,
+    space: SPACE || '',
+    start: proposalStart,
+    timestamp: proposalTimestamp,
+  });
 
   const [submitError, setSubmitError] = useState<Error>();
 
@@ -64,6 +113,7 @@ export default function SubmitAction(props: SubmitActionProps) {
    */
 
   const contracts = useSelector((s: StoreState) => s.contracts);
+
   const daoRegistryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
   );
@@ -161,30 +211,65 @@ export default function SubmitAction(props: SubmitActionProps) {
         throw new Error('No DAO Registry address was found.');
       }
 
-      if (!snapshotDraft) {
-        throw new Error('No Snapshot draft was found.');
+      const actionId: string =
+        (snapshotDraft || snapshotProposal)?.actionId || '';
+
+      const contract = getContractByAddress(actionId, contracts);
+
+      if (!contract) {
+        throw Error(`No contract was found for action id ${actionId}.`);
       }
 
-      const contract = getContractByAddress(snapshotDraft.actionId, contracts);
+      const idForDAO: string =
+        (snapshotDraft || snapshotProposal)?.idInDAO || '';
 
-      const {
-        msg: {
-          payload: {name, body, metadata},
-          timestamp,
-        },
-      } = snapshotDraft;
+      const submitActionArgs: any[] = (
+        snapshotDraft?.msg.payload || snapshotProposal?.msg.payload
+      )?.metadata.submitActionArgs;
 
-      // Sign and submit draft for snapshot-hub
-      const {data, signature} = await signAndSendProposal({
-        partialProposalData: {
-          name,
-          body,
-          metadata,
-          timestamp,
-        },
-        adapterAddress: contract.contractAddress,
-        type: SnapshotType.proposal,
-      });
+      // If the Snapshot Proposal has not yet been submitted to Snapshot Hub
+      if (!snapshotProposalSubmitted && snapshotDraft) {
+        const {
+          msg: {
+            payload: {
+              name: draftName,
+              body: draftBody,
+              metadata: draftMetadata,
+            },
+            timestamp: draftTimestamp,
+          },
+        } = snapshotDraft;
+
+        // Sign and submit draft for snapshot-hub
+        const {data, signature} = await signAndSendProposal({
+          partialProposalData: {
+            name: draftName,
+            body: draftBody,
+            metadata: draftMetadata,
+            timestamp: draftTimestamp,
+          },
+          adapterAddress: contract.contractAddress,
+          type: SnapshotType.proposal,
+        });
+
+        // Set the proposal data for submission to the DAO
+        proposalDataForDaoRef.current = {
+          body: data.payload.body,
+          choices: data.payload.choices,
+          end: data.payload.end,
+          name: data.payload.name,
+          sig: signature,
+          snapshot: data.payload.snapshot,
+          space: data.space,
+          start: data.payload.start,
+          timestamp: data.timestamp,
+        };
+
+        setSnapshotProposalSubmitted(true);
+      }
+
+      const {body, choices, end, name, sig, snapshot, space, start, timestamp} =
+        proposalDataForDaoRef.current;
 
       /**
        * Prepare `data` argument for submission to DAO
@@ -195,24 +280,24 @@ export default function SubmitAction(props: SubmitActionProps) {
       const preparedVoteVerificationBytes = prepareVoteProposalData(
         {
           payload: {
-            name: data.payload.name,
-            body: data.payload.body,
-            choices: data.payload.choices,
-            snapshot: data.payload.snapshot.toString(),
-            start: data.payload.start,
-            end: data.payload.end,
+            body,
+            choices,
+            end,
+            name,
+            snapshot: snapshot.toString(),
+            start,
           },
-          sig: signature,
-          space: data.space,
-          timestamp: parseInt(data.timestamp),
+          sig,
+          space,
+          timestamp: parseInt(timestamp),
         },
         web3Instance
       );
 
       const submitArguments: SubmitArguments = [
         daoRegistryAddress,
-        snapshotDraft.idInDAO,
-        ...(metadata.submitActionArgs || []),
+        idForDAO,
+        ...(submitActionArgs || []),
         preparedVoteVerificationBytes,
       ];
 
