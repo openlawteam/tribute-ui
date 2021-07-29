@@ -39,6 +39,40 @@ describe('SubmitAction unit tests', () => {
   const whyIsDisabledRegex: RegExp = /^why is sponsoring disabled\?$/i;
   const actionId: string = '0xa8ED02b24B4E9912e39337322885b65b23CdF188';
 
+  async function setUpOnboardingAdapter({
+    wrapperStore,
+    web3Instance,
+    actionId,
+  }: {
+    wrapperStore: Store;
+    web3Instance: Web3;
+    actionId: string;
+  }) {
+    // Wait for the adapter to init
+    await waitFor(() => {
+      expect(
+        wrapperStore.getState().contracts.OnboardingContract.contractAddress
+      ).toBeDefined();
+    });
+
+    /**
+     * Setup: change address of onboarding adapter so `SubmitAction` can find it specifically,
+     * as all the test contracts use the same address.
+     */
+    await waitFor(async () => {
+      await wrapperStore.dispatch<any>(
+        initContractOnboarding(web3Instance, actionId)
+      );
+    });
+
+    // Wait for the adapter to be updated
+    await waitFor(() => {
+      expect(
+        wrapperStore.getState().contracts.OnboardingContract.contractAddress
+      ).toBe(actionId);
+    });
+  }
+
   // Provide bare minimum draft data needed for processing
   const defaultDraftData = (refetchSpy?: ReturnType<typeof jest.fn>) =>
     ({
@@ -116,27 +150,8 @@ describe('SubmitAction unit tests', () => {
       screen.getByRole('button', {name: sponsorButtonRegex})
     ).toBeInTheDocument();
 
-    // Wait for the adapter to init
-    await waitFor(() => {
-      expect(
-        wrapperStore.getState().contracts.OnboardingContract.contractAddress
-      ).toBeDefined();
-    });
-
-    /**
-     * Setup: change address of onboarding adapter so `SubmitAction` can find it specifically,
-     * as all the test contracts use the same address.
-     */
     await waitFor(async () => {
-      await wrapperStore.dispatch<any>(
-        initContractOnboarding(web3Instance, actionId)
-      );
-    });
-
-    await waitFor(() => {
-      expect(
-        wrapperStore.getState().contracts.OnboardingContract.contractAddress
-      ).toBe(actionId);
+      await setUpOnboardingAdapter({wrapperStore, web3Instance, actionId});
     });
 
     // Setup: Mock RPC calls for `submitProposal`
@@ -208,27 +223,8 @@ describe('SubmitAction unit tests', () => {
       screen.getByRole('button', {name: sponsorButtonRegex})
     ).toBeInTheDocument();
 
-    // Wait for the adapter to init
-    await waitFor(() => {
-      expect(
-        wrapperStore.getState().contracts.OnboardingContract.contractAddress
-      ).toBeDefined();
-    });
-
-    /**
-     * Setup: change address of onboarding adapter so `SubmitAction` can find it specifically,
-     * as all the test contracts use the same address.
-     */
     await waitFor(async () => {
-      await wrapperStore.dispatch<any>(
-        initContractOnboarding(web3Instance, actionId)
-      );
-    });
-
-    await waitFor(() => {
-      expect(
-        wrapperStore.getState().contracts.OnboardingContract.contractAddress
-      ).toBe(actionId);
+      await setUpOnboardingAdapter({wrapperStore, web3Instance, actionId});
     });
 
     // Setup: Mock RPC calls for `submitProposal`
@@ -285,36 +281,18 @@ describe('SubmitAction unit tests', () => {
       screen.getByRole('button', {name: sponsorButtonRegex})
     ).toBeInTheDocument();
 
-    // Wait for the adapter to init
-    await waitFor(() => {
-      expect(
-        wrapperStore.getState().contracts.OnboardingContract.contractAddress
-      ).toBeDefined();
+    await waitFor(async () => {
+      await setUpOnboardingAdapter({wrapperStore, web3Instance, actionId});
     });
 
-    /**
-     * Setup: change address of onboarding adapter so `SubmitAction` can find it specifically,
-     *   as all the test contracts use the same address.
-     *
-     * Setup: set connected wallet address to not be an active member
-     */
+    // Setup: set connected wallet address to not be an active member
     await waitFor(async () => {
-      await wrapperStore.dispatch<any>(
-        initContractOnboarding(web3Instance, actionId)
-      );
-
       await wrapperStore.dispatch<any>(
         setConnectedMember({
           type: SET_CONNECTED_MEMBER,
           isActiveMember: false,
         } as any)
       );
-    });
-
-    await waitFor(() => {
-      expect(
-        wrapperStore.getState().contracts.OnboardingContract.contractAddress
-      ).toBe(actionId);
     });
 
     await waitFor(() => {
@@ -333,6 +311,102 @@ describe('SubmitAction unit tests', () => {
       expect(() => screen.getByText(awaitingConfirmationRegex)).toThrow();
     });
 
+    userEvent.click(screen.getByRole('button', {name: whyIsDisabledRegex}));
+
+    // Disabled reason
+    expect(
+      screen.getByText(
+        /either you are not a member, or your membership is not active\./i
+      )
+    ).toBeInTheDocument();
+  });
+
+  test('should not submit a proposal if no wallet connected', async () => {
+    const proposalData = defaultDraftData();
+
+    render(
+      <Wrapper useInit>
+        <SubmitAction proposal={proposalData as ProposalData} />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: sponsorButtonRegex})
+      ).toBeDisabled();
+
+      expect(
+        screen.getByRole('button', {name: whyIsDisabledRegex})
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByRole('button', {name: sponsorButtonRegex}));
+
+    await waitFor(() => {
+      expect(() => screen.getByText(awaitingConfirmationRegex)).toThrow();
+    });
+
+    userEvent.click(screen.getByRole('button', {name: whyIsDisabledRegex}));
+
+    // Disabled reason
+    expect(
+      screen.getByText(/your wallet is not connected\./i)
+    ).toBeInTheDocument();
+  });
+
+  test('should not submit a proposal if applicant check is not OK', async () => {
+    const proposalData = defaultDraftData();
+
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+    let wrapperStore: Store;
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+          wrapperStore = p.store;
+
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameters(
+              ['uint256', 'bytes[]'],
+              [
+                0,
+                [
+                  // `isNotReservedAddress`
+                  web3Instance.eth.abi.encodeParameter('bool', true),
+                  // `isNotZeroAddress`
+                  web3Instance.eth.abi.encodeParameter('bool', true),
+                  // `isNotReservedAddress`
+                  web3Instance.eth.abi.encodeParameter(
+                    'address',
+                    '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+                  ),
+                ],
+              ]
+            )
+          );
+        }}>
+        <SubmitAction
+          checkApplicant={DEFAULT_ETH_ADDRESS}
+          proposal={proposalData as ProposalData}
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: sponsorButtonRegex})
+      ).toBeDisabled();
+    });
+
+    await waitFor(async () => {
+      await setUpOnboardingAdapter({wrapperStore, web3Instance, actionId});
+    });
+
     expect(
       screen.getByRole('button', {name: whyIsDisabledRegex})
     ).toBeInTheDocument();
@@ -342,7 +416,7 @@ describe('SubmitAction unit tests', () => {
     // Disabled reason
     expect(
       screen.getByText(
-        /either you are not a member, or your membership is not active\./i
+        /the applicant address 0x04028\.\.\.11d is already in use as a delegate key\. the address must be removed as a delegate before it can become a member\./i
       )
     ).toBeInTheDocument();
   });
@@ -371,27 +445,8 @@ describe('SubmitAction unit tests', () => {
       screen.getByRole('button', {name: sponsorButtonRegex})
     ).toBeInTheDocument();
 
-    // Wait for the adapter to init
-    await waitFor(() => {
-      expect(
-        wrapperStore.getState().contracts.OnboardingContract.contractAddress
-      ).toBeDefined();
-    });
-
-    /**
-     * Setup: change address of onboarding adapter so `SubmitAction` can find it specifically,
-     * as all the test contracts use the same address.
-     */
     await waitFor(async () => {
-      await wrapperStore.dispatch<any>(
-        initContractOnboarding(web3Instance, actionId)
-      );
-    });
-
-    await waitFor(() => {
-      expect(
-        wrapperStore.getState().contracts.OnboardingContract.contractAddress
-      ).toBe(actionId);
+      await setUpOnboardingAdapter({wrapperStore, web3Instance, actionId});
     });
 
     // Setup: Mock RPC calls for `processProposal`
@@ -464,27 +519,8 @@ describe('SubmitAction unit tests', () => {
       screen.getByRole('button', {name: sponsorButtonRegex})
     ).toBeInTheDocument();
 
-    // Wait for the adapter to init
-    await waitFor(() => {
-      expect(
-        wrapperStore.getState().contracts.OnboardingContract.contractAddress
-      ).toBeDefined();
-    });
-
-    /**
-     * Setup: change address of onboarding adapter so `SubmitAction` can find it specifically,
-     * as all the test contracts use the same address.
-     */
     await waitFor(async () => {
-      await wrapperStore.dispatch<any>(
-        initContractOnboarding(web3Instance, actionId)
-      );
-    });
-
-    await waitFor(() => {
-      expect(
-        wrapperStore.getState().contracts.OnboardingContract.contractAddress
-      ).toBe(actionId);
+      await setUpOnboardingAdapter({wrapperStore, web3Instance, actionId});
     });
 
     await waitFor(() => {
@@ -511,32 +547,5 @@ describe('SubmitAction unit tests', () => {
 
       expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
     });
-  });
-
-  test('can disable process button if no wallet connected', async () => {
-    const proposalData = defaultDraftData();
-
-    render(
-      <Wrapper useInit>
-        <SubmitAction proposal={proposalData as ProposalData} />
-      </Wrapper>
-    );
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole('button', {name: sponsorButtonRegex})
-      ).toBeDisabled();
-    });
-
-    expect(
-      screen.getByRole('button', {name: whyIsDisabledRegex})
-    ).toBeInTheDocument();
-
-    userEvent.click(screen.getByRole('button', {name: whyIsDisabledRegex}));
-
-    // Disabled reason
-    expect(
-      screen.getByText(/your wallet is not connected\./i)
-    ).toBeInTheDocument();
   });
 });

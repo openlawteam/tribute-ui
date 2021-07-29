@@ -7,7 +7,7 @@ import {AsyncStatus} from '../../../util/types';
 import {StoreState} from '../../../store/types';
 import {multicall, MulticallTuple} from '../../../components/web3/helpers';
 import {useWeb3Modal} from '../../../components/web3/hooks';
-import {truncateEthAddress} from '../../../util/helpers';
+import {normalizeString, truncateEthAddress} from '../../../util/helpers';
 
 type UseCheckApplicantReturn = {
   checkApplicantError: Error | undefined;
@@ -39,11 +39,14 @@ export function useCheckApplicant(address?: string): UseCheckApplicantReturn {
    */
 
   const [checkApplicantError, setCheckApplicantError] = useState<Error>();
+
   const [checkApplicantInvalidMsg, setCheckApplicantInvalidMsg] =
     useState<string>();
+
   const [checkApplicantStatus, setCheckApplicantStatus] = useState<AsyncStatus>(
     AsyncStatus.STANDBY
   );
+
   const [isApplicantValid, setIsApplicantValid] = useState<boolean>();
 
   /**
@@ -154,7 +157,8 @@ export function useCheckApplicant(address?: string): UseCheckApplicantReturn {
           `The applicant address ${truncatedAddress} is invalid.`
         );
       } else if (
-        address.toLowerCase() !== getAddressIfDelegatedResult.toLowerCase()
+        normalizeString(address) !==
+        normalizeString(getAddressIfDelegatedResult)
       ) {
         // Applicant address cannot already be in use as a delegate key.
         setIsApplicantValid(false);
