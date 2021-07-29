@@ -4,13 +4,17 @@ import {
   DaoAdapterConstants,
   VotingAdapterName,
 } from '../adapters-extensions/enums';
+import {
+  getVotingTimeRanges,
+  proposalHasFlag,
+  proposalHasVotingState,
+} from './helpers';
 import {AsyncStatus} from '../../util/types';
 import {BURN_ADDRESS} from '../../util/constants';
 import {ContractDAOConfigKeys} from '../web3/types';
 import {normalizeString} from '../../util/helpers';
-import {OffchainVotingAdapterVote, ProposalData, ProposalFlag} from './types';
 import {OffchainVotingStatus} from './voting';
-import {proposalHasFlag, proposalHasVotingState} from './helpers';
+import {ProposalData, ProposalFlag} from './types';
 import {ProposalHeaderNames} from '../../util/enums';
 import {useDaoConfigurations} from '../../hooks';
 import {useIsDefaultChain} from '../web3/hooks';
@@ -54,36 +58,6 @@ const configurationKeysToGet: ContractDAOConfigKeys[] = [
   ContractDAOConfigKeys.offchainVotingVotingPeriod,
   ContractDAOConfigKeys.offchainVotingGracePeriod,
 ];
-
-function getOffchainContractVotingAndGracePeriodTimes({
-  daoProposalVote,
-  offchainGracePeriod,
-  offchainVotingPeriod,
-}: {
-  daoProposalVote: OffchainVotingAdapterVote | undefined;
-  offchainGracePeriod: number;
-  offchainVotingPeriod: number;
-}): {
-  voteEndMs: number;
-  voteStartMs: number;
-  gracePeriodEndMs: number;
-  gracePeriodStartMs: number;
-} {
-  const {gracePeriodStartingTime, startingTime} = daoProposalVote || {};
-
-  const gracePeriodStartMs: number =
-    Number(gracePeriodStartingTime || 0) * 1000;
-
-  const voteStartMs: number = Number(startingTime || 0) * 1000;
-
-  return {
-    voteEndMs: voteStartMs + Number(offchainVotingPeriod || 0) * 1000,
-    voteStartMs,
-    gracePeriodEndMs:
-      gracePeriodStartMs + Number(offchainGracePeriod || 0) * 1000,
-    gracePeriodStartMs,
-  };
-}
 
 export default function Proposals(props: ProposalsProps): JSX.Element {
   const {
@@ -330,11 +304,14 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
 
       switch (votingAdapterName) {
         case VotingAdapterName.OffchainVotingContract:
-          const times = getOffchainContractVotingAndGracePeriodTimes({
-            offchainGracePeriod: Number(offchainGracePeriod || 0),
-            offchainVotingPeriod: Number(offchainVotingPeriod || 0),
-            daoProposalVote:
-              daoProposalVote?.[VotingAdapterName.OffchainVotingContract],
+          const {startingTime, gracePeriodStartingTime} =
+            daoProposalVote?.[VotingAdapterName.OffchainVotingContract] || {};
+
+          const times = getVotingTimeRanges({
+            gracePeriodLength: offchainGracePeriod,
+            gracePeriodStartingTime,
+            votePeriodLength: offchainVotingPeriod,
+            voteStartingTime: startingTime,
           });
 
           gracePeriodEndMs = times.gracePeriodEndMs;
