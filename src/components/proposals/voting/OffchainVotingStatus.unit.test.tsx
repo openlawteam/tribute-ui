@@ -147,7 +147,7 @@ describe('OffchainVotingStatus unit tests', () => {
     const nowMs = nowMilliseconds();
     const votingStartMs: number = nowMs;
     const votingEndMs: number = nowMs + 3000;
-    const gracePeriodStartMs: number = nowMs + 3000;
+    const gracePeriodStartMs: number = nowMs + 3500;
     const gracePeriodEndMs: number = nowMs + 9000;
 
     await act(async () => {
@@ -227,7 +227,7 @@ describe('OffchainVotingStatus unit tests', () => {
     const nowMs = nowMilliseconds();
     const votingStartMs: number = nowMs;
     const votingEndMs: number = nowMs + 3000;
-    const gracePeriodStartMs: number = nowMs + 3000;
+    const gracePeriodStartMs: number = nowMs + 3500;
     const gracePeriodEndMs: number = nowMs + 9000;
 
     await act(async () => {
@@ -413,7 +413,7 @@ describe('OffchainVotingStatus unit tests', () => {
     const nowMs = nowMilliseconds();
     const votingStartMs: number = nowMs - 5000;
     const votingEndMs: number = nowMs;
-    const gracePeriodStartMs: number = nowMs;
+    const gracePeriodStartMs: number = nowMs + 500;
     const gracePeriodEndMs: number = nowMs + 3000;
     const customStatusRegex: RegExp = /what a great status!/i;
 
@@ -511,7 +511,7 @@ describe('OffchainVotingStatus unit tests', () => {
     const nowMs = nowMilliseconds();
     const votingStartMs: number = nowMs - 5000;
     const votingEndMs: number = nowMs;
-    const gracePeriodStartMs: number = nowMs;
+    const gracePeriodStartMs: number = nowMs + 500;
     const gracePeriodEndMs: number = nowMs + 3000;
 
     let rerender: ReturnType<typeof render>['rerender'];
@@ -624,11 +624,12 @@ describe('OffchainVotingStatus unit tests', () => {
     });
   });
 
+  // @note This test uses an adjusted Jest timeout
   test('should call `onGracePeriodChange` throughout grace period', async () => {
     const nowMs = nowMilliseconds();
     const votingStartMs: number = nowMs - 5000;
     const votingEndMs: number = nowMs;
-    const gracePeriodStartMs: number = nowMs;
+    const gracePeriodStartMs: number = nowMs + 500;
     const gracePeriodEndMs: number = nowMs + 3000;
     const spy = jest.fn();
 
@@ -655,7 +656,7 @@ describe('OffchainVotingStatus unit tests', () => {
             proposalId: undefined,
           });
         },
-        {timeout: 3000}
+        {timeout: 5000}
       );
 
       await waitFor(
@@ -667,10 +668,10 @@ describe('OffchainVotingStatus unit tests', () => {
             proposalId: undefined,
           });
         },
-        {timeout: 3000}
+        {timeout: 5000}
       );
 
       expect(spy.mock.calls.length).toBe(2);
     });
-  });
+  }, 10000);
 });
