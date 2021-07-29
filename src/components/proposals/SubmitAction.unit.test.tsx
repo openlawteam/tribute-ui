@@ -401,10 +401,20 @@ describe('SubmitAction unit tests', () => {
       expect(
         screen.getByRole('button', {name: sponsorButtonRegex})
       ).toBeDisabled();
+
+      expect(
+        screen.getByRole('button', {name: whyIsDisabledRegex})
+      ).toBeInTheDocument();
     });
 
     await waitFor(async () => {
       await setUpOnboardingAdapter({wrapperStore, web3Instance, actionId});
+    });
+
+    userEvent.click(screen.getByRole('button', {name: sponsorButtonRegex}));
+
+    await waitFor(() => {
+      expect(() => screen.getByText(awaitingConfirmationRegex)).toThrow();
     });
 
     expect(
