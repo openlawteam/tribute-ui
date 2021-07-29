@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
-import {useQueryClient} from 'react-query';
+import {useQuery} from 'react-query';
+import Web3 from 'web3';
 
 import {AsyncStatus} from '../../../util/types';
 import {BURN_ADDRESS} from '../../../util/constants';
@@ -9,7 +10,7 @@ import {multicall, MulticallTuple} from '../../web3/helpers';
 import {ProposalVotingAdapterData} from '../types';
 import {StoreState} from '../../../store/types';
 import {useWeb3Modal} from '../../web3/hooks';
-import {VotingAdapterName} from '../../adapters-extensions/enums';
+// import {VotingAdapterName} from '../../adapters-extensions/enums';
 
 type ProposalVotingAdapterTuple = [
   proposalId: string,
@@ -46,18 +47,6 @@ export function useProposalsVotingAdapter(
   );
 
   /**
-   * Our hooks
-   */
-
-  const {web3Instance} = useWeb3Modal();
-
-  /**
-   * Their hooks
-   */
-
-  const queryClient = useQueryClient();
-
-  /**
    * State
    */
 
@@ -71,13 +60,122 @@ export function useProposalsVotingAdapter(
   const [proposalsVotingAdaptersStatus, setProposalsVotingAdaptersStatus] =
     useState<AsyncStatus>(AsyncStatus.STANDBY);
 
+  const [safeProposalIds, setSafeProposalIds] = useState<string[]>();
+
+  const [votingAdapterCalls, setVotingAdapterCalls] =
+    useState<MulticallTuple[]>();
+
+  const [votingAdapterABIError, setVotingAdapterABIError] = useState<Error>();
+
+  const [filteredProposalIds, setFilteredProposalIds] = useState<string[]>();
+
+  const [
+    filteredVotingAdapterAddressResults,
+    setFilteredVotingAdapterAddressResults,
+  ] = useState<string[]>();
+
+  const [votingAdapterNameCalls, setVotingAdapterNameCalls] =
+    useState<MulticallTuple[]>();
+
+  const [adapterNameABIError, setAdapterNameABIError] = useState<Error>();
+
+  /**
+   * Our hooks
+   */
+
+  const {web3Instance} = useWeb3Modal();
+
+  /**
+   * Their hooks
+   */
+
+  const {
+    data: votingAdapterAddressResults,
+    error: votingAdapterAddressResultsError,
+  } = useQuery(
+    ['votingAdapterAddressResults', votingAdapterCalls],
+    async () =>
+      await multicall({
+        calls: votingAdapterCalls as MulticallTuple[],
+        web3Instance: web3Instance as Web3,
+      }),
+    {enabled: !!votingAdapterCalls && !!web3Instance}
+  );
+
+  const {data: adapterNameResults, error: adapterNameResultsError} = useQuery(
+    ['adapterNameResults', votingAdapterNameCalls],
+    async () =>
+      await multicall({
+        calls: votingAdapterNameCalls as MulticallTuple[],
+        web3Instance: web3Instance as Web3,
+      }),
+    {enabled: !!votingAdapterNameCalls && !!web3Instance}
+  );
+
+  const {data: votingAdaptersToSetData, error: votingAdaptersToSetError} =
+    useQuery(
+      ['votingAdaptersToSet', filteredProposalIds],
+      async () =>
+        await Promise.all(
+          (filteredProposalIds as string[]).map(
+            async (id, i): Promise<ProposalVotingAdapterTuple> => {
+              const votingAdapterABI = await getVotingAdapterABI(
+                adapterNameResults[i]
+              );
+              const votingAdapterAddress = (
+                filteredVotingAdapterAddressResults as string[]
+              )[i];
+
+              return [
+                id,
+                {
+                  votingAdapterName: adapterNameResults[i],
+                  votingAdapterAddress,
+                  getVotingAdapterABI: () => votingAdapterABI,
+                  getWeb3VotingAdapterContract: <T>() =>
+                    new (web3Instance as Web3).eth.Contract(
+                      votingAdapterABI,
+                      votingAdapterAddress
+                    ) as any as T,
+                },
+              ];
+            }
+          )
+        ),
+      {
+        enabled:
+          !!filteredProposalIds &&
+          !!filteredVotingAdapterAddressResults &&
+          !!adapterNameResults &&
+          !!web3Instance,
+      }
+    );
+
   /**
    * Cached callbacks
    */
 
   const getProposalsVotingAdaptersOnchainCached = useCallback(
     getProposalsVotingAdaptersOnchain,
-    [proposalIds, queryClient, registryABI, registryAddress, web3Instance]
+    [
+      adapterNameABIError,
+      adapterNameResults,
+      adapterNameResultsError,
+      filteredProposalIds,
+      filteredVotingAdapterAddressResults,
+      proposalIds.length,
+      registryABI,
+      registryAddress,
+      safeProposalIds,
+      votingAdapterABIError,
+      votingAdapterAddressResults,
+      votingAdapterAddressResultsError,
+      votingAdapterCalls,
+      votingAdapterNameCalls,
+      votingAdaptersToSetData,
+      votingAdaptersToSetError,
+      web3Instance,
+    ]
   );
 
   /**
@@ -88,6 +186,98 @@ export function useProposalsVotingAdapter(
     getProposalsVotingAdaptersOnchainCached();
   }, [getProposalsVotingAdaptersOnchainCached]);
 
+  useEffect(() => {
+    if (!proposalIds.length || !web3Instance) {
+      return;
+    }
+
+    // Only use hex (more specifically `bytes32`) id's
+    const safeProposalIdsToSet = proposalIds.filter(
+      web3Instance.utils.isHexStrict
+    );
+
+    setSafeProposalIds(safeProposalIdsToSet);
+  }, [proposalIds, web3Instance]);
+
+  useEffect(() => {
+    if (!registryABI || !registryAddress || !safeProposalIds?.length) return;
+
+    const votingAdapterABI = registryABI.find(
+      (ai) => ai.name === 'votingAdapter'
+    );
+
+    if (!votingAdapterABI) {
+      setVotingAdapterABIError(
+        new Error(
+          'No "votingAdapter" ABI function was found in the DAO registry ABI.'
+        )
+      );
+
+      return;
+    }
+
+    // `DaoRegistry.votingAdapter` calls
+    const votingAdapterCallsToSet: MulticallTuple[] = safeProposalIds.map(
+      (id) => [registryAddress, votingAdapterABI, [id]]
+    );
+
+    setVotingAdapterCalls(votingAdapterCallsToSet);
+  }, [registryABI, registryAddress, safeProposalIds]);
+
+  useEffect(() => {
+    async function setProposalsVotingAdaptersPrepData() {
+      if (!safeProposalIds || !votingAdapterAddressResults || !registryABI)
+        return;
+
+      /**
+       * Filter out `safeProposalIds` which are not sponsored (i.e. voting adapter address === `BURN_ADDRESS`).
+       * Filter out `votingAdapterAddressResults` which equal the `BURN_ADDRESS`.
+       *
+       * This ensures these two arrays maintain the same length as they rely on indexes for the
+       * proposals to match up to the array of `multicall` results.
+       */
+      const filteredProposalIdsToSet = safeProposalIds.filter(
+        (_id, i) => votingAdapterAddressResults[i] !== BURN_ADDRESS
+      );
+      setFilteredProposalIds(filteredProposalIdsToSet);
+
+      const filteredVotingAdapterAddressResultsToSet =
+        votingAdapterAddressResults.filter((a: string) => a !== BURN_ADDRESS);
+      setFilteredVotingAdapterAddressResults(
+        filteredVotingAdapterAddressResultsToSet
+      );
+
+      const {default: lazyIVotingABI} = await import(
+        '../../../abis/IVoting.json'
+      );
+      const adapterNameABI = (lazyIVotingABI as typeof registryABI).find(
+        (ai) => ai.name === 'getAdapterName'
+      );
+
+      if (!adapterNameABI) {
+        setAdapterNameABIError(
+          new Error(
+            'No "getAdapterName" ABI function was found in the IVoting ABI.'
+          )
+        );
+
+        return;
+      }
+
+      const votingAdapterNameCallsToSet: MulticallTuple[] =
+        filteredVotingAdapterAddressResultsToSet.map(
+          (votingAdapterAddress: string) => [
+            votingAdapterAddress,
+            adapterNameABI,
+            [],
+          ]
+        );
+      setVotingAdapterNameCalls(votingAdapterNameCallsToSet);
+    }
+
+    setProposalsVotingAdaptersPrepData();
+  }, [registryABI, safeProposalIds, votingAdapterAddressResults]);
+
   /**
    * Functions
    */
@@ -95,15 +285,13 @@ export function useProposalsVotingAdapter(
   async function getProposalsVotingAdaptersOnchain(): Promise<void> {
     if (
       !proposalIds.length ||
+      !safeProposalIds ||
       !registryABI ||
       !registryAddress ||
       !web3Instance
     ) {
       return;
     }
-
-    // Only use hex (more specifically `bytes32`) id's
-    const safeProposalIds = proposalIds.filter(web3Instance.utils.isHexStrict);
 
     if (!safeProposalIds.length) {
       setProposalsVotingAdapters(INITIAL_VOTING_ADAPTERS);
@@ -113,128 +301,54 @@ export function useProposalsVotingAdapter(
     }
 
     try {
-      const votingAdapterABI = registryABI.find(
-        (ai) => ai.name === 'votingAdapter'
-      );
-
-      if (!votingAdapterABI) {
-        throw new Error(
-          'No "votingAdapter" ABI function was found in the DAO registry ABI.'
-        );
+      if (votingAdapterABIError) {
+        throw votingAdapterABIError;
       }
 
-      // `DaoRegistry.votingAdapter` calls
-      const votingAdapterCalls: MulticallTuple[] = safeProposalIds.map((id) => [
-        registryAddress,
-        votingAdapterABI,
-        [id],
-      ]);
+      if (!votingAdapterCalls) return;
 
       setProposalsVotingAdaptersStatus(AsyncStatus.PENDING);
 
-      const votingAdapterAddressResults: string[] =
-        await queryClient.fetchQuery(
-          ['votingAdapterAddressResults', votingAdapterCalls],
-          async () =>
-            await multicall({calls: votingAdapterCalls, web3Instance}),
-          {
-            staleTime: 60000,
-          }
-        );
-
-      const {default: lazyIVotingABI} = await import(
-        '../../../abis/IVoting.json'
-      );
-
-      const getAdapterNameABI = (lazyIVotingABI as typeof registryABI).find(
-        (ai) => ai.name === 'getAdapterName'
-      );
-
-      if (!getAdapterNameABI) {
-        throw new Error(
-          'No "getAdapterName" ABI function was found in the IVoting ABI.'
-        );
+      if (votingAdapterAddressResultsError) {
+        throw votingAdapterAddressResultsError;
       }
 
-      /**
-       * Filter out `safeProposalIds` which are not sponsored (i.e. voting adapter address === `BURN_ADDRESS`).
-       * Filter out `votingAdapterAddressResults` which equal the `BURN_ADDRESS`.
-       *
-       * This ensures these two arrays maintain the same length as they rely on indexes for the
-       * proposals to match up to the array of `multicall` results.
-       */
+      if (votingAdapterAddressResults) {
+        if (adapterNameABIError) {
+          throw adapterNameABIError;
+        }
 
-      const filteredProposalIds = safeProposalIds.filter(
-        (_id, i) => votingAdapterAddressResults[i] !== BURN_ADDRESS
-      );
+        if (!filteredProposalIds || !filteredVotingAdapterAddressResults)
+          return;
 
-      const filteredVotingAdapterAddressResults =
-        votingAdapterAddressResults.filter((a) => a !== BURN_ADDRESS);
+        /**
+         * Exit early if there's no voting adapter addresses.
+         * It means no proposals were found to be sponsored
+         */
+        if (!filteredVotingAdapterAddressResults.length) {
+          setProposalsVotingAdapters(INITIAL_VOTING_ADAPTERS);
+          setProposalsVotingAdaptersStatus(AsyncStatus.FULFILLED);
 
-      /**
-       * Exit early if there's no voting adapter addresses.
-       * It means no proposals were found to be sponsored
-       */
-      if (!filteredVotingAdapterAddressResults.length) {
-        setProposalsVotingAdapters(INITIAL_VOTING_ADAPTERS);
-        setProposalsVotingAdaptersStatus(AsyncStatus.FULFILLED);
+          return;
+        }
 
-        return;
+        if (!votingAdapterNameCalls) return;
+
+        if (adapterNameResultsError) {
+          throw adapterNameResultsError;
+        }
+
+        if (adapterNameResults) {
+          if (votingAdaptersToSetError) {
+            throw votingAdaptersToSetError;
+          }
+
+          if (votingAdaptersToSetData) {
+            setProposalsVotingAdapters(votingAdaptersToSetData);
+            setProposalsVotingAdaptersStatus(AsyncStatus.FULFILLED);
+          }
+        }
       }
-
-      const votingAdapterNameCalls: MulticallTuple[] =
-        filteredVotingAdapterAddressResults.map((votingAdapterAddress) => [
-          votingAdapterAddress,
-          getAdapterNameABI,
-          [],
-        ]);
-
-      const adapterNameResults: VotingAdapterName[] =
-        await queryClient.fetchQuery(
-          ['adapterNameResults', votingAdapterNameCalls],
-          async () =>
-            await multicall({calls: votingAdapterNameCalls, web3Instance}),
-          {
-            staleTime: 60000,
-          }
-        );
-
-      const votingAdaptersToSet: ProposalVotingAdapterTuple[] =
-        await queryClient.fetchQuery(
-          ['votingAdaptersToSet', filteredProposalIds],
-          async () =>
-            await Promise.all(
-              filteredProposalIds.map(
-                async (id, i): Promise<ProposalVotingAdapterTuple> => {
-                  const votingAdapterABI = await getVotingAdapterABI(
-                    adapterNameResults[i]
-                  );
-                  const votingAdapterAddress =
-                    filteredVotingAdapterAddressResults[i];
-
-                  return [
-                    id,
-                    {
-                      votingAdapterName: adapterNameResults[i],
-                      votingAdapterAddress,
-                      getVotingAdapterABI: () => votingAdapterABI,
-                      getWeb3VotingAdapterContract: <T>() =>
-                        new web3Instance.eth.Contract(
-                          votingAdapterABI,
-                          votingAdapterAddress
-                        ) as any as T,
-                    },
-                  ];
-                }
-              )
-            ),
-          {
-            staleTime: 60000,
-          }
-        );
-
-      setProposalsVotingAdapters(votingAdaptersToSet);
-      setProposalsVotingAdaptersStatus(AsyncStatus.FULFILLED);
     } catch (error) {
       setProposalsVotingAdaptersStatus(AsyncStatus.REJECTED);
       setProposalsVotingAdapters([]);

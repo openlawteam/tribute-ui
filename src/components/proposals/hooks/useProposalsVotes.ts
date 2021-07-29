@@ -1,7 +1,8 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
-import {useQueryClient} from 'react-query';
+import {useQuery} from 'react-query';
+import Web3 from 'web3';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
@@ -43,6 +44,23 @@ export function useProposalsVotes(
   );
 
   /**
+   * State
+   */
+
+  const [proposalsVotes, setProposalsVotes] = useState<ProposalsVotesTuple[]>(
+    []
+  );
+
+  const [proposalsVotesError, setProposalsVotesError] = useState<Error>();
+
+  const [proposalsVotesStatus, setProposalsVotesStatus] = useState<AsyncStatus>(
+    AsyncStatus.STANDBY
+  );
+
+  const [safeProposalVotingAdapters, setSafeProposalVotingAdapters] =
+    useState<ProposalVotingAdapterTuple[]>();
+
+  /**
    * Our hooks
    */
 
@@ -52,18 +70,43 @@ export function useProposalsVotes(
    * Their hooks
    */
 
-  const queryClient = useQueryClient();
-
-  /**
-   * State
-   */
-
-  const [proposalsVotes, setProposalsVotes] = useState<ProposalsVotesTuple[]>(
-    []
+  const {data: votesDataCallsData, error: votesDataCallsError} = useQuery(
+    ['votesDataCalls', safeProposalVotingAdapters],
+    async () =>
+      await Promise.all(
+        (safeProposalVotingAdapters as ProposalVotingAdapterTuple[]).map(
+          async ([
+            proposalId,
+            {votingAdapterAddress, getVotingAdapterABI, votingAdapterName},
+          ]): Promise<MulticallTuple> => [
+            votingAdapterAddress,
+            await getVotesDataABI(votingAdapterName, getVotingAdapterABI()),
+            /**
+             * We build the call arguments the same way for the different voting adapters
+             * (i.e. [dao, proposalId]). If we need to change this we can move it to another function.
+             */
+            [registryAddress as string, proposalId],
+          ]
+        )
+      ),
+    {
+      enabled:
+        !!proposalVotingAdapters.length &&
+        !!safeProposalVotingAdapters &&
+        !!registryABI &&
+        !!registryAddress &&
+        !!web3Instance,
+    }
   );
-  const [proposalsVotesError, setProposalsVotesError] = useState<Error>();
-  const [proposalsVotesStatus, setProposalsVotesStatus] = useState<AsyncStatus>(
-    AsyncStatus.STANDBY
+
+  const {data: votesDataResults, error: votesDataResultsError} = useQuery(
+    ['votesDataResults', votesDataCallsData],
+    async () =>
+      await multicall({
+        calls: votesDataCallsData as MulticallTuple[],
+        web3Instance: web3Instance as Web3,
+      }),
+    {enabled: !!votesDataCallsData && !!web3Instance}
   );
 
   /**
@@ -71,10 +114,14 @@ export function useProposalsVotes(
    */
 
   const getProposalsVotesOnchainCached = useCallback(getProposalsVotesOnchain, [
-    proposalVotingAdapters,
-    queryClient,
+    proposalVotingAdapters.length,
     registryABI,
     registryAddress,
+    safeProposalVotingAdapters,
+    votesDataCallsData,
+    votesDataCallsError,
+    votesDataResults,
+    votesDataResultsError,
     web3Instance,
   ]);
 
@@ -86,6 +133,19 @@ export function useProposalsVotes(
     getProposalsVotesOnchainCached();
   }, [getProposalsVotesOnchainCached]);
 
+  useEffect(() => {
+    if (!proposalVotingAdapters.length || !web3Instance) {
+      return;
+    }
+
+    // Only use hex (more specifically `bytes32`) id's
+    const safeProposalVotingAdaptersToSet = proposalVotingAdapters.filter(
+      ([id]) => web3Instance.utils.isHexStrict(id)
+    );
+
+    setSafeProposalVotingAdapters(safeProposalVotingAdaptersToSet);
+  }, [proposalVotingAdapters, web3Instance]);
+
   /**
    * Functions
    */
@@ -93,17 +153,13 @@ export function useProposalsVotes(
   async function getProposalsVotesOnchain() {
     if (
       !proposalVotingAdapters.length ||
+      !safeProposalVotingAdapters ||
       !registryABI ||
       !registryAddress ||
       !web3Instance
     ) {
       return;
     }
-
-    // Only use hex (more specifically `bytes32`) id's
-    const safeProposalVotingAdapters = proposalVotingAdapters.filter(([id]) =>
-      web3Instance.utils.isHexStrict(id)
-    );
 
     if (!safeProposalVotingAdapters.length) {
       setProposalsVotesStatus(AsyncStatus.FULFILLED);
@@ -115,50 +171,30 @@ export function useProposalsVotes(
     try {
       setProposalsVotesStatus(AsyncStatus.PENDING);
 
+      if (votesDataCallsError) {
+        throw votesDataCallsError;
+      }
+
       // Build votes results
-      const votesDataCalls: MulticallTuple[] = await queryClient.fetchQuery(
-        ['votesDataCalls', safeProposalVotingAdapters],
-        async () =>
-          await Promise.all(
+      if (votesDataCallsData) {
+        if (votesDataResultsError) {
+          throw votesDataResultsError;
+        }
+
+        if (votesDataResults) {
+          setProposalsVotesStatus(AsyncStatus.FULFILLED);
+          setProposalsVotes(
             safeProposalVotingAdapters.map(
-              async ([
+              ([proposalId, {votingAdapterName}], i) => [
                 proposalId,
-                {votingAdapterAddress, getVotingAdapterABI, votingAdapterName},
-              ]): Promise<MulticallTuple> => [
-                votingAdapterAddress,
-                await getVotesDataABI(votingAdapterName, getVotingAdapterABI()),
-                /**
-                 * We build the call arguments the same way for the different voting adapters
-                 * (i.e. [dao, proposalId]). If we need to change this we can move it to another function.
-                 */
-                [registryAddress, proposalId],
+                {
+                  [votingAdapterName]: votesDataResults[i],
+                },
               ]
             )
-          ),
-        {
-          staleTime: 60000,
+          );
         }
-      );
-
-      const votesDataResults = await queryClient.fetchQuery(
-        ['votesDataResults', votesDataCalls],
-        async () => await multicall({calls: votesDataCalls, web3Instance}),
-        {
-          staleTime: 60000,
-        }
-      );
-
-      setProposalsVotesStatus(AsyncStatus.FULFILLED);
-      setProposalsVotes(
-        safeProposalVotingAdapters.map(
-          ([proposalId, {votingAdapterName}], i) => [
-            proposalId,
-            {
-              [votingAdapterName]: votesDataResults[i],
-            },
-          ]
-        )
-      );
+      }
     } catch (error) {
       setProposalsVotesStatus(AsyncStatus.REJECTED);
       setProposalsVotes([]);
