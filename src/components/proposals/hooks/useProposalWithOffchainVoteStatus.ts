@@ -110,6 +110,10 @@ export function useProposalWithOffchainVoteStatus({
    * State
    */
 
+  const [status, setStatus] = useState<ProposalFlowStatus>();
+
+  const [initComplete, setInitComplete] = useState<boolean>(false);
+
   const [daoProposal, setDAOProposal] =
     useState<UseProposalWithOffchainVoteStatusReturn['daoProposal']>();
 
@@ -130,7 +134,6 @@ export function useProposalWithOffchainVoteStatus({
 
   const pollingIntervalIdRef = useRef<NodeJS.Timeout>();
   const stopPollingRef = useRef<boolean>(false);
-  const initialFetchCompleteRef = useRef<boolean>(false);
 
   /**
    * Our hooks
@@ -147,11 +150,10 @@ export function useProposalWithOffchainVoteStatus({
    */
 
   const initialAsyncChecksCompleted: boolean =
-    initialFetchCompleteRef.current &&
+    initComplete &&
     (useCountdownToCheckInVoting ? timeStartEndInitReady : true);
 
   const {daoProposalVotingAdapter, snapshotDraft, snapshotProposal} = proposal;
-  const {votes: snapshotVotes} = snapshotProposal || {};
   const proposalId = snapshotDraft?.idInDAO || snapshotProposal?.idInDAO;
 
   const atExistsInDAO = daoProposal
@@ -210,14 +212,14 @@ export function useProposalWithOffchainVoteStatus({
 
   // Get status as soon as possible.
   useEffect(() => {
-    if (initialFetchCompleteRef.current) {
+    if (initComplete) {
       return;
     }
 
     getStatusFromContractCached().catch((error) => {
       setProposalFlowStatusError(error);
     });
-  }, [getStatusFromContractCached]);
+  }, [getStatusFromContractCached, initComplete]);
 
   // Poll for status, etc.
   useEffect(() => {
@@ -262,22 +264,115 @@ export function useProposalWithOffchainVoteStatus({
     };
   }, [atProcessedInDAO]);
 
+  // Determine the `status`
+  useEffect(() => {
+    // Status: cannot yet be determined
+    if (!initialAsyncChecksCompleted) {
+      setStatus(undefined);
+
+      return;
+    }
+
+    const isStatusInitial: boolean = status === undefined;
+
+    // Status: Submit
+    if (
+      !atExistsInDAO &&
+      !atSponsoredInDAO &&
+      !atProcessedInDAO &&
+      (status === Submit || isStatusInitial)
+    ) {
+      setStatus(Submit);
+
+      return;
+    }
+
+    /**
+     * Status: Sponsor
+     *
+     * This may never occur for many adapter's proposals as submit and sponsor
+     * take place in 1 transaction.
+     */
+    if (
+      atExistsInDAO &&
+      !isInVoting &&
+      (status === Submit || isStatusInitial)
+    ) {
+      setStatus(Sponsor);
+
+      return;
+    }
+
+    // Status: Off-Chain Voting
+    if (
+      atSponsoredInDAO &&
+      isInVoting &&
+      !offchainResultSubmitted &&
+      (status === Submit || status === Sponsor || isStatusInitial)
+    ) {
+      setStatus(OffchainVoting);
+
+      return;
+    }
+
+    // Status: Ready to Submit Vote Result
+    if (
+      atSponsoredInDAO &&
+      !isInVoting &&
+      !offchainResultSubmitted &&
+      (status === OffchainVoting || isStatusInitial)
+    ) {
+      setStatus(OffchainVotingSubmitResult);
+
+      return;
+    }
+
+    // Status: Grace period
+    if (
+      atSponsoredInDAO &&
+      !isInVoting &&
+      offchainResultSubmitted &&
+      isInVotingGracePeriod &&
+      (status === OffchainVotingSubmitResult || isStatusInitial)
+    ) {
+      setStatus(OffchainVotingGracePeriod);
+
+      return;
+    }
+
+    // Status: Process
+    if (
+      atSponsoredInDAO &&
+      !isInVoting &&
+      offchainResultSubmitted &&
+      !isInVotingGracePeriod &&
+      (status === OffchainVotingGracePeriod || isStatusInitial)
+    ) {
+      setStatus(Process);
+
+      return;
+    }
+
+    // Status: Processed (completed)
+    if (atProcessedInDAO && (status === Process || isStatusInitial)) {
+      setStatus(Completed);
+
+      return;
+    }
+  }, [
+    atExistsInDAO,
+    atProcessedInDAO,
+    atSponsoredInDAO,
+    status,
+    initialAsyncChecksCompleted,
+    isInVoting,
+    isInVotingGracePeriod,
+    offchainResultSubmitted,
+  ]);
+
   /**
    * Functions
    */
-
-  function getReturnData(
-    status: ProposalFlowStatus | undefined
-  ): UseProposalWithOffchainVoteStatusReturn {
-    return {
-      daoProposal,
-      daoProposalVoteResult,
-      daoProposalVote,
-      proposalFlowStatusError,
-      status,
-      stopPollingForStatus: handleStopPollingForStatus,
-    };
-  }
 
   async function getStatusFromContract(): Promise<
     | Partial<{
@@ -314,9 +409,9 @@ export function useProposalWithOffchainVoteStatus({
           web3Instance,
         });
 
-        initialFetchCompleteRef.current = true;
-
         setDAOProposal(proposal);
+        // Set last
+        setInitComplete(true);
 
         return proposal;
       }
@@ -349,11 +444,11 @@ export function useProposalWithOffchainVoteStatus({
         web3Instance,
       });
 
-      initialFetchCompleteRef.current = true;
-
       setDAOProposal(proposal);
       setDAOProposalVote(votes);
       setDAOProposalVoteResult(voteResult);
+      // Set last
+      setInitComplete(true);
 
       return {
         proposal,
@@ -377,73 +472,12 @@ export function useProposalWithOffchainVoteStatus({
    * Return
    */
 
-  // Status: cannot yet be determined
-  if (!initialAsyncChecksCompleted) {
-    return getReturnData(undefined);
-  }
-
-  // Status: Submit
-  if (!atExistsInDAO && !atSponsoredInDAO && !atProcessedInDAO) {
-    return getReturnData(Submit);
-  }
-
-  /**
-   * Status: Sponsor
-   *
-   * This may never occur for many adapter's proposals as submit and sponsor
-   * take place in 1 transaction.
-   */
-  if (atExistsInDAO && !isInVoting) {
-    return getReturnData(Sponsor);
-  }
-
-  // Status: Off-Chain Voting
-  if (atSponsoredInDAO && isInVoting && !offchainResultSubmitted) {
-    return getReturnData(OffchainVoting);
-  }
-
-  // Status: If no votes, skip `OffchainVotingSubmitResult` and set to `OffchainVotingGracePeriod` or `Completed`
-  if (
-    atSponsoredInDAO &&
-    !isInVoting &&
-    !offchainResultSubmitted &&
-    !snapshotVotes?.length
-  ) {
-    return getReturnData(
-      isInVotingGracePeriod ? OffchainVotingGracePeriod : Completed
-    );
-  }
-
-  // Status: Ready to Submit Vote Result
-  if (atSponsoredInDAO && !isInVoting && !offchainResultSubmitted) {
-    return getReturnData(OffchainVotingSubmitResult);
-  }
-
-  // Status: Grace period
-  if (
-    atSponsoredInDAO &&
-    !isInVoting &&
-    offchainResultSubmitted &&
-    isInVotingGracePeriod
-  ) {
-    return getReturnData(OffchainVotingGracePeriod);
-  }
-
-  // Status: Process
-  if (
-    atSponsoredInDAO &&
-    !isInVoting &&
-    offchainResultSubmitted &&
-    !isInVotingGracePeriod
-  ) {
-    return getReturnData(Process);
-  }
-
-  // Status: Processed (completed)
-  if (atProcessedInDAO) {
-    return getReturnData(Completed);
-  }
-
-  // Fallthrough
-  return getReturnData(undefined);
+  return {
+    daoProposal,
+    daoProposalVote,
+    daoProposalVoteResult,
+    proposalFlowStatusError,
+    status,
+    stopPollingForStatus: handleStopPollingForStatus,
+  };
 }
