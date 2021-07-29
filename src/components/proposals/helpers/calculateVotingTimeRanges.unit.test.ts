@@ -1,6 +1,6 @@
-import {getVotingTimeRanges} from './getVotingTimeRanges';
+import {calculateVotingTimeRanges} from './calculateVotingTimeRanges';
 
-describe('getVotingTimeRanges unit tests', () => {
+describe('calculateVotingTimeRanges unit tests', () => {
   const MS_MULTIPLIER: number = 1000;
   const nowSeconds: number = Math.floor(Date.now() / 1000);
   const oneDaySeconds: number = 86400;
@@ -15,7 +15,7 @@ describe('getVotingTimeRanges unit tests', () => {
   test('should return correct time ranges', () => {
     // Assert normal
     expect(
-      getVotingTimeRanges({
+      calculateVotingTimeRanges({
         gracePeriodLength: oneDaySecondsString,
         gracePeriodStartingTime: defaultGracePeriodStartingTime,
         votePeriodLength: threeDaySecondsString,
@@ -32,7 +32,7 @@ describe('getVotingTimeRanges unit tests', () => {
   test('should return correct time ranges when arguments are `undefined`', () => {
     // Assert all `0` time ranges
     expect(
-      getVotingTimeRanges({
+      calculateVotingTimeRanges({
         gracePeriodLength: undefined,
         gracePeriodStartingTime: undefined,
         votePeriodLength: undefined,
@@ -49,7 +49,7 @@ describe('getVotingTimeRanges unit tests', () => {
   test('should return correct time ranges when `gracePeriodLength`, `votePeriodLength` are `undefined`', () => {
     // Assert each pair of time ranges are equivalent
     expect(
-      getVotingTimeRanges({
+      calculateVotingTimeRanges({
         gracePeriodLength: undefined,
         gracePeriodStartingTime: defaultGracePeriodStartingTime,
         votePeriodLength: undefined,

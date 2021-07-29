@@ -1,4 +1,4 @@
-export function getVotingTimeRanges({
+export function calculateVotingTimeRanges({
   gracePeriodLength,
   gracePeriodStartingTime,
   votePeriodLength,

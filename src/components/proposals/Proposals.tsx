@@ -5,7 +5,7 @@ import {
   VotingAdapterName,
 } from '../adapters-extensions/enums';
 import {
-  getVotingTimeRanges,
+  calculateVotingTimeRanges,
   proposalHasFlag,
   proposalHasVotingState,
 } from './helpers';
@@ -307,7 +307,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
           const {startingTime, gracePeriodStartingTime} =
             daoProposalVote?.[VotingAdapterName.OffchainVotingContract] || {};
 
-          const times = getVotingTimeRanges({
+          const times = calculateVotingTimeRanges({
             gracePeriodLength: offchainGracePeriod,
             gracePeriodStartingTime,
             votePeriodLength: offchainVotingPeriod,
