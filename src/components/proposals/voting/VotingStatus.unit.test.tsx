@@ -27,6 +27,7 @@ describe('VotingStatus unit tests', () => {
     expect(screen.getByText(/you are in voting/i)).toBeInTheDocument();
     expect(screen.getByText(/5%/i)).toBeInTheDocument();
     expect(screen.getByText(/5%/i)).toBeInTheDocument();
+
     // ClockSVG label
     expect(
       screen.getByLabelText(/counting down until voting ends/i)
@@ -63,7 +64,7 @@ describe('VotingStatus unit tests', () => {
     await waitFor(() => {
       expect(screen.getByLabelText(/vote has passed/i)).toBeInTheDocument();
       expect(screen.getByText(/grace period:/i)).toBeInTheDocument();
-      expect(screen.getByText(/1 sec/i)).toBeInTheDocument();
+      expect(screen.getByText(/^[012] secs?/i)).toBeInTheDocument();
     });
 
     // Voting passed

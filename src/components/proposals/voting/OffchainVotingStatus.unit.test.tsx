@@ -40,9 +40,10 @@ describe('OffchainVotingStatus unit tests', () => {
     totalUnits: 10000000,
   };
 
+  // @note This test uses an adjusted Jest timeout
   test('should render correct content from voting->passed', async () => {
     const votingStartMs: number = nowMilliseconds();
-    const votingEndMs: number = nowMilliseconds() + 3000;
+    const votingEndMs: number = nowMilliseconds() + 5000;
 
     await act(async () => {
       render(
@@ -83,17 +84,21 @@ describe('OffchainVotingStatus unit tests', () => {
     );
 
     // Status: approved
-    await waitFor(() => {
-      expect(screen.getByText(approvedRegex)).toBeInTheDocument();
+    await waitFor(
+      () => {
+        expect(screen.getByText(approvedRegex)).toBeInTheDocument();
 
-      expect(() => screen.getByText(loadingRegex)).toThrow();
-      expect(() => screen.getByText(votingEndsRegex)).toThrow();
-    });
-  });
+        expect(() => screen.getByText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(votingEndsRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+  }, 10000);
 
+  // @note This test uses an adjusted Jest timeout
   test('should render correct content from voting->failed', async () => {
     const votingStartMs: number = nowMilliseconds();
-    const votingEndMs: number = nowMilliseconds() + 3000;
+    const votingEndMs: number = nowMilliseconds() + 5000;
 
     await act(async () => {
       render(
@@ -134,13 +139,16 @@ describe('OffchainVotingStatus unit tests', () => {
     );
 
     // Status: failed
-    await waitFor(() => {
-      expect(screen.getByText(failedRegex)).toBeInTheDocument();
+    await waitFor(
+      () => {
+        expect(screen.getByText(failedRegex)).toBeInTheDocument();
 
-      expect(() => screen.getByText(loadingRegex)).toThrow();
-      expect(() => screen.getByText(votingEndsRegex)).toThrow();
-    });
-  });
+        expect(() => screen.getByText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(votingEndsRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+  }, 10000);
 
   // @note This test uses an adjusted Jest timeout
   test('should render correct content from voting->passed when grace period props provided', async () => {
