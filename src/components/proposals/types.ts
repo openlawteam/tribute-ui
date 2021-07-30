@@ -9,9 +9,9 @@ import {
 import {AbiItem} from 'web3-utils/types';
 import {Contract} from 'web3-eth-contract/types';
 
+import {ContractAdapterNames} from '../web3/types';
 import {VotingAdapterName} from '../adapters-extensions/enums';
 import {VotingState} from './voting/types';
-import {ContractAdapterNames} from '../web3/types';
 
 /**
  * ENUMS
@@ -80,8 +80,9 @@ export type RenderActionPropArguments = {
     adapterName: ContractAdapterNames;
     // An enum name (`string`) of the DAO proposal's `VotingState` index
     daoProposalVoteResult: typeof VotingState[any] | undefined;
-    daoProposalVotes: OffchainVotingAdapterVotes | undefined;
-    gracePeriodStartMs: number;
+    daoProposalVote: OffchainVotingAdapterVote | undefined;
+    gracePeriodStartMs: number | undefined;
+    gracePeriodEndMs: number | undefined;
     proposal: ProposalData;
     status: ProposalFlowStatus | undefined;
   };
@@ -130,7 +131,7 @@ export type ProposalData = {
   // @todo Make non-nullable?
   daoProposalVotingAdapter?: ProposalVotingAdapterData;
   // @todo Make non-nullable?
-  daoProposalVotes?: ProposalVotesData;
+  daoProposalVote?: ProposalVotesData;
   // @todo Make non-nullable?
   daoProposalVotingState?: VotingState;
   daoProposal: Proposal | undefined;
@@ -183,7 +184,7 @@ export type VotingAdapterVotes = {
  *
  * @link https://github.com/openlawteam/tribute-contracts/blob/master/contracts/adapters/voting/OffchainVoting.sol
  */
-export type OffchainVotingAdapterVotes = {
+export type OffchainVotingAdapterVote = {
   fallbackVotesCount: string;
   forceFailed: boolean;
   gracePeriodStartingTime: string;
@@ -242,6 +243,6 @@ export type ProposalVotingAdapterTuple = [
  * @see `useProposalsVotes`
  */
 export type ProposalVotesData = {
-  [VotingAdapterName.OffchainVotingContract]?: OffchainVotingAdapterVotes;
+  [VotingAdapterName.OffchainVotingContract]?: OffchainVotingAdapterVote;
   [VotingAdapterName.VotingContract]?: VotingAdapterVotes;
 };

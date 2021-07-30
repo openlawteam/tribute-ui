@@ -158,13 +158,15 @@ describe('ProposalCard unit tests', () => {
     },
   };
 
-  const getWeb3Results = ({
+  function injectDefaultWeb3Results({
     mockWeb3Provider,
     web3Instance,
   }: {
     mockWeb3Provider: FakeHttpProvider;
     web3Instance: Web3;
-  }) => {
+  }) {
+    injectDefaultDaoConfigurationResults({mockWeb3Provider, web3Instance});
+
     /**
      * Mock `useProposals` proposals response
      */
@@ -360,26 +362,47 @@ describe('ProposalCard unit tests', () => {
       )
     );
 
-    /**
-     * Inject voting results. The order should align with the order above of
-     * fake responses for proposals that have been sponsored.
-     */
+    injectDefaultVotingWeightResults({web3Instance, mockWeb3Provider});
+  }
 
-    injectVotingWeightResults({web3Instance, mockWeb3Provider});
-  };
-
-  function injectVotingWeightResults({
+  /**
+   * Inject DAO configuration values.
+   *
+   * In the case of `<Proposals />`, it uses the off-chain
+   * voting voting and grace period values.
+   */
+  function injectDefaultDaoConfigurationResults({
     mockWeb3Provider,
     web3Instance,
   }: {
     mockWeb3Provider: FakeHttpProvider;
     web3Instance: Web3;
   }) {
-    /**
-     * Inject voting results. The order should align with the order above of
-     * fake responses for proposals that have been sponsored.
-     */
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
+        [
+          0,
+          [
+            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+          ],
+        ]
+      )
+    );
+  }
 
+  /**
+   * Inject voting results. The order should align with the order above of
+   * fake responses for proposals that have been sponsored.
+   */
+  function injectDefaultVotingWeightResults({
+    mockWeb3Provider,
+    web3Instance,
+  }: {
+    mockWeb3Provider: FakeHttpProvider;
+    web3Instance: Web3;
+  }) {
     // Inject passed result
     mockWeb3Provider.injectResult(
       web3Instance.eth.abi.encodeParameters(
@@ -470,7 +493,10 @@ describe('ProposalCard unit tests', () => {
     );
 
     await waitFor(() => {
-      getWeb3Results({mockWeb3Provider, web3Instance} as WrapperReturnProps);
+      injectDefaultWeb3Results({
+        mockWeb3Provider,
+        web3Instance,
+      } as WrapperReturnProps);
     });
 
     await waitFor(() => {
@@ -539,6 +565,8 @@ describe('ProposalCard unit tests', () => {
     );
 
     await waitFor(() => {
+      injectDefaultDaoConfigurationResults({mockWeb3Provider, web3Instance});
+
       /**
        * Mock `useProposals` proposals response
        */
@@ -732,7 +760,7 @@ describe('ProposalCard unit tests', () => {
         )
       );
 
-      injectVotingWeightResults({web3Instance, mockWeb3Provider});
+      injectDefaultVotingWeightResults({web3Instance, mockWeb3Provider});
     });
 
     await waitFor(() => {
@@ -822,6 +850,8 @@ describe('ProposalCard unit tests', () => {
     );
 
     await waitFor(() => {
+      injectDefaultDaoConfigurationResults({mockWeb3Provider, web3Instance});
+
       /**
        * Mock `useProposals` proposals response
        */
@@ -1044,6 +1074,8 @@ describe('ProposalCard unit tests', () => {
     );
 
     await waitFor(() => {
+      injectDefaultDaoConfigurationResults({mockWeb3Provider, web3Instance});
+
       /**
        * Mock `useProposals` proposals response
        */
@@ -1250,10 +1282,12 @@ describe('ProposalCard unit tests', () => {
       </Wrapper>
     );
 
-    /**
-     * Mock the unsponsored proposals' multicall response
-     */
     await waitFor(() => {
+      injectDefaultDaoConfigurationResults({mockWeb3Provider, web3Instance});
+
+      /**
+       * Mock the unsponsored proposals' multicall response
+       */
       mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameters(
           ['uint256', 'bytes[]'],
@@ -1344,14 +1378,27 @@ describe('ProposalCard unit tests', () => {
       ]
     );
 
+    let web3Instance: Web3;
+    let mockWeb3Provider: FakeHttpProvider;
+
     render(
-      <Wrapper useInit useWallet>
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          web3Instance = p.web3Instance;
+          mockWeb3Provider = p.mockWeb3Provider;
+        }}>
         <Proposals
           adapterName={DaoAdapterConstants.ONBOARDING}
           onProposalClick={() => {}}
         />
       </Wrapper>
     );
+
+    await waitFor(() => {
+      injectDefaultDaoConfigurationResults({mockWeb3Provider, web3Instance});
+    });
 
     await waitFor(() => {
       expect(screen.getByLabelText(/loading content/i)).toBeInTheDocument();
@@ -1392,8 +1439,17 @@ describe('ProposalCard unit tests', () => {
       ]
     );
 
+    let web3Instance: Web3;
+    let mockWeb3Provider: FakeHttpProvider;
+
     render(
-      <Wrapper useInit useWallet>
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          web3Instance = p.web3Instance;
+          mockWeb3Provider = p.mockWeb3Provider;
+        }}>
         <Proposals
           adapterName={DaoAdapterConstants.ONBOARDING}
           onProposalClick={() => {}}
@@ -1402,9 +1458,14 @@ describe('ProposalCard unit tests', () => {
     );
 
     await waitFor(() => {
+      injectDefaultDaoConfigurationResults({mockWeb3Provider, web3Instance});
+    });
+
+    await waitFor(() => {
       expect(
         screen.getByText(/something went wrong while getting the proposals/i)
       ).toBeInTheDocument();
+
       expect(
         screen.getByText(
           /something went wrong while fetching the snapshot drafts/i
@@ -1472,7 +1533,10 @@ describe('ProposalCard unit tests', () => {
     );
 
     await waitFor(() => {
-      getWeb3Results({mockWeb3Provider, web3Instance} as WrapperReturnProps);
+      injectDefaultWeb3Results({
+        mockWeb3Provider,
+        web3Instance,
+      } as WrapperReturnProps);
     });
 
     await waitFor(() => {

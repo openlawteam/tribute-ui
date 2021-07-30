@@ -1,91 +1,59 @@
-import {render, screen, waitFor} from '@testing-library/react';
-import {SnapshotType, VoteChoices} from '@openlaw/snapshot-js-erc712';
-import Web3 from 'web3';
+import {act, render, screen, waitFor} from '@testing-library/react';
 
-import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../../test/helpers';
 import {OffchainVotingStatus} from './OffchainVotingStatus';
-import {ProposalData} from '../types';
+import {VotingResult} from '../types';
 import Wrapper from '../../../test/Wrapper';
 
 describe('OffchainVotingStatus unit tests', () => {
-  const yesterday = Date.now() / 1000 - 86400;
-  const now = Date.now() / 1000;
+  const nowMilliseconds = () => Date.now();
+  const ONE_DAY_MS: number = 86400 * 1000;
+  const approvedRegex: RegExp = /^approved$/i;
+  const failedRegex: RegExp = /^failed$/i;
+  const votingEndsRegex: RegExp = /^ends:$/i;
+  const gracePeriodEndedRegex: RegExp = /^grace period ended$/i;
+  const gracePeriodRegex: RegExp = /^grace period:$/i;
+  const daysCountdownRegex: RegExp = /^\d{1,} days? : \d{1,} hrs?$/i;
+  const secondsCountdownRegex: RegExp = /^\d{1,} secs?$/i;
+  const loadingRegex: RegExp = /^getting off-chain voting status$/i;
 
-  // Bare minimum fake data
-  const fakeProposal: Partial<ProposalData> = {
-    snapshotDraft: undefined,
-    snapshotProposal: {
-      idInSnapshot: 'abc123',
-      idInDAO: 'abc123',
-      msg: {
-        payload: {
-          name: 'Such a great proposal',
-          body: '',
-          choices: [VoteChoices.Yes, VoteChoices.No],
-          start: yesterday,
-          end: now - 40000,
-          snapshot: 100,
-        },
-        type: SnapshotType.proposal,
-      },
-      votes: [
-        {
-          DEFAULT_ETH_ADDRESS: {
-            address: DEFAULT_ETH_ADDRESS,
-            msg: {
-              version: '0.2.0',
-              timestamp: '1614264732',
-              token: '0x8f56682a50becb1df2fb8136954f2062871bc7fc',
-              type: SnapshotType.vote,
-              payload: {
-                choice: 1, // Yes
-                proposalId:
-                  '0x1679cac3f54777f5d9c95efd83beff9f87ac55487311ecacd95827d267a15c4e',
-                metadata: {
-                  memberAddress: DEFAULT_ETH_ADDRESS,
-                },
-              },
-            },
-            sig: '0xdbdbf122734b34ed5b10542551636e4250e98f443e35bf5d625f284fe54dcaf80c5bc44be04fefed1e9e5f25a7c13809a5266fcdbdcd0b94c885f2128544e79a1b',
-            authorIpfsHash:
-              '0xfe8f864ef475f60c7e01d5425df332199c5ae7ab712b8545f07433c68f06c644',
-            relayerIpfsHash: '',
-            actionId: '0xFCB86F90bd7b30cDB8A2c43FB15bf5B33A70Ea4f',
-          },
-        },
-      ],
-    } as any,
+  const defaultPassedVotingResult: VotingResult = {
+    Yes: {
+      percentage: 1,
+      units: 100000,
+    },
+    No: {
+      percentage: 0,
+      units: 0,
+    },
+    totalUnits: 10000000,
   };
 
-  test('should render correct content', async () => {
-    let web3Instance: Web3;
-    let mockWeb3Provider: FakeHttpProvider;
+  const defaultFailedVotingResult: VotingResult = {
+    Yes: {
+      percentage: 0,
+      units: 0,
+    },
+    No: {
+      percentage: 1,
+      units: 100000,
+    },
+    totalUnits: 10000000,
+  };
 
-    render(
-      <Wrapper
-        useInit
-        useWallet
-        getProps={(p) => {
-          mockWeb3Provider = p.mockWeb3Provider;
-          web3Instance = p.web3Instance;
-        }}>
-        <OffchainVotingStatus proposal={fakeProposal as ProposalData} />
-      </Wrapper>
-    );
+  // @note This test uses an adjusted Jest timeout
+  test('should render correct content from voting->passed', async () => {
+    const votingStartMs: number = nowMilliseconds();
+    const votingEndMs: number = nowMilliseconds() + 5000;
 
-    await waitFor(() => {
-      // Inject mocked units result 1
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-            ],
-          ]
-        )
+    await act(async () => {
+      render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownVotingEndMs={votingEndMs}
+            countdownVotingStartMs={votingStartMs}
+            votingResult={defaultPassedVotingResult}
+          />
+        </Wrapper>
       );
     });
 
@@ -97,116 +65,621 @@ describe('OffchainVotingStatus unit tests', () => {
 
     // Status: loader
     await waitFor(() => {
-      expect(
-        screen.getByLabelText(/getting off-chain voting status/i)
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
     });
 
-    // Status
-    await waitFor(() => {
-      expect(screen.getByText(/approved/i)).toBeInTheDocument();
-    });
-  });
+    // Status: voting
+    await waitFor(
+      () => {
+        expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
+        expect(screen.getByText(secondsCountdownRegex)).toBeInTheDocument();
 
-  test('should render correct content when providing a "votingResult"', async () => {
-    render(
-      <Wrapper useInit useWallet>
-        <OffchainVotingStatus
-          proposal={fakeProposal as ProposalData}
-          votingResult={{
-            Yes: {units: 100000, percentage: 1},
-            No: {units: 0, percentage: 0},
-            totalUnits: 10000000,
-          }}
-        />
-      </Wrapper>
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(loadingRegex)).toThrow();
+      },
+      {timeout: 5000}
     );
 
-    // Percentages
-    await waitFor(() => {
-      expect(screen.getByText(/1%/i)).toBeInTheDocument();
-      expect(screen.getByText(/0%/i)).toBeInTheDocument();
-    });
+    // Status: approved
+    await waitFor(
+      () => {
+        expect(screen.getByText(approvedRegex)).toBeInTheDocument();
 
-    // Status: loader
-    await waitFor(() => {
-      expect(
-        screen.getByLabelText(/getting off-chain voting status/i)
-      ).toBeInTheDocument();
-    });
-
-    // Status
-    await waitFor(() => {
-      expect(screen.getByText(/approved/i)).toBeInTheDocument();
-    });
-  });
-
-  test('should render correct content when "countdownGracePeriodStartMs" provided', async () => {
-    let web3Instance: Web3;
-    let mockWeb3Provider: FakeHttpProvider;
-
-    render(
-      <Wrapper
-        useInit
-        useWallet
-        getProps={(p) => {
-          web3Instance = p.web3Instance;
-          mockWeb3Provider = p.mockWeb3Provider;
-
-          // Inject mocked result for grace period end
-          mockWeb3Provider.injectResult(
-            web3Instance.eth.abi.encodeParameter('uint256', 3)
-          );
-        }}>
-        <OffchainVotingStatus
-          countdownGracePeriodStartMs={Date.now()}
-          proposal={fakeProposal as ProposalData}
-        />
-      </Wrapper>
+        expect(() => screen.getByText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(votingEndsRegex)).toThrow();
+      },
+      {timeout: 5000}
     );
+  }, 10000);
 
-    // Inject mocked results for total units and single vote
-    await waitFor(() => {
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-              web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-            ],
-          ]
-        )
+  // @note This test uses an adjusted Jest timeout
+  test('should render correct content from voting->failed', async () => {
+    const votingStartMs: number = nowMilliseconds();
+    const votingEndMs: number = nowMilliseconds() + 5000;
+
+    await act(async () => {
+      render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownVotingEndMs={votingEndMs}
+            countdownVotingStartMs={votingStartMs}
+            votingResult={defaultFailedVotingResult}
+          />
+        </Wrapper>
       );
     });
 
+    // Percentages
+    await waitFor(() => {
+      expect(screen.getByText(/1%/i)).toBeInTheDocument();
+      expect(screen.getByText(/0%/i)).toBeInTheDocument();
+    });
+
     // Status: loader
     await waitFor(() => {
-      expect(
-        screen.getByLabelText(/getting off-chain voting status/i)
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
+    });
+
+    // Status: voting
+    await waitFor(
+      () => {
+        expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
+        expect(screen.getByText(secondsCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(loadingRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+
+    // Status: failed
+    await waitFor(
+      () => {
+        expect(screen.getByText(failedRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(votingEndsRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+  }, 10000);
+
+  // @note This test uses an adjusted Jest timeout
+  test('should render correct content from voting->passed when grace period props provided', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs;
+    const votingEndMs: number = nowMs + 3000;
+    const gracePeriodStartMs: number = nowMs + 3500;
+    const gracePeriodEndMs: number = nowMs + 9000;
+
+    await act(async () => {
+      render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownGracePeriodEndMs={gracePeriodEndMs}
+            countdownGracePeriodStartMs={gracePeriodStartMs}
+            votingResult={defaultPassedVotingResult}
+            countdownVotingEndMs={votingEndMs}
+            countdownVotingStartMs={votingStartMs}
+          />
+        </Wrapper>
+      );
     });
 
     // Percentages
     await waitFor(() => {
       expect(screen.getByText(/1%/i)).toBeInTheDocument();
       expect(screen.getByText(/0%/i)).toBeInTheDocument();
+    });
+
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
+    });
+
+    // Status: voting
+    await waitFor(
+      () => {
+        expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
+        expect(screen.getByText(secondsCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+
+    // Grace period label
+    await waitFor(
+      () => {
+        expect(screen.getByText(gracePeriodRegex)).toBeInTheDocument();
+        expect(screen.getByText(secondsCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+        expect(() => screen.getByText(votingEndsRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+
+    // Assert vote approved
+    await waitFor(
+      () => {
+        expect(screen.getByText(approvedRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+        expect(() => screen.getByText(votingEndsRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+  }, 10000);
+
+  // @note This test uses an adjusted Jest timeout
+  test('should render correct content from voting->failed when grace period props provided', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs;
+    const votingEndMs: number = nowMs + 3000;
+    const gracePeriodStartMs: number = nowMs + 3500;
+    const gracePeriodEndMs: number = nowMs + 9000;
+
+    await act(async () => {
+      render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownGracePeriodEndMs={gracePeriodEndMs}
+            countdownGracePeriodStartMs={gracePeriodStartMs}
+            votingResult={defaultFailedVotingResult}
+            countdownVotingEndMs={votingEndMs}
+            countdownVotingStartMs={votingStartMs}
+          />
+        </Wrapper>
+      );
+    });
+
+    // Percentages
+    await waitFor(() => {
+      expect(screen.getByText(/1%/i)).toBeInTheDocument();
+      expect(screen.getByText(/0%/i)).toBeInTheDocument();
+    });
+
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
+    });
+
+    // Status: voting
+    await waitFor(
+      () => {
+        expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
+        expect(screen.getByText(secondsCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+
+    // Grace period label
+    await waitFor(
+      () => {
+        expect(screen.getByText(gracePeriodRegex)).toBeInTheDocument();
+        expect(screen.getByText(secondsCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+        expect(() => screen.getByText(votingEndsRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+
+    // Assert vote approved
+    await waitFor(
+      () => {
+        expect(screen.getByText(failedRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+        expect(() => screen.getByText(votingEndsRegex)).toThrow();
+      },
+      {timeout: 5000}
+    );
+  }, 10000);
+
+  // @note This test uses an adjusted Jest timeout
+  test('should render correct content for voting period status when `days > 0`', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs;
+    const votingEndMs: number = nowMs + ONE_DAY_MS * 2;
+    const gracePeriodStartMs: number = nowMs + ONE_DAY_MS * 2;
+    const gracePeriodEndMs: number = nowMs + ONE_DAY_MS * 3;
+
+    await act(async () => {
+      render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownGracePeriodEndMs={gracePeriodEndMs}
+            countdownGracePeriodStartMs={gracePeriodStartMs}
+            votingResult={defaultPassedVotingResult}
+            countdownVotingEndMs={votingEndMs}
+            countdownVotingStartMs={votingStartMs}
+          />
+        </Wrapper>
+      );
+    });
+
+    // Percentages
+    await waitFor(() => {
+      expect(screen.getByText(/1%/i)).toBeInTheDocument();
+      expect(screen.getByText(/0%/i)).toBeInTheDocument();
+    });
+
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
+    });
+
+    // Voting period label
+    await waitFor(
+      () => {
+        expect(screen.getByText(votingEndsRegex)).toBeInTheDocument();
+        expect(screen.getByText(daysCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodEndMs)).toThrow();
+      },
+      {timeout: 5000}
+    );
+  }, 10000);
+
+  // @note This test uses an adjusted Jest timeout
+  test('should render correct content for grace period status when `days > 0`', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs - ONE_DAY_MS;
+    const votingEndMs: number = nowMs;
+    const gracePeriodStartMs: number = nowMs;
+    const gracePeriodEndMs: number = nowMs + ONE_DAY_MS * 2;
+
+    await act(async () => {
+      render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownGracePeriodEndMs={gracePeriodEndMs}
+            countdownGracePeriodStartMs={gracePeriodStartMs}
+            votingResult={defaultPassedVotingResult}
+            countdownVotingEndMs={votingEndMs}
+            countdownVotingStartMs={votingStartMs}
+          />
+        </Wrapper>
+      );
+    });
+
+    // Percentages
+    await waitFor(() => {
+      expect(screen.getByText(/1%/i)).toBeInTheDocument();
+      expect(screen.getByText(/0%/i)).toBeInTheDocument();
+    });
+
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodRegex)).toThrow();
+      expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+      expect(() => screen.getByText(votingEndsRegex)).toThrow();
     });
 
     // Grace period label
     await waitFor(
       () => {
-        expect(screen.getByText(/grace period ends/i)).toBeInTheDocument();
+        expect(screen.getByText(gracePeriodRegex)).toBeInTheDocument();
+
+        expect(screen.getByText(daysCountdownRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByLabelText(loadingRegex)).toThrow();
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(gracePeriodEndedRegex)).toThrow();
+        expect(() => screen.getByText(votingEndsRegex)).toThrow();
       },
-      {timeout: 2000}
+      {timeout: 5000}
+    );
+  }, 10000);
+
+  test('should render correct content when `renderStatus` provided', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs - 5000;
+    const votingEndMs: number = nowMs;
+    const gracePeriodStartMs: number = nowMs + 500;
+    const gracePeriodEndMs: number = nowMs + 3000;
+    const customStatusRegex: RegExp = /what a great status!/i;
+
+    let rerender: ReturnType<typeof render>['rerender'];
+
+    await act(async () => {
+      const {rerender: rr} = render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownVotingStartMs={votingStartMs}
+            countdownVotingEndMs={votingEndMs}
+            countdownGracePeriodStartMs={gracePeriodStartMs}
+            countdownGracePeriodEndMs={gracePeriodEndMs}
+            // Render a status
+            renderStatus={({
+              votingStartEndInitReady,
+              hasVotingStarted,
+              hasVotingEnded,
+            }) => {
+              if (
+                votingStartEndInitReady &&
+                hasVotingStarted &&
+                hasVotingEnded
+              ) {
+                return <span>What a great status!</span>;
+              }
+            }}
+            votingResult={defaultPassedVotingResult}
+          />
+        </Wrapper>
+      );
+
+      rerender = rr;
+    });
+
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(customStatusRegex)).toThrow();
+    });
+
+    // Custom label
+    await waitFor(
+      () => {
+        expect(screen.getByText(customStatusRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByText(approvedRegex)).toThrow();
+        expect(() => screen.getByText(loadingRegex)).toThrow();
+      }
+      // {timeout: 5000}
+    );
+
+    const renderStatusSpy = jest.fn();
+
+    // Re-render with custom status for when grace period ended and waiting on contract
+    await act(async () => {
+      rerender(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownVotingStartMs={votingStartMs}
+            countdownVotingEndMs={votingEndMs}
+            countdownGracePeriodStartMs={gracePeriodStartMs}
+            countdownGracePeriodEndMs={gracePeriodEndMs}
+            // Use a spy to assert the correct arguments were provided to `renderStatus`
+            renderStatus={renderStatusSpy}
+            votingResult={defaultPassedVotingResult}
+          />
+        </Wrapper>
+      );
+    });
+
+    // Assert spy calls
+    await waitFor(() => {
+      expect(renderStatusSpy.mock.calls.length > 0).toBe(true);
+
+      expect(Object.keys(renderStatusSpy.mock.calls[0][0])).toEqual([
+        'countdownGracePeriodEndMs',
+        'countdownGracePeriodStartMs',
+        'countdownVotingEndMs',
+        'countdownVotingStartMs',
+        'didVotePassSimpleMajority',
+        'gracePeriodStartEndInitReady',
+        'hasGracePeriodEnded',
+        'hasGracePeriodStarted',
+        'hasVotingEnded',
+        'hasVotingStarted',
+        'votingStartEndInitReady',
+      ]);
+    });
+  });
+
+  test('should render correct content when `renderStatus` returns falsy or `Fragment`', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs - 5000;
+    const votingEndMs: number = nowMs;
+    const gracePeriodStartMs: number = nowMs + 500;
+    const gracePeriodEndMs: number = nowMs + 3000;
+
+    let rerender: ReturnType<typeof render>['rerender'];
+
+    await act(async () => {
+      const {rerender: rr} = render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownVotingStartMs={votingStartMs}
+            countdownVotingEndMs={votingEndMs}
+            countdownGracePeriodStartMs={gracePeriodStartMs}
+            countdownGracePeriodEndMs={gracePeriodEndMs}
+            // Render a falsy (e.g. `false`, `undefined`, `0`, etc.)status
+            renderStatus={() => {
+              return '';
+            }}
+            votingResult={defaultPassedVotingResult}
+          />
+        </Wrapper>
+      );
+
+      rerender = rr;
+    });
+
+    // Status: loader
+    await waitFor(() => {
+      expect(screen.getByLabelText(loadingRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+    });
+
+    // Custom label
+    await waitFor(
+      () => {
+        expect(screen.getByText(approvedRegex)).toBeInTheDocument();
+
+        expect(() => screen.getByText(loadingRegex)).toThrow();
+      }
+      // {timeout: 5000}
+    );
+
+    // Re-render with custom status for when grace period ended and waiting on contract
+    await act(async () => {
+      rerender(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownVotingStartMs={votingStartMs}
+            countdownVotingEndMs={votingEndMs}
+            countdownGracePeriodStartMs={gracePeriodStartMs}
+            countdownGracePeriodEndMs={gracePeriodEndMs}
+            // Render a React.Fragment (truthy, but empty, value) in order to hide the status
+            renderStatus={() => {
+              return <></>;
+            }}
+            votingResult={defaultPassedVotingResult}
+          />
+        </Wrapper>
+      );
+    });
+
+    await waitFor(() => {
+      expect(() => screen.getByText(approvedRegex)).toThrow();
+      expect(() => screen.getByText(loadingRegex)).toThrow();
+    });
+  });
+
+  test('should call `onVotingPeriodChange` throughout voting period', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs;
+    const votingEndMs: number = nowMs + 3000;
+    const spy = jest.fn();
+
+    await act(async () => {
+      render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownVotingEndMs={votingEndMs}
+            countdownVotingStartMs={votingStartMs}
+            onVotingPeriodChange={spy}
+            votingResult={defaultPassedVotingResult}
+          />
+        </Wrapper>
+      );
+    });
+
+    await waitFor(
+      () => {
+        expect(spy.mock.calls[0]?.[0]).toEqual({
+          hasVotingEnded: false,
+          hasVotingStarted: true,
+          proposalId: undefined,
+          votingStartEndInitReady: true,
+        });
+      },
+      {timeout: 3000}
     );
 
     await waitFor(
       () => {
-        expect(screen.getByText(/grace period ended/i)).toBeInTheDocument();
+        expect(spy.mock.calls[1]?.[0]).toEqual({
+          hasVotingEnded: true,
+          hasVotingStarted: true,
+          proposalId: undefined,
+          votingStartEndInitReady: true,
+        });
       },
-      {timeout: 2000}
+      {timeout: 3000}
     );
+
+    expect(spy.mock.calls.length).toBe(2);
   });
+
+  // @note This test uses an adjusted Jest timeout
+  test('should call `onGracePeriodChange` throughout grace period', async () => {
+    const nowMs = nowMilliseconds();
+    const votingStartMs: number = nowMs - 5000;
+    const votingEndMs: number = nowMs - 1000;
+    const gracePeriodStartMs: number = nowMs;
+    const gracePeriodEndMs: number = nowMs + 3000;
+    const spy = jest.fn();
+
+    await act(async () => {
+      render(
+        <Wrapper useInit useWallet>
+          <OffchainVotingStatus
+            countdownGracePeriodEndMs={gracePeriodEndMs}
+            countdownGracePeriodStartMs={gracePeriodStartMs}
+            countdownVotingEndMs={votingEndMs}
+            countdownVotingStartMs={votingStartMs}
+            onGracePeriodChange={spy}
+            votingResult={defaultPassedVotingResult}
+          />
+        </Wrapper>
+      );
+    });
+
+    await waitFor(
+      () => {
+        expect(spy.mock.calls[0]?.[0]).toEqual({
+          gracePeriodStartEndInitReady: true,
+          hasGracePeriodEnded: false,
+          hasGracePeriodStarted: true,
+          proposalId: undefined,
+        });
+      },
+      {timeout: 5000}
+    );
+
+    await waitFor(
+      () => {
+        expect(spy.mock.calls[1]?.[0]).toEqual({
+          gracePeriodStartEndInitReady: true,
+          hasGracePeriodEnded: true,
+          hasGracePeriodStarted: true,
+          proposalId: undefined,
+        });
+      },
+      {timeout: 5000}
+    );
+
+    expect(spy.mock.calls.length).toBe(2);
+  }, 10000);
 });

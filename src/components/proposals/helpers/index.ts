@@ -1,3 +1,4 @@
+export * from './calculateVotingTimeRanges';
 export * from './getOffchainVotingProof';
 export * from './getVoteChosen';
 export * from './getVotingAdapterABI';

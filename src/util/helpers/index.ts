@@ -3,6 +3,7 @@ export * from './disableReactDevTools';
 export * from './dontCloseWindowWarning';
 export * from './formatDecimal';
 export * from './formatNumber';
+export * from './getTimeRemaining';
 export * from './getValidationError';
 export * from './isPossibleContractWallet';
 export * from './normalizeString';

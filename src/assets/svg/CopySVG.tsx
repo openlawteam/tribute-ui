@@ -1,6 +1,6 @@
 import {SVGAttributes} from 'react';
 
-export default function CheckSVG(props: SVGAttributes<HTMLOrSVGElement>) {
+export default function CopySVG(props: SVGAttributes<HTMLOrSVGElement>) {
   return (
     <svg
       aria-hidden="true"

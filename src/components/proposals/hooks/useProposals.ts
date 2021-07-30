@@ -284,14 +284,14 @@ export function useProposals({
             normalizeString(proposalIdVotingState) === normalizeString(id)
         )?.[1];
 
-        const daoProposalVotes = proposalsVotes.find(
+        const daoProposalVote = proposalsVotes.find(
           ([proposalIdVotes]) =>
             normalizeString(id) === normalizeString(proposalIdVotes)
         )?.[1];
 
         return {
           daoProposal,
-          daoProposalVotes,
+          daoProposalVote,
           daoProposalVotingAdapter,
           daoProposalVotingState,
           /**

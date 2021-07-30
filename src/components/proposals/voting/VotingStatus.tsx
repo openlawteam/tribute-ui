@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {SquareRootVotingBar} from '.';
-import ProposalPeriod from '../ProposalPeriod';
+import ProposalPeriodCountdown from '../ProposalPeriodCountdown';
 import StopwatchSVG from '../../../assets/svg/StopwatchSVG';
 
 type VotingStatusProps = {
@@ -18,7 +18,7 @@ type VotingStatusProps = {
    * gives the opportunity to easily show a timer for voting, or grace period, for example,
    * without adding more props.
    */
-  renderTimer: (component: typeof ProposalPeriod) => React.ReactNode;
+  renderTimer: (component: typeof ProposalPeriodCountdown) => React.ReactNode;
   /**
    * Set to `false` to hide percentage data under the voting progress bar.
    * Defaults to `true`.
@@ -51,7 +51,7 @@ export function VotingStatus(props: VotingStatusProps) {
           <span className="votingstatus">{renderedStatus}</span>
         )}
 
-        {renderTimer(ProposalPeriod)}
+        {renderTimer(ProposalPeriodCountdown)}
       </div>
 
       {/* VOTES */}

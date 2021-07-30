@@ -21,11 +21,12 @@ describe('ProposalActions component unit tests', () => {
         'useProposalWithOffchainVoteStatus'
       )
       .mockImplementation(() => ({
-        status: ProposalFlowStatus.Sponsor,
+        status: ProposalFlowStatus.Process,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
+        stopPollingForStatus: () => {},
       }));
 
     render(
@@ -52,7 +53,7 @@ describe('ProposalActions component unit tests', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', {name: /sponsor/i})
+        screen.getByRole('button', {name: /^process$/i})
       ).toBeInTheDocument();
     });
 
@@ -70,8 +71,9 @@ describe('ProposalActions component unit tests', () => {
         status: ProposalFlowStatus.OffchainVoting,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
+        stopPollingForStatus: () => {},
       }));
 
     render(
@@ -123,8 +125,9 @@ describe('ProposalActions component unit tests', () => {
         status: ProposalFlowStatus.OffchainVoting,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
+        stopPollingForStatus: () => {},
       }));
 
     render(
@@ -181,8 +184,9 @@ describe('ProposalActions component unit tests', () => {
         status: ProposalFlowStatus.Sponsor,
         daoProposal: undefined,
         daoProposalVoteResult: undefined,
-        daoProposalVotes: undefined,
+        daoProposalVote: undefined,
         proposalFlowStatusError: undefined,
+        stopPollingForStatus: () => {},
       }));
 
     render(

@@ -1,50 +1,101 @@
-import {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
+import {useEffect} from 'react';
 
-import {ContractDAOConfigKeys} from '../../web3/types';
 import {CycleEllipsis} from '../../feedback';
-import {getDAOConfigEntry} from '../../web3/helpers';
-import {ProposalData, VotingResult} from '../types';
-import {StoreState} from '../../../store/types';
-import {useOffchainVotingResults, useVotingTimeStartEnd} from '../hooks';
+import {RenderCountdownTextProps} from '../ProposalPeriodCountdown';
+import {useTimeStartEnd} from '../../../hooks';
+import {VotingResult} from '../types';
 import {VotingStatus} from './VotingStatus';
+
+export type OffchainVotingStatusRenderStatusProps = {
+  countdownGracePeriodEndMs: OffchainVotingStatusProps['countdownGracePeriodEndMs'];
+  countdownGracePeriodStartMs: OffchainVotingStatusProps['countdownGracePeriodStartMs'];
+  countdownVotingEndMs: OffchainVotingStatusProps['countdownVotingEndMs'];
+  countdownVotingStartMs: OffchainVotingStatusProps['countdownVotingStartMs'];
+  didVotePassSimpleMajority: boolean | undefined;
+  gracePeriodStartEndInitReady: boolean;
+  hasGracePeriodEnded: boolean;
+  hasGracePeriodStarted: boolean;
+  hasVotingEnded: boolean;
+  hasVotingStarted: boolean;
+  votingStartEndInitReady: boolean;
+};
+
+export type OnGracePeriodChangeProps = {
+  hasGracePeriodEnded: boolean;
+  hasGracePeriodStarted: boolean;
+  /**
+   * Helpful if responding to events for multiple proposals
+   */
+  proposalId?: string;
+  gracePeriodStartEndInitReady: boolean;
+};
+
+export type OnVotingPeriodChangeProps = {
+  hasVotingEnded: boolean;
+  hasVotingStarted: boolean;
+  /**
+   * Helpful if responding to events for multiple proposals
+   */
+  proposalId?: string;
+  votingStartEndInitReady: boolean;
+};
 
 type OffchainVotingStatusProps = {
   /**
-   * When the offchain grace period seconds are provided the grace period timer
-   * will display. The end seconds will be determined inside the component.
-   *
-   * Be sure to unset this value (`0`, `undefined`) if the grace period should not show.
+   * Voting start time
+   * i.e. calculated from the `OffchainVoting` contract's vote's start time, or Snapshot proposal's start time
+   */
+  countdownVotingStartMs: number | undefined;
+  /**
+   * Voting end time
+   * i.e. calculated from the `OffchainVoting` contract's vote's end time, or Snapshot proposal's end time
+   */
+  countdownVotingEndMs: number | undefined;
+  /**
+   * Grace period start time
+   * i.e. calculated from the `OffchainVoting` contract's vote's start time, or Snapshot proposal's start time
    */
   countdownGracePeriodStartMs?: number;
-  proposal: ProposalData;
   /**
-   * If a fetched `VotingResult` is provided
-   * it will save the need to fetch inside of this component.
-   *
-   * e.g. Governance proposals listing may fetch all voting results
-   *   in order to filter the `ProposalCard`s and be able to provide the results.
+   * Grace period end time
+   * i.e. calculated from the `OffchainVoting` contract's vote's end time, or Snapshot proposal's end time
    */
-  votingResult?: VotingResult;
+  countdownGracePeriodEndMs?: number;
+  /**
+   * An optional callback to run on grace period time changes
+   */
+  onGracePeriodChange?: (p: OnGracePeriodChangeProps) => void;
+  /**
+   * An optional callback to run on voting time changes
+   */
+  onVotingPeriodChange?: (p: OnVotingPeriodChangeProps) => void;
+  /**
+   * An optional proposal ID if working with multiple proposals (i.e. listing).
+   * Helps when repsonding to events from callbacks like `onVotingPeriodChange` and `onGracePeriodChange`.
+   */
+  proposalId?: string;
+  /**
+   * Render a custom status
+   */
+  renderStatus?: (p: OffchainVotingStatusRenderStatusProps) => React.ReactNode;
+  /**
+   * A single proposal's `VotingResult` (i.e. as provided by `useOffchainVotingResults`)
+   */
+  votingResult: VotingResult | undefined;
 };
 
-// Cached grace period label
-const gracePeriodEndLabel = (
-  <span>
-    Grace period ends:
-    <br />
-  </span>
-);
+function renderCountdownText({
+  days,
+  hours,
+  formatTimePeriod: format,
+}: RenderCountdownTextProps) {
+  if (days > 0) {
+    return `${format(days, 'day')} : ${format(hours, 'hr')}`;
+  }
+}
 
-// Cached grace period ended label
-const gracePeriodEndedLabel = (
-  <span>
-    Grace period ended <br />{' '}
-    <span style={{textTransform: 'none'}}>
-      Awaiting contract status&hellip;
-    </span>
-  </span>
-);
+// Grace period label
+const gracePeriodLabel = <span>Grace period:</span>;
 
 const cycleEllipsisFadeInProps = {duration: 150};
 
@@ -57,105 +108,144 @@ const cycleEllipsisFadeInProps = {duration: 150};
  * @returns {JSX.Element}
  */
 export function OffchainVotingStatus({
-  countdownGracePeriodStartMs,
-  proposal,
+  countdownGracePeriodEndMs = 0,
+  countdownGracePeriodStartMs = 0,
+  countdownVotingEndMs = 0,
+  countdownVotingStartMs = 0,
+  onGracePeriodChange,
+  onVotingPeriodChange,
+  proposalId,
+  renderStatus,
   votingResult,
 }: OffchainVotingStatusProps): JSX.Element {
-  const {snapshotProposal} = proposal;
-
-  /**
-   * Selectors
-   */
-
-  const daoRegistryInstance = useSelector(
-    (s: StoreState) => s.contracts.DaoRegistryContract?.instance
-  );
-
-  /**
-   * State
-   */
-
-  const [didVotePass, setDidVotePass] = useState<boolean>();
-  const [gracePeriodEndMs, setGracePeriodEndMs] = useState<number>(0);
-
   /**
    * Our hooks
    */
 
   const {
-    hasVotingTimeStarted,
-    hasVotingTimeEnded,
-    votingTimeStartEndInitReady,
-  } = useVotingTimeStartEnd(
-    proposal.snapshotProposal?.msg.payload.start,
-    proposal.snapshotProposal?.msg.payload.end
+    hasTimeEnded: hasVotingEnded,
+    hasTimeStarted: hasVotingStarted,
+    timeStartEndInitReady: votingStartEndInitReady,
+  } = useTimeStartEnd(
+    countdownVotingStartMs / 1000,
+    countdownVotingEndMs / 1000
   );
 
-  const {offchainVotingResults} = useOffchainVotingResults(
-    votingResult ? undefined : proposal.snapshotProposal
+  const {
+    hasTimeEnded: hasGracePeriodEnded,
+    hasTimeStarted: hasGracePeriodStarted,
+    timeStartEndInitReady: gracePeriodStartEndInitReady,
+  } = useTimeStartEnd(
+    countdownGracePeriodStartMs / 1000,
+    countdownGracePeriodEndMs / 1000
   );
 
   /**
    * Variables
    */
 
-  // There is only one vote result entry as we only passed a single proposal
-  const votingResultToUse = votingResult
-    ? votingResult
-    : offchainVotingResults[0]?.[1];
+  const isGracePeriodActive: boolean =
+    gracePeriodStartEndInitReady &&
+    hasGracePeriodStarted &&
+    !hasGracePeriodEnded;
 
-  const votingStartSeconds = snapshotProposal?.msg.payload.start || 0;
-  const votingEndSeconds = snapshotProposal?.msg.payload.end || 0;
-  const yesUnits = votingResultToUse?.Yes.units || 0;
-  const noUnits = votingResultToUse?.No.units || 0;
-  const totalUnits = votingResultToUse?.totalUnits;
+  const noUnits: number = votingResult?.No.units || 0;
+  const totalUnits: number = votingResult?.totalUnits || 0;
+  const yesUnits: number = votingResult?.Yes.units || 0;
+
+  // We use `undefined` to indicate that the result has not yet been determined.
+  const didVotePassSimpleMajority: boolean | undefined = hasVotingEnded
+    ? yesUnits > noUnits
+    : undefined;
+
+  const renderedStatusFromProp = renderStatus?.({
+    countdownGracePeriodEndMs,
+    countdownGracePeriodStartMs,
+    countdownVotingEndMs,
+    countdownVotingStartMs,
+    didVotePassSimpleMajority,
+    gracePeriodStartEndInitReady,
+    hasGracePeriodEnded,
+    hasGracePeriodStarted,
+    hasVotingEnded,
+    hasVotingStarted,
+    votingStartEndInitReady,
+  });
 
   /**
    * Effects
    */
 
+  // When voting times are updated, call the `onVotingPeriodChange` callback
   useEffect(() => {
-    if (!hasVotingTimeEnded) return;
+    if (!votingStartEndInitReady) return;
 
-    setDidVotePass(yesUnits > noUnits);
-  }, [hasVotingTimeEnded, noUnits, yesUnits]);
+    onVotingPeriodChange?.({
+      hasVotingStarted,
+      hasVotingEnded,
+      proposalId,
+      votingStartEndInitReady,
+    });
+  }, [
+    hasVotingEnded,
+    hasVotingStarted,
+    onVotingPeriodChange,
+    proposalId,
+    votingStartEndInitReady,
+  ]);
 
-  // Determine grace period end
+  // When voting times are updated, call the `onGracePeriodChange` callback
   useEffect(() => {
-    if (!countdownGracePeriodStartMs || !daoRegistryInstance) return;
+    if (!gracePeriodStartEndInitReady) return;
 
-    getDAOConfigEntry(
-      ContractDAOConfigKeys.offchainVotingGracePeriod,
-      daoRegistryInstance
-    )
-      .then((r) => r && setGracePeriodEndMs(Number(r) * 1000))
-      .catch(() => setGracePeriodEndMs(0));
-  }, [countdownGracePeriodStartMs, daoRegistryInstance]);
+    onGracePeriodChange?.({
+      hasGracePeriodEnded,
+      hasGracePeriodStarted,
+      proposalId,
+      gracePeriodStartEndInitReady,
+    });
+  }, [
+    gracePeriodStartEndInitReady,
+    hasGracePeriodEnded,
+    hasGracePeriodStarted,
+    onGracePeriodChange,
+    proposalId,
+  ]);
 
   /**
    * Functions
    */
 
-  function renderStatus() {
-    // On loading
-    if (!votingTimeStartEndInitReady) {
+  function renderOffchainVotingStatus(): React.ReactNode {
+    // Render status from prop
+    if (renderedStatusFromProp) {
+      return renderedStatusFromProp;
+    }
+
+    // Loading
+    if (!votingStartEndInitReady) {
       return (
         <CycleEllipsis
           ariaLabel="Getting off-chain voting status"
-          intervalMs={200}
           fadeInProps={cycleEllipsisFadeInProps}
+          intervalMs={200}
         />
       );
     }
 
-    // Do not show a label as we provide one in addition to the timer.
-    if (countdownGracePeriodStartMs) {
+    // If in grace period, do not show a status.
+    if (isGracePeriodActive) {
       return '';
     }
 
-    // On voting ended
-    if (typeof didVotePass === 'boolean') {
-      return didVotePass ? 'Approved' : 'Failed';
+    // If passed on voting period ended
+    if (didVotePassSimpleMajority) {
+      return 'Approved';
+    }
+
+    // If failed on voting period ended
+    if (didVotePassSimpleMajority === false) {
+      return 'Failed';
     }
   }
 
@@ -163,29 +253,26 @@ export function OffchainVotingStatus({
     ProposalPeriodComponent: Parameters<
       Parameters<typeof VotingStatus>[0]['renderTimer']
     >[0]
-  ) {
+  ): React.ReactNode {
     // Vote countdown timer
-    if (
-      votingTimeStartEndInitReady &&
-      hasVotingTimeStarted &&
-      !hasVotingTimeEnded
-    ) {
+    if (votingStartEndInitReady && hasVotingStarted && !hasVotingEnded) {
       return (
         <ProposalPeriodComponent
-          startPeriodMs={votingStartSeconds * 1000}
-          endPeriodMs={votingEndSeconds * 1000}
+          endPeriodMs={countdownVotingEndMs}
+          renderCountdownText={renderCountdownText}
+          startPeriodMs={countdownVotingStartMs}
         />
       );
     }
 
     // Grace period countdown timer
-    if (countdownGracePeriodStartMs && gracePeriodEndMs) {
+    if (isGracePeriodActive) {
       return (
         <ProposalPeriodComponent
-          startPeriodMs={countdownGracePeriodStartMs}
-          endLabel={gracePeriodEndLabel}
-          endedLabel={gracePeriodEndedLabel}
-          endPeriodMs={countdownGracePeriodStartMs + gracePeriodEndMs}
+          endLabel={gracePeriodLabel}
+          endPeriodMs={countdownGracePeriodEndMs || 0}
+          renderCountdownText={renderCountdownText}
+          startPeriodMs={countdownGracePeriodStartMs || 0}
         />
       );
     }
@@ -197,10 +284,10 @@ export function OffchainVotingStatus({
 
   return (
     <VotingStatus
-      renderTimer={renderTimer}
-      renderStatus={renderStatus}
-      hasVotingEnded={hasVotingTimeEnded}
+      hasVotingEnded={hasVotingEnded}
       noUnits={noUnits}
+      renderStatus={renderOffchainVotingStatus}
+      renderTimer={renderTimer}
       totalUnits={totalUnits}
       yesUnits={yesUnits}
     />

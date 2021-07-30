@@ -179,8 +179,15 @@ export default function GovernanceProposalsList(
     proposals: ProposalData[]
   ): React.ReactNode | null {
     return proposals.map((proposal) => {
-      const proposalId = proposal.snapshotProposal?.idInSnapshot;
-      const proposalName = proposal.snapshotProposal?.msg.payload.name || '';
+      const {snapshotProposal} = proposal;
+      const proposalId = snapshotProposal?.idInSnapshot;
+      const proposalName = snapshotProposal?.msg.payload.name || '';
+
+      const votingStartMs: number =
+        Number(snapshotProposal?.msg.payload.start || 0) * 1000;
+
+      const votingEndMs: number =
+        Number(snapshotProposal?.msg.payload.end || 0) * 1000;
 
       if (!proposalId) return null;
 
@@ -209,8 +216,9 @@ export default function GovernanceProposalsList(
           proposalOnClickId={proposalId}
           renderStatus={() => (
             <OffchainVotingStatus
-              proposal={proposal}
               votingResult={offchainResult}
+              countdownVotingEndMs={votingEndMs}
+              countdownVotingStartMs={votingStartMs}
             />
           )}
         />

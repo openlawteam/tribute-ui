@@ -31,7 +31,9 @@ describe('VotingActionButtons unit tests', () => {
       <VotingActionButtons onClick={() => {}} voteChosen={VoteChoices.No} />
     );
 
-    expect(screen.getByText(/voted no/i)).toBeInTheDocument();
+    expect(screen.getByText(/^voted no/i)).toBeInTheDocument();
+    // SVG check
+    expect(screen.getByLabelText(/^you voted no/i)).toBeInTheDocument();
   });
 
   test('can show correct text when voted yes', () => {
@@ -40,6 +42,8 @@ describe('VotingActionButtons unit tests', () => {
     );
 
     expect(screen.getByText(/voted yes/i)).toBeInTheDocument();
+    // SVG check
+    expect(screen.getByLabelText(/^you voted yes/i)).toBeInTheDocument();
   });
 
   test('can show no text (only progress SVG) when voting no and is disabled', () => {

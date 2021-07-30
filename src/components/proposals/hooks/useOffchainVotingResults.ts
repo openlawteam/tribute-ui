@@ -6,9 +6,9 @@ import Web3 from 'web3';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
-import {UNITS_ADDRESS, TOTAL_ADDRESS} from '../../../config';
 import {SnapshotProposal, VotingResult} from '../types';
 import {StoreState} from '../../../store/types';
+import {UNITS_ADDRESS, TOTAL_ADDRESS} from '../../../config';
 import {useIsMounted} from '../../../hooks';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VoteChoices} from '../../web3/types';
@@ -26,7 +26,6 @@ type UseOffchainVotingResultsReturn = {
 
 /**
  * @todo Polling
- * @todo Attempt to use subgraph data first.
  */
 export function useOffchainVotingResults(
   /**
