@@ -214,7 +214,7 @@ export default function ProposalWithOffchainVoteActions(
       return (
         <span>
           Grace period ended <br />{' '}
-          <span style={{textTransform: 'none'}}>
+          <span style={{textTransform: 'lowercase'}}>
             Awaiting contract status
             <CycleEllipsis />
           </span>
