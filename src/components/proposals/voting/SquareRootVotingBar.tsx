@@ -17,8 +17,19 @@ type SquareRootVotingBarProps = {
   showPercentages: boolean;
 };
 
-function getUnitsPercent(units: number, totalUnits: number) {
-  return ((units / totalUnits) * 100).toFixed(0);
+/**
+ * Provides a formatted number string for display as a percentage.
+ * Two decimal places are used, unless the decimals are `.00`,
+ * then they are removed.
+ *
+ * E.g. 50%; 50.77%; 0%
+ *
+ * @param units
+ * @param totalUnits
+ * @returns `string`
+ */
+function getUnitsPercent(units: number, totalUnits: number): string {
+  return ((units / totalUnits) * 100).toFixed(2).replace(/\.00$/, '');
 }
 
 export function SquareRootVotingBar({
