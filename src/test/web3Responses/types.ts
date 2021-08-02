@@ -7,4 +7,4 @@ export type TestWeb3ResponseArgs = {
   web3Instance: Web3;
 };
 
-export type TestWeb3ResponseReturn<T> = [T, InjectResultOptions];
+export type TestWeb3ResponseReturn<T> = [T, InjectResultOptions?];

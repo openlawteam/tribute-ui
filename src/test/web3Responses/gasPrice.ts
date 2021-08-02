@@ -12,5 +12,5 @@ export const ethGasPrice = ({
   web3Instance,
 }: TestWeb3ResponseArgs): TestWeb3ResponseReturn<string> => [
   web3Instance.eth.abi.encodeParameter('uint256', result ?? 8049999872),
-  {rpcMethodName: 'eth_gasPrice'},
+  {debugName: '`ethGasPrice` helper'},
 ];

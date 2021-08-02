@@ -34,8 +34,7 @@ describe('CreateMembershipProposal unit tests', () => {
             web3Instance.eth.abi.encodeParameter(
               'uint256',
               '123000000000000000000'
-            ),
-            {abiMethodName: 'eth_getBalance'}
+            )
           );
         }}>
         <CreateMembershipProposal />
@@ -72,8 +71,7 @@ describe('CreateMembershipProposal unit tests', () => {
             web3Instance.eth.abi.encodeParameter(
               'uint256',
               '123000000000000000000'
-            ),
-            {abiMethodName: 'eth_getBalance'}
+            )
           );
 
           // Mock `multicall` in useCheckApplicant hook

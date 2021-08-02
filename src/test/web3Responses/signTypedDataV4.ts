@@ -16,5 +16,5 @@ export const signTypedDataV4 = ({
       'bytes32',
       web3Instance.utils.toHex('great signature')
     ),
-  {rpcMethodName: 'eth_signTypedData_v4'},
+  {debugName: '`signTypedDataV4` helper'},
 ];

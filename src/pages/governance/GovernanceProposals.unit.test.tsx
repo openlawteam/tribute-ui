@@ -104,8 +104,7 @@ describe('GovernanceProposals unit tests', () => {
               web3Instance.eth.abi.encodeParameter('uint256', '200000'),
             ],
           ]
-        ),
-        {abi: MulticallABI, abiMethodName: 'aggregate'}
+        )
       );
     });
 

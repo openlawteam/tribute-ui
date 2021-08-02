@@ -141,8 +141,7 @@ describe('useOffchainVotingResults unit tests', () => {
               web3Instance.eth.abi.encodeParameter('uint256', '100000'),
             ],
           ]
-        ),
-        {abi: MulticallABI, abiMethodName: 'aggregate'}
+        )
       );
 
       // Inject mocked units result 2
@@ -157,8 +156,7 @@ describe('useOffchainVotingResults unit tests', () => {
               web3Instance.eth.abi.encodeParameter('uint256', '200000'),
             ],
           ]
-        ),
-        {abi: MulticallABI, abiMethodName: 'aggregate'}
+        )
       );
 
       await waitForValueToChange(

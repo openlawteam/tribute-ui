@@ -25,5 +25,5 @@ export const getTransactionReceipt = ({
     logsBloom: DEFAULT_ETH_ADDRESS, // 256 byte bloom filter
     status: '0x1',
   },
-  {rpcMethodName: 'eth_getTransactionReceipt'},
+  {debugName: '`getTransactionReceipt` helper'},
 ];

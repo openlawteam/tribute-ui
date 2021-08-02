@@ -11,5 +11,5 @@ export const sendTransaction = ({
   result,
 }: TestWeb3ResponseArgs): TestWeb3ResponseReturn<string> => [
   result ?? '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331',
-  {rpcMethodName: 'eth_sendTransaction'},
+  {debugName: '`sendTransaction` helper'},
 ];
