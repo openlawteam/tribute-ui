@@ -17,7 +17,7 @@ export const memberAddressesByDelegatedKey = ({
   return [
     result ??
       web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
-    {abiMethodName: 'memberAddressesByDelegatedKey', abi: DAORegistryABI},
+    {debugName: '`memberAddressesByDelegatedKey` helper'},
   ];
 };
 
@@ -36,6 +36,6 @@ export const balanceOfMember = ({
 }: TestWeb3ResponseArgs): TestWeb3ResponseReturn<string> => {
   return [
     result ?? web3Instance.eth.abi.encodeParameter('uint160', 100),
-    {abiMethodName: 'balanceOf', abi: BankExtensionABI},
+    {debugName: '`balanceOfMember` helper'},
   ];
 };

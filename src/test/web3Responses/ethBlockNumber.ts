@@ -12,5 +12,5 @@ export const ethBlockNumber = ({
   web3Instance,
 }: TestWeb3ResponseArgs): TestWeb3ResponseReturn<string> => [
   web3Instance.eth.abi.encodeParameter('uint256', result ?? 100),
-  {rpcMethodName: 'eth_blockNumber'},
+  {debugName: '`ethBlockNumber` helper'},
 ];
