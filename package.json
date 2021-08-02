@@ -47,7 +47,7 @@
     "@testing-library/user-event": "^13.1.9",
     "@types/aos": "^3.0.4",
     "@types/jest": "^26.0.24",
-    "@types/node": "^15.14.0",
+    "@types/node": "^16.4.10",
     "@types/react": "^17.0.13",
     "@types/react-dom": "^17.0.6",
     "@types/react-helmet": "^6.1.1",
