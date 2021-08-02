@@ -3,6 +3,7 @@ import {
   SnapshotProposalResponse,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
+import {useQuery} from 'react-query';
 
 import {AsyncStatus} from '../../../util/types';
 import {BURN_ADDRESS} from '../../../util/constants';
@@ -48,13 +49,25 @@ export function useGovernanceProposals({
 
   const {isMountedRef} = useIsMounted();
 
+  const {
+    data: snapshotProposalEntriesData,
+    error: snapshotProposalEntriesError,
+  } = useQuery(
+    ['snapshotProposalEntries', actionId],
+    async () => await getSnapshotProposalsByActionId(actionId),
+    {
+      enabled: !!actionId,
+    }
+  );
+
   /**
    * Cached callbacks
    */
 
   const handleGetProposalsCached = useCallback(handleGetProposals, [
-    actionId,
     isMountedRef,
+    snapshotProposalEntriesData,
+    snapshotProposalEntriesError,
   ]);
 
   /**
@@ -119,14 +132,16 @@ export function useGovernanceProposals({
     try {
       setGovernanceProposalsStatus(AsyncStatus.PENDING);
 
-      const snapshotProposalEntries = await getSnapshotProposalsByActionId(
-        actionId
-      );
+      if (snapshotProposalEntriesError) {
+        throw snapshotProposalEntriesError;
+      }
 
-      if (!isMountedRef.current) return;
+      if (snapshotProposalEntriesData) {
+        if (!isMountedRef.current) return;
 
-      setGovernanceProposalsStatus(AsyncStatus.FULFILLED);
-      setGovernanceProposals(snapshotProposalEntries);
+        setGovernanceProposalsStatus(AsyncStatus.FULFILLED);
+        setGovernanceProposals(snapshotProposalEntriesData);
+      }
     } catch (error) {
       if (!isMountedRef.current) return;
 
