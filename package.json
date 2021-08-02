@@ -53,7 +53,7 @@
     "@types/react-helmet": "^6.1.1",
     "@types/react-modal": "^3.12.0",
     "@types/react-redux": "^7.1.16",
-    "@types/react-router": "^5.1.14",
+    "@types/react-router": "^5.1.16",
     "@types/react-router-dom": "^5.1.7",
     "@types/react-transition-group": "^4.4.1",
     "abi-decoder": "^2.4.0",
