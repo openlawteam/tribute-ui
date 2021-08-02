@@ -241,19 +241,18 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
       ).toBeInTheDocument();
     });
 
-    await waitFor(() => {
-      // The component start `useFirstItemStart = true` for `<CycleMessage />`
-      expect(screen.getByText(TX_CYCLE_MESSAGES[0])).toBeInTheDocument();
-      expect(screen.getByText(/view progress/i)).toBeInTheDocument();
-    });
-
     // Mock RPC calls for `submitVoteResult`
     await waitFor(() => {
-      // Mock RPC calls for estimating gas before the tx
       mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
       mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
+    });
+
+    await waitFor(() => {
+      // The component start `useFirstItemStart = true` for `<CycleMessage />`
+      expect(screen.getByText(TX_CYCLE_MESSAGES[0])).toBeInTheDocument();
+      expect(screen.getByText(/view progress/i)).toBeInTheDocument();
     });
 
     await waitFor(() => {
@@ -331,19 +330,18 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
       ).toBeInTheDocument();
     });
 
-    await waitFor(() => {
-      // The component start `useFirstItemStart = true` for `<CycleMessage />`
-      expect(screen.getByText(TX_CYCLE_MESSAGES[0])).toBeInTheDocument();
-      expect(screen.getByText(/view progress/i)).toBeInTheDocument();
-    });
-
     // Mock RPC calls for `submitVoteResult`
     await waitFor(() => {
-      // Mock RPC calls for estimating gas before the tx
       mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
       mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
+    });
+
+    await waitFor(() => {
+      // The component start `useFirstItemStart = true` for `<CycleMessage />`
+      expect(screen.getByText(TX_CYCLE_MESSAGES[0])).toBeInTheDocument();
+      expect(screen.getByText(/view progress/i)).toBeInTheDocument();
     });
 
     await waitFor(() => {
