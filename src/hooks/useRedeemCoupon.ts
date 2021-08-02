@@ -2,17 +2,18 @@ import {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {toChecksumAddress} from 'web3-utils';
 
-import {Web3TxStatus} from '../components/web3/types';
-import {COUPON_API_URL} from '../config';
 import {
   useContractSend,
   useETHGasPrice,
   useIsDefaultChain,
   useWeb3Modal,
 } from '../components/web3/hooks';
+import {COUPON_API_URL} from '../config';
 import {ERC20RegisterDetails} from '../components/dao-token/DaoToken';
 import {getConnectedMember} from '../store/actions';
 import {ReduxDispatch, StoreState} from '../store/types';
+import {Web3TxStatus} from '../components/web3/types';
+import {normalizeString} from '../util/helpers';
 
 export enum FetchStatus {
   STANDBY = 'STANDBY',
@@ -142,16 +143,16 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
       };
 
       // Execute contract call for `redeemCoupon`
-      const tx = await txSend(
+      const txReceipt = await txSend(
         'redeemCoupon',
         couponOnboardingContract.instance.methods,
         redeemCouponArguments,
         txArguments
       );
 
-      if (tx) {
+      if (txReceipt) {
         // update the db and send email
-        await fetch(`${COUPON_API_URL}/api/coupon/redeem`, {
+        const response = await fetch(`${COUPON_API_URL}/api/coupon/redeem`, {
           method: 'PATCH',
           body: JSON.stringify({
             // search by signature
@@ -162,11 +163,16 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
           },
         });
 
+        if (!response.ok) {
+          throw new Error('Something went wrong while updating the coupon.');
+        }
+
         setSubmitStatus(FetchStatus.FULFILLED);
 
         // if connected account is the coupon recipient
         if (
-          redeemableCoupon.recipient.toLowerCase() === account.toLowerCase()
+          normalizeString(redeemableCoupon.recipient) ===
+          normalizeString(account)
         ) {
           // re-fetch member
           await dispatch(
