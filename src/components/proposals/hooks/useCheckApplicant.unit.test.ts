@@ -1,15 +1,17 @@
 import {act, renderHook} from '@testing-library/react-hooks';
 import {waitFor} from '@testing-library/react';
+import Web3 from 'web3';
 
 import {
   DEFAULT_ETH_ADDRESS,
   DEFAULT_DELEGATED_ADDRESS,
+  FakeHttpProvider,
 } from '../../../test/helpers';
-import Wrapper from '../../../test/Wrapper';
-import {useCheckApplicant} from './useCheckApplicant';
 import {AsyncStatus} from '../../../util/types';
-import {GUILD_ADDRESS} from '../../../config';
 import {BURN_ADDRESS} from '../../../util/constants';
+import {GUILD_ADDRESS} from '../../../config';
+import {useCheckApplicant} from './useCheckApplicant';
+import Wrapper from '../../../test/Wrapper';
 
 describe('useCheckApplicant unit tests', () => {
   test('should return correct data when applicant address is undefined', async () => {
@@ -36,8 +38,8 @@ describe('useCheckApplicant unit tests', () => {
 
   test('should return correct data when applicant address is valid', async () => {
     await act(async () => {
-      let mockWeb3Provider: any;
-      let web3Instance: any;
+      let mockWeb3Provider: FakeHttpProvider;
+      let web3Instance: Web3;
 
       const address = DEFAULT_ETH_ADDRESS;
 
@@ -87,8 +89,8 @@ describe('useCheckApplicant unit tests', () => {
 
   test('should return correct data when applicant address is reserved', async () => {
     await act(async () => {
-      let mockWeb3Provider: any;
-      let web3Instance: any;
+      let mockWeb3Provider: FakeHttpProvider;
+      let web3Instance: Web3;
 
       const address = GUILD_ADDRESS;
 
@@ -137,8 +139,8 @@ describe('useCheckApplicant unit tests', () => {
 
   test('should return correct data when applicant address is address(0x0)', async () => {
     await act(async () => {
-      let mockWeb3Provider: any;
-      let web3Instance: any;
+      let mockWeb3Provider: FakeHttpProvider;
+      let web3Instance: Web3;
 
       const address = BURN_ADDRESS;
 
@@ -187,8 +189,8 @@ describe('useCheckApplicant unit tests', () => {
 
   test('should return correct data when applicant address is already used as delegate key', async () => {
     await act(async () => {
-      let mockWeb3Provider: any;
-      let web3Instance: any;
+      let mockWeb3Provider: FakeHttpProvider;
+      let web3Instance: Web3;
 
       const address = DEFAULT_ETH_ADDRESS;
 
