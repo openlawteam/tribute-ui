@@ -178,13 +178,6 @@ export default function Wrapper(
     };
   }, [getVotingAdapterNameMock]);
 
-  useEffect(() => {}, [
-    mockWeb3Provider,
-    useInit,
-    web3Instance.eth.abi,
-    web3Instance.utils,
-  ]);
-
   useEffect(() => {
     /**
      * Setup for `getConnectedMember` in `<Init />`
@@ -213,7 +206,8 @@ export default function Wrapper(
               ),
             ],
           ]
-        )
+        ),
+        {debugName: '<Wrapper /> multicall for `getConnectedMember`'}
       );
     }
   }, [mockWeb3Provider, useInit, useWallet, web3Instance]);
