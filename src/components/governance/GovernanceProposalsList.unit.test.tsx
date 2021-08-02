@@ -148,8 +148,7 @@ describe('GovernanceProposalsList unit tests', () => {
             web3Instance.eth.abi.encodeParameter('uint256', '100000'),
           ],
         ]
-      ),
-      {abi: MulticallABI, abiMethodName: 'aggregate'}
+      )
     );
 
     // 2. Inject failed result
@@ -164,8 +163,7 @@ describe('GovernanceProposalsList unit tests', () => {
             web3Instance.eth.abi.encodeParameter('uint256', '300000'),
           ],
         ]
-      ),
-      {abi: MulticallABI, abiMethodName: 'aggregate'}
+      )
     );
 
     // 3. Inject voting result
@@ -180,8 +178,7 @@ describe('GovernanceProposalsList unit tests', () => {
             web3Instance.eth.abi.encodeParameter('uint256', '100000'),
           ],
         ]
-      ),
-      {abi: MulticallABI, abiMethodName: 'aggregate'}
+      )
     );
   };
 
