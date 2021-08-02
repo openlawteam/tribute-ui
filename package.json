@@ -56,7 +56,6 @@
     "@types/react-router": "^5.1.16",
     "@types/react-router-dom": "^5.1.7",
     "@types/react-transition-group": "^4.4.1",
-    "abi-decoder": "^2.4.0",
     "dotenv": "^10.0.0",
     "http-proxy-middleware": "^2.0.0",
     "msw": "^0.30.1",
