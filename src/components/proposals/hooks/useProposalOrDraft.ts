@@ -4,7 +4,6 @@ import {
   SnapshotProposalResponse,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
-import {useQuery} from 'react-query';
 
 import {
   Proposal,
@@ -29,65 +28,6 @@ type UseProposalReturn = {
 const ERROR_PROPOSAL: string =
   'Something went wrong while getting the proposal.';
 const ERROR_PROPOSAL_NOT_FOUND: string = 'Proposal was not found.';
-
-// Gets Draft (unsponsored Proposal) from Snapshot Hub
-async function getSnapshotDraftById(
-  id: string,
-  abortController?: AbortController
-) {
-  try {
-    const draft = await fetch(
-      `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/draft/${id}`,
-      {signal: abortController?.signal}
-    );
-
-    if (!draft.ok) {
-      throw new Error(ERROR_PROPOSAL);
-    }
-
-    const draftJSON: SnapshotDraftResponse = await draft.json();
-
-    return draftJSON;
-  } catch (error) {
-    throw error;
-  }
-}
-
-// Gets Proposal from Snapshot Hub
-async function getSnapshotProposalById(
-  id: string,
-  abortController?: AbortController,
-  type?: ProposalOrDraftSnapshotType
-) {
-  try {
-    /**
-     * @note `searchUniqueDraftId` includes the draft id in the search for the proposal
-     *   as a Tribute proposal's ID hash could be the Snapshot Draft's ID.
-     */
-    const proposal = await fetch(
-      `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/proposal/${id}?searchUniqueDraftId=true&includeVotes=true`,
-      {signal: abortController?.signal}
-    );
-
-    if (!proposal.ok) {
-      /**
-       * If `type` is set then we know we can determine `handleGetDraft`
-       * will not be called after in `handleGetProposalOrDraft`.
-       */
-      if (type === SnapshotType.proposal) {
-        throw new Error(ERROR_PROPOSAL);
-      }
-
-      return;
-    }
-
-    const proposalJSON: SnapshotProposalResponse = await proposal.json();
-
-    return proposalJSON;
-  } catch (error) {
-    throw error;
-  }
-}
 
 /**
  * useProposalOrDraft
@@ -144,33 +84,6 @@ export function useProposalOrDraft(
   const [refetchCount, updateRefetchCount] = useCounter();
 
   /**
-   * Their hooks
-   */
-
-  const {data: snapshotProposalEntryData, error: snapshotProposalEntryError} =
-    useQuery(
-      ['snapshotProposalEntry', id],
-      async () => await getSnapshotProposalById(id, abortController, type),
-      {
-        enabled: !!id && !!abortController?.signal,
-      }
-    );
-
-  const {data: snapshotDraftEntryData, error: snapshotDraftEntryError} =
-    useQuery(
-      ['snapshotDraftEntry', id],
-      async () => await getSnapshotDraftById(id, abortController),
-      {
-        enabled:
-          !!id &&
-          !!abortController?.signal &&
-          (type === SnapshotType.draft ||
-            (!!snapshotProposalEntryData &&
-              !Object.keys(snapshotProposalEntryData).length)),
-      }
-    );
-
-  /**
    * Fetch on-chain voting adapter data for proposals.
    * Only returns data for proposals of which voting adapters have been assigned (i.e. sponsored).
    */
@@ -185,15 +98,15 @@ export function useProposalOrDraft(
    */
 
   const handleGetDraftCached = useCallback(handleGetDraft, [
+    abortController?.signal,
+    id,
     isMountedRef,
-    snapshotDraftEntryData,
-    snapshotDraftEntryError,
   ]);
 
   const handleGetProposalCached = useCallback(handleGetProposal, [
+    abortController?.signal,
+    id,
     isMountedRef,
-    snapshotProposalEntryData,
-    snapshotProposalEntryError,
     type,
   ]);
 
@@ -344,33 +257,38 @@ export function useProposalOrDraft(
     try {
       setProposalStatus(AsyncStatus.PENDING);
 
-      if (snapshotDraftEntryError) {
-        throw snapshotDraftEntryError;
+      const response = await fetch(
+        `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/draft/${id}`,
+        {signal: abortController?.signal}
+      );
+
+      if (!response.ok) {
+        throw new Error(ERROR_PROPOSAL);
       }
 
-      if (snapshotDraftEntryData) {
-        if (!isMountedRef.current) return;
+      const responseJSON: SnapshotDraftResponse = await response.json();
 
-        // @note API does not provide a 404
-        if (!Object.keys(snapshotDraftEntryData).length) {
-          setProposalNotFound(true);
+      if (!isMountedRef.current) return;
 
-          throw new Error(ERROR_PROPOSAL_NOT_FOUND);
-        }
+      // @note API does not provide a 404
+      if (!responseJSON || !Object.keys(responseJSON).length) {
+        setProposalNotFound(true);
 
-        const idKey = Object.keys(snapshotDraftEntryData)[0];
-        // Get the `SnapshotDraftResponseData` by the address key of the single result.
-        const draft: SnapshotDraft = {
-          idInDAO: idKey,
-          idInSnapshot: idKey,
-          ...snapshotDraftEntryData[idKey],
-        };
-
-        setProposalStatus(AsyncStatus.FULFILLED);
-        setSnapshotDraft(draft);
-
-        return draft;
+        throw new Error(ERROR_PROPOSAL_NOT_FOUND);
       }
+
+      const idKey = Object.keys(responseJSON)[0];
+      // Get the `SnapshotDraftResponseData` by the address key of the single result.
+      const draft: SnapshotDraft = {
+        idInDAO: idKey,
+        idInSnapshot: idKey,
+        ...responseJSON[idKey],
+      };
+
+      setProposalStatus(AsyncStatus.FULFILLED);
+      setSnapshotDraft(draft);
+
+      return draft;
     } catch (error) {
       if (!isMountedRef.current) return;
 
@@ -383,43 +301,60 @@ export function useProposalOrDraft(
     try {
       setProposalStatus(AsyncStatus.PENDING);
 
-      if (snapshotProposalEntryError) {
-        throw snapshotProposalEntryError;
-      }
+      /**
+       * @note `searchUniqueDraftId` includes the draft id in the search for the proposal
+       *   as a Tribute proposal's ID hash could be the Snapshot Draft's ID.
+       */
+      const response = await fetch(
+        `${SNAPSHOT_HUB_API_URL}/api/${SPACE}/proposal/${id}?searchUniqueDraftId=true&includeVotes=true`,
+        {signal: abortController?.signal}
+      );
 
-      if (snapshotProposalEntryData) {
-        if (!isMountedRef.current) return;
-
-        // @note API does not provide a 404
-        if (!Object.keys(snapshotProposalEntryData).length) {
-          /**
-           * If `type` is set then we know we can determine `handleGetDraft`
-           * will not be called after in `handleGetProposalOrDraft`.
-           */
-          if (type === SnapshotType.proposal) {
-            setProposalNotFound(true);
-            throw new Error(ERROR_PROPOSAL_NOT_FOUND);
-          }
-
-          return;
+      if (!response.ok) {
+        /**
+         * If `type` is set then we know we can determine `handleGetDraft`
+         * will not be called after in `handleGetProposalOrDraft`.
+         */
+        if (type === SnapshotType.proposal) {
+          throw new Error(ERROR_PROPOSAL);
         }
 
-        const idKey = Object.keys(snapshotProposalEntryData)[0];
-        // Determine ID submitted to DAO, i.e. if there's a Draft ID hash, we should use that.
-        const proposalId: string =
-          snapshotProposalEntryData[idKey]?.data.erc712DraftHash || idKey;
-        // Get the `SnapshotProposalResponseData` by the address key of the single result.
-        const proposal: SnapshotProposal = {
-          idInDAO: proposalId,
-          idInSnapshot: idKey,
-          ...snapshotProposalEntryData[idKey],
-        };
-
-        setProposalStatus(AsyncStatus.FULFILLED);
-        setSnapshotProposal(proposal);
-
-        return proposal;
+        return;
       }
+
+      const responseJSON: SnapshotProposalResponse = await response.json();
+
+      if (!isMountedRef.current) return;
+
+      // @note API does not provide a 404
+      if (!responseJSON || !Object.keys(responseJSON).length) {
+        /**
+         * If `type` is set then we know we can determine `handleGetDraft`
+         * will not be called after in `handleGetProposalOrDraft`.
+         */
+        if (type === SnapshotType.proposal) {
+          setProposalNotFound(true);
+          throw new Error(ERROR_PROPOSAL_NOT_FOUND);
+        }
+
+        return;
+      }
+
+      const idKey = Object.keys(responseJSON)[0];
+      // Determine ID submitted to DAO, i.e. if there's a Draft ID hash, we should use that.
+      const proposalId: string =
+        responseJSON[idKey]?.data.erc712DraftHash || idKey;
+      // Get the `SnapshotProposalResponseData` by the address key of the single result.
+      const proposal: SnapshotProposal = {
+        idInDAO: proposalId,
+        idInSnapshot: idKey,
+        ...responseJSON[idKey],
+      };
+
+      setProposalStatus(AsyncStatus.FULFILLED);
+      setSnapshotProposal(proposal);
+
+      return proposal;
     } catch (error) {
       if (!isMountedRef.current) return;
 
