@@ -1,4 +1,3 @@
-import {formatBytes32String} from 'ethers/lib/utils';
 import {render, screen, waitFor} from '@testing-library/react';
 import {Store} from 'redux';
 import {useDispatch, useSelector} from 'react-redux';
@@ -10,12 +9,12 @@ import {
   setConnectedMember,
 } from '../../store/actions';
 import {CHAINS} from '../../config';
+import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
 import {StoreState} from '../../store/types';
+import {useEffect} from 'react';
+import {useHistory, useLocation} from 'react-router';
 import ConnectWalletModal from './ConnectWalletModal';
 import Wrapper from '../../test/Wrapper';
-import {useHistory, useLocation} from 'react-router';
-import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
-import {useEffect} from 'react';
 
 describe('ConnectWalletModal unit tests', () => {
   test('should open modal', async () => {
@@ -608,13 +607,12 @@ describe('ConnectWalletModal unit tests', () => {
   });
 
   test('can remove `"injected"` provider option when device is mobile', async () => {
-    // Mock default chain so we can click `"walletconnect"`
-    const reactDeviceDetect = await import('react-device-detect');
+    // Mock @walletconnect's `isMobile: () => boolean`
+    const walletConnectUtils = await import('@walletconnect/browser-utils');
 
-    const reactDeviceDetectIsMobile = reactDeviceDetect.isMobile;
-
-    // Set as mobile
-    reactDeviceDetect.isMobile = true;
+    const isMobileMock = jest
+      .spyOn(walletConnectUtils, 'isMobile')
+      .mockImplementation(() => true);
 
     let store: Store;
 
@@ -660,6 +658,6 @@ describe('ConnectWalletModal unit tests', () => {
     });
 
     // Reset to original value
-    reactDeviceDetect.isMobile = reactDeviceDetectIsMobile;
+    isMobileMock.mockRestore();
   });
 });

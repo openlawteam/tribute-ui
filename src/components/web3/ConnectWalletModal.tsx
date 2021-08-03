@@ -1,4 +1,4 @@
-import {isMobile} from 'react-device-detect';
+import {isMobile} from '@walletconnect/browser-utils';
 import {Link, useLocation} from 'react-router-dom';
 import {useEffect} from 'react';
 import {usePrevious} from 'react-use';
@@ -80,7 +80,7 @@ export default function ConnectWalletModal(
 
   const displayOptions: JSX.Element[] = Object.entries(providerOptions)
     // If mobile, filter-out `"injected"`
-    .filter(([type]) => (isMobile ? type !== 'injected' : true))
+    .filter(([type]) => (isMobile() ? type !== 'injected' : true))
     .map((provider: Record<number, any>) => {
       const isButtonDisabled: boolean =
         isChainGanache && provider[0] === 'walletconnect';

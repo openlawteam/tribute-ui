@@ -1,4 +1,6 @@
 import {config as dotenvConfig} from 'dotenv';
+import {IProviderOptions} from 'web3modal';
+import {isMobile} from '@walletconnect/browser-utils';
 import {resolve} from 'path';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 
@@ -121,7 +123,7 @@ export const ETHEREUM_PROVIDER_URL: string = INFURA_WS_URLS[DEFAULT_CHAIN]
  * The built-in web browser provider (only one can exist at a time),
  * MetaMask, Brave or Opera is added automatically by Web3modal
  */
-export const WALLETCONNECT_PROVIDER_OPTIONS = {
+export const WALLETCONNECT_PROVIDER_OPTIONS: IProviderOptions = {
   // Injected providers
   injected: {
     display: {
@@ -140,7 +142,9 @@ export const WALLETCONNECT_PROVIDER_OPTIONS = {
     options: {
       infuraId: INFURA_PROJECT_ID, // required
       qrcodeModalOptions: {
-        mobileLinks: ['rainbow', 'metamask', 'argent', 'trust'],
+        mobileLinks: isMobile()
+          ? ['rainbow', 'metamask', 'argent', 'trust']
+          : [],
       },
     },
   },

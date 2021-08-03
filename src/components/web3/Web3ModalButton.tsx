@@ -1,4 +1,4 @@
-import {isMobile} from 'react-device-detect';
+import {isMobile} from '@walletconnect/browser-utils';
 import {useDispatch} from 'react-redux';
 
 import {connectModalOpen} from '../../store/actions';
@@ -10,7 +10,7 @@ import {WalletIcon} from './';
 type CustomWalletTextProps = {
   account: ReturnType<typeof useWeb3Modal>['account'];
   connected: ReturnType<typeof useWeb3Modal>['connected'];
-  isMobile: typeof isMobile;
+  isMobile: ReturnType<typeof isMobile>;
 };
 
 type ConnectWalletButtonProps = {
@@ -50,7 +50,7 @@ export default function ConnectWalletButton({
   function getWalletText(): string {
     if (customWalletText) {
       return typeof customWalletText === 'function'
-        ? customWalletText({account, connected, isMobile})
+        ? customWalletText({account, connected, isMobile: isMobile()})
         : customWalletText;
     }
 
