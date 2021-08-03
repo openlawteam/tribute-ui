@@ -1,6 +1,6 @@
 import {createContext, useEffect, useRef, useState} from 'react';
 import Web3 from 'web3';
-import Web3Modal from 'web3modal';
+import Web3Modal, {IProviderOptions} from 'web3modal';
 
 import useWeb3ModalManager, {
   DefaultTheme,
@@ -24,7 +24,7 @@ type Web3ModalProviderArguments = {
   onBeforeConnect?: Parameters<
     typeof useWeb3ModalManager
   >[0]['onBeforeConnect'];
-  providerOptions: Record<string, any>; // required
+  providerOptions: IProviderOptions; // required
 };
 
 type Web3ModalManagerProps = {
@@ -40,7 +40,7 @@ export type Web3ModalContextValue = {
   initialCachedConnectorCheckStatus: AsyncStatus | undefined;
   networkId: number | undefined;
   provider: any;
-  providerOptions: Record<string, any>;
+  providerOptions: IProviderOptions;
   web3Instance: Web3 | undefined;
   web3Modal: Web3Modal | undefined;
 };
