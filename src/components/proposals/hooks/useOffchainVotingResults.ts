@@ -106,7 +106,7 @@ export function useOffchainVotingResults(
               ];
             });
 
-            if (!voterEntries) return;
+            if (!voterEntries || !voterEntries.length) return;
 
             // Dedupe any duplicate addresses to be safe.
             const voterAddressesAndChoices = Object.entries(

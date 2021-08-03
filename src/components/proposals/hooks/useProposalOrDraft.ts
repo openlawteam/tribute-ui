@@ -144,33 +144,6 @@ export function useProposalOrDraft(
   const [refetchCount, updateRefetchCount] = useCounter();
 
   /**
-   * Their hooks
-   */
-
-  const {data: snapshotProposalEntryData, error: snapshotProposalEntryError} =
-    useQuery(
-      ['snapshotProposalEntry', id],
-      async () => await getSnapshotProposalById(id, abortController, type),
-      {
-        enabled: !!id && !!abortController?.signal,
-      }
-    );
-
-  const {data: snapshotDraftEntryData, error: snapshotDraftEntryError} =
-    useQuery(
-      ['snapshotDraftEntry', id],
-      async () => await getSnapshotDraftById(id, abortController),
-      {
-        enabled:
-          !!id &&
-          !!abortController?.signal &&
-          (type === SnapshotType.draft ||
-            (!!snapshotProposalEntryData &&
-              !Object.keys(snapshotProposalEntryData).length)),
-      }
-    );
-
-  /**
    * Fetch on-chain voting adapter data for proposals.
    * Only returns data for proposals of which voting adapters have been assigned (i.e. sponsored).
    */
@@ -179,6 +152,39 @@ export function useProposalOrDraft(
     proposalsVotingAdaptersError,
     proposalsVotingAdaptersStatus,
   } = useProposalsVotingAdapter(proposalVotingAdapterId);
+
+  /**
+   * Their hooks
+   */
+
+  const {
+    data: snapshotProposalEntryData,
+    error: snapshotProposalEntryError,
+    refetch: snapshotProposalEntryRefetch,
+  } = useQuery(
+    ['snapshotProposalEntry', id],
+    async () => await getSnapshotProposalById(id, abortController, type),
+    {
+      enabled: !!id && !!abortController?.signal,
+    }
+  );
+
+  const {
+    data: snapshotDraftEntryData,
+    error: snapshotDraftEntryError,
+    // refetch: snapshotDraftEntryRefetch,
+  } = useQuery(
+    ['snapshotDraftEntry', id],
+    async () => await getSnapshotDraftById(id, abortController),
+    {
+      enabled:
+        !!id &&
+        !!abortController?.signal &&
+        (type === SnapshotType.draft ||
+          (!!snapshotProposalEntryData &&
+            !Object.keys(snapshotProposalEntryData).length)),
+    }
+  );
 
   /**
    * Cached callbacks
@@ -257,6 +263,12 @@ export function useProposalOrDraft(
     refetchCount,
     type,
   ]);
+
+  useEffect(() => {
+    if (refetchCount === 0) return;
+
+    snapshotProposalEntryRefetch();
+  }, [refetchCount, snapshotProposalEntryRefetch]);
 
   useEffect(() => {
     if (refetchCount === 0) return;
