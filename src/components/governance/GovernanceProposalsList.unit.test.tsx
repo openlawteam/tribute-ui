@@ -12,13 +12,12 @@ import {rest, server} from '../../test/server';
 import {SNAPSHOT_HUB_API_URL} from '../../config';
 import {snapshotAPIProposalResponse} from '../../test/restResponses';
 import GovernanceProposalsList from './GovernanceProposalsList';
-import MulticallABI from '../../truffle-contracts/Multicall.json';
 import Wrapper from '../../test/Wrapper';
 
 describe('GovernanceProposalsList unit tests', () => {
   const defaultProposalVotes: SnapshotProposalResponseData['votes'] = [
     {
-      DEFAULT_ETH_ADDRESS: {
+      [DEFAULT_ETH_ADDRESS]: {
         address: DEFAULT_ETH_ADDRESS,
         msg: {
           version: '0.2.0',
