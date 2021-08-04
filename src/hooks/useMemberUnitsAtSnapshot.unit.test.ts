@@ -10,7 +10,7 @@ describe('useMemberUnitsAtSnapshot unit tests', () => {
   const {STANDBY, PENDING, FULFILLED, REJECTED} = AsyncStatus;
 
   test('should return correct data when member has units at snapshot', async () => {
-    let mockWebProvider: FakeHttpProvider;
+    let mockWeb3Provider: FakeHttpProvider;
     let web3Instance: Web3;
 
     await act(async () => {
@@ -23,7 +23,7 @@ describe('useMemberUnitsAtSnapshot unit tests', () => {
               useInit: true,
               useWallet: true,
               getProps: (p) => {
-                mockWebProvider = p.mockWeb3Provider;
+                mockWeb3Provider = p.mockWeb3Provider;
                 web3Instance = p.web3Instance;
               },
             },
@@ -39,7 +39,7 @@ describe('useMemberUnitsAtSnapshot unit tests', () => {
       await waitForNextUpdate();
 
       // Mock `getPriorAmount` response
-      mockWebProvider.injectResult(
+      mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameter('uint256', 123456)
       );
 
@@ -66,7 +66,7 @@ describe('useMemberUnitsAtSnapshot unit tests', () => {
   });
 
   test('should return correct data when member has no units at snapshot', async () => {
-    let mockWebProvider: FakeHttpProvider;
+    let mockWeb3Provider: FakeHttpProvider;
     let web3Instance: Web3;
 
     await act(async () => {
@@ -79,7 +79,7 @@ describe('useMemberUnitsAtSnapshot unit tests', () => {
               useInit: true,
               useWallet: true,
               getProps: (p) => {
-                mockWebProvider = p.mockWeb3Provider;
+                mockWeb3Provider = p.mockWeb3Provider;
                 web3Instance = p.web3Instance;
               },
             },
@@ -95,7 +95,7 @@ describe('useMemberUnitsAtSnapshot unit tests', () => {
       await waitForNextUpdate();
 
       // Mock `getPriorAmount` response
-      mockWebProvider.injectResult(
+      mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameter('uint256', 0)
       );
 
@@ -121,8 +121,37 @@ describe('useMemberUnitsAtSnapshot unit tests', () => {
     });
   });
 
+  test('should return correct data when arguments `undefined`', async () => {
+    await act(async () => {
+      const {result, waitForNextUpdate} = await renderHook(
+        () => useMemberUnitsAtSnapshot(undefined, undefined),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+          },
+        }
+      );
+
+      // Assert initial state
+      expect(result.current.hasMembershipAtSnapshot).toBe(false);
+      expect(result.current.memberUnitsAtSnapshot).toBe(undefined);
+      expect(result.current.memberUnitsAtSnapshotError).toBe(undefined);
+      expect(result.current.memberUnitsAtSnapshotStatus).toBe(STANDBY);
+
+      await waitForNextUpdate();
+
+      // Assert pending state
+      expect(result.current.hasMembershipAtSnapshot).toBe(false);
+      expect(result.current.memberUnitsAtSnapshot).toBe(undefined);
+      expect(result.current.memberUnitsAtSnapshotError).toBe(undefined);
+      expect(result.current.memberUnitsAtSnapshotStatus).toBe(STANDBY);
+    });
+  });
+
   test('should return correct data when web3 error', async () => {
-    let mockWebProvider: FakeHttpProvider;
+    let mockWeb3Provider: FakeHttpProvider;
 
     await act(async () => {
       const {result, waitForValueToChange, waitForNextUpdate} =
@@ -134,7 +163,7 @@ describe('useMemberUnitsAtSnapshot unit tests', () => {
               useInit: true,
               useWallet: true,
               getProps: (p) => {
-                mockWebProvider = p.mockWeb3Provider;
+                mockWeb3Provider = p.mockWeb3Provider;
               },
             },
           }
@@ -149,7 +178,7 @@ describe('useMemberUnitsAtSnapshot unit tests', () => {
       await waitForNextUpdate();
 
       // Mock web3 error response
-      mockWebProvider.injectError({code: 1234, message: 'Some bad error'});
+      mockWeb3Provider.injectError({code: 1234, message: 'Some bad error'});
 
       await waitForValueToChange(
         () => result.current.memberUnitsAtSnapshotStatus

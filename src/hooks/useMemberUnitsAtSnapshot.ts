@@ -24,8 +24,8 @@ type UseMemberUnitsAtSnapshotReturn = {
 const {STANDBY, PENDING, FULFILLED, REJECTED} = AsyncStatus;
 
 export function useMemberUnitsAtSnapshot(
-  memberAddress: string,
-  snapshot: number
+  memberAddress: string | undefined,
+  snapshot: number | undefined
 ): UseMemberUnitsAtSnapshotReturn {
   /**
    * Selectors
@@ -55,7 +55,8 @@ export function useMemberUnitsAtSnapshot(
    */
 
   useEffect(() => {
-    if (!bankExtensionMethods) return;
+    // These parameters may be arriving async and not ready, yet.
+    if (!memberAddress || !snapshot || !bankExtensionMethods) return;
 
     handleGetPriorUnitsAmount({
       bankExtensionMethods,
