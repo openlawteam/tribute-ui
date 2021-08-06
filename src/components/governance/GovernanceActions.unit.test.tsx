@@ -136,7 +136,7 @@ describe('GovernanceActions unit tests', () => {
 
     await waitFor(() => {
       // SVG
-      expect(screen.getByLabelText(/^voting status$/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/^proposal status$/i)).toBeInTheDocument();
 
       // Voting %
       expect(screen.getByText(/^2%$/i)).toBeInTheDocument();
