@@ -45,7 +45,7 @@ export function VotingStatus(props: VotingStatusProps) {
   return (
     <>
       <div className="votingstatus-container">
-        <StopwatchSVG aria-label="Counting down until voting ends" role="img" />
+        <StopwatchSVG aria-label="Proposal status" role="img" />
 
         {renderedStatus && (
           <span className="votingstatus">{renderedStatus}</span>
