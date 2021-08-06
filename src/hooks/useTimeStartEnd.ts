@@ -15,8 +15,10 @@ type UseTimeStartEndReturn = {
 
 type StartEndStatus = {start: AsyncStatus; end: AsyncStatus};
 
+const {FULFILLED, PENDING, STANDBY} = AsyncStatus;
+
 function areAllAsyncReady(asyncMapping: Record<string, AsyncStatus>) {
-  return Object.values(asyncMapping).every((s) => s === AsyncStatus.FULFILLED);
+  return Object.values(asyncMapping).every((s) => s === FULFILLED);
 }
 
 /**
@@ -38,8 +40,8 @@ export function useTimeStartEnd(
    */
 
   const startEndStatusRef = useRef<StartEndStatus>({
-    start: AsyncStatus.STANDBY,
-    end: AsyncStatus.STANDBY,
+    start: STANDBY,
+    end: STANDBY,
   });
 
   /**
@@ -71,7 +73,7 @@ export function useTimeStartEnd(
   useEffect(() => {
     if (hasTimeStarted || shouldNotCheck) {
       setTimeStartEndInitReady(() => {
-        startEndStatusRef.current.start = AsyncStatus.FULFILLED;
+        startEndStatusRef.current.start = FULFILLED;
         return areAllAsyncReady(startEndStatusRef.current);
       });
 
@@ -79,24 +81,24 @@ export function useTimeStartEnd(
     }
 
     setTimeStartEndInitReady(() => {
-      startEndStatusRef.current.start = AsyncStatus.PENDING;
+      startEndStatusRef.current.start = PENDING;
       return areAllAsyncReady(startEndStatusRef.current);
     });
 
     // Check if time has started every 1 second
     const intervalID = setInterval(() => {
-      // Async process ran
-      setTimeStartEndInitReady(() => {
-        startEndStatusRef.current.start = AsyncStatus.FULFILLED;
-        return areAllAsyncReady(startEndStatusRef.current);
-      });
-
       const hasStartedCheck: boolean =
         Math.floor(Date.now() / 1000) > (startSeconds ?? 0);
 
-      if (!hasStartedCheck) return;
-
       setHasTimeStarted(hasStartedCheck);
+
+      // The interval async process has run once
+      if (startEndStatusRef.current.start !== FULFILLED) {
+        setTimeStartEndInitReady(() => {
+          startEndStatusRef.current.start = FULFILLED;
+          return areAllAsyncReady(startEndStatusRef.current);
+        });
+      }
     }, 1000);
 
     return function cleanup() {
@@ -110,7 +112,7 @@ export function useTimeStartEnd(
   useEffect(() => {
     if (hasTimeEnded || shouldNotCheck) {
       setTimeStartEndInitReady(() => {
-        startEndStatusRef.current.end = AsyncStatus.FULFILLED;
+        startEndStatusRef.current.end = FULFILLED;
         return areAllAsyncReady(startEndStatusRef.current);
       });
 
@@ -118,24 +120,24 @@ export function useTimeStartEnd(
     }
 
     setTimeStartEndInitReady(() => {
-      startEndStatusRef.current.end = AsyncStatus.PENDING;
+      startEndStatusRef.current.end = PENDING;
       return areAllAsyncReady(startEndStatusRef.current);
     });
 
     // Check if time has ended every 1 second
     const intervalID = setInterval(() => {
-      // Async process ran
-      setTimeStartEndInitReady(() => {
-        startEndStatusRef.current.end = AsyncStatus.FULFILLED;
-        return areAllAsyncReady(startEndStatusRef.current);
-      });
-
       const hasEndedCheck: boolean =
         Math.ceil(Date.now() / 1000) > (endSeconds ?? 0);
 
-      if (!hasEndedCheck) return;
-
       setHasTimeEnded(hasEndedCheck);
+
+      // The interval async process has run once
+      if (startEndStatusRef.current.end !== FULFILLED) {
+        setTimeStartEndInitReady(() => {
+          startEndStatusRef.current.end = FULFILLED;
+          return areAllAsyncReady(startEndStatusRef.current);
+        });
+      }
     }, 1000);
 
     return function cleanup() {
