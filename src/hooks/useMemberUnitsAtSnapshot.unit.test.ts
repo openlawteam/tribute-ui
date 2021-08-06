@@ -3,6 +3,7 @@ import Web3 from 'web3';
 
 import {AsyncStatus} from '../util/types';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../test/helpers';
+import {ethBlockNumber} from '../test/web3Responses';
 import {useMemberUnitsAtSnapshot} from './useMemberUnitsAtSnapshot';
 import Wrapper from '../test/Wrapper';
 
@@ -37,6 +38,11 @@ describe('useMemberUnitsAtSnapshot unit tests', () => {
       expect(result.current.memberUnitsAtSnapshotStatus).toBe(STANDBY);
 
       await waitForNextUpdate();
+
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        ...ethBlockNumber({result: 150, web3Instance})
+      );
 
       // Mock `getPriorAmount` response
       mockWeb3Provider.injectResult(
@@ -94,6 +100,11 @@ describe('useMemberUnitsAtSnapshot unit tests', () => {
 
       await waitForNextUpdate();
 
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        ...ethBlockNumber({result: 150, web3Instance})
+      );
+
       // Mock `getPriorAmount` response
       mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameter('uint256', 0)
@@ -116,6 +127,82 @@ describe('useMemberUnitsAtSnapshot unit tests', () => {
       // Assert fulfilled state
       expect(result.current.hasMembershipAtSnapshot).toBe(false);
       expect(result.current.memberUnitsAtSnapshot).toBe('0');
+      expect(result.current.memberUnitsAtSnapshotError).toBe(undefined);
+      expect(result.current.memberUnitsAtSnapshotStatus).toBe(FULFILLED);
+    });
+  });
+
+  test('should return correct data when current block number not yet in past', async () => {
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    await act(async () => {
+      const {result, waitForValueToChange, waitForNextUpdate} =
+        await renderHook(
+          () =>
+            useMemberUnitsAtSnapshot(DEFAULT_ETH_ADDRESS, 123, {
+              // Make the poll interval quicker for the test
+              currentBlockPollIntervalMs: 2000,
+            }),
+          {
+            wrapper: Wrapper,
+            initialProps: {
+              useInit: true,
+              useWallet: true,
+              getProps: (p) => {
+                mockWeb3Provider = p.mockWeb3Provider;
+                web3Instance = p.web3Instance;
+              },
+            },
+          }
+        );
+
+      // Assert initial state
+      expect(result.current.hasMembershipAtSnapshot).toBe(false);
+      expect(result.current.memberUnitsAtSnapshot).toBe(undefined);
+      expect(result.current.memberUnitsAtSnapshotError).toBe(undefined);
+      expect(result.current.memberUnitsAtSnapshotStatus).toBe(STANDBY);
+
+      await waitForNextUpdate();
+
+      // Mock `eth_blockNumber` to be equal to the block to check
+      mockWeb3Provider.injectResult(
+        ...ethBlockNumber({result: 123, web3Instance})
+      );
+
+      // Mock `eth_blockNumber` to be 1 greater than the block to check
+      mockWeb3Provider.injectResult(
+        ...ethBlockNumber({result: 124, web3Instance})
+      );
+
+      // Mock `eth_blockNumber` to be 2 greater than the block to check
+      mockWeb3Provider.injectResult(
+        ...ethBlockNumber({result: 125, web3Instance})
+      );
+
+      // Mock `getPriorAmount` response
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('uint256', 123456)
+      );
+
+      await waitForValueToChange(
+        () => result.current.memberUnitsAtSnapshotStatus
+      );
+
+      // Assert pending state
+      expect(result.current.hasMembershipAtSnapshot).toBe(false);
+      expect(result.current.memberUnitsAtSnapshot).toBe(undefined);
+      expect(result.current.memberUnitsAtSnapshotError).toBe(undefined);
+      expect(result.current.memberUnitsAtSnapshotStatus).toBe(PENDING);
+
+      await waitForValueToChange(
+        () => result.current.memberUnitsAtSnapshotStatus,
+        {timeout: 5000}
+      );
+
+      // Assert fulfilled state
+      expect(result.current.hasMembershipAtSnapshot).toBe(true);
+      expect(result.current.memberUnitsAtSnapshot).toBe('123456');
       expect(result.current.memberUnitsAtSnapshotError).toBe(undefined);
       expect(result.current.memberUnitsAtSnapshotStatus).toBe(FULFILLED);
     });

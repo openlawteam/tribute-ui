@@ -25,11 +25,12 @@ type OffchainVotingActionProps = {
 type VotingDisabledReasons = {
   addressIsDelegatedMessage: string;
   alreadyVotedMessage: string;
+  fetchingMembershipAtSnapshotMessage: string;
   noMembershipAtSnapshotMessage: string;
   undeterminedMembershipAtSnapshotMessage: string;
 };
 
-const {FULFILLED, REJECTED} = AsyncStatus;
+const {FULFILLED, PENDING, REJECTED} = AsyncStatus;
 
 const getDelegatedAddressMessage = (a: string) =>
   `Your member address is delegated to ${truncateEthAddress(
@@ -66,6 +67,7 @@ export function OffchainVotingAction(
   const votingDisabledReasonsRef = useRef<VotingDisabledReasons>({
     addressIsDelegatedMessage: '',
     alreadyVotedMessage: '',
+    fetchingMembershipAtSnapshotMessage: '',
     noMembershipAtSnapshotMessage: '',
     undeterminedMembershipAtSnapshotMessage: '',
   });
@@ -114,6 +116,7 @@ export function OffchainVotingAction(
    * Variables
    */
 
+  const snapshot: number | undefined = snapshotProposal?.msg.payload.snapshot;
   const proposalHash: string = snapshotProposal?.idInDAO || '';
   const snapshotProposalId: string = snapshotProposal?.idInSnapshot || '';
 
@@ -158,7 +161,15 @@ export function OffchainVotingAction(
     setDisabledReasonHelper(
       'noMembershipAtSnapshotMessage',
       !hasMembershipAtSnapshot && memberUnitsAtSnapshotStatus === FULFILLED
-        ? 'You were not a member when the proposal was sponsored.'
+        ? `You were not a member when the proposal was sponsored at snapshot ${snapshot}.`
+        : ''
+    );
+
+    // Reason: determining membership by snapshot
+    setDisabledReasonHelper(
+      'fetchingMembershipAtSnapshotMessage',
+      memberUnitsAtSnapshotStatus === PENDING
+        ? `We are waiting on your membership status for when this proposal was sponsored at snapshot ${snapshot}.`
         : ''
     );
 
@@ -166,7 +177,7 @@ export function OffchainVotingAction(
     setDisabledReasonHelper(
       'undeterminedMembershipAtSnapshotMessage',
       memberUnitsAtSnapshotStatus === REJECTED
-        ? 'Your membership status at the time this proposal was sponsored cannot be determined.'
+        ? `Something went wrong. Your membership status when this proposal was sponsored at snapshot ${snapshot} cannot be determined.`
         : ''
     );
 
@@ -178,6 +189,7 @@ export function OffchainVotingAction(
     isAddressDelegated,
     memberUnitsAtSnapshotStatus,
     setOtherDisabledReasons,
+    snapshot,
     voteChosen,
   ]);
 

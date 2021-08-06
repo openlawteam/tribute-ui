@@ -13,7 +13,7 @@ import {OffchainVotingAction} from './OffchainVotingAction';
 import {ProposalData, SnapshotProposal} from '../types';
 import {server, rest} from '../../../test/server';
 import {setConnectedMember} from '../../../store/actions';
-import {signTypedDataV4} from '../../../test/web3Responses';
+import {ethBlockNumber, signTypedDataV4} from '../../../test/web3Responses';
 import {SNAPSHOT_HUB_API_URL} from '../../../config';
 import {snapshotAPIProposalResponse} from '../../../test/restResponses';
 import Wrapper from '../../../test/Wrapper';
@@ -90,6 +90,8 @@ describe('OffchainVotingAction unit tests', () => {
         payload: {
           ...defaultProposalBody.msg.payload,
           name: 'Another cool one',
+          // Set the snapshot as this test will use the eth block number against the snapshot
+          snapshot: 100,
         },
       },
       data: {
@@ -130,6 +132,12 @@ describe('OffchainVotingAction unit tests', () => {
     );
 
     await waitFor(() => {
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        // Set a higher block than the fake proposal
+        ...ethBlockNumber({result: 150, web3Instance})
+      );
+
       // Mock RPC response for `useMemberUnitsAtSnapshot`
       mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameter('uint256', 123456)
@@ -226,23 +234,87 @@ describe('OffchainVotingAction unit tests', () => {
     });
   });
 
-  test('should disable submitting a vote for custom reasons', async () => {
+  test('should disable submitting a vote when not a member before snapshot', async () => {
     const refetchSpy = jest.fn();
     const proposal = defaultProposalData(refetchSpy) as ProposalData;
 
-    const proposalWithVotes = {
-      ...proposal,
-      snapshotProposal: {
-        ...proposal.snapshotProposal,
-        votes: defaultProposalVotes,
-      },
-    };
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainVotingAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposal}
+        />
+      </Wrapper>
+    );
+
+    // Mock RPC response for `useMemberUnitsAtSnapshot`
+    await waitFor(() => {
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        // Set a higher block than the fake proposal
+        ...ethBlockNumber({result: 150, web3Instance})
+      );
+
+      mockWeb3Provider.injectResult(
+        // Address had no weight at snapshot
+        web3Instance.eth.abi.encodeParameter('uint256', 0)
+      );
+    });
+
+    // Assert content
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: voteYesButtonRegex})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: voteNoButtonRegex})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: voteYesButtonRegex})
+      ).toBeDisabled();
+
+      expect(
+        screen.getByRole('button', {name: voteNoButtonRegex})
+      ).toBeDisabled();
+
+      expect(screen.getByText(votingWhyDisabledRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(errorTextRegex)).toThrow();
+    });
+
+    // Click the "why disabled?" link
+    userEvent.click(screen.getByText(votingWhyDisabledRegex));
+
+    // Assert `noMembershipAtSnapshotMessage` message content
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /you were not a member when the proposal was sponsored at snapshot 100\./i
+        )
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('should disable submitting a vote when address is delegated', async () => {
+    const refetchSpy = jest.fn();
+    const proposal = defaultProposalData(refetchSpy) as ProposalData;
 
     let mockWeb3Provider: FakeHttpProvider;
     let web3Instance: Web3;
     let store: Store;
 
-    const {rerender} = render(
+    render(
       <Wrapper
         useInit
         useWallet
@@ -260,6 +332,12 @@ describe('OffchainVotingAction unit tests', () => {
 
     // Mock RPC response for `useMemberUnitsAtSnapshot`
     await waitFor(() => {
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        // Set a higher block than the fake proposal
+        ...ethBlockNumber({result: 150, web3Instance})
+      );
+
       mockWeb3Provider.injectResult(
         // Address had no weight at snapshot
         web3Instance.eth.abi.encodeParameter('uint256', 0)
@@ -315,30 +393,31 @@ describe('OffchainVotingAction unit tests', () => {
         )
       ).toBeInTheDocument();
     });
+  });
 
-    // Revert the `connectedMember` state
-    await waitFor(() => {
-      store.dispatch(
-        setConnectedMember({
-          ...store.getState().connectedMember,
-          delegateKey: DEFAULT_ETH_ADDRESS,
-          isAddressDelegated: false,
-        })
-      );
-    });
+  test('should disable submitting a vote when already voted', async () => {
+    const refetchSpy = jest.fn();
+    const proposal = defaultProposalData(refetchSpy) as ProposalData;
 
-    // Assert `noMembershipAtSnapshotMessage` message content
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          /you were not a member when the proposal was sponsored\./i
-        )
-      ).toBeInTheDocument();
-    });
+    const proposalWithVotes = {
+      ...proposal,
+      snapshotProposal: {
+        ...proposal.snapshotProposal,
+        votes: defaultProposalVotes,
+      },
+    };
 
-    // Re-render with votes
-    rerender(
-      <Wrapper useInit useWallet>
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
         <OffchainVotingAction
           adapterName={ContractAdapterNames.onboarding}
           proposal={proposalWithVotes as ProposalData}
@@ -346,9 +425,170 @@ describe('OffchainVotingAction unit tests', () => {
       </Wrapper>
     );
 
+    // Mock RPC response for `useMemberUnitsAtSnapshot`
+    await waitFor(() => {
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        // Set a higher block than the fake proposal
+        ...ethBlockNumber({result: 150, web3Instance})
+      );
+
+      mockWeb3Provider.injectResult(
+        // Address had no weight at snapshot
+        web3Instance.eth.abi.encodeParameter('uint256', 0)
+      );
+    });
+
+    // Assert content
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: votedYesButtonRegex})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: voteNoButtonRegex})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: votedYesButtonRegex})
+      ).toBeDisabled();
+
+      expect(
+        screen.getByRole('button', {name: voteNoButtonRegex})
+      ).toBeDisabled();
+
+      expect(screen.getByText(votingWhyDisabledRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(errorTextRegex)).toThrow();
+    });
+
+    // Click the "why disabled?" link
+    userEvent.click(screen.getByText(votingWhyDisabledRegex));
+
     // Assert `alreadyVotedMessage` message content
     await waitFor(() => {
       expect(screen.getByText(alreadyVotedRegex)).toBeInTheDocument();
+    });
+  });
+
+  test('should disable submitting a vote when waiting on `useMemberUnitsAtSnapshot` polling', async () => {
+    const refetchSpy = jest.fn();
+    const proposal = defaultProposalData(refetchSpy) as ProposalData;
+
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainVotingAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposal}
+        />
+      </Wrapper>
+    );
+
+    // Mock RPC response for `useMemberUnitsAtSnapshot`
+    await waitFor(() => {
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        // Set a higher block than the fake proposal
+        ...ethBlockNumber({result: 100, web3Instance})
+      );
+
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        // Set a higher block than the fake proposal
+        ...ethBlockNumber({result: 101, web3Instance})
+      );
+
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        // Set a higher block than the fake proposal
+        ...ethBlockNumber({result: 102, web3Instance})
+      );
+
+      mockWeb3Provider.injectResult(
+        // Address had no weight at snapshot
+        web3Instance.eth.abi.encodeParameter('uint256', 123456)
+      );
+    });
+
+    // Assert content
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: voteYesButtonRegex})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: voteNoButtonRegex})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: voteYesButtonRegex})
+      ).toBeDisabled();
+
+      expect(
+        screen.getByRole('button', {name: voteNoButtonRegex})
+      ).toBeDisabled();
+
+      expect(screen.getByText(votingWhyDisabledRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(errorTextRegex)).toThrow();
+    });
+
+    // Click the "why disabled?" link
+    userEvent.click(screen.getByText(votingWhyDisabledRegex));
+
+    // Assert `undeterminedMembershipAtSnapshotMessage` message content
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /we are waiting on your membership status for when this proposal was sponsored at snapshot 100\./i
+        )
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('should disable submitting a vote when `useMemberUnitsAtSnapshot` fails', async () => {
+    const refetchSpy = jest.fn();
+    const proposal = defaultProposalData(refetchSpy) as ProposalData;
+
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    const {rerender} = render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainVotingAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={proposal}
+        />
+      </Wrapper>
+    );
+
+    // Mock RPC response for `useMemberUnitsAtSnapshot`
+    await waitFor(() => {
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        // Set a higher block than the fake proposal
+        ...ethBlockNumber({result: 150, web3Instance})
+      );
+
+      mockWeb3Provider.injectResult(
+        // Address had no weight at snapshot
+        web3Instance.eth.abi.encodeParameter('uint256', 123456)
+      );
     });
 
     const proposalToForceRerender = {
@@ -387,18 +627,39 @@ describe('OffchainVotingAction unit tests', () => {
       </Wrapper>
     );
 
+    // Assert content
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: voteYesButtonRegex})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: voteNoButtonRegex})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: voteYesButtonRegex})
+      ).toBeDisabled();
+
+      expect(
+        screen.getByRole('button', {name: voteNoButtonRegex})
+      ).toBeDisabled();
+
+      expect(screen.getByText(votingWhyDisabledRegex)).toBeInTheDocument();
+
+      expect(() => screen.getByText(errorTextRegex)).toThrow();
+    });
+
+    // Click the "why disabled?" link
+    userEvent.click(screen.getByText(votingWhyDisabledRegex));
+
     // Assert `undeterminedMembershipAtSnapshotMessage` message content
     await waitFor(() => {
       expect(
         screen.getByText(
-          /your membership status at the time this proposal was sponsored cannot be determined\./i
+          /something went wrong\. your membership status when this proposal was sponsored at snapshot 789 cannot be determined\./i
         )
       ).toBeInTheDocument();
-    });
-
-    // Assert refetch was called
-    await waitFor(() => {
-      expect(refetchSpy.mock.calls.length === 0).toBe(true);
     });
   });
 
@@ -425,6 +686,12 @@ describe('OffchainVotingAction unit tests', () => {
     );
 
     await waitFor(() => {
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        // Set a higher block than the fake proposal
+        ...ethBlockNumber({result: 150, web3Instance})
+      );
+
       // Mock RPC response for `useMemberUnitsAtSnapshot`
       mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameter('uint256', 123456)
@@ -528,6 +795,12 @@ describe('OffchainVotingAction unit tests', () => {
     );
 
     await waitFor(() => {
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        // Set a higher block than the fake proposal
+        ...ethBlockNumber({result: 150, web3Instance})
+      );
+
       // Mock RPC response for `useMemberUnitsAtSnapshot`
       mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameter('uint256', 123456)
@@ -627,6 +900,12 @@ describe('OffchainVotingAction unit tests', () => {
     );
 
     await waitFor(() => {
+      // Mock `eth_blockNumber`
+      mockWeb3Provider.injectResult(
+        // Set a higher block than the fake proposal
+        ...ethBlockNumber({result: 150, web3Instance})
+      );
+
       // Mock RPC response for `useMemberUnitsAtSnapshot`
       mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameter('uint256', 123456)
@@ -681,16 +960,27 @@ describe('OffchainVotingAction unit tests', () => {
 
       expect(
         screen.getByRole('button', {name: voteYesButtonRegex})
-      ).toBeEnabled();
+      ).toBeDisabled();
 
       expect(
         screen.getByRole('button', {name: voteNoButtonRegex})
-      ).toBeEnabled();
+      ).toBeDisabled();
 
       expect(screen.getByText(errorTextRegex)).toBeInTheDocument();
       expect(screen.getByText(/some bad error/i)).toBeInTheDocument();
 
-      expect(() => screen.getByText(votingWhyDisabledRegex)).toThrow();
+      expect(screen.getByText(votingWhyDisabledRegex)).toBeInTheDocument();
+    });
+
+    // Click the "why disabled" modal to view the text
+    userEvent.click(screen.getByText(votingWhyDisabledRegex));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /something went wrong\. your membership status when this proposal was sponsored at snapshot 789 cannot be determined\./i
+        )
+      ).toBeInTheDocument();
     });
   });
 });
