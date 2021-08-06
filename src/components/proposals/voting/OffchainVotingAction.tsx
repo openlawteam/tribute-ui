@@ -234,11 +234,6 @@ export function OffchainVotingAction(
         voteProgress={voteChoiceProgress}
       />
 
-      <ErrorMessageWithDetails
-        error={error}
-        renderText="Something went wrong"
-      />
-
       {isDisabled && (
         <button
           className="button--help-centered"
@@ -246,6 +241,11 @@ export function OffchainVotingAction(
           Why is voting disabled?
         </button>
       )}
+
+      <ErrorMessageWithDetails
+        error={error}
+        renderText="Something went wrong"
+      />
 
       <WhyDisabledModal title="Why is voting disabled?" />
     </>
