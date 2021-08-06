@@ -61,8 +61,9 @@ describe('VotingActionButtons unit tests', () => {
     expect(screen.getByRole('button', {name: /voting no/i})).toBeDisabled();
     expect(screen.getByLabelText(/voting no \u2026/i)).toBeInTheDocument();
     expect(() => screen.getByText(/voting no \u2026/i)).toThrow();
+
     expect(
-      screen.getByLabelText(/voting no spinner image/i)
+      screen.getByLabelText(/currently voting no\.\.\./i)
     ).toBeInTheDocument();
   });
 
@@ -81,8 +82,9 @@ describe('VotingActionButtons unit tests', () => {
     expect(screen.getByRole('button', {name: /voting yes/i})).toBeDisabled();
     expect(screen.getByLabelText(/voting yes \u2026/i)).toBeInTheDocument();
     expect(() => screen.getByText(/voting yes \u2026/i)).toThrow();
+
     expect(
-      screen.getByLabelText(/voting yes spinner image/i)
+      screen.getByLabelText(/currently voting yes\.\.\./i)
     ).toBeInTheDocument();
   });
 });

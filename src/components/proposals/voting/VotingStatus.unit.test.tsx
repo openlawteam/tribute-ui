@@ -29,9 +29,7 @@ describe('VotingStatus unit tests', () => {
     expect(screen.getByText(/5%/i)).toBeInTheDocument();
 
     // ClockSVG label
-    expect(
-      screen.getByLabelText(/counting down until voting ends/i)
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/^proposal status$/i)).toBeInTheDocument();
 
     /**
      * Assert countdown

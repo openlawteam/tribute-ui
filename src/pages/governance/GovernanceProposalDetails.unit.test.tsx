@@ -80,18 +80,16 @@ describe('GovernanceProposalDetails unit tests', () => {
      */
 
     await waitFor(() => {
-      expect(
-        screen.getByLabelText(/counting down until voting ends/i)
-      ).toBeInTheDocument();
+      // SVG
+      expect(screen.getByLabelText(/^proposal status$/i)).toBeInTheDocument();
       expect(screen.getAllByText(/0%/i).length).toBe(2);
       expect(screen.getByLabelText(/0% yes votes/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/0% no votes/i)).toBeInTheDocument();
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByLabelText(/counting down until voting ends/i)
-      ).toBeInTheDocument();
+      // SVG
+      expect(screen.getByLabelText(/^proposal status$/i)).toBeInTheDocument();
       expect(screen.getAllByText(/0%/i).length).toBe(2);
       expect(screen.getByLabelText(/0% yes votes/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/0% no votes/i)).toBeInTheDocument();

@@ -195,10 +195,10 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
           normalizeString(p.snapshotProposal?.idInDAO || '')
       )?.[1];
 
-      if (!offchainResult) return;
-
       // Did the vote pass by a simple majority?
-      const didPass = offchainResult.Yes.units > offchainResult.No.units;
+      const didPassSimpleMajority: boolean = offchainResult
+        ? offchainResult.Yes.units > offchainResult.No.units
+        : false;
 
       /**
        * Voting proposal: voting has ended, off-chain result was not submitted,
@@ -208,12 +208,13 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
        * @note For now, we can assume across all adapters that if the vote did
        * not pass then the result does not need to be submitted (proposal would
        * fall back to "failed" logic).
+       *
        * @note Should be placed before "failed" logic.
        */
       if (
         offchainResultNotYetSubmitted &&
         noSnapshotVotes === false &&
-        didPass
+        didPassSimpleMajority
       ) {
         filteredProposalsToSet.votingProposals.push(p);
 
@@ -248,7 +249,7 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
       if (
         voteState !== undefined &&
         offchainResultNotYetSubmitted &&
-        !didPass
+        !didPassSimpleMajority
       ) {
         filteredProposalsToSet.failedProposals.push(p);
 

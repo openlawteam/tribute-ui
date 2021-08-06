@@ -52,7 +52,7 @@ describe('ProposalCard unit tests', () => {
 
   const defaultProposalVotes: SnapshotProposalResponseData['votes'] = [
     {
-      DEFAULT_ETH_ADDRESS: {
+      [DEFAULT_ETH_ADDRESS]: {
         address: DEFAULT_ETH_ADDRESS,
         msg: {
           version: '0.2.0',

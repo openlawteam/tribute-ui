@@ -1,15 +1,19 @@
 import {useEffect, useRef, useState} from 'react';
+import {useSelector} from 'react-redux';
+import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 
-import {truncateEthAddress} from '../../../util/helpers';
+import {
+  useMemberActionDisabled,
+  useMemberUnitsAtSnapshot,
+} from '../../../hooks';
+import {AsyncStatus} from '../../../util/types';
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {getVoteChosen} from '../helpers';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
-import {useMemberActionDisabled} from '../../../hooks';
-import {useSelector} from 'react-redux';
+import {truncateEthAddress} from '../../../util/helpers';
 import {useSignAndSendVote} from '../hooks';
 import {useWeb3Modal} from '../../web3/hooks';
-import {VoteChoices} from '@openlaw/snapshot-js-erc712';
 import {VotingActionButtons} from '.';
 import ErrorMessageWithDetails from '../../common/ErrorMessageWithDetails';
 
@@ -21,7 +25,12 @@ type OffchainVotingActionProps = {
 type VotingDisabledReasons = {
   addressIsDelegatedMessage: string;
   alreadyVotedMessage: string;
+  fetchingMembershipAtSnapshotMessage: string;
+  noMembershipAtSnapshotMessage: string;
+  undeterminedMembershipAtSnapshotMessage: string;
 };
+
+const {FULFILLED, PENDING, REJECTED} = AsyncStatus;
 
 const getDelegatedAddressMessage = (a: string) =>
   `Your member address is delegated to ${truncateEthAddress(
@@ -39,7 +48,10 @@ const getDelegatedAddressMessage = (a: string) =>
 export function OffchainVotingAction(
   props: OffchainVotingActionProps
 ): JSX.Element | null {
-  const {adapterName, proposal} = props;
+  const {
+    adapterName,
+    proposal: {snapshotProposal, refetchProposalOrDraft},
+  } = props;
 
   /**
    * State
@@ -55,6 +67,9 @@ export function OffchainVotingAction(
   const votingDisabledReasonsRef = useRef<VotingDisabledReasons>({
     addressIsDelegatedMessage: '',
     alreadyVotedMessage: '',
+    fetchingMembershipAtSnapshotMessage: '',
+    noMembershipAtSnapshotMessage: '',
+    undeterminedMembershipAtSnapshotMessage: '',
   });
 
   /**
@@ -69,16 +84,18 @@ export function OffchainVotingAction(
     (s: StoreState) => s.connectedMember?.isAddressDelegated
   );
 
+  const memberAddress = useSelector(
+    (s: StoreState) => s.connectedMember?.memberAddress
+  );
+
   /**
    * Our hooks
    */
 
   const {account} = useWeb3Modal();
   const {signAndSendVote, voteDataStatus} = useSignAndSendVote();
-  const voteChosen = getVoteChosen(
-    proposal.snapshotProposal?.votes,
-    account || ''
-  );
+  const voteChosen = getVoteChosen(snapshotProposal?.votes, account || '');
+
   const {
     isDisabled,
     openWhyDisabledModal,
@@ -86,13 +103,22 @@ export function OffchainVotingAction(
     WhyDisabledModal,
   } = useMemberActionDisabled();
 
+  const {
+    hasMembershipAtSnapshot,
+    memberUnitsAtSnapshotError,
+    memberUnitsAtSnapshotStatus,
+  } = useMemberUnitsAtSnapshot(
+    memberAddress,
+    snapshotProposal?.msg.payload.snapshot
+  );
+
   /**
    * Variables
    */
 
-  const proposalHash: string = proposal.snapshotProposal?.idInDAO || '';
-  const snapshotProposalId: string =
-    proposal.snapshotProposal?.idInSnapshot || '';
+  const snapshot: number | undefined = snapshotProposal?.msg.payload.snapshot;
+  const proposalHash: string = snapshotProposal?.idInDAO || '';
+  const snapshotProposalId: string = snapshotProposal?.idInSnapshot || '';
 
   const isInProcess =
     voteDataStatus === Web3TxStatus.AWAITING_CONFIRM ||
@@ -108,6 +134,8 @@ export function OffchainVotingAction(
     ? voteChoiceClicked
     : undefined;
 
+  const error: Error | undefined = submitError || memberUnitsAtSnapshotError;
+
   /**
    * Effects
    */
@@ -117,29 +145,51 @@ export function OffchainVotingAction(
 
     // Reason: address is delegated
     if (delegateAddress) {
-      // Set or unset
-      const addressIsDelegatedMessage = isAddressDelegated
-        ? getDelegatedAddressMessage(delegateAddress)
-        : '';
-
-      votingDisabledReasonsRef.current = {
-        ...votingDisabledReasonsRef.current,
-        addressIsDelegatedMessage,
-      };
+      setDisabledReasonHelper(
+        'addressIsDelegatedMessage',
+        isAddressDelegated ? getDelegatedAddressMessage(delegateAddress) : ''
+      );
     }
 
     // Reason: already voted
-    votingDisabledReasonsRef.current = {
-      ...votingDisabledReasonsRef.current,
-      alreadyVotedMessage: voteChosen ? 'You have already voted.' : '',
-    };
+    setDisabledReasonHelper(
+      'alreadyVotedMessage',
+      voteChosen ? 'You have already voted.' : ''
+    );
+
+    // Reason: did not hold membership by snapshot
+    setDisabledReasonHelper(
+      'noMembershipAtSnapshotMessage',
+      !hasMembershipAtSnapshot && memberUnitsAtSnapshotStatus === FULFILLED
+        ? `You were not a member when the proposal was sponsored at snapshot ${snapshot}.`
+        : ''
+    );
+
+    // Reason: determining membership by snapshot
+    setDisabledReasonHelper(
+      'fetchingMembershipAtSnapshotMessage',
+      memberUnitsAtSnapshotStatus === PENDING
+        ? `We are waiting on your membership status for when this proposal was sponsored at snapshot ${snapshot}.`
+        : ''
+    );
+
+    // Reason: cannot determine membership by snapshot
+    setDisabledReasonHelper(
+      'undeterminedMembershipAtSnapshotMessage',
+      memberUnitsAtSnapshotStatus === REJECTED
+        ? `Something went wrong. Your membership status when this proposal was sponsored at snapshot ${snapshot} cannot be determined.`
+        : ''
+    );
 
     // 2. Set reasons
     setOtherDisabledReasons(Object.values(votingDisabledReasonsRef.current));
   }, [
     delegateAddress,
+    hasMembershipAtSnapshot,
     isAddressDelegated,
+    memberUnitsAtSnapshotStatus,
     setOtherDisabledReasons,
+    snapshot,
     voteChosen,
   ]);
 
@@ -152,6 +202,7 @@ export function OffchainVotingAction(
       if (!proposalHash) {
         throw new Error('No proposal hash was found.');
       }
+
       if (!snapshotProposalId) {
         throw new Error('No proposal ID was found.');
       }
@@ -166,10 +217,21 @@ export function OffchainVotingAction(
       });
 
       // Refetch to show the vote the user submitted
-      await proposal.refetchProposalOrDraft();
+      await refetchProposalOrDraft();
     } catch (error) {
       setSubmitError(error);
     }
+  }
+
+  function setDisabledReasonHelper(
+    key: keyof VotingDisabledReasons,
+    message: string
+  ): void {
+    votingDisabledReasonsRef.current = {
+      ...votingDisabledReasonsRef.current,
+
+      [key]: message,
+    };
   }
 
   return (
@@ -184,11 +246,6 @@ export function OffchainVotingAction(
         voteProgress={voteChoiceProgress}
       />
 
-      <ErrorMessageWithDetails
-        error={submitError}
-        renderText="Something went wrong"
-      />
-
       {isDisabled && (
         <button
           className="button--help-centered"
@@ -196,6 +253,11 @@ export function OffchainVotingAction(
           Why is voting disabled?
         </button>
       )}
+
+      <ErrorMessageWithDetails
+        error={error}
+        renderText="Something went wrong"
+      />
 
       <WhyDisabledModal title="Why is voting disabled?" />
     </>

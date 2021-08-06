@@ -5,5 +5,6 @@ export * from './useDaoConfigurations';
 export * from './useDaoTotalUnits';
 export * from './useIsMounted';
 export * from './useMemberActionDisabled';
+export * from './useMemberUnitsAtSnapshot';
 export * from './useRedeemCoupon';
 export * from './useTimeStartEnd';

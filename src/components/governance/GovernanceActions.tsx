@@ -53,7 +53,9 @@ export function GovernanceActions(props: GovernanceActionsProps) {
    */
 
   const votingResult = offchainVotingResults[0]?.[1];
-  const {hasVotingEnded, hasVotingStarted} = votingPeriodData;
+
+  const {hasVotingEnded, hasVotingStarted, votingStartEndInitReady} =
+    votingPeriodData;
 
   /**
    * Functions
@@ -78,7 +80,7 @@ export function GovernanceActions(props: GovernanceActionsProps) {
         votingResult={votingResult}
       />
 
-      {hasVotingStarted && !hasVotingEnded && (
+      {votingStartEndInitReady && hasVotingStarted && !hasVotingEnded && (
         <OffchainVotingAction proposal={proposal} />
       )}
     </>

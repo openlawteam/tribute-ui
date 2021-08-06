@@ -39,7 +39,7 @@ export function VotingActionButtons(
 
   function getButtonText(choice: VoteChoices): React.ReactNode {
     return voteProgress === choice ? (
-      <Loader aria-label={`Voting ${choice} spinner image`} role="img" />
+      <Loader aria-label={`Currently voting ${choice}...`} role="img" />
     ) : voteChosen === choice ? (
       `Voted ${choice}`
     ) : (

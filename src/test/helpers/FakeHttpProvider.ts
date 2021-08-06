@@ -90,12 +90,12 @@ export class FakeHttpProvider {
     params?: any[] | Record<string, any>;
   }): Promise<any> {
     try {
-      const {result, debugName} = (this.getResponseOrError(
+      const {result, debugName: debugNameResponse} = (this.getResponseOrError(
         'response',
         payload
       ) || {}) as ResponseStub;
 
-      const {error} =
+      const {error, debugName: debugNameError} =
         (this.getResponseOrError('error', payload) as ErrorStub) || {};
 
       if (this.isDebugActive) {
@@ -106,9 +106,9 @@ export class FakeHttpProvider {
             '\nMETHOD: ' +
             payload.method +
             '\nDEBUG METHOD NAME: ' +
-            debugName +
-            '\nENCODED RESULT: ' +
-            result
+            (error ? debugNameError : debugNameResponse) +
+            '\nENCODED RESULT OR ERROR: ' +
+            (error ? JSON.stringify(error) : result)
         );
       }
 
