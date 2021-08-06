@@ -142,19 +142,20 @@ export default function GovernanceProposalsList(
           normalizeString(p.snapshotProposal?.idInSnapshot || '')
       )?.[1];
 
-      if (!offchainResult) return;
-
-      const didPass = didPassSimpleMajority(offchainResult);
+      // Did the vote pass by a simple majority?
+      const didPassSimpleMajority: boolean = offchainResult
+        ? offchainResult.Yes.units > offchainResult.No.units
+        : false;
 
       // passed proposal
-      if (didPass) {
+      if (didPassSimpleMajority) {
         filteredProposalsToSet.passedProposals.push(p);
 
         return;
       }
 
       // failed proposal
-      if (!didPass) {
+      if (!didPassSimpleMajority) {
         filteredProposalsToSet.failedProposals.push(p);
 
         return;
@@ -170,10 +171,6 @@ export default function GovernanceProposalsList(
   /**
    * Functions
    */
-
-  function didPassSimpleMajority(offchainVoteResult: VotingResult): boolean {
-    return offchainVoteResult.Yes.units > offchainVoteResult.No.units;
-  }
 
   function renderProposalCards(
     proposals: ProposalData[]
