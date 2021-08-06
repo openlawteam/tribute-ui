@@ -4,7 +4,7 @@ import {
   SnapshotProposalResponse,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
-import {useQuery} from 'react-query';
+import {useQuery, useQueryClient} from 'react-query';
 
 import {
   Proposal,
@@ -157,34 +157,30 @@ export function useProposalOrDraft(
    * Their hooks
    */
 
-  const {
-    data: snapshotProposalEntryData,
-    error: snapshotProposalEntryError,
-    refetch: snapshotProposalEntryRefetch,
-  } = useQuery(
-    ['snapshotProposalEntry', id],
-    async () => await getSnapshotProposalById(id, abortController, type),
-    {
-      enabled: !!id && !!abortController?.signal,
-    }
-  );
+  const queryClient = useQueryClient();
 
-  const {
-    data: snapshotDraftEntryData,
-    error: snapshotDraftEntryError,
-    // refetch: snapshotDraftEntryRefetch,
-  } = useQuery(
-    ['snapshotDraftEntry', id],
-    async () => await getSnapshotDraftById(id, abortController),
-    {
-      enabled:
-        !!id &&
-        !!abortController?.signal &&
-        (type === SnapshotType.draft ||
-          (!!snapshotProposalEntryData &&
-            !Object.keys(snapshotProposalEntryData).length)),
-    }
-  );
+  const {data: snapshotProposalEntryData, error: snapshotProposalEntryError} =
+    useQuery(
+      ['snapshotProposalEntry', id],
+      async () => await getSnapshotProposalById(id, abortController, type),
+      {
+        enabled: !!id && !!abortController?.signal,
+      }
+    );
+
+  const {data: snapshotDraftEntryData, error: snapshotDraftEntryError} =
+    useQuery(
+      ['snapshotDraftEntry', id],
+      async () => await getSnapshotDraftById(id, abortController),
+      {
+        enabled:
+          !!id &&
+          !!abortController?.signal &&
+          (type === SnapshotType.draft ||
+            (!!snapshotProposalEntryData &&
+              !Object.keys(snapshotProposalEntryData).length)),
+      }
+    );
 
   /**
    * Cached callbacks
@@ -265,21 +261,25 @@ export function useProposalOrDraft(
   ]);
 
   useEffect(() => {
-    if (refetchCount === 0) return;
+    async function invalidateSnapshotProposalEntryQuery() {
+      if (refetchCount === 0) return;
 
-    snapshotProposalEntryRefetch();
-  }, [refetchCount, snapshotProposalEntryRefetch]);
+      /**
+       *Refetch `snapshotProposalEntry` query when `refetchCount` is incremented
+       *(proposal is sponsored/submitted on chain, proposal is voted on)
+       */
+      await queryClient.invalidateQueries('snapshotProposalEntry');
 
-  useEffect(() => {
-    if (refetchCount === 0) return;
+      /**
+       * Provide a different Array reference to force a re-render of the
+       * `useProposalsVotingAdapter` hook. If the `id` argument changes, that's
+       * fine as well, but it's unlikely.
+       */
+      setProposalVotingAdapterId([id]);
+    }
 
-    /**
-     * Provide a different Array reference to force a re-render
-     * of the `useProposalsVotingAdapter` hook. If the `id` argument changes,
-     * that's fine as well, but it's unlikely.
-     */
-    setProposalVotingAdapterId([id]);
-  }, [id, refetchCount]);
+    invalidateSnapshotProposalEntryQuery();
+  }, [id, queryClient, refetchCount]);
 
   // Set overall async status
   useEffect(() => {
