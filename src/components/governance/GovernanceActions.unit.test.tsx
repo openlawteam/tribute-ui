@@ -77,7 +77,7 @@ describe('GovernanceActions unit tests', () => {
             metadata: {},
             start: nowSeconds() - 10,
             // Voting ended
-            end: nowSeconds() - 5,
+            end: nowSeconds() + 3,
           },
           version: '',
           timestamp: '',
@@ -136,9 +136,7 @@ describe('GovernanceActions unit tests', () => {
 
     await waitFor(() => {
       // SVG
-      expect(
-        screen.getByLabelText(/^counting down until voting ends$/i)
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText(/^voting status$/i)).toBeInTheDocument();
 
       // Voting %
       expect(screen.getByText(/^2%$/i)).toBeInTheDocument();
@@ -155,68 +153,22 @@ describe('GovernanceActions unit tests', () => {
     });
 
     // Voting end
-    await waitFor(() => {
-      expect(screen.getByText(/^approved$/i)).toBeInTheDocument();
+    await waitFor(
+      () => {
+        // SVG
+        expect(screen.getByLabelText(/^proposal status$/i)).toBeInTheDocument();
 
-      // Voting buttons should be hidden
-      expect(() => screen.getByRole('button', {name: /^vote yes$/i})).toThrow();
-      expect(() => screen.getByRole('button', {name: /^vote no$/i})).toThrow();
-    });
-  });
+        expect(screen.getByText(/^approved$/i)).toBeInTheDocument();
 
-  test('should return correct content after voting end', async () => {
-    const proposal = fakeSnapshotProposal();
-
-    let mockWeb3Provider: FakeHttpProvider;
-    let web3Instance: Web3;
-
-    render(
-      <Wrapper
-        useInit
-        useWallet
-        getProps={(p) => {
-          mockWeb3Provider = p.mockWeb3Provider;
-          web3Instance = p.web3Instance;
-        }}>
-        <GovernanceActions proposal={proposal} />
-      </Wrapper>
+        // Voting buttons should be hidden
+        expect(() =>
+          screen.getByRole('button', {name: /^vote yes$/i})
+        ).toThrow();
+        expect(() =>
+          screen.getByRole('button', {name: /^vote no$/i})
+        ).toThrow();
+      },
+      {timeout: 5000}
     );
-
-    await waitFor(() => {
-      // Inject mocked units result
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameters(
-          ['uint256', 'bytes[]'],
-          [
-            0,
-            [
-              // Total units
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
-              // Units for "yes" voter
-              web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-              // Units for "no" voter
-              web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-            ],
-          ]
-        )
-      );
-    });
-
-    await waitFor(() => {
-      // SVG
-      expect(
-        screen.getByLabelText(/^counting down until voting ends$/i)
-      ).toBeInTheDocument();
-
-      // Voting %
-      expect(screen.getByText(/^2%$/i)).toBeInTheDocument();
-      expect(screen.getByText(/^1%$/i)).toBeInTheDocument();
-
-      expect(screen.getByText(/^approved$/i)).toBeInTheDocument();
-
-      // Voting buttons should be hidden
-      expect(() => screen.getByRole('button', {name: /^vote yes$/i})).toThrow();
-      expect(() => screen.getByRole('button', {name: /^vote no$/i})).toThrow();
-    });
   });
 });
