@@ -265,8 +265,9 @@ export function useProposalOrDraft(
       if (refetchCount === 0) return;
 
       /**
-       *Refetch `snapshotProposalEntry` query when `refetchCount` is incremented
-       *(proposal is sponsored/submitted on chain, proposal is voted on)
+       * Refetch `snapshotProposalEntry` query when `refetchCount` is
+       * incremented (proposal is sponsored/submitted on chain, proposal is
+       * voted on)
        */
       await queryClient.invalidateQueries('snapshotProposalEntry');
 
