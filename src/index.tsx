@@ -84,7 +84,7 @@ export const getApolloClient = (
   });
 
 // Create `QueryClient`
-export const queryClient = new QueryClient({
+const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,

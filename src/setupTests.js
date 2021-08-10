@@ -1,3 +1,5 @@
+import {queryClient} from './test/Wrapper';
+
 // Adds jest-dom's custom assertions
 require('@testing-library/jest-dom/extend-expect');
 const path = require('path');
@@ -69,5 +71,8 @@ beforeAll(() => {
 // If you need to add a handler after calling setupServer for some specific test
 // this will remove that handler for the rest of them
 // (which is important for test isolation):
-afterEach(() => server.resetHandlers());
+afterEach(() => {
+  server.resetHandlers();
+  queryClient.clear();
+});
 afterAll(() => server.close());

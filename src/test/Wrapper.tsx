@@ -6,7 +6,7 @@ import {Provider} from 'react-redux';
 import {ApolloProvider} from '@apollo/react-hooks';
 import React, {useEffect, useMemo, useState} from 'react';
 import Web3 from 'web3';
-import {QueryClientProvider} from 'react-query';
+import {QueryClient, QueryClientProvider} from 'react-query';
 
 import {
   Web3ModalContext,
@@ -15,7 +15,7 @@ import {
 import {AsyncStatus} from '../util/types';
 import {CHAINS as mockChains, WALLETCONNECT_PROVIDER_OPTIONS} from '../config';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider, getNewStore} from './helpers';
-import {getApolloClient, queryClient} from '../index';
+import {getApolloClient} from '../index';
 import {VotingAdapterName} from '../components/adapters-extensions/enums';
 import App from '../App';
 import Init from '../Init';
@@ -53,6 +53,15 @@ type WrapperProps = {
    */
   locationEntries?: LocationDescriptor[];
 };
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // turns retries off
+      retry: false,
+    },
+  },
+});
 
 /**
  * Similar to our app code, `<Wrapper />` provides a wrapper for tests which need the following to run:
