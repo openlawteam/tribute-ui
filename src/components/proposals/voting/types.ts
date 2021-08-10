@@ -13,6 +13,18 @@ export enum VotingState {
 }
 
 /**
+ * @see `OffchainVoting.sol->getBadNodeError` in tribute-contracts
+ */
+export enum BadNodeError {
+  OK,
+  WRONG_PROPOSAL_ID,
+  INVALID_CHOICE,
+  AFTER_VOTING_PERIOD,
+  BAD_SIGNATURE,
+  INDEX_OUT_OF_BOUND,
+}
+
+/**
  * Response when calling `GET snapshot-hub/api/:space/offchain_proof/:merkle_root`
  */
 export type SnapshotOffchainProofResponse = {

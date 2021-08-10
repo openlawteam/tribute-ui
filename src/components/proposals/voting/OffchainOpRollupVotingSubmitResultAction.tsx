@@ -1,5 +1,3 @@
-import React, {useState} from 'react';
-import {useSelector} from 'react-redux';
 import {
   createVote,
   getVoteResultRootDomainDefinition,
@@ -11,8 +9,9 @@ import {
   ToStepNodeResult,
   VoteEntry,
 } from '@openlaw/snapshot-js-erc712/dist/types';
+import {useSelector} from 'react-redux';
+import {useState} from 'react';
 
-import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {
   DEFAULT_CHAIN,
   MEMBER_COUNT_ADDRESS,
@@ -24,6 +23,8 @@ import {
   multicall,
   MulticallTuple,
 } from '../../web3/helpers';
+import {BadNodeError} from './types';
+import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {getOffchainVotingProof, submitOffchainVotingProof} from '../helpers';
 import {normalizeString, numberRangeArray} from '../../../util/helpers';
 import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
@@ -239,7 +240,31 @@ export function OffchainOpRollupVotingSubmitResultAction(
       });
 
       const voteResultTreeHexRoot: string = voteResultTree.getHexRoot();
+      // The last of the result node tree steps
+      const resultNodeLast: ToStepNodeResult = result[result.length - 1];
 
+      // Validate the vote result node by calling the contract
+      const getBadNodeErrorResponse: number = await votingAdapterMethods
+        .getBadNodeError(
+          daoRegistryAddress,
+          proposalHash,
+          // `bool submitNewVote`
+          true,
+          voteResultTreeHexRoot,
+          snapshot,
+          // `gracePeriodStartingTime` should be `0` as `submitNewVote` is `true`
+          0,
+          resultNodeLast
+        )
+        .call();
+
+      if (Number(getBadNodeErrorResponse) !== BadNodeError.OK) {
+        throw new Error(
+          `Cannot submit off-chain voting result. Node has an error: ${BadNodeError[getBadNodeErrorResponse]}.`
+        );
+      }
+
+      // Prepare to sign root hex result
       const {domain, types} = getVoteResultRootDomainDefinition(
         daoRegistryAddress,
         adapterAddress,
@@ -288,7 +313,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         daoRegistryAddress,
         proposalHash,
         voteResultTreeHexRoot,
-        result[result.length - 1],
+        resultNodeLast,
         signature,
       ];
 
