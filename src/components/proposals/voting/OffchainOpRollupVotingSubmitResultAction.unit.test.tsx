@@ -2,8 +2,9 @@ import {
   SnapshotProposalResponseData,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
-import {screen, waitFor} from '@testing-library/react';
 import {render} from '@testing-library/react';
+import {screen, waitFor} from '@testing-library/react';
+import {Store} from 'redux';
 import userEvent from '@testing-library/user-event';
 import Web3 from 'web3';
 
@@ -25,6 +26,10 @@ import {snapshotAPIProposalResponse} from '../../../test/restResponses';
 import {TX_CYCLE_MESSAGES} from '../../web3/config';
 import OffchainVotingABI from '../../../truffle-contracts/OffchainVotingContract.json';
 import Wrapper from '../../../test/Wrapper';
+
+const somethingWentWrongRegex: RegExp = /^something went wrong$/i;
+const submitVoteResultButtonRegex: RegExp = /^submit vote result$/i;
+const whyDisabledButtonRegex: RegExp = /^why is submitting disabled\?$/i;
 
 const defaultProposalVotes: SnapshotProposalResponseData['votes'] = [
   {
@@ -104,60 +109,80 @@ const proposalData: Partial<ProposalData> = {
 
 function mockInitialCallsHelper(
   mockWeb3Provider: FakeHttpProvider,
-  web3Instance: Web3
-) {
+  web3Instance: Web3,
+  options?: {
+    getBadNodeError?: () => void;
+    getMemberAddress?: () => void;
+    getNbMembers?: () => void;
+    getPriorAmount?: () => void;
+    signature?: () => void;
+  }
+): void {
   // Mock RPC call for `getNbMembers`
-  mockWeb3Provider.injectResult(
-    web3Instance.eth.abi.encodeParameter('uint256', 4)
-  );
+  options?.getNbMembers?.() ||
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameter('uint256', 4)
+    );
 
   // Mock `multicall` for `getMemberAddress`
-  mockWeb3Provider.injectResult(
-    web3Instance.eth.abi.encodeParameters(
-      ['uint256', 'bytes[]'],
-      [
-        0,
+  options?.getMemberAddress?.() ||
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
         [
-          // Let's pretend this is the DaoFactory
-          web3Instance.eth.abi.encodeParameter(
-            'address',
-            '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
-          ),
-          // Let's pretend this is the DAO deployer
-          web3Instance.eth.abi.encodeParameter(
-            'address',
-            '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
-          ),
-          // Voters from `defaultProposalVotes`
-          web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
-          web3Instance.eth.abi.encodeParameter(
-            'address',
-            '0xc0437e11094275376defbe51dc6e04598403d276'
-          ),
-        ],
-      ]
-    )
-  );
+          0,
+          [
+            // Let's pretend this is the DaoFactory
+            web3Instance.eth.abi.encodeParameter(
+              'address',
+              '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
+            ),
+            // Let's pretend this is the DAO deployer
+            web3Instance.eth.abi.encodeParameter(
+              'address',
+              '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+            ),
+            // Voters from `defaultProposalVotes`
+            web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            ),
+            web3Instance.eth.abi.encodeParameter(
+              'address',
+              '0xc0437e11094275376defbe51dc6e04598403d276'
+            ),
+          ],
+        ]
+      )
+    );
 
   // Mock `multicall` for `getPriorAmount`
-  mockWeb3Provider.injectResult(
-    web3Instance.eth.abi.encodeParameters(
-      ['uint256', 'bytes[]'],
-      [
-        0,
+  options?.getPriorAmount?.() ||
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameters(
+        ['uint256', 'bytes[]'],
         [
-          // For `getPriorAmount` calls
-          web3Instance.eth.abi.encodeParameter('uint256', '0'),
-          web3Instance.eth.abi.encodeParameter('uint256', '1'),
-          web3Instance.eth.abi.encodeParameter('uint256', '200000'),
-          web3Instance.eth.abi.encodeParameter('uint256', '100000'),
-        ],
-      ]
-    )
-  );
+          0,
+          [
+            // For `getPriorAmount` calls
+            web3Instance.eth.abi.encodeParameter('uint256', '0'),
+            web3Instance.eth.abi.encodeParameter('uint256', '1'),
+            web3Instance.eth.abi.encodeParameter('uint256', '200000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '100000'),
+          ],
+        ]
+      )
+    );
+
+  // Mock `getBadNodeError` call `BadNodeError.OK`
+  options?.getBadNodeError?.() ||
+    mockWeb3Provider.injectResult(
+      web3Instance.eth.abi.encodeParameter('uint256', '0')
+    );
 
   // Mock signature
-  mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
+  options?.signature?.() ||
+    mockWeb3Provider.injectResult(...signTypedDataV4({web3Instance}));
 }
 
 describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
@@ -176,23 +201,7 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
     let mockWeb3Provider: FakeHttpProvider;
     let web3Instance: Web3;
 
-    const {rerender} = render(
-      <Wrapper
-        useInit
-        useWallet
-        getProps={(p) => {
-          mockWeb3Provider = p.mockWeb3Provider;
-          web3Instance = p.web3Instance;
-        }}>
-        <OffchainOpRollupVotingSubmitResultAction
-          adapterName={ContractAdapterNames.onboarding}
-          proposal={proposalData as ProposalData}
-        />
-      </Wrapper>
-    );
-
-    // Set the `daoProposalVotingAdapter.getWeb3VotingAdapterContract`
-    rerender(
+    render(
       <Wrapper
         useInit
         useWallet
@@ -220,11 +229,11 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeInTheDocument();
 
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeEnabled();
     });
 
@@ -233,7 +242,9 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
       mockInitialCallsHelper(mockWeb3Provider, web3Instance);
     });
 
-    userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
+    userEvent.click(
+      screen.getByRole('button', {name: submitVoteResultButtonRegex})
+    );
 
     await waitFor(() => {
       expect(
@@ -265,23 +276,7 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
     let mockWeb3Provider: FakeHttpProvider;
     let web3Instance: Web3;
 
-    const {rerender} = render(
-      <Wrapper
-        useInit
-        useWallet
-        getProps={(p) => {
-          mockWeb3Provider = p.mockWeb3Provider;
-          web3Instance = p.web3Instance;
-        }}>
-        <OffchainOpRollupVotingSubmitResultAction
-          adapterName={ContractAdapterNames.onboarding}
-          proposal={proposalData as ProposalData}
-        />
-      </Wrapper>
-    );
-
-    // Set the `daoProposalVotingAdapter.getWeb3VotingAdapterContract`
-    rerender(
+    render(
       <Wrapper
         useInit
         useWallet
@@ -309,11 +304,11 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeInTheDocument();
 
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeEnabled();
     });
 
@@ -322,7 +317,9 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
       mockInitialCallsHelper(mockWeb3Provider, web3Instance);
     });
 
-    userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
+    userEvent.click(
+      screen.getByRole('button', {name: submitVoteResultButtonRegex})
+    );
 
     await waitFor(() => {
       expect(
@@ -354,23 +351,7 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
     let mockWeb3Provider: FakeHttpProvider;
     let web3Instance: Web3;
 
-    const {rerender} = render(
-      <Wrapper
-        useInit
-        useWallet
-        getProps={(p) => {
-          mockWeb3Provider = p.mockWeb3Provider;
-          web3Instance = p.web3Instance;
-        }}>
-        <OffchainOpRollupVotingSubmitResultAction
-          adapterName={ContractAdapterNames.onboarding}
-          proposal={proposalData as ProposalData}
-        />
-      </Wrapper>
-    );
-
-    // Set the `daoProposalVotingAdapter.getWeb3VotingAdapterContract`
-    rerender(
+    render(
       <Wrapper
         useInit
         useWallet
@@ -398,27 +379,101 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeInTheDocument();
 
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeEnabled();
     });
 
     // Setup: Mock RPC calls for signature and set mock error
     await waitFor(() => {
-      mockInitialCallsHelper(mockWeb3Provider, web3Instance);
-
-      // Mock RPC error for estimating gas before the tx
-      mockWeb3Provider.injectError({code: 1234, message: 'Bad stuff!'});
+      mockInitialCallsHelper(mockWeb3Provider, web3Instance, {
+        // Mock RPC error
+        getPriorAmount: () =>
+          mockWeb3Provider.injectError({
+            code: 1234,
+            message: 'Some really nasty error',
+          }),
+      });
     });
 
-    userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
+    userEvent.click(
+      screen.getByRole('button', {name: submitVoteResultButtonRegex})
+    );
 
     await waitFor(() => {
-      expect(screen.getByText(/^something went wrong$/i)).toBeInTheDocument();
-      expect(screen.getByText(/bad stuff!/i)).toBeInTheDocument();
+      expect(screen.getByText(somethingWentWrongRegex)).toBeInTheDocument();
+
+      expect(
+        screen.getByText(/^some really nasty error$/i)
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('should show an error when `getBadNodeError` != `BadNodeError.OK`', async () => {
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    render(
+      <Wrapper
+        useInit
+        useWallet
+        getProps={(p) => {
+          mockWeb3Provider = p.mockWeb3Provider;
+          web3Instance = p.web3Instance;
+        }}>
+        <OffchainOpRollupVotingSubmitResultAction
+          adapterName={ContractAdapterNames.onboarding}
+          proposal={
+            {
+              ...proposalData,
+              daoProposalVotingAdapter: {
+                getWeb3VotingAdapterContract: () =>
+                  new web3Instance.eth.Contract(
+                    OffchainVotingABI as any,
+                    DEFAULT_ETH_ADDRESS
+                  ),
+              },
+            } as ProposalData
+          }
+        />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
+      ).toBeEnabled();
+    });
+
+    // Setup: Mock RPC calls for a bad node error
+    await waitFor(() => {
+      mockInitialCallsHelper(mockWeb3Provider, web3Instance, {
+        getBadNodeError: () =>
+          mockWeb3Provider.injectResult(
+            web3Instance.eth.abi.encodeParameter('uint256', '1')
+          ),
+      });
+    });
+
+    userEvent.click(
+      screen.getByRole('button', {name: submitVoteResultButtonRegex})
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(somethingWentWrongRegex)).toBeInTheDocument();
+
+      expect(
+        screen.getByText(
+          /^cannot submit off-chain voting result\. node has an error: WRONG_PROPOSAL_ID\.$/i
+        )
+      ).toBeInTheDocument();
     });
   });
 
@@ -433,23 +488,7 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
     let mockWeb3Provider: FakeHttpProvider;
     let web3Instance: Web3;
 
-    const {rerender} = render(
-      <Wrapper
-        useInit
-        useWallet
-        getProps={(p) => {
-          mockWeb3Provider = p.mockWeb3Provider;
-          web3Instance = p.web3Instance;
-        }}>
-        <OffchainOpRollupVotingSubmitResultAction
-          adapterName={ContractAdapterNames.onboarding}
-          proposal={proposalData as ProposalData}
-        />
-      </Wrapper>
-    );
-
-    // Set the `daoProposalVotingAdapter.getWeb3VotingAdapterContract`
-    rerender(
+    render(
       <Wrapper
         useInit
         useWallet
@@ -477,11 +516,11 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeInTheDocument();
 
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeEnabled();
     });
 
@@ -490,10 +529,13 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
       mockInitialCallsHelper(mockWeb3Provider, web3Instance);
     });
 
-    userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
+    userEvent.click(
+      screen.getByRole('button', {name: submitVoteResultButtonRegex})
+    );
 
     await waitFor(() => {
-      expect(screen.getByText(/^something went wrong$/i)).toBeInTheDocument();
+      expect(screen.getByText(somethingWentWrongRegex)).toBeInTheDocument();
+
       expect(
         screen.getByText(
           /something went wrong while getting the off-chain vote proof\./i
@@ -524,23 +566,7 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
     let mockWeb3Provider: FakeHttpProvider;
     let web3Instance: Web3;
 
-    const {rerender} = render(
-      <Wrapper
-        useInit
-        useWallet
-        getProps={(p) => {
-          mockWeb3Provider = p.mockWeb3Provider;
-          web3Instance = p.web3Instance;
-        }}>
-        <OffchainOpRollupVotingSubmitResultAction
-          adapterName={ContractAdapterNames.onboarding}
-          proposal={proposalData as ProposalData}
-        />
-      </Wrapper>
-    );
-
-    // Set the `daoProposalVotingAdapter.getWeb3VotingAdapterContract`
-    rerender(
+    render(
       <Wrapper
         useInit
         useWallet
@@ -568,11 +594,11 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeInTheDocument();
 
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeEnabled();
     });
 
@@ -581,10 +607,12 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
       mockInitialCallsHelper(mockWeb3Provider, web3Instance);
     });
 
-    userEvent.click(screen.getByRole('button', {name: /submit vote result/i}));
+    userEvent.click(
+      screen.getByRole('button', {name: submitVoteResultButtonRegex})
+    );
 
     await waitFor(() => {
-      expect(screen.getByText(/^something went wrong$/i)).toBeInTheDocument();
+      expect(screen.getByText(somethingWentWrongRegex)).toBeInTheDocument();
       expect(
         screen.getByText(
           /something went wrong while submitting the off-chain vote proof\./i
@@ -594,37 +622,14 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
   });
 
   test('should disable the submit button if not a member', async () => {
-    let wrapperStore: any;
+    let store: Store;
 
-    const {rerender} = render(
+    render(
       <Wrapper
         useInit
         useWallet
-        getProps={({store}) => {
-          wrapperStore = store;
-        }}>
-        <OffchainOpRollupVotingSubmitResultAction
-          adapterName={ContractAdapterNames.onboarding}
-          proposal={proposalData as ProposalData}
-        />
-      </Wrapper>
-    );
-
-    wrapperStore.dispatch(
-      setConnectedMember({
-        delegateKey: DEFAULT_ETH_ADDRESS,
-        isActiveMember: false,
-        isAddressDelegated: false,
-        memberAddress: DEFAULT_ETH_ADDRESS,
-      })
-    );
-
-    rerender(
-      <Wrapper
-        useInit
-        useWallet
-        getProps={({store}) => {
-          wrapperStore = store;
+        getProps={(p) => {
+          store = p.store;
         }}>
         <OffchainOpRollupVotingSubmitResultAction
           adapterName={ContractAdapterNames.onboarding}
@@ -635,11 +640,38 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
-      ).toBeDisabled();
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
+      ).toBeInTheDocument();
 
       expect(
-        screen.getByRole('button', {name: /why is submitting disabled\?/i})
+        screen.getByRole('button', {name: whyDisabledButtonRegex})
+      ).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      store.dispatch(
+        setConnectedMember({
+          delegateKey: DEFAULT_ETH_ADDRESS,
+          isActiveMember: false,
+          isAddressDelegated: false,
+          memberAddress: DEFAULT_ETH_ADDRESS,
+        })
+      );
+    });
+
+    userEvent.click(screen.getByRole('button', {name: whyDisabledButtonRegex}));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
+      ).toBeDisabled();
+
+      expect(screen.getByText(/why is this disabled\?/i)).toBeInTheDocument();
+
+      expect(
+        screen.getByText(
+          /either you are not a member, or your membership is not active\./i
+        )
       ).toBeInTheDocument();
     });
   });
@@ -656,18 +688,18 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeDisabled();
     });
 
     // check again after any component updates
     await waitFor(() => {
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeDisabled();
 
       expect(
-        screen.getByRole('button', {name: /why is submitting disabled\?/i})
+        screen.getByRole('button', {name: whyDisabledButtonRegex})
       ).toBeInTheDocument();
     });
   });
@@ -684,27 +716,26 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeDisabled();
     });
 
     // check again after any component updates
     await waitFor(() => {
       expect(
-        screen.getByRole('button', {name: /submit vote result/i})
+        screen.getByRole('button', {name: submitVoteResultButtonRegex})
       ).toBeDisabled();
 
       expect(
-        screen.getByRole('button', {name: /why is submitting disabled\?/i})
+        screen.getByRole('button', {name: whyDisabledButtonRegex})
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
-      screen.getByRole('button', {name: /why is submitting disabled\?/i})
-    );
+    userEvent.click(screen.getByRole('button', {name: whyDisabledButtonRegex}));
 
     await waitFor(() => {
       expect(screen.getByText(/why is this disabled\?/i)).toBeInTheDocument();
+
       expect(
         screen.getByText(/your wallet is not connected\./i)
       ).toBeInTheDocument();
