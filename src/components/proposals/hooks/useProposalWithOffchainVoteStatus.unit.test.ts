@@ -20,7 +20,7 @@ import {proposalHasVotingState} from '../helpers';
 import {useProposalWithOffchainVoteStatus} from '.';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
 import {VotingState} from '../voting/types';
-import OffchainVotingABI from '../../../truffle-contracts/OffchainVotingContract.json';
+import OffchainVotingABI from '../../../abis/OffchainVotingContract.json';
 import Wrapper from '../../../test/Wrapper';
 
 const nowSeconds = Date.now() / 1000;

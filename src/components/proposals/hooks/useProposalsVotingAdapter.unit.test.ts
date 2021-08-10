@@ -4,8 +4,8 @@ import {AsyncStatus} from '../../../util/types';
 import {DEFAULT_ETH_ADDRESS} from '../../../test/helpers';
 import {useProposalsVotingAdapter} from './useProposalsVotingAdapter';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
-import OffchainVotingContractABI from '../../../truffle-contracts/OffchainVotingContract.json';
-import VotingContractABI from '../../../truffle-contracts/VotingContract.json';
+import OffchainVotingContractABI from '../../../abis/OffchainVotingContract.json';
+import VotingContractABI from '../../../abis/VotingContract.json';
 import Wrapper from '../../../test/Wrapper';
 
 describe('useProposalsVotingAdapter unit tests', () => {

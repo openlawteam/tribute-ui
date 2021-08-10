@@ -38,7 +38,7 @@ import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
 import Wrap from '../../components/common/Wrap';
 import EtherscanURL from '../../components/web3/EtherscanURL';
-import {default as ERC20ABI} from '../../truffle-contracts/ERC20.json';
+import {default as ERC20ABI} from '../../abis/ERC20.json';
 
 enum Fields {
   type = 'type',

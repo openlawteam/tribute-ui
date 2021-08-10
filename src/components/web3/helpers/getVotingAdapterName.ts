@@ -8,7 +8,7 @@ export async function getVotingAdapterName(
 ): Promise<VotingAdapterName> {
   try {
     const {default: lazyIVotingABI} = await import(
-      '../../../truffle-contracts/IVoting.json'
+      '../../../abis/IVoting.json'
     );
 
     return await new web3Instance.eth.Contract(

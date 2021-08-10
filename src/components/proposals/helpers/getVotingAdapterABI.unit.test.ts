@@ -1,7 +1,7 @@
 import {getVotingAdapterABI} from './';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
-import OffchainVotingContractABI from '../../../truffle-contracts/OffchainVotingContract.json';
-import VotingContractABI from '../../../truffle-contracts/VotingContract.json';
+import OffchainVotingContractABI from '../../../abis/OffchainVotingContract.json';
+import VotingContractABI from '../../../abis/VotingContract.json';
 
 describe('getVotingAdapterABI unit tests', () => {
   test('can return off-chain voting abi', async () => {

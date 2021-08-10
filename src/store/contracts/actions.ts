@@ -83,7 +83,7 @@ export function initContractBankFactory(web3Instance: Web3) {
     try {
       if (web3Instance) {
         const {default: lazyBankFactoryABI} = await import(
-          '../../truffle-contracts/BankFactory.json'
+          '../../abis/BankFactory.json'
         );
         const bankFactoryContract: AbiItem[] = lazyBankFactoryABI as any;
         const contractAddress = BANK_FACTORY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
@@ -112,7 +112,7 @@ export function initContractDaoFactory(web3Instance: Web3) {
     try {
       if (web3Instance) {
         const {default: lazyDaoFactoryABI} = await import(
-          '../../truffle-contracts/DaoFactory.json'
+          '../../abis/DaoFactory.json'
         );
         const daoFactoryContract: AbiItem[] = lazyDaoFactoryABI as any;
         const contractAddress = DAO_FACTORY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
@@ -141,7 +141,7 @@ export function initContractDaoRegistry(web3Instance: Web3) {
     try {
       if (web3Instance) {
         const {default: lazyDaoRegistryABI} = await import(
-          '../../truffle-contracts/DaoRegistry.json'
+          '../../abis/DaoRegistry.json'
         );
 
         const daoRegistryContract: AbiItem[] = lazyDaoRegistryABI as any;
@@ -180,7 +180,7 @@ export function initContractVoting(
     adapterOrExtensionName: ContractAdapterNames.voting,
     adapterNameForRedux: VotingAdapterName.VotingContract,
     contractAddress,
-    lazyImport: () => import('../../truffle-contracts/VotingContract.json'),
+    lazyImport: () => import('../../abis/VotingContract.json'),
     web3Instance,
   });
 }
@@ -194,8 +194,7 @@ export function initContractVotingOpRollup(
     adapterOrExtensionName: ContractAdapterNames.voting,
     adapterNameForRedux: VotingAdapterName.OffchainVotingContract,
     contractAddress,
-    lazyImport: () =>
-      import('../../truffle-contracts/OffchainVotingContract.json'),
+    lazyImport: () => import('../../abis/OffchainVotingContract.json'),
     web3Instance,
   });
 }
@@ -209,7 +208,7 @@ export function initContractOnboarding(
     adapterNameForRedux: DaoAdapterConstants.ONBOARDING,
     adapterOrExtensionName: ContractAdapterNames.onboarding,
     contractAddress,
-    lazyImport: () => import('../../truffle-contracts/OnboardingContract.json'),
+    lazyImport: () => import('../../abis/OnboardingContract.json'),
     web3Instance,
   });
 }
@@ -224,7 +223,7 @@ export function initContractBankExtension(
     adapterOrExtensionName: ContractExtensionNames.bank,
     contractAddress,
     isExtension: true,
-    lazyImport: () => import('../../truffle-contracts/BankExtension.json'),
+    lazyImport: () => import('../../abis/BankExtension.json'),
     web3Instance,
   });
 }
@@ -238,7 +237,7 @@ export function initContractTribute(
     adapterNameForRedux: DaoAdapterConstants.TRIBUTE,
     adapterOrExtensionName: ContractAdapterNames.tribute,
     contractAddress,
-    lazyImport: () => import('../../truffle-contracts/TributeContract.json'),
+    lazyImport: () => import('../../abis/TributeContract.json'),
     web3Instance,
   });
 }
@@ -252,7 +251,7 @@ export function initContractDistribute(
     adapterNameForRedux: DaoAdapterConstants.DISTRIBUTE,
     adapterOrExtensionName: ContractAdapterNames.distribute,
     contractAddress,
-    lazyImport: () => import('../../truffle-contracts/DistributeContract.json'),
+    lazyImport: () => import('../../abis/DistributeContract.json'),
     web3Instance,
   });
 }
@@ -266,7 +265,7 @@ export function initContractManaging(
     adapterNameForRedux: DaoAdapterConstants.MANAGING,
     adapterOrExtensionName: ContractAdapterNames.managing,
     contractAddress,
-    lazyImport: () => import('../../truffle-contracts/ManagingContract.json'),
+    lazyImport: () => import('../../abis/ManagingContract.json'),
     web3Instance,
   });
 }
@@ -280,8 +279,7 @@ export function initContractBankAdapter(
     adapterNameForRedux: DaoAdapterConstants.BANK,
     adapterOrExtensionName: ContractAdapterNames.bank,
     contractAddress,
-    lazyImport: () =>
-      import('../../truffle-contracts/BankAdapterContract.json'),
+    lazyImport: () => import('../../abis/BankAdapterContract.json'),
     web3Instance,
   });
 }
@@ -295,7 +293,7 @@ export function initContractNFTAdapter(
     adapterNameForRedux: DaoAdapterConstants.NFT,
     adapterOrExtensionName: ContractAdapterNames.nft,
     contractAddress,
-    lazyImport: () => import('../../truffle-contracts/NFTAdapterContract.json'),
+    lazyImport: () => import('../../abis/NFTAdapterContract.json'),
     web3Instance,
   });
 }
@@ -309,8 +307,7 @@ export function initContractDaoRegistryAdapter(
     adapterNameForRedux: DaoAdapterConstants.DAO_REGISTRY,
     adapterOrExtensionName: ContractAdapterNames.dao_registry,
     contractAddress,
-    lazyImport: () =>
-      import('../../truffle-contracts/DaoRegistryAdapterContract.json'),
+    lazyImport: () => import('../../abis/DaoRegistryAdapterContract.json'),
     web3Instance,
   });
 }
@@ -324,7 +321,7 @@ export function initContractRagequit(
     adapterNameForRedux: DaoAdapterConstants.RAGEQUIT,
     adapterOrExtensionName: ContractAdapterNames.ragequit,
     contractAddress,
-    lazyImport: () => import('../../truffle-contracts/RagequitContract.json'),
+    lazyImport: () => import('../../abis/RagequitContract.json'),
     web3Instance,
   });
 }
@@ -338,7 +335,7 @@ export function initContractGuildKick(
     adapterNameForRedux: DaoAdapterConstants.GUILDKICK,
     adapterOrExtensionName: ContractAdapterNames.guildkick,
     contractAddress,
-    lazyImport: () => import('../../truffle-contracts/GuildKickContract.json'),
+    lazyImport: () => import('../../abis/GuildKickContract.json'),
     web3Instance,
   });
 }
@@ -352,7 +349,7 @@ export function initContractFinancing(
     adapterNameForRedux: DaoAdapterConstants.FINANCING,
     adapterOrExtensionName: ContractAdapterNames.financing,
     contractAddress,
-    lazyImport: () => import('../../truffle-contracts/FinancingContract.json'),
+    lazyImport: () => import('../../abis/FinancingContract.json'),
     web3Instance,
   });
 }
@@ -366,8 +363,7 @@ export function initContractConfiguration(
     adapterNameForRedux: DaoAdapterConstants.CONFIGURATION,
     adapterOrExtensionName: ContractAdapterNames.configuration,
     contractAddress,
-    lazyImport: () =>
-      import('../../truffle-contracts/ConfigurationContract.json'),
+    lazyImport: () => import('../../abis/ConfigurationContract.json'),
     web3Instance,
   });
 }
@@ -381,7 +377,7 @@ export function initContractTributeNFT(
     adapterNameForRedux: DaoAdapterConstants.TRIBUTE_NFT,
     adapterOrExtensionName: ContractAdapterNames.tribute_nft,
     contractAddress,
-    lazyImport: () => import('../../truffle-contracts/TributeNFTContract.json'),
+    lazyImport: () => import('../../abis/TributeNFTContract.json'),
     web3Instance,
   });
 }
@@ -395,8 +391,7 @@ export function initContractCouponOnboarding(
     adapterNameForRedux: DaoAdapterConstants.COUPON_ONBOARDING,
     adapterOrExtensionName: ContractAdapterNames.coupon_onboarding,
     contractAddress,
-    lazyImport: () =>
-      import('../../truffle-contracts/CouponOnboardingContract.json'),
+    lazyImport: () => import('../../abis/CouponOnboardingContract.json'),
     web3Instance,
   });
 }
@@ -411,7 +406,7 @@ export function initContractNFTExtension(
     adapterOrExtensionName: ContractExtensionNames.nft,
     contractAddress,
     isExtension: true,
-    lazyImport: () => import('../../truffle-contracts/NFTExtension.json'),
+    lazyImport: () => import('../../abis/NFTExtension.json'),
     web3Instance,
   });
 }
@@ -426,7 +421,7 @@ export function initContractERC20Extension(
     adapterOrExtensionName: ContractExtensionNames.erc20,
     contractAddress,
     isExtension: true,
-    lazyImport: () => import('../../truffle-contracts/ERC20Extension.json'),
+    lazyImport: () => import('../../abis/ERC20Extension.json'),
     web3Instance,
   });
 }

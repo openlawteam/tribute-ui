@@ -4,7 +4,7 @@ import {ContractAdapterNames} from '../types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
 import {getAdapterAddress} from '.';
 import {DEFAULT_ETH_ADDRESS, getWeb3Instance} from '../../../test/helpers';
-import DaoRegistryABI from '../../../truffle-contracts/DaoRegistry.json';
+import DaoRegistryABI from '../../../abis/DaoRegistry.json';
 
 describe('getAdapterAddress unit tests', () => {
   test('should return correct address', async () => {

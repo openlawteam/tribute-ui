@@ -4,7 +4,7 @@ import {ContractExtensionNames} from '../types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
 import {DEFAULT_ETH_ADDRESS, getWeb3Instance} from '../../../test/helpers';
 import {getExtensionAddress} from '.';
-import DAORegistryABI from '../../../truffle-contracts/DaoRegistry.json';
+import DAORegistryABI from '../../../abis/DaoRegistry.json';
 
 describe('getExtensionAddress unit tests', () => {
   test('should return correct address', async () => {

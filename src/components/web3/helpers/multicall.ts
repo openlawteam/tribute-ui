@@ -22,7 +22,7 @@ export async function multicall({
   web3Instance: Web3;
 }) {
   const {default: lazyMulticallABI} = await import(
-    '../../../truffle-contracts/Multicall.json'
+    '../../../abis/Multicall.json'
   );
 
   // Let's `console.error` and exit instead of throwing.

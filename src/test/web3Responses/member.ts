@@ -1,7 +1,7 @@
 import {DEFAULT_ETH_ADDRESS} from '../helpers';
 import {TestWeb3ResponseArgs, TestWeb3ResponseReturn} from './types';
-import DAORegistryABI from '../../truffle-contracts/DaoRegistry.json';
-import BankExtensionABI from '../../truffle-contracts/BankExtension.json';
+import DAORegistryABI from '../../abis/DaoRegistry.json';
+import BankExtensionABI from '../../abis/BankExtension.json';
 
 /**
  * memberAddressesByDelegatedKey
