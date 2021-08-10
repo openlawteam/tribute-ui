@@ -1,7 +1,6 @@
 import {useEffect, useState, useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import Web3 from 'web3';
-import {AbiItem} from 'web3-utils/types';
 import {useQuery} from 'react-query';
 
 import {AsyncStatus} from '../../../util/types';
@@ -85,7 +84,6 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
    */
 
   const handleGetDaoProposalsCached = useCallback(handleGetDaoProposals, [
-    daoProposalsCalls,
     daoProposalsData,
     daoProposalsQueryError,
     safeProposalIds,
@@ -98,6 +96,7 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
   useEffect(() => {
     if (
       !proposalIds.length ||
+      !safeProposalIds ||
       !proposalsAbi ||
       !registryAddress ||
       !web3Instance
@@ -105,17 +104,13 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
       return;
     }
 
-    handleGetDaoProposalsCached({
-      proposalIds,
-      proposalsAbi,
-      registryAddress,
-      web3Instance,
-    });
+    handleGetDaoProposalsCached();
   }, [
     handleGetDaoProposalsCached,
-    proposalIds,
+    proposalIds.length,
     proposalsAbi,
     registryAddress,
+    safeProposalIds,
     web3Instance,
   ]);
 
@@ -146,19 +141,9 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
    * Functions
    */
 
-  async function handleGetDaoProposals({
-    proposalIds,
-    proposalsAbi,
-    registryAddress,
-    web3Instance,
-  }: {
-    proposalIds: string[];
-    proposalsAbi: AbiItem;
-    registryAddress: string;
-    web3Instance: Web3;
-  }) {
+  async function handleGetDaoProposals() {
     try {
-      if (!proposalIds.length || !safeProposalIds) return;
+      if (!safeProposalIds) return;
 
       if (!safeProposalIds.length) {
         setDaoProposalsStatus(AsyncStatus.FULFILLED);
@@ -170,8 +155,6 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
       setDaoProposalsStatus(AsyncStatus.PENDING);
       // Reset error
       setDaoProposalsError(undefined);
-
-      if (!daoProposalsCalls) return;
 
       if (daoProposalsQueryError) {
         throw daoProposalsQueryError;
