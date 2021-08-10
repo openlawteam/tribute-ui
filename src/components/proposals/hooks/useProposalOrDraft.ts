@@ -182,9 +182,9 @@ export function useProposalOrDraft(
     if (refetchCount === 0) return;
 
     /**
-     * Provide a different Array reference to force a re-render
-     * of the `useProposalsVotingAdapter` hook. If the `id` argument changes,
-     * that's fine as well, but it's unlikely.
+     * Provide a different Array reference to force a re-render of the
+     * `useProposalsVotingAdapter` hook. If the `id` argument changes, that's
+     * fine as well, but it's unlikely.
      */
     setProposalVotingAdapterId([id]);
   }, [id, refetchCount]);
@@ -194,9 +194,8 @@ export function useProposalOrDraft(
       if (refetchCount === 0) return;
 
       /**
-       * Reset queries when `refetchCount` is
-       * incremented (proposal is sponsored/submitted on chain, proposal is
-       * voted on)
+       * Reset queries when `refetchCount` is incremented (proposal is
+       * sponsored/submitted on chain, proposal is voted on)
        */
       await queryClient.resetQueries();
     }
