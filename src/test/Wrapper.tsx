@@ -57,7 +57,7 @@ type WrapperProps = {
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // turns retries off
+      // turns retries off to test error results
       retry: false,
     },
   },
