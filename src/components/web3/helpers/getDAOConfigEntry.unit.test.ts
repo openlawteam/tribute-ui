@@ -2,6 +2,7 @@ import {AbiItem} from 'web3-utils/types';
 
 import {ContractDAOConfigKeys} from '../types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
+import {DaoRegistry} from '../../../../abi-types/DaoRegistry';
 import {getDAOConfigEntry} from '.';
 import {getWeb3Instance} from '../../../test/helpers';
 import DaoRegistryABI from '../../../abis/DaoRegistry.json';
@@ -13,7 +14,7 @@ describe('getDAOConfigEntry unit tests', () => {
     const instance = new web3.eth.Contract(
       DaoRegistryABI as AbiItem[],
       contractAddress
-    );
+    ) as any as DaoRegistry;
 
     const result: [string] = [web3.eth.abi.encodeParameter('uint256', 1000)];
 

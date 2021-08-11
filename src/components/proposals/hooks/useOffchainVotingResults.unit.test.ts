@@ -11,7 +11,6 @@ import {AsyncStatus} from '../../../util/types';
 import {SnapshotProposal} from '../types';
 import {useOffchainVotingResults} from './useOffchainVotingResults';
 import {VoteChoices} from '../../web3/types';
-import MulticallABI from '../../../abis/Multicall.json';
 import Wrapper from '../../../test/Wrapper';
 
 const fakeSnapshotProposal: SnapshotProposal = {
