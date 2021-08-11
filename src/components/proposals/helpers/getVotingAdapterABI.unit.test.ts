@@ -1,3 +1,5 @@
+import {waitFor} from '@testing-library/react';
+
 import {getVotingAdapterABI} from './';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
 import OffchainVotingContractABI from '../../../abis/OffchainVotingContract.json';
@@ -27,8 +29,10 @@ describe('getVotingAdapterABI unit tests', () => {
       errorToTest = error;
     }
 
-    expect(errorToTest.message).toMatch(
-      /no voting adapter name was found for "ew"\./i
-    );
+    await waitFor(() => {
+      expect(errorToTest.message).toMatch(
+        /no voting adapter name was found for "ew"\./i
+      );
+    });
   });
 });

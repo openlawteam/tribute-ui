@@ -2,6 +2,7 @@ import {AbiItem} from 'web3-utils/types';
 
 import {ContractExtensionNames} from '../types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
+import {DaoRegistry} from '../../../../abi-types/DaoRegistry';
 import {DEFAULT_ETH_ADDRESS, getWeb3Instance} from '../../../test/helpers';
 import {getExtensionAddress} from '.';
 import DAORegistryABI from '../../../abis/DaoRegistry.json';
@@ -13,7 +14,7 @@ describe('getExtensionAddress unit tests', () => {
     const instance = new web3.eth.Contract(
       DAORegistryABI as AbiItem[],
       contractAddress
-    );
+    ) as any as DaoRegistry;
 
     const result: [string] = [
       web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),

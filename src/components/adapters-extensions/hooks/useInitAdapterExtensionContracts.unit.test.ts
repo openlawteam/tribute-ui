@@ -1,8 +1,6 @@
 import {renderHook, act} from '@testing-library/react-hooks';
 import {waitFor} from '@testing-library/react';
 
-import {useInitAdapterExtensionContracts} from './useInitAdapterExtensionContracts';
-
 import {
   CONTRACT_BANK_ADAPTER,
   CONTRACT_BANK_EXTENSION,
@@ -18,7 +16,7 @@ import {
   CONTRACT_TRIBUTE,
   CONTRACT_VOTING,
 } from '../../../store/actions';
-
+import {useInitAdapterExtensionContracts} from './useInitAdapterExtensionContracts';
 import Wrapper from '../../../test/Wrapper';
 
 describe('useInitAdapterExtensionContracts unit tests', () => {

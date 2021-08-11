@@ -2,8 +2,9 @@ import {AbiItem} from 'web3-utils/types';
 
 import {ContractAdapterNames} from '../types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
-import {getAdapterAddress} from '.';
+import {DaoRegistry} from '../../../../abi-types/DaoRegistry';
 import {DEFAULT_ETH_ADDRESS, getWeb3Instance} from '../../../test/helpers';
+import {getAdapterAddress} from '.';
 import DaoRegistryABI from '../../../abis/DaoRegistry.json';
 
 describe('getAdapterAddress unit tests', () => {
@@ -13,7 +14,7 @@ describe('getAdapterAddress unit tests', () => {
     const instance = new web3.eth.Contract(
       DaoRegistryABI as AbiItem[],
       contractAddress
-    );
+    ) as any as DaoRegistry;
 
     const result: [string] = [
       web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
