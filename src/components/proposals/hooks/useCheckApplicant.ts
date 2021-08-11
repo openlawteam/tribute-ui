@@ -1,13 +1,13 @@
-import {useState, useEffect, useCallback} from 'react';
-import {useSelector} from 'react-redux';
-import usePreviousDistinct from 'react-use/lib/usePreviousDistinct';
 import {AbiItem} from 'web3-utils';
+import {useSelector} from 'react-redux';
+import {useState, useEffect, useCallback} from 'react';
+import usePreviousDistinct from 'react-use/lib/usePreviousDistinct';
 
 import {AsyncStatus} from '../../../util/types';
-import {StoreState} from '../../../store/types';
 import {multicall, MulticallTuple} from '../../../components/web3/helpers';
-import {useWeb3Modal} from '../../../components/web3/hooks';
 import {normalizeString, truncateEthAddress} from '../../../util/helpers';
+import {StoreState} from '../../../store/types';
+import {useWeb3Modal} from '../../../components/web3/hooks';
 
 type UseCheckApplicantReturn = {
   checkApplicantError: Error | undefined;
@@ -142,7 +142,7 @@ export function useCheckApplicant(address?: string): UseCheckApplicantReturn {
         isNotReservedAddressResult,
         isNotZeroAddressResult,
         getAddressIfDelegatedResult,
-      ]: [boolean, boolean, string] = await multicall({calls, web3Instance});
+      ] = await multicall<[boolean, boolean, string]>({calls, web3Instance});
 
       if (!isNotReservedAddressResult) {
         // Applicant address cannot be a reserved address.

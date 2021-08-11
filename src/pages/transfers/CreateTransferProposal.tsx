@@ -1,15 +1,14 @@
-import React, {useState, useCallback, useEffect} from 'react';
 import {
   SnapshotType,
   SnapshotProposalData,
   prepareVoteProposalData,
 } from '@openlaw/snapshot-js-erc712';
-import {useForm} from 'react-hook-form';
-import {useSelector} from 'react-redux';
-import {useHistory} from 'react-router-dom';
 import {toBN, AbiItem, toWei, toChecksumAddress} from 'web3-utils';
+import {useForm} from 'react-hook-form';
+import {useHistory} from 'react-router-dom';
+import {useSelector} from 'react-redux';
+import {useState, useCallback, useEffect} from 'react';
 
-import {ETH_TOKEN_ADDRESS, GUILD_ADDRESS, UNITS_ADDRESS} from '../../config';
 import {
   getValidationError,
   stripFormatNumber,
@@ -23,22 +22,23 @@ import {
   useIsDefaultChain,
   useWeb3Modal,
 } from '../../components/web3/hooks';
+import {BURN_ADDRESS} from '../../util/constants';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
+import {default as ERC20ABI} from '../../abis/ERC20.json';
+import {ETH_TOKEN_ADDRESS, GUILD_ADDRESS, UNITS_ADDRESS} from '../../config';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
-import {BURN_ADDRESS} from '../../util/constants';
+import {multicall, MulticallTuple} from '../../components/web3/helpers';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
-import {multicall, MulticallTuple} from '../../components/web3/helpers';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
 import CycleMessage from '../../components/feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
+import EtherscanURL from '../../components/web3/EtherscanURL';
 import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
 import Wrap from '../../components/common/Wrap';
-import EtherscanURL from '../../components/web3/EtherscanURL';
-import {default as ERC20ABI} from '../../abis/ERC20.json';
 
 enum Fields {
   type = 'type',

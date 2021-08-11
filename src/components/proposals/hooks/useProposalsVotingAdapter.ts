@@ -196,11 +196,11 @@ export function useProposalsVotingAdapter(
                 votingAdapterName: adapterNameResults[i],
                 votingAdapterAddress,
                 getVotingAdapterABI: () => votingAdapterABI,
-                getWeb3VotingAdapterContract: () =>
+                getWeb3VotingAdapterContract: <T>() =>
                   new web3Instance.eth.Contract(
                     votingAdapterABI,
                     votingAdapterAddress
-                  ),
+                  ) as any as T,
               },
             ];
           }

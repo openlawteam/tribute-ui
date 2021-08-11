@@ -229,7 +229,7 @@ export type ProposalVotingAdapterData = {
    */
   getVotingAdapterABI: () => AbiItem[];
   // Helper to use the Web3 Contract directly
-  getWeb3VotingAdapterContract: () => Contract;
+  getWeb3VotingAdapterContract: <T = Contract>() => T;
 };
 
 export type ProposalVotingAdapterTuple = [
