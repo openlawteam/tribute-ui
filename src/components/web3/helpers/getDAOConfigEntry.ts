@@ -1,12 +1,11 @@
 import Web3 from 'web3';
 
 import {ContractDAOConfigKeys} from '../types';
-import {ContractsStateEntry} from '../../../store/contracts/types';
 import {DaoRegistry} from '../../../../abi-types/DaoRegistry';
 
 export async function getDAOConfigEntry(
   configKey: ContractDAOConfigKeys,
-  daoContractInstance: ContractsStateEntry<DaoRegistry>['instance'] | undefined
+  daoContractInstance: DaoRegistry | undefined
 ): Promise<string> {
   try {
     if (!daoContractInstance) {

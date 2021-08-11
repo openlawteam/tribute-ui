@@ -1,4 +1,3 @@
-import {ContractsStateEntry} from '../../../store/contracts/types';
 import {DaoRegistry} from '../../../../abi-types/DaoRegistry';
 
 export enum DaoState {
@@ -7,7 +6,7 @@ export enum DaoState {
 }
 
 export async function getDaoState(
-  daoContractInstance: ContractsStateEntry<DaoRegistry>['instance'] | undefined
+  daoContractInstance: DaoRegistry | undefined
 ): Promise<DaoState> {
   try {
     if (!daoContractInstance) {
