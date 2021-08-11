@@ -15,7 +15,7 @@ import {StoreState} from '../../../store/types';
 export function getContractByAddress(
   address: string,
   contracts: StoreState['contracts']
-): ContractsStateEntry {
+): ContractsStateEntry<any> {
   try {
     const contract = Object.values(contracts).find(
       (c) =>

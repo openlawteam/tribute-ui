@@ -185,14 +185,21 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
   async function getTributeProposalDetails() {
     try {
-      if (!snapshotProposal || !TributeContract) return;
+      if (
+        !daoRegistryContract?.contractAddress ||
+        !snapshotProposal ||
+        !TributeContract
+      ) {
+        return;
+      }
 
       const proposalDetails = await TributeContract.instance.methods
         .proposals(
-          daoRegistryContract?.contractAddress,
+          daoRegistryContract.contractAddress,
           snapshotProposal.idInDAO
         )
         .call();
+
       const {token: tokenAddress, tributeAmount} = proposalDetails;
 
       setTributeProposalDetails({tokenAddress, tributeAmount});

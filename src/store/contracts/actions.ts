@@ -1,6 +1,7 @@
-import Web3 from 'web3';
 import {AbiItem} from 'web3-utils/types';
+import {Contract as Web3Contract} from 'web3-eth-contract/types';
 import {Dispatch} from 'redux';
+import Web3 from 'web3';
 
 import {
   ContractAdapterNames,
@@ -490,12 +491,12 @@ export function initRegisteredVotingAdapter(
   };
 }
 
-export function createContractAction({
+export function createContractAction<T = Web3Contract>({
   type,
   ...payload
 }: {
   type: ContractAction;
-} & ContractsStateEntry) {
+} & ContractsStateEntry<T>) {
   return {
     type,
     ...payload,
@@ -541,11 +542,11 @@ export function initContractThunkFactory({
         contractAddress ||
         (isExtension
           ? await getExtensionAddress(
-              adapterOrExtensionName as unknown as ContractExtensionNames,
+              adapterOrExtensionName as any as ContractExtensionNames,
               getState().contracts.DaoRegistryContract?.instance
             )
           : await getAdapterAddress(
-              adapterOrExtensionName as unknown as ContractAdapterNames,
+              adapterOrExtensionName as any as ContractAdapterNames,
               getState().contracts.DaoRegistryContract?.instance
             ));
 

@@ -36,7 +36,7 @@ const initialState = {
   DistributeContract: null,
   ERC20ExtensionContract: null,
   FinancingContract: null,
-  GuildBankContract: null,
+  GuildKickContract: null,
   ManagingContract: null,
   NFTAdapterContract: null,
   NFTExtensionContract: null,
@@ -79,7 +79,7 @@ export default function reducer(
     case CONTRACT_FINANCING:
       return contractFinancing(state, payload);
     case CONTRACT_GUILDKICK:
-      return contractGuildBank(state, payload);
+      return contractGuildKick(state, payload);
     case CONTRACT_MANAGING:
       return contractManaging(state, payload);
     case CONTRACT_NFT_ADAPTER:
@@ -149,8 +149,8 @@ function contractFinancing(state: ContractsState, payload: any) {
   return {...state, FinancingContract: {...payload}};
 }
 
-function contractGuildBank(state: ContractsState, payload: any) {
-  return {...state, GuildBankContract: {...payload}};
+function contractGuildKick(state: ContractsState, payload: any) {
+  return {...state, GuildKickContract: {...payload}};
 }
 
 function contractOnboarding(state: ContractsState, payload: any) {

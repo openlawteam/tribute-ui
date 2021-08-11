@@ -165,6 +165,10 @@ export function OffchainOpRollupVotingSubmitResultAction(
         throw new Error('No Web3 instance was found.');
       }
 
+      if (!bankExtensionMethods) {
+        throw new Error('No BankExtension methods were found.');
+      }
+
       setSignatureStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       const {idInDAO: proposalHash} = snapshotProposal;

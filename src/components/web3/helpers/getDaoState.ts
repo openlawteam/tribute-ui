@@ -1,4 +1,5 @@
 import {ContractsStateEntry} from '../../../store/contracts/types';
+import {DaoRegistry} from '../../../../abi-types/DaoRegistry';
 
 export enum DaoState {
   CREATION = 'CREATION',
@@ -6,15 +7,14 @@ export enum DaoState {
 }
 
 export async function getDaoState(
-  daoContractInstance: ContractsStateEntry['instance'] | undefined
+  daoContractInstance: ContractsStateEntry<DaoRegistry>['instance'] | undefined
 ): Promise<DaoState> {
   try {
     if (!daoContractInstance) {
       throw new Error('No DaoRegistry contract instance provided.');
     }
 
-    const daoRegistryMethods = daoContractInstance.methods;
-    const state = await daoRegistryMethods.state().call();
+    const state = await daoContractInstance.methods.state().call();
 
     return Number(state) === 0 ? DaoState.CREATION : DaoState.READY;
   } catch (error) {
