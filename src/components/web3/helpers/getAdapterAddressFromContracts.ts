@@ -3,7 +3,7 @@ import {ContractsStateEntry} from '../../../store/contracts/types';
 import {StoreState} from '../../../store/types';
 
 function getContractAddressOrThrow(
-  contract: ContractsStateEntry | null
+  contract: ContractsStateEntry<any> | null
 ): string {
   try {
     const address = contract?.contractAddress;

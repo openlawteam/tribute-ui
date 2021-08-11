@@ -159,11 +159,17 @@ export default function ProcessActionMembership(
 
   async function getMembershipProposalAmount() {
     try {
-      if (!snapshotProposal || !OnboardingContract) return;
+      if (
+        !daoRegistryContract?.contractAddress ||
+        !OnboardingContract ||
+        !snapshotProposal
+      ) {
+        return;
+      }
 
       const proposalDetails = await OnboardingContract.instance.methods
         .proposals(
-          daoRegistryContract?.contractAddress,
+          daoRegistryContract.contractAddress,
           snapshotProposal.idInDAO
         )
         .call();

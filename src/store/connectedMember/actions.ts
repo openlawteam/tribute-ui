@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import {BURN_ADDRESS} from '../../util/constants';
 import {ConnectedMemberState} from '../connectedMember/types';
 import {ContractsStateEntry} from '../contracts/types';
+import {DaoRegistry} from '../../../abi-types/DaoRegistry';
 import {hasFlag, multicall} from '../../components/web3/helpers';
 import {MemberFlag} from '../../components/web3/types';
 import {normalizeString} from '../../util/helpers';
@@ -28,11 +29,10 @@ export function getConnectedMember({
   web3Instance,
 }: {
   account: string;
-  daoRegistryContract: ContractsStateEntry;
+  daoRegistryContract: ContractsStateEntry<DaoRegistry>;
   web3Instance: Web3;
 }) {
   return async function (dispatch: Dispatch<any>) {
-    const daoRegistryMethods = daoRegistryContract?.instance.methods;
     const daoRegistryAddress = daoRegistryContract?.contractAddress;
 
     const getAddressIfDelegatedABI = daoRegistryContract?.abi.find(
@@ -51,7 +51,6 @@ export function getConnectedMember({
     if (
       !account ||
       !daoRegistryAddress ||
-      !daoRegistryMethods ||
       !getAddressIfDelegatedABI ||
       !getCurrentDelegateKeyABI ||
       !isActiveMemberABI ||

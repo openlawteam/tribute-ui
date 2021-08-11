@@ -71,7 +71,7 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
         ).toBeNull();
         expect(reduxStore.getState().contracts.DistributeContract).toBeNull();
         expect(reduxStore.getState().contracts.FinancingContract).toBeNull();
-        expect(reduxStore.getState().contracts.GuildBankContract).toBeNull();
+        expect(reduxStore.getState().contracts.GuildKickContract).toBeNull();
         expect(reduxStore.getState().contracts.ManagingContract).toBeNull();
         expect(reduxStore.getState().contracts.OnboardingContract).toBeNull();
         expect(reduxStore.getState().contracts.RagequitContract).toBeNull();
@@ -132,7 +132,7 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
       ).not.toBeNull();
       expect(reduxStore.getState().contracts.DistributeContract).not.toBeNull();
       expect(reduxStore.getState().contracts.FinancingContract).not.toBeNull();
-      expect(reduxStore.getState().contracts.GuildBankContract).not.toBeNull();
+      expect(reduxStore.getState().contracts.GuildKickContract).not.toBeNull();
       expect(reduxStore.getState().contracts.ManagingContract).not.toBeNull();
       expect(reduxStore.getState().contracts.OnboardingContract).not.toBeNull();
       expect(reduxStore.getState().contracts.RagequitContract).not.toBeNull();

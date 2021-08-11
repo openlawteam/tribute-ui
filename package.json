@@ -44,6 +44,7 @@
     "@testing-library/react": "^12.0.0",
     "@testing-library/react-hooks": "^7.0.0",
     "@testing-library/user-event": "^13.1.9",
+    "@typechain/web3-v1": "^3.0.0",
     "@types/aos": "^3.0.4",
     "@types/jest": "^26.0.24",
     "@types/node": "^16.4.10",
@@ -63,16 +64,19 @@
     "react-test-renderer": "^17.0.2",
     "redux-devtools-extension": "^2.13.9",
     "sass": "^1.35.1",
+    "typechain": "^5.1.2",
     "typescript": "^4.3.2"
   },
   "scripts": {
-    "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "style": "prettier --check 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
+    "generate-abi-types": "typechain --target=web3-v1 --out-dir='abi-types' 'src/abis/*.json'",
+    "postinstall": "npm run generate-abi-types",
+    "release": "np",
+    "start": "npm run generate-abi-types && react-scripts start",
     "style:fix": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
-    "release": "np"
+    "style": "prettier --check 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
+    "test": "react-scripts test"
   },
   "eslintConfig": {
     "extends": [

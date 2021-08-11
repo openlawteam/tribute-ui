@@ -1,6 +1,8 @@
 import {AbiItem} from 'web3-utils/types';
-import {VotingAdapterName} from '../../adapters-extensions/enums';
 import Web3 from 'web3';
+
+import {IVoting} from '../../../../abi-types/IVoting';
+import {VotingAdapterName} from '../../adapters-extensions/enums';
 
 export async function getVotingAdapterName(
   address: string,
@@ -8,15 +10,19 @@ export async function getVotingAdapterName(
 ): Promise<VotingAdapterName> {
   try {
     const {default: lazyIVotingABI} = await import(
-      '../../../truffle-contracts/IVoting.json'
+      '../../../abis/IVoting.json'
     );
 
-    return await new web3Instance.eth.Contract(
-      lazyIVotingABI as AbiItem[],
-      address
+    const votingAdapterName: string = await (
+      new web3Instance.eth.Contract(
+        lazyIVotingABI as AbiItem[],
+        address
+      ) as any as IVoting
     ).methods
       .getAdapterName()
       .call();
+
+    return votingAdapterName as VotingAdapterName;
   } catch (error) {
     throw error;
   }

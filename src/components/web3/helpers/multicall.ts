@@ -1,7 +1,9 @@
 import Web3 from 'web3';
 import {AbiItem} from 'web3-utils/types';
 
+import {BlockType} from '../../../../abi-types/types';
 import {MULTICALL_CONTRACT_ADDRESS} from '../../../config';
+import {Multicall} from '../../../../abi-types/Multicall';
 
 export type MulticallTuple = [
   contractAddress: string,
@@ -9,7 +11,7 @@ export type MulticallTuple = [
   parameters: string[]
 ];
 
-export async function multicall({
+export async function multicall<T = any[]>({
   blockNumber = 'latest',
   calls,
   web3Instance,
@@ -17,25 +19,23 @@ export async function multicall({
   /**
    * Defaults to `latest`
    */
-  blockNumber?: number | string | ReturnType<typeof Web3.utils.toBN>;
+  blockNumber?: BlockType;
   calls: MulticallTuple[];
   web3Instance: Web3;
-}) {
+}): Promise<T> {
   const {default: lazyMulticallABI} = await import(
-    '../../../truffle-contracts/Multicall.json'
+    '../../../abis/Multicall.json'
   );
 
-  // Let's `console.error` and exit instead of throwing.
   if (!MULTICALL_CONTRACT_ADDRESS) {
-    console.error('No Multicall address was found. Are you sure it is set?');
-    return;
+    throw new Error('No Multicall address was found. Are you sure it is set?');
   }
 
   try {
     const {methods: multicallMethods} = new web3Instance.eth.Contract(
       lazyMulticallABI as AbiItem[],
       MULTICALL_CONTRACT_ADDRESS
-    );
+    ) as any as Multicall;
 
     const {returnData} = await multicallMethods
       .aggregate(
@@ -65,7 +65,7 @@ export async function multicall({
         outputsABIItem || [],
         hexString
       );
-    });
+    }) as any as T;
   } catch (error) {
     throw error;
   }

@@ -131,7 +131,7 @@ export function useProposalsVotingAdapter(
       });
 
       const {default: lazyIVotingABI} = await import(
-        '../../../truffle-contracts/IVoting.json'
+        '../../../abis/IVoting.json'
       );
 
       const getAdapterNameABI = (lazyIVotingABI as typeof registryABI).find(
@@ -196,11 +196,11 @@ export function useProposalsVotingAdapter(
                 votingAdapterName: adapterNameResults[i],
                 votingAdapterAddress,
                 getVotingAdapterABI: () => votingAdapterABI,
-                getWeb3VotingAdapterContract: () =>
+                getWeb3VotingAdapterContract: <T>() =>
                   new web3Instance.eth.Contract(
                     votingAdapterABI,
                     votingAdapterAddress
-                  ),
+                  ) as any as T,
               },
             ];
           }

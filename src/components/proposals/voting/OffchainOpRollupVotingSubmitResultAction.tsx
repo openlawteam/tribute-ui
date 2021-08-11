@@ -5,12 +5,9 @@ import {
   signMessage,
   VoteChoicesIndex,
 } from '@openlaw/snapshot-js-erc712';
-import {
-  ToStepNodeResult,
-  VoteEntry,
-} from '@openlaw/snapshot-js-erc712/dist/types';
 import {useSelector} from 'react-redux';
 import {useState} from 'react';
+import {VoteEntry} from '@openlaw/snapshot-js-erc712/dist/types';
 
 import {
   DEFAULT_CHAIN,
@@ -27,6 +24,7 @@ import {BadNodeError} from './types';
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {getOffchainVotingProof, submitOffchainVotingProof} from '../helpers';
 import {normalizeString, numberRangeArray} from '../../../util/helpers';
+import {OffchainVotingContract} from '../../../../abi-types/OffchainVotingContract';
 import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
@@ -38,6 +36,10 @@ import EtherscanURL from '../../web3/EtherscanURL';
 import FadeIn from '../../common/FadeIn';
 import Loader from '../../feedback/Loader';
 
+type Node = Parameters<
+  OffchainVotingContract['methods']['submitVoteResult']
+>['3'];
+
 type OffchainVotingSubmitResultActionProps = {
   adapterName: ContractAdapterNames;
   proposal: ProposalData;
@@ -47,7 +49,7 @@ type SubmitVoteResultArguments = [
   daoAddress: string,
   proposalId: string,
   resultRoot: string,
-  lastResult: ToStepNodeResult,
+  lastResult: Node,
   rootSig: string
 ];
 
@@ -110,7 +112,8 @@ export function OffchainOpRollupVotingSubmitResultAction(
    */
 
   const votingAdapterMethods =
-    daoProposalVotingAdapter?.getWeb3VotingAdapterContract().methods;
+    daoProposalVotingAdapter?.getWeb3VotingAdapterContract<OffchainVotingContract>()
+      .methods;
 
   const isInProcess =
     signatureStatus === Web3TxStatus.AWAITING_CONFIRM ||
@@ -160,6 +163,10 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
       if (!web3Instance) {
         throw new Error('No Web3 instance was found.');
+      }
+
+      if (!bankExtensionMethods) {
+        throw new Error('No BankExtension methods were found.');
       }
 
       setSignatureStatus(Web3TxStatus.AWAITING_CONFIRM);
@@ -241,10 +248,10 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
       const voteResultTreeHexRoot: string = voteResultTree.getHexRoot();
       // The last of the result node tree steps
-      const resultNodeLast: ToStepNodeResult = result[result.length - 1];
+      const resultNodeLast = result[result.length - 1] as any as Node;
 
       // Validate the vote result node by calling the contract
-      const getBadNodeErrorResponse: number = await votingAdapterMethods
+      const getBadNodeErrorResponse: string = await votingAdapterMethods
         .getBadNodeError(
           daoRegistryAddress,
           proposalHash,

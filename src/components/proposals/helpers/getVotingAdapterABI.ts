@@ -18,7 +18,7 @@ export async function getVotingAdapterABI(
       // Off-chain optimistic rollup
       case VotingAdapterName.OffchainVotingContract:
         const {default: lazyOffchainVotingABI} = await import(
-          '../../../truffle-contracts/OffchainVotingContract.json'
+          '../../../abis/OffchainVotingContract.json'
         );
 
         return lazyOffchainVotingABI as AbiItem[];
@@ -26,7 +26,7 @@ export async function getVotingAdapterABI(
       // On-chain voting
       case VotingAdapterName.VotingContract:
         const {default: lazyVotingABI} = await import(
-          '../../../truffle-contracts/VotingContract.json'
+          '../../../abis/VotingContract.json'
         );
 
         return lazyVotingABI as AbiItem[];

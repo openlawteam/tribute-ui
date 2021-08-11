@@ -1,14 +1,15 @@
-import {useState, useRef, useEffect, useCallback} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {toBN, AbiItem} from 'web3-utils';
+import {useDispatch, useSelector} from 'react-redux';
+import {useState, useRef, useEffect, useCallback} from 'react';
 
 import {CycleEllipsis} from '../feedback';
-import {useDaoTokenDetails} from '../dao-token/hooks';
+import {ERC20} from '../../../abi-types/ERC20';
 import {getConnectedMember} from '../../store/actions';
 import {ProposalData, SnapshotProposal} from './types';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
 import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
+import {useDaoTokenDetails} from '../dao-token/hooks';
 import {useMemberActionDisabled} from '../../hooks';
 import {Web3TxStatus} from '../web3/types';
 import CycleMessage from '../feedback/CycleMessage';
@@ -63,6 +64,7 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
    */
 
   const [submitError, setSubmitError] = useState<Error>();
+
   const [tributeProposalDetails, setTributeProposalDetails] =
     useState<TributeProposalDetails>();
 
@@ -91,18 +93,21 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
   const {account, web3Instance} = useWeb3Modal();
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
+
   const {
     txEtherscanURL: txEtherscanURLTokenApprove,
     txIsPromptOpen: txIsPromptOpenTokenApprove,
     txSend: txSendTokenApprove,
     txStatus: txStatusTokenApprove,
   } = useContractSend();
+
   const {
     isDisabled,
     openWhyDisabledModal,
     WhyDisabledModal,
     setOtherDisabledReasons,
   } = useMemberActionDisabled(useMemberActionDisabledProps);
+
   const {fast: fastGasPrice} = useETHGasPrice();
   const {daoTokenDetails} = useDaoTokenDetails();
 
@@ -121,9 +126,12 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
     txStatus === Web3TxStatus.PENDING ||
     txStatusTokenApprove === Web3TxStatus.AWAITING_CONFIRM ||
     txStatusTokenApprove === Web3TxStatus.PENDING;
+
   const isDone = txStatus === Web3TxStatus.FULFILLED;
+
   const isInProcessOrDone =
     isInProcess || isDone || txIsPromptOpen || txIsPromptOpenTokenApprove;
+
   const areSomeDisabled = isDisabled || isInProcessOrDone || propsDisabled;
 
   /**
@@ -177,14 +185,21 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
   async function getTributeProposalDetails() {
     try {
-      if (!snapshotProposal || !TributeContract) return;
+      if (
+        !daoRegistryContract?.contractAddress ||
+        !snapshotProposal ||
+        !TributeContract
+      ) {
+        return;
+      }
 
       const proposalDetails = await TributeContract.instance.methods
         .proposals(
-          daoRegistryContract?.contractAddress,
+          daoRegistryContract.contractAddress,
           snapshotProposal.idInDAO
         )
         .call();
+
       const {token: tokenAddress, tributeAmount} = proposalDetails;
 
       setTributeProposalDetails({tokenAddress, tributeAmount});
@@ -214,14 +229,13 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
       const {tokenAddress, tributeAmount} = tributeProposalDetails;
 
-      const {default: lazyERC20ABI} = await import(
-        '../../truffle-contracts/ERC20.json'
-      );
+      const {default: lazyERC20ABI} = await import('../../abis/ERC20.json');
       const erc20Contract: AbiItem[] = lazyERC20ABI as any;
+
       const erc20Instance = new web3Instance.eth.Contract(
         erc20Contract,
         tokenAddress
-      );
+      ) as any as ERC20; // TypeChain: for Web3 we need to cast
 
       // Value to check if adapter is allowed to spend amount of tribute tokens
       // on behalf of owner. If allowance is not sufficient, the owner will approve the adapter to spend the amount of

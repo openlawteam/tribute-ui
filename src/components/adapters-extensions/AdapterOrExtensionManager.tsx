@@ -196,6 +196,7 @@ export default function AdapterOrExtensionManager() {
       const finalizedMessage = `${dao?.name} is already finalized`;
 
       const daoRegistryState = await getDaoState(DaoRegistryContract.instance);
+
       setDaoState(daoRegistryState);
 
       daoRegistryState === DaoState.READY &&

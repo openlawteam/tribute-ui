@@ -92,9 +92,8 @@ export function useProposalsVotingState(
     }
 
     try {
-      const lazyIVotingABI = (
-        await import('../../../truffle-contracts/IVoting.json')
-      ).default as AbiItem[];
+      const lazyIVotingABI = (await import('../../../abis/IVoting.json'))
+        .default as AbiItem[];
 
       const votingResultAbi = lazyIVotingABI.find(
         (ai) => ai.name === 'voteResult'

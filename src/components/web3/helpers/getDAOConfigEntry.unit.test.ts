@@ -4,7 +4,7 @@ import {ContractDAOConfigKeys} from '../types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
 import {getDAOConfigEntry} from '.';
 import {getWeb3Instance} from '../../../test/helpers';
-import DaoRegistryABI from '../../../truffle-contracts/DaoRegistry.json';
+import DaoRegistryABI from '../../../abis/DaoRegistry.json';
 
 describe('getDAOConfigEntry unit tests', () => {
   test('should return correct config value', async () => {

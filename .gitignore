@@ -30,3 +30,6 @@ yarn-error.log*
 .env
 # We need the `[..]/test/.env` for tests
 !src/test/.env
+
+# types
+abi-types
