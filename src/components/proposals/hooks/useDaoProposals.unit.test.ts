@@ -303,12 +303,12 @@ describe('useDaoProposals unit tests', () => {
       );
 
       /**
-       * Inject mocked result for `proposals`
+       * Inject mocked error result for `proposals`
        *
-       * @todo Fix needing two injected errors to make test work.
+       * @todo Fix needing `injectResult` to make test work.
        */
 
-      mockWeb3Provider.injectError({code: 1234, message: 'Some RPC error!'});
+      mockWeb3Provider.injectResult(null);
       mockWeb3Provider.injectError({code: 1234, message: 'Some RPC error!'});
 
       await waitForValueToChange(() => result.current.daoProposalsStatus);
@@ -320,9 +320,9 @@ describe('useDaoProposals unit tests', () => {
         AsyncStatus.PENDING
       );
 
-      await waitForValueToChange(() => result.current.daoProposalsError);
+      await waitForValueToChange(() => result.current.daoProposalsStatus);
 
-      // Assert fulfilled
+      // Assert rejected
       expect(result.current.daoProposals).toStrictEqual([]);
       expect(result.current.daoProposalsError).toStrictEqual({
         code: 1234,
