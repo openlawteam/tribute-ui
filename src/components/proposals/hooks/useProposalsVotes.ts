@@ -39,9 +39,6 @@ export function useProposalsVotes(
   const registryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
   );
-  const registryABI = useSelector(
-    (s: StoreState) => s.contracts.DaoRegistryContract?.abi
-  );
 
   /**
    * State
@@ -93,7 +90,6 @@ export function useProposalsVotes(
       enabled:
         !!proposalVotingAdapters.length &&
         !!safeProposalVotingAdapters &&
-        !!registryABI &&
         !!registryAddress &&
         !!web3Instance,
     }
@@ -114,15 +110,11 @@ export function useProposalsVotes(
    */
 
   const getProposalsVotesOnchainCached = useCallback(getProposalsVotesOnchain, [
-    proposalVotingAdapters.length,
-    registryABI,
-    registryAddress,
     safeProposalVotingAdapters,
     votesDataCallsData,
     votesDataCallsError,
     votesDataResults,
     votesDataResultsError,
-    web3Instance,
   ]);
 
   /**
@@ -130,8 +122,23 @@ export function useProposalsVotes(
    */
 
   useEffect(() => {
+    if (
+      !proposalVotingAdapters.length ||
+      !safeProposalVotingAdapters ||
+      !registryAddress ||
+      !web3Instance
+    ) {
+      return;
+    }
+
     getProposalsVotesOnchainCached();
-  }, [getProposalsVotesOnchainCached]);
+  }, [
+    getProposalsVotesOnchainCached,
+    proposalVotingAdapters.length,
+    registryAddress,
+    safeProposalVotingAdapters,
+    web3Instance,
+  ]);
 
   useEffect(() => {
     if (!proposalVotingAdapters.length || !web3Instance) {
@@ -151,13 +158,7 @@ export function useProposalsVotes(
    */
 
   async function getProposalsVotesOnchain() {
-    if (
-      !proposalVotingAdapters.length ||
-      !safeProposalVotingAdapters ||
-      !registryABI ||
-      !registryAddress ||
-      !web3Instance
-    ) {
+    if (!safeProposalVotingAdapters) {
       return;
     }
 

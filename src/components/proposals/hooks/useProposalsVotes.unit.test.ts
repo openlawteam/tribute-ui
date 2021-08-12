@@ -45,7 +45,7 @@ describe('useProposalsVotes unit tests', () => {
     ];
 
     await act(async () => {
-      const {result, waitForNextUpdate} = await renderHook(
+      const {result, waitForValueToChange} = await renderHook(
         () => useProposalsVotes(proposalsVotingAdapterTuples),
         {
           wrapper: Wrapper,
@@ -128,18 +128,21 @@ describe('useProposalsVotes unit tests', () => {
         }
       );
 
+      // Assert initial state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.STANDBY);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
 
-      await waitForNextUpdate();
+      await waitForValueToChange(() => result.current.proposalsVotesStatus);
 
+      // Assert pending state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.PENDING);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
 
-      await waitForNextUpdate();
+      await waitForValueToChange(() => result.current.proposalsVotesStatus);
 
+      // Assert fulfilled state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.FULFILLED);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([
@@ -289,12 +292,21 @@ describe('useProposalsVotes unit tests', () => {
         }
       );
 
+      // Assert initial state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.STANDBY);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
 
       await waitForValueToChange(() => result.current.proposalsVotesStatus);
 
+      // Assert pending state
+      expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.PENDING);
+      expect(result.current.proposalsVotesError).toBe(undefined);
+      expect(result.current.proposalsVotes).toMatchObject([]);
+
+      await waitForValueToChange(() => result.current.proposalsVotesStatus);
+
+      // Assert rejected state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.REJECTED);
       expect(result.current.proposalsVotesError?.message).toMatch(
         /no voting adapter name was found for "badvotingadaptername"/i
@@ -371,20 +383,23 @@ describe('useProposalsVotes unit tests', () => {
         }
       );
 
+      // Assert initial state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.STANDBY);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
 
       await waitForValueToChange(() => result.current.proposalsVotesStatus);
 
+      // Assert pending state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.PENDING);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
 
       await waitForValueToChange(() => result.current.proposalsVotesStatus);
 
+      // Assert fulfilled state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.FULFILLED);
-      expect(result.current.proposalsVotesError?.message).toBe(undefined);
+      expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([
         [
           '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
@@ -487,12 +502,14 @@ describe('useProposalsVotes unit tests', () => {
         }
       );
 
+      // Assert initial state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.STANDBY);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
 
       await waitForValueToChange(() => result.current.proposalsVotesStatus);
 
+      // Assert fulfilled state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.FULFILLED);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
@@ -558,6 +575,7 @@ describe('useProposalsVotes unit tests', () => {
         }
       );
 
+      // Assert initial state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.STANDBY);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
