@@ -1,4 +1,4 @@
-import {queryClient} from './test/Wrapper';
+const {queryClient} = require('./test/Wrapper');
 
 // Adds jest-dom's custom assertions
 require('@testing-library/jest-dom/extend-expect');
