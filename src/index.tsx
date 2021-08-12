@@ -11,8 +11,6 @@ import {
   HttpLink,
 } from '@apollo/client';
 import {QueryClient, QueryClientProvider} from 'react-query';
-// @todo Remove react-query dev tools before merging
-import {ReactQueryDevtools} from 'react-query/devtools';
 
 import {
   ENVIRONMENT,
@@ -120,8 +118,6 @@ if (root !== null) {
                   ) : null
                 }
               />
-              {/* @todo Remove react-query dev tools before merging */}
-              <ReactQueryDevtools initialIsOpen={false} />
             </QueryClientProvider>
           </ApolloProvider>
         </Web3ModalManager>
