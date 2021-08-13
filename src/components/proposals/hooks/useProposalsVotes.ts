@@ -1,8 +1,7 @@
-import {useCallback, useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
+import {useCallback, useEffect, useState} from 'react';
 import {useQuery} from 'react-query';
-import Web3 from 'web3';
+import {useSelector} from 'react-redux';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
@@ -69,8 +68,10 @@ export function useProposalsVotes(
 
   const {data: votesDataCallsData, error: votesDataCallsError} = useQuery(
     ['votesDataCalls', safeProposalVotingAdapters],
-    async () =>
-      await Promise.all(
+    async (): Promise<MulticallTuple[] | undefined> => {
+      if (!registryAddress) return;
+
+      return await Promise.all(
         (safeProposalVotingAdapters as ProposalVotingAdapterTuple[]).map(
           async ([
             proposalId,
@@ -82,10 +83,11 @@ export function useProposalsVotes(
              * We build the call arguments the same way for the different voting adapters
              * (i.e. [dao, proposalId]). If we need to change this we can move it to another function.
              */
-            [registryAddress as string, proposalId],
+            [registryAddress, proposalId],
           ]
         )
-      ),
+      );
+    },
     {
       enabled:
         !!proposalVotingAdapters.length &&
@@ -96,13 +98,18 @@ export function useProposalsVotes(
   );
 
   const {data: votesDataResults, error: votesDataResultsError} = useQuery(
-    ['votesDataResults', votesDataCallsData],
-    async () =>
-      await multicall({
-        calls: votesDataCallsData as MulticallTuple[],
-        web3Instance: web3Instance as Web3,
-      }),
-    {enabled: !!votesDataCallsData && !!web3Instance}
+    ['votesDataResults', votesDataCallsData?.length],
+    async () => {
+      if (!votesDataCallsData?.length || !web3Instance) {
+        return;
+      }
+
+      return await multicall({
+        calls: votesDataCallsData,
+        web3Instance,
+      });
+    },
+    {enabled: !!votesDataCallsData?.length && !!web3Instance}
   );
 
   /**
@@ -183,7 +190,6 @@ export function useProposalsVotes(
         }
 
         if (votesDataResults) {
-          setProposalsVotesStatus(AsyncStatus.FULFILLED);
           setProposalsVotes(
             safeProposalVotingAdapters.map(
               ([proposalId, {votingAdapterName}], i) => [
@@ -194,11 +200,13 @@ export function useProposalsVotes(
               ]
             )
           );
+
+          setProposalsVotesStatus(AsyncStatus.FULFILLED);
         }
       }
     } catch (error) {
-      setProposalsVotesStatus(AsyncStatus.REJECTED);
       setProposalsVotes([]);
+      setProposalsVotesStatus(AsyncStatus.REJECTED);
       setProposalsVotesError(error);
     }
   }
