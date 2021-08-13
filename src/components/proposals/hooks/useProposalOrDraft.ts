@@ -194,8 +194,12 @@ export function useProposalOrDraft(
       if (refetchCount === 0) return;
 
       /**
-       * Reset queries when `refetchCount` is incremented (proposal is
+       * Reset React Queries when `refetchCount` is incremented (proposal is
        * sponsored/submitted on chain, proposal is voted on)
+       *
+       * Needed so queries can fetch data that has been updated by the change in
+       * proposal status
+       *
        */
       await queryClient.resetQueries();
     }

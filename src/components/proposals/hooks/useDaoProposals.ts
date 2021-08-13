@@ -1,6 +1,5 @@
 import {useEffect, useState, useCallback} from 'react';
 import {useSelector} from 'react-redux';
-import Web3 from 'web3';
 import {useQuery} from 'react-query';
 
 import {AsyncStatus} from '../../../util/types';
@@ -66,17 +65,22 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
   const {web3Instance} = useWeb3Modal();
 
   /**
-   * Their hooks
+   * React Query
    */
 
   const {data: daoProposalsData, error: daoProposalsQueryError} = useQuery(
     ['daoProposals', daoProposalsCalls],
-    async () =>
-      await multicall({
-        calls: daoProposalsCalls as MulticallTuple[],
-        web3Instance: web3Instance as Web3,
-      }),
-    {enabled: !!daoProposalsCalls && !!web3Instance}
+    async () => {
+      if (!daoProposalsCalls?.length || !web3Instance) {
+        return;
+      }
+
+      return await multicall({
+        calls: daoProposalsCalls,
+        web3Instance,
+      });
+    },
+    {enabled: !!daoProposalsCalls?.length && !!web3Instance}
   );
 
   /**

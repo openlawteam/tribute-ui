@@ -63,16 +63,16 @@ export function useProposalsVotes(
   const {web3Instance} = useWeb3Modal();
 
   /**
-   * Their hooks
+   * React Query
    */
 
   const {data: votesDataCallsData, error: votesDataCallsError} = useQuery(
     ['votesDataCalls', safeProposalVotingAdapters],
     async (): Promise<MulticallTuple[] | undefined> => {
-      if (!registryAddress) return;
+      if (!safeProposalVotingAdapters || !registryAddress) return;
 
       return await Promise.all(
-        (safeProposalVotingAdapters as ProposalVotingAdapterTuple[]).map(
+        safeProposalVotingAdapters.map(
           async ([
             proposalId,
             {votingAdapterAddress, getVotingAdapterABI, votingAdapterName},

@@ -2,7 +2,6 @@ import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
 import {useQuery} from 'react-query';
-import Web3 from 'web3';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
@@ -65,7 +64,7 @@ export function useProposalsVotingState(
   const {web3Instance} = useWeb3Modal();
 
   /**
-   * Their hooks
+   * React Query
    */
 
   const {
@@ -73,12 +72,17 @@ export function useProposalsVotingState(
     error: proposalsVotingStateResultError,
   } = useQuery(
     ['proposalsVotingStateResult', proposalsVotingStateCalls],
-    async () =>
-      await multicall({
-        calls: proposalsVotingStateCalls as MulticallTuple[],
-        web3Instance: web3Instance as Web3,
-      }),
-    {enabled: !!proposalsVotingStateCalls && !!web3Instance}
+    async () => {
+      if (!proposalsVotingStateCalls?.length || !web3Instance) {
+        return;
+      }
+
+      return await multicall({
+        calls: proposalsVotingStateCalls,
+        web3Instance,
+      });
+    },
+    {enabled: !!proposalsVotingStateCalls?.length && !!web3Instance}
   );
 
   /**

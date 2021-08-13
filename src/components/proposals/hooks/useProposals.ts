@@ -197,14 +197,17 @@ export function useProposals({
     useProposalsVotes(proposalsVotingAdapters);
 
   /**
-   * Their hooks
+   * React Query
    */
 
   const {data: snapshotDraftEntriesData, error: snapshotDraftEntriesError} =
     useQuery(
       ['snapshotDraftEntries', adapterAddress],
-      async () =>
-        await getSnapshotDraftsByAdapterAddress(adapterAddress as string),
+      async () => {
+        if (!adapterAddress) return;
+
+        return await getSnapshotDraftsByAdapterAddress(adapterAddress);
+      },
       {
         enabled: !!adapterAddress,
       }
@@ -215,8 +218,11 @@ export function useProposals({
     error: snapshotProposalEntriesError,
   } = useQuery(
     ['snapshotProposalEntries', adapterAddress],
-    async () =>
-      await getSnapshotProposalsByAdapterAddress(adapterAddress as string),
+    async () => {
+      if (!adapterAddress) return;
+
+      return await getSnapshotProposalsByAdapterAddress(adapterAddress);
+    },
     {
       enabled: !!adapterAddress,
     }

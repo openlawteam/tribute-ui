@@ -79,13 +79,21 @@ export function useOffchainVotingResults(
   const {isMountedRef} = useIsMounted();
 
   /**
-   * Their hooks
+   * React Query
    */
 
   const {data: votingResultsToSetData, error: votingResultsToSetError} =
     useQuery(
       ['votingResultsToSet', proposalsToMap],
       async () => {
+        if (
+          !bankAddress ||
+          !getPriorAmountABI ||
+          !proposalsToMap.length ||
+          !web3Instance
+        )
+          return;
+
         return await Promise.all(
           proposalsToMap.map(async (p) => {
             const snapshot = p?.msg.payload.snapshot;
@@ -115,11 +123,11 @@ export function useOffchainVotingResults(
 
             try {
               const result = await getUnitsPerChoiceCached({
-                bankAddress: bankAddress as string,
-                getPriorAmountABI: getPriorAmountABI as AbiItem,
+                bankAddress,
+                getPriorAmountABI,
                 snapshot,
                 voterAddressesAndChoices,
-                web3Instance: web3Instance as Web3,
+                web3Instance,
               });
 
               return [idInSnapshot, result];

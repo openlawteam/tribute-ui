@@ -49,6 +49,10 @@ export function useGovernanceProposals({
 
   const {isMountedRef} = useIsMounted();
 
+  /**
+   * React Query
+   */
+
   const {
     data: snapshotProposalEntriesData,
     error: snapshotProposalEntriesError,
