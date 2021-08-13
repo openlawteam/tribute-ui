@@ -1,3 +1,4 @@
+const {act} = require('@testing-library/react-hooks');
 const {queryClient} = require('./test/Wrapper');
 
 // Adds jest-dom's custom assertions
@@ -73,6 +74,7 @@ beforeAll(() => {
 // (which is important for test isolation):
 afterEach(() => {
   server.resetHandlers();
-  queryClient.clear();
+  // clear global cache
+  act(() => queryClient.clear());
 });
 afterAll(() => server.close());
