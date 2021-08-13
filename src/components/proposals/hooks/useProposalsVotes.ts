@@ -1,6 +1,7 @@
-import {useCallback, useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
+import {useCallback, useEffect, useState} from 'react';
+import {useQuery} from 'react-query';
+import {useSelector} from 'react-redux';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
@@ -37,15 +38,6 @@ export function useProposalsVotes(
   const registryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
   );
-  const registryABI = useSelector(
-    (s: StoreState) => s.contracts.DaoRegistryContract?.abi
-  );
-
-  /**
-   * Our hooks
-   */
-
-  const {web3Instance} = useWeb3Modal();
 
   /**
    * State
@@ -54,61 +46,32 @@ export function useProposalsVotes(
   const [proposalsVotes, setProposalsVotes] = useState<ProposalsVotesTuple[]>(
     []
   );
+
   const [proposalsVotesError, setProposalsVotesError] = useState<Error>();
+
   const [proposalsVotesStatus, setProposalsVotesStatus] = useState<AsyncStatus>(
     AsyncStatus.STANDBY
   );
 
-  /**
-   * Cached callbacks
-   */
-
-  const getProposalsVotesOnchainCached = useCallback(getProposalsVotesOnchain, [
-    proposalVotingAdapters,
-    registryABI,
-    registryAddress,
-    web3Instance,
-  ]);
+  const [safeProposalVotingAdapters, setSafeProposalVotingAdapters] =
+    useState<ProposalVotingAdapterTuple[]>();
 
   /**
-   * Effects
+   * Our hooks
    */
 
-  useEffect(() => {
-    getProposalsVotesOnchainCached();
-  }, [getProposalsVotesOnchainCached]);
+  const {web3Instance} = useWeb3Modal();
 
   /**
-   * Functions
+   * React Query
    */
 
-  async function getProposalsVotesOnchain() {
-    if (
-      !proposalVotingAdapters.length ||
-      !registryABI ||
-      !registryAddress ||
-      !web3Instance
-    ) {
-      return;
-    }
+  const {data: votesDataCallsData, error: votesDataCallsError} = useQuery(
+    ['votesDataCalls', safeProposalVotingAdapters],
+    async (): Promise<MulticallTuple[] | undefined> => {
+      if (!safeProposalVotingAdapters || !registryAddress) return;
 
-    // Only use hex (more specifically `bytes32`) id's
-    const safeProposalVotingAdapters = proposalVotingAdapters.filter(([id]) =>
-      web3Instance.utils.isHexStrict(id)
-    );
-
-    if (!safeProposalVotingAdapters.length) {
-      setProposalsVotesStatus(AsyncStatus.FULFILLED);
-      setProposalsVotes([]);
-
-      return;
-    }
-
-    try {
-      setProposalsVotesStatus(AsyncStatus.PENDING);
-
-      // Build votes results
-      const votesDataCalls: MulticallTuple[] = await Promise.all(
+      return await Promise.all(
         safeProposalVotingAdapters.map(
           async ([
             proposalId,
@@ -124,26 +87,126 @@ export function useProposalsVotes(
           ]
         )
       );
+    },
+    {
+      enabled:
+        !!proposalVotingAdapters.length &&
+        !!safeProposalVotingAdapters &&
+        !!registryAddress &&
+        !!web3Instance,
+    }
+  );
 
-      const votesDataResults = await multicall({
-        calls: votesDataCalls,
+  const {data: votesDataResults, error: votesDataResultsError} = useQuery(
+    ['votesDataResults', votesDataCallsData?.length],
+    async () => {
+      if (!votesDataCallsData?.length || !web3Instance) {
+        return;
+      }
+
+      return await multicall({
+        calls: votesDataCallsData,
         web3Instance,
       });
+    },
+    {enabled: !!votesDataCallsData?.length && !!web3Instance}
+  );
 
+  /**
+   * Cached callbacks
+   */
+
+  const getProposalsVotesOnchainCached = useCallback(getProposalsVotesOnchain, [
+    safeProposalVotingAdapters,
+    votesDataCallsData,
+    votesDataCallsError,
+    votesDataResults,
+    votesDataResultsError,
+  ]);
+
+  /**
+   * Effects
+   */
+
+  useEffect(() => {
+    if (
+      !proposalVotingAdapters.length ||
+      !safeProposalVotingAdapters ||
+      !registryAddress ||
+      !web3Instance
+    ) {
+      return;
+    }
+
+    getProposalsVotesOnchainCached();
+  }, [
+    getProposalsVotesOnchainCached,
+    proposalVotingAdapters.length,
+    registryAddress,
+    safeProposalVotingAdapters,
+    web3Instance,
+  ]);
+
+  useEffect(() => {
+    if (!proposalVotingAdapters.length || !web3Instance) {
+      return;
+    }
+
+    // Only use hex (more specifically `bytes32`) id's
+    const safeProposalVotingAdaptersToSet = proposalVotingAdapters.filter(
+      ([id]) => web3Instance.utils.isHexStrict(id)
+    );
+
+    setSafeProposalVotingAdapters(safeProposalVotingAdaptersToSet);
+  }, [proposalVotingAdapters, web3Instance]);
+
+  /**
+   * Functions
+   */
+
+  async function getProposalsVotesOnchain() {
+    if (!safeProposalVotingAdapters) {
+      return;
+    }
+
+    if (!safeProposalVotingAdapters.length) {
       setProposalsVotesStatus(AsyncStatus.FULFILLED);
-      setProposalsVotes(
-        safeProposalVotingAdapters.map(
-          ([proposalId, {votingAdapterName}], i) => [
-            proposalId,
-            {
-              [votingAdapterName]: votesDataResults[i],
-            },
-          ]
-        )
-      );
-    } catch (error) {
-      setProposalsVotesStatus(AsyncStatus.REJECTED);
       setProposalsVotes([]);
+
+      return;
+    }
+
+    try {
+      setProposalsVotesStatus(AsyncStatus.PENDING);
+
+      if (votesDataCallsError) {
+        throw votesDataCallsError;
+      }
+
+      // Build votes results
+      if (votesDataCallsData) {
+        if (votesDataResultsError) {
+          throw votesDataResultsError;
+        }
+
+        if (votesDataResults) {
+          setProposalsVotes(
+            safeProposalVotingAdapters.map(
+              ([proposalId, {votingAdapterName}], i) => [
+                proposalId,
+                {
+                  [votingAdapterName]: votesDataResults[i],
+                },
+              ]
+            )
+          );
+
+          setProposalsVotesStatus(AsyncStatus.FULFILLED);
+        }
+      }
+    } catch (error) {
+      setProposalsVotes([]);
+      setProposalsVotesStatus(AsyncStatus.REJECTED);
       setProposalsVotesError(error);
     }
   }

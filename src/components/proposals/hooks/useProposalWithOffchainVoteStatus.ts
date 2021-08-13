@@ -363,11 +363,11 @@ export function useProposalWithOffchainVoteStatus({
     atExistsInDAO,
     atProcessedInDAO,
     atSponsoredInDAO,
-    status,
     initialAsyncChecksCompleted,
     isInVoting,
     isInVotingGracePeriod,
     offchainResultSubmitted,
+    status,
   ]);
 
   /**

@@ -1,7 +1,6 @@
-import {AbiItem} from 'web3-utils/types';
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useCallback} from 'react';
 import {useSelector} from 'react-redux';
-import Web3 from 'web3';
+import {useQuery} from 'react-query';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
@@ -54,11 +53,45 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
 
   const [daoProposalsError, setDaoProposalsError] = useState<Error>();
 
+  const [safeProposalIds, setSafeProposalIds] = useState<string[]>();
+
+  const [daoProposalsCalls, setDaoProposalsCalls] =
+    useState<MulticallTuple[]>();
+
   /**
    * Our hooks
    */
 
   const {web3Instance} = useWeb3Modal();
+
+  /**
+   * React Query
+   */
+
+  const {data: daoProposalsData, error: daoProposalsQueryError} = useQuery(
+    ['daoProposals', daoProposalsCalls],
+    async () => {
+      if (!daoProposalsCalls?.length || !web3Instance) {
+        return;
+      }
+
+      return await multicall({
+        calls: daoProposalsCalls,
+        web3Instance,
+      });
+    },
+    {enabled: !!daoProposalsCalls?.length && !!web3Instance}
+  );
+
+  /**
+   * Cached callbacks
+   */
+
+  const handleGetDaoProposalsCached = useCallback(handleGetDaoProposals, [
+    daoProposalsData,
+    daoProposalsQueryError,
+    safeProposalIds,
+  ]);
 
   /**
    * Effects
@@ -67,6 +100,7 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
   useEffect(() => {
     if (
       !proposalIds.length ||
+      !safeProposalIds ||
       !proposalsAbi ||
       !registryAddress ||
       !web3Instance
@@ -74,36 +108,46 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
       return;
     }
 
-    handleGetDaoProposals({
-      proposalIds,
-      proposalsAbi,
-      registryAddress,
-      web3Instance,
-    });
-  }, [proposalIds, proposalsAbi, registryAddress, web3Instance]);
+    handleGetDaoProposalsCached();
+  }, [
+    handleGetDaoProposalsCached,
+    proposalIds.length,
+    proposalsAbi,
+    registryAddress,
+    safeProposalIds,
+    web3Instance,
+  ]);
+
+  useEffect(() => {
+    if (!proposalIds.length || !web3Instance) {
+      return;
+    }
+
+    // Only use hex (more specifically `bytes32`) id's
+    const safeProposalIdsToSet = proposalIds.filter(
+      web3Instance.utils.isHexStrict
+    );
+
+    setSafeProposalIds(safeProposalIdsToSet);
+  }, [proposalIds, web3Instance]);
+
+  useEffect(() => {
+    if (!proposalsAbi || !registryAddress || !safeProposalIds?.length) return;
+
+    const daoProposalsCallsToSet: MulticallTuple[] = safeProposalIds.map(
+      (id) => [registryAddress, proposalsAbi, [id]]
+    );
+
+    setDaoProposalsCalls(daoProposalsCallsToSet);
+  }, [proposalsAbi, registryAddress, safeProposalIds]);
 
   /**
    * Functions
    */
 
-  async function handleGetDaoProposals({
-    proposalIds,
-    proposalsAbi,
-    registryAddress,
-    web3Instance,
-  }: {
-    proposalIds: string[];
-    proposalsAbi: AbiItem;
-    registryAddress: string;
-    web3Instance: Web3;
-  }) {
+  async function handleGetDaoProposals() {
     try {
-      if (!proposalIds.length) return;
-
-      // Only use hex (more specifically `bytes32`) id's
-      const safeProposalIds = proposalIds.filter(
-        web3Instance.utils.isHexStrict
-      );
+      if (!safeProposalIds) return;
 
       if (!safeProposalIds.length) {
         setDaoProposalsStatus(AsyncStatus.FULFILLED);
@@ -116,19 +160,16 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
       // Reset error
       setDaoProposalsError(undefined);
 
-      const calls: MulticallTuple[] = safeProposalIds.map((id) => [
-        registryAddress,
-        proposalsAbi,
-        [id],
-      ]);
+      if (daoProposalsQueryError) {
+        throw daoProposalsQueryError;
+      }
 
-      const proposals = await multicall({
-        calls,
-        web3Instance,
-      });
-
-      setDaoProposals(safeProposalIds.map((id, i) => [id, proposals[i]]));
-      setDaoProposalsStatus(AsyncStatus.FULFILLED);
+      if (daoProposalsData) {
+        setDaoProposals(
+          safeProposalIds.map((id, i) => [id, daoProposalsData[i]])
+        );
+        setDaoProposalsStatus(AsyncStatus.FULFILLED);
+      }
     } catch (error) {
       setDaoProposals(INITIAL_DAO_PROPOSAL_ENTRIES);
       setDaoProposalsError(error);

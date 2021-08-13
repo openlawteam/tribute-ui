@@ -217,7 +217,7 @@ export function OffchainVotingAction(
       });
 
       // Refetch to show the vote the user submitted
-      await refetchProposalOrDraft();
+      refetchProposalOrDraft();
     } catch (error) {
       setSubmitError(error);
     }

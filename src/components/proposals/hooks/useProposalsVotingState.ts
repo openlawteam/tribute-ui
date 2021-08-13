@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AbiItem} from 'web3-utils/types';
+import {useQuery} from 'react-query';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
@@ -36,12 +37,6 @@ export function useProposalsVotingState(
   );
 
   /**
-   * Our hooks
-   */
-
-  const {web3Instance} = useWeb3Modal();
-
-  /**
    * State
    */
 
@@ -54,13 +49,58 @@ export function useProposalsVotingState(
   const [proposalsVotingStateStatus, setProposalsVotingStateStatus] =
     useState<AsyncStatus>(AsyncStatus.STANDBY);
 
+  const [votingResultABIError, setVotingResultABIError] = useState<Error>();
+
+  const [proposalsVotingStateCalls, setProposalsVotingStateCalls] =
+    useState<MulticallTuple[]>();
+
+  const [safeProposalVotingAdapters, setSafeProposalVotingAdapters] =
+    useState<ProposalVotingAdapterTuple[]>();
+
+  /**
+   * Our hooks
+   */
+
+  const {web3Instance} = useWeb3Modal();
+
+  /**
+   * React Query
+   */
+
+  const {
+    data: proposalsVotingStateResult,
+    error: proposalsVotingStateResultError,
+  } = useQuery(
+    ['proposalsVotingStateResult', proposalsVotingStateCalls],
+    async () => {
+      if (!proposalsVotingStateCalls?.length || !web3Instance) {
+        return;
+      }
+
+      return await multicall({
+        calls: proposalsVotingStateCalls,
+        web3Instance,
+      });
+    },
+    {enabled: !!proposalsVotingStateCalls?.length && !!web3Instance}
+  );
+
   /**
    * Cached callbacks
    */
 
   const getProposalsVotingStateOnchainCached = useCallback(
     getProposalsVotingStateOnchain,
-    [proposalVotingAdapters, registryAddress, web3Instance]
+    [
+      proposalVotingAdapters.length,
+      proposalsVotingStateCalls,
+      proposalsVotingStateResult,
+      proposalsVotingStateResultError,
+      registryAddress,
+      safeProposalVotingAdapters,
+      votingResultABIError,
+      web3Instance,
+    ]
   );
 
   /**
@@ -71,19 +111,67 @@ export function useProposalsVotingState(
     getProposalsVotingStateOnchainCached();
   }, [getProposalsVotingStateOnchainCached]);
 
+  useEffect(() => {
+    if (!proposalVotingAdapters.length || !web3Instance) {
+      return;
+    }
+
+    // Only use hex (more specifically `bytes32`) id's
+    const safeProposalVotingAdaptersToSet = proposalVotingAdapters.filter(
+      ([id]) => web3Instance.utils.isHexStrict(id)
+    );
+
+    setSafeProposalVotingAdapters(safeProposalVotingAdaptersToSet);
+  }, [proposalVotingAdapters, web3Instance]);
+
+  useEffect(() => {
+    async function setProposalsVotingStateCallsPrepData() {
+      if (!registryAddress || !safeProposalVotingAdapters?.length) return;
+
+      const lazyIVotingABI = (await import('../../../abis/IVoting.json'))
+        .default as AbiItem[];
+
+      const votingResultABI = lazyIVotingABI.find(
+        (ai) => ai.name === 'voteResult'
+      );
+
+      if (!votingResultABI) {
+        setVotingResultABIError(
+          new Error(
+            'No "voteResult" ABI function was found on the "IVoting" contract.'
+          )
+        );
+
+        return;
+      }
+
+      const proposalsVotingStateCallsToSet: MulticallTuple[] =
+        safeProposalVotingAdapters.map(
+          ([proposalId, {votingAdapterAddress}]) => [
+            votingAdapterAddress,
+            votingResultABI,
+            [registryAddress, proposalId],
+          ]
+        );
+      setProposalsVotingStateCalls(proposalsVotingStateCallsToSet);
+    }
+
+    setProposalsVotingStateCallsPrepData();
+  }, [registryAddress, safeProposalVotingAdapters]);
+
   /**
    * Functions
    */
 
   async function getProposalsVotingStateOnchain() {
-    if (!registryAddress || !proposalVotingAdapters.length || !web3Instance) {
+    if (
+      !registryAddress ||
+      !proposalVotingAdapters.length ||
+      !safeProposalVotingAdapters ||
+      !web3Instance
+    ) {
       return;
     }
-
-    // Only use hex (more specifically `bytes32`) id's
-    const safeProposalVotingAdapters = proposalVotingAdapters.filter(([id]) =>
-      web3Instance.utils.isHexStrict(id)
-    );
 
     if (!safeProposalVotingAdapters.length) {
       setProposalsVotingStateStatus(AsyncStatus.FULFILLED);
@@ -92,41 +180,27 @@ export function useProposalsVotingState(
     }
 
     try {
-      const lazyIVotingABI = (await import('../../../abis/IVoting.json'))
-        .default as AbiItem[];
-
-      const votingResultAbi = lazyIVotingABI.find(
-        (ai) => ai.name === 'voteResult'
-      );
-
-      if (!votingResultAbi) {
-        throw new Error(
-          'No "voteResult" ABI function was found on the "IVoting" contract.'
-        );
+      if (votingResultABIError) {
+        throw votingResultABIError;
       }
 
-      const calls: MulticallTuple[] = safeProposalVotingAdapters.map(
-        ([proposalId, {votingAdapterAddress}]) => [
-          votingAdapterAddress,
-          votingResultAbi,
-          [registryAddress, proposalId],
-        ]
-      );
+      if (!proposalsVotingStateCalls) return;
 
       setProposalsVotingStateStatus(AsyncStatus.PENDING);
 
-      const proposalsVotingStateResult = await multicall({
-        calls,
-        web3Instance,
-      });
+      if (proposalsVotingStateResultError) {
+        throw proposalsVotingStateResultError;
+      }
 
-      setProposalsVotingStateStatus(AsyncStatus.FULFILLED);
-      setProposaslsVotingState(
-        safeProposalVotingAdapters.map(([proposalId], i) => [
-          proposalId,
-          proposalsVotingStateResult[i],
-        ])
-      );
+      if (proposalsVotingStateResult) {
+        setProposalsVotingStateStatus(AsyncStatus.FULFILLED);
+        setProposaslsVotingState(
+          safeProposalVotingAdapters.map(([proposalId], i) => [
+            proposalId,
+            proposalsVotingStateResult[i],
+          ])
+        );
+      }
     } catch (error) {
       setProposalsVotingStateStatus(AsyncStatus.REJECTED);
       setProposaslsVotingState([]);

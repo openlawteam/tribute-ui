@@ -314,11 +314,8 @@ describe('useProposals unit tests', () => {
       await waitForValueToChange(() => result.current.proposalsStatus);
 
       // Assert fulfilled state
-      expect(result.current.proposals).toStrictEqual([]);
       expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.FULFILLED);
-
-      await waitForValueToChange(() => result.current.proposals);
 
       // Assert Draft
 
@@ -556,6 +553,7 @@ describe('useProposals unit tests', () => {
     );
 
     await act(async () => {
+      // Assert initial state
       expect(result.current.proposals).toEqual([]);
       expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
@@ -757,17 +755,16 @@ describe('useProposals unit tests', () => {
 
       await waitForValueToChange(() => result.current.proposalsStatus);
 
+      // Assert pending state
       expect(result.current.proposals).toStrictEqual([]);
       expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
 
       await waitForValueToChange(() => result.current.proposalsStatus);
 
-      expect(result.current.proposals).toStrictEqual([]);
+      // Assert fulfilled state
       expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.FULFILLED);
-
-      await waitForValueToChange(() => result.current.proposals);
 
       // Assert Draft
 
@@ -1024,6 +1021,7 @@ describe('useProposals unit tests', () => {
     );
 
     await act(async () => {
+      // Assert initial state
       expect(result.current.proposals).toEqual([]);
       expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.STANDBY);
@@ -1032,15 +1030,15 @@ describe('useProposals unit tests', () => {
 
       await waitForValueToChange(() => result.current.proposalsStatus);
 
+      // Assert pending state
       expect(result.current.proposals).toEqual([]);
       expect(result.current.proposalsError).toBe(undefined);
       expect(result.current.proposalsStatus).toBe(AsyncStatus.PENDING);
 
       await waitForValueToChange(() => result.current.proposalsStatus);
 
+      // Assert rejected state
       expect(result.current.proposalsStatus).toBe(AsyncStatus.REJECTED);
-
-      await waitForValueToChange(() => result.current.proposalsError);
 
       expect(result.current.proposalsError?.message).toMatch(
         /something went wrong while fetching the/i

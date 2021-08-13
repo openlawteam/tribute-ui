@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState, useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import {
   SnapshotDraftResponse,
@@ -7,6 +7,7 @@ import {
   SnapshotProposalResponseData,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
+import {useQuery} from 'react-query';
 
 import {AsyncStatus} from '../../../util/types';
 import {DaoAdapterConstants} from '../../adapters-extensions/enums';
@@ -196,6 +197,58 @@ export function useProposals({
     useProposalsVotes(proposalsVotingAdapters);
 
   /**
+   * React Query
+   */
+
+  const {data: snapshotDraftEntriesData, error: snapshotDraftEntriesError} =
+    useQuery(
+      ['snapshotDraftEntries', adapterAddress],
+      async () => {
+        if (!adapterAddress) return;
+
+        return await getSnapshotDraftsByAdapterAddress(adapterAddress);
+      },
+      {
+        enabled: !!adapterAddress,
+      }
+    );
+
+  const {
+    data: snapshotProposalEntriesData,
+    error: snapshotProposalEntriesError,
+  } = useQuery(
+    ['snapshotProposalEntries', adapterAddress],
+    async () => {
+      if (!adapterAddress) return;
+
+      return await getSnapshotProposalsByAdapterAddress(adapterAddress);
+    },
+    {
+      enabled: !!adapterAddress,
+    }
+  );
+
+  /**
+   * Variables
+   */
+
+  const allSnapshotDraftsAndProposalsError =
+    snapshotDraftEntriesError || snapshotProposalEntriesError;
+
+  /**
+   * Cached callbacks
+   */
+
+  const handleGetAllSnapshotDraftsAndProposalsCached = useCallback(
+    handleGetAllSnapshotDraftsAndProposals,
+    [
+      allSnapshotDraftsAndProposalsError,
+      snapshotDraftEntriesData,
+      snapshotProposalEntriesData,
+    ]
+  );
+
+  /**
    * Effects
    */
 
@@ -213,8 +266,8 @@ export function useProposals({
   useEffect(() => {
     if (!adapterAddress) return;
 
-    handleGetAllSnapshotDraftsAndProposals(adapterAddress);
-  }, [adapterAddress]);
+    handleGetAllSnapshotDraftsAndProposalsCached();
+  }, [adapterAddress, handleGetAllSnapshotDraftsAndProposalsCached]);
 
   // Set the DAO proposal IDs we want to work with
   useEffect(() => {
@@ -433,34 +486,31 @@ export function useProposals({
    * Functions
    */
 
-  async function handleGetAllSnapshotDraftsAndProposals(
-    adapterAddress: string
-  ) {
+  async function handleGetAllSnapshotDraftsAndProposals() {
     try {
       setSnapshotDraftAndProposalsStatus(AsyncStatus.PENDING);
       // Reset error
       setSnapshotDraftAndProposalsError(undefined);
 
-      const snapshotDraftEntries = await getSnapshotDraftsByAdapterAddress(
-        adapterAddress
-      );
-
-      const snapshotProposalEntries =
-        await getSnapshotProposalsByAdapterAddress(adapterAddress);
-
-      const mergedEntries = [
-        ...snapshotDraftEntries,
-        ...snapshotProposalEntries,
-      ];
-
-      if (!mergedEntries.length) {
-        setSnapshotDraftAndProposalsStatus(AsyncStatus.FULFILLED);
-
-        return;
+      if (allSnapshotDraftsAndProposalsError) {
+        throw allSnapshotDraftsAndProposalsError;
       }
 
-      setSnapshotDraftAndProposals(mergedEntries);
-      setSnapshotDraftAndProposalsStatus(AsyncStatus.FULFILLED);
+      if (snapshotDraftEntriesData && snapshotProposalEntriesData) {
+        const mergedEntries = [
+          ...snapshotDraftEntriesData,
+          ...snapshotProposalEntriesData,
+        ];
+
+        if (!mergedEntries.length) {
+          setSnapshotDraftAndProposalsStatus(AsyncStatus.FULFILLED);
+
+          return;
+        }
+
+        setSnapshotDraftAndProposals(mergedEntries);
+        setSnapshotDraftAndProposalsStatus(AsyncStatus.FULFILLED);
+      }
     } catch (error) {
       setSnapshotDraftAndProposalsStatus(AsyncStatus.REJECTED);
       setSnapshotDraftAndProposals(INITIAL_ARRAY);

@@ -1,9 +1,11 @@
-import {act, renderHook} from '@testing-library/react-hooks';
 import {AbiItem} from 'web3-utils/types';
+import {act, renderHook} from '@testing-library/react-hooks';
+import Web3 from 'web3';
 
 import {
   DEFAULT_ETH_ADDRESS,
   DEFAULT_PROPOSAL_HASH,
+  FakeHttpProvider,
 } from '../../../test/helpers';
 import {AsyncStatus} from '../../../util/types';
 import {ProposalVotingAdapterData, ProposalVotingAdapterTuple} from '../types';
@@ -44,102 +46,102 @@ describe('useProposalsVotes unit tests', () => {
       ],
     ];
 
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
     await act(async () => {
-      const {result, waitForNextUpdate} = await renderHook(
+      const {result, waitForValueToChange} = await renderHook(
         () => useProposalsVotes(proposalsVotingAdapterTuples),
         {
           wrapper: Wrapper,
           initialProps: {
             useInit: true,
             useWallet: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              /**
-               * @note Maintain the same order as the contract's struct.
-               * @note We use the same, single result for any off-chain votes repsonses for testing only.
-               */
-              const offchainVotesDataResponse =
-                web3Instance.eth.abi.encodeParameter(
-                  {
-                    Voting: {
-                      snapshot: 'uint256',
-                      reporter: 'address',
-                      resultRoot: 'bytes32',
-                      nbYes: 'uint256',
-                      nbNo: 'uint256',
-                      startingTime: 'uint256',
-                      gracePeriodStartingTime: 'uint256',
-                      forceFailed: 'bool',
-                      isChallenged: 'bool',
-                      fallbackVotesCount: 'uint256',
-                    },
-                  },
-                  {
-                    snapshot: '8376297',
-                    reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-                    resultRoot:
-                      '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                    nbYes: '1',
-                    nbNo: '0',
-                    startingTime: '1617878162',
-                    gracePeriodStartingTime: '1617964640',
-                    forceFailed: false,
-                    isChallenged: false,
-                    fallbackVotesCount: '0',
-                  }
-                );
-
-              /**
-               * @note Maintain the same order as the contract's struct.
-               */
-              const onchainVotesDataResponse =
-                web3Instance.eth.abi.encodeParameter(
-                  {
-                    Voting: {
-                      nbYes: 'uint256',
-                      nbNo: 'uint256',
-                      startingTime: 'uint256',
-                      blockNumber: 'uint256',
-                    },
-                  },
-                  {
-                    blockNumber: '10',
-                    nbNo: '50',
-                    nbYes: '100',
-                    startingTime: '1617878162',
-                  }
-                );
-
-              // Mock votes data responses
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [
-                    0,
-                    [
-                      offchainVotesDataResponse,
-                      offchainVotesDataResponse,
-                      onchainVotesDataResponse,
-                    ],
-                  ]
-                )
-              );
+            getProps: (p) => {
+              mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
           },
         }
       );
 
+      const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
+        {
+          Voting: {
+            snapshot: 'uint256',
+            reporter: 'address',
+            resultRoot: 'bytes32',
+            nbYes: 'uint256',
+            nbNo: 'uint256',
+            startingTime: 'uint256',
+            gracePeriodStartingTime: 'uint256',
+            forceFailed: 'bool',
+            isChallenged: 'bool',
+            fallbackVotesCount: 'uint256',
+          },
+        },
+        {
+          snapshot: '8376297',
+          reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
+          resultRoot:
+            '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
+          nbYes: '1',
+          nbNo: '0',
+          startingTime: '1617878162',
+          gracePeriodStartingTime: '1617964640',
+          forceFailed: false,
+          isChallenged: false,
+          fallbackVotesCount: '0',
+        }
+      );
+
+      const onchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
+        {
+          Voting: {
+            nbYes: 'uint256',
+            nbNo: 'uint256',
+            startingTime: 'uint256',
+            blockNumber: 'uint256',
+          },
+        },
+        {
+          blockNumber: '10',
+          nbNo: '50',
+          nbYes: '100',
+          startingTime: '1617878162',
+        }
+      );
+
+      // Assert initial state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.STANDBY);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
 
-      await waitForNextUpdate();
+      await waitForValueToChange(() => result.current.proposalsVotesStatus);
 
+      // Mock votes data responses
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [
+            0,
+            [
+              offchainVotesDataResponse,
+              offchainVotesDataResponse,
+              onchainVotesDataResponse,
+            ],
+          ]
+        )
+      );
+
+      // Assert pending state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.PENDING);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
 
-      await waitForNextUpdate();
+      await waitForValueToChange(() => result.current.proposalsVotesStatus);
 
+      // Assert fulfilled state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.FULFILLED);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([
@@ -241,60 +243,25 @@ describe('useProposalsVotes unit tests', () => {
           initialProps: {
             useInit: true,
             useWallet: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              /**
-               * @note Maintain the same order as the contract's struct.
-               * @note We use the same, single result for any off-chain votes repsonses for testing only.
-               */
-              const offchainVotesDataResponse =
-                web3Instance.eth.abi.encodeParameter(
-                  {
-                    Voting: {
-                      snapshot: 'uint256',
-                      proposalHash: 'bytes32',
-                      reporter: 'address',
-                      resultRoot: 'bytes32',
-                      nbYes: 'uint256',
-                      nbNo: 'uint256',
-                      startingTime: 'uint256',
-                      gracePeriodStartingTime: 'uint256',
-                      isChallenged: 'bool',
-                      fallbackVotesCount: 'uint256',
-                    },
-                  },
-                  {
-                    snapshot: '8376297',
-                    proposalHash: DEFAULT_PROPOSAL_HASH,
-                    reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-                    resultRoot:
-                      '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                    nbYes: '1',
-                    nbNo: '0',
-                    startingTime: '1617878162',
-                    gracePeriodStartingTime: '1617964640',
-                    isChallenged: false,
-                    fallbackVotesCount: '0',
-                  }
-                );
-
-              // Mock votes data responses
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [0, [offchainVotesDataResponse]]
-                )
-              );
-            },
           },
         }
       );
 
+      // Assert initial state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.STANDBY);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
 
       await waitForValueToChange(() => result.current.proposalsVotesStatus);
 
+      // Assert pending state
+      expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.PENDING);
+      expect(result.current.proposalsVotesError).toBe(undefined);
+      expect(result.current.proposalsVotes).toMatchObject([]);
+
+      await waitForValueToChange(() => result.current.proposalsVotesStatus);
+
+      // Assert rejected state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.REJECTED);
       expect(result.current.proposalsVotesError?.message).toMatch(
         /no voting adapter name was found for "badvotingadaptername"/i
@@ -316,6 +283,9 @@ describe('useProposalsVotes unit tests', () => {
       ],
     ];
 
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
         () => useProposalsVotes(proposalsVotingAdapterTuples),
@@ -324,67 +294,69 @@ describe('useProposalsVotes unit tests', () => {
           initialProps: {
             useInit: true,
             useWallet: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              /**
-               * @note Maintain the same order as the contract's struct.
-               */
-              const offchainVotesDataResponse =
-                web3Instance.eth.abi.encodeParameter(
-                  {
-                    Voting: {
-                      snapshot: 'uint256',
-                      reporter: 'address',
-                      resultRoot: 'bytes32',
-                      nbYes: 'uint256',
-                      nbNo: 'uint256',
-                      startingTime: 'uint256',
-                      gracePeriodStartingTime: 'uint256',
-                      forceFailed: 'bool',
-                      isChallenged: 'bool',
-                      fallbackVotesCount: 'uint256',
-                    },
-                  },
-                  {
-                    snapshot: '8376297',
-                    reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-                    resultRoot:
-                      '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                    nbYes: '1',
-                    nbNo: '0',
-                    startingTime: '1617878162',
-                    gracePeriodStartingTime: '1617964640',
-                    forceFailed: false,
-                    isChallenged: false,
-                    fallbackVotesCount: '0',
-                  }
-                );
-
-              // Mock votes data responses
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [0, [offchainVotesDataResponse]]
-                )
-              );
+            getProps: (p) => {
+              mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
           },
         }
       );
 
+      const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
+        {
+          Voting: {
+            snapshot: 'uint256',
+            reporter: 'address',
+            resultRoot: 'bytes32',
+            nbYes: 'uint256',
+            nbNo: 'uint256',
+            startingTime: 'uint256',
+            gracePeriodStartingTime: 'uint256',
+            forceFailed: 'bool',
+            isChallenged: 'bool',
+            fallbackVotesCount: 'uint256',
+          },
+        },
+        {
+          snapshot: '8376297',
+          reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
+          resultRoot:
+            '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
+          nbYes: '1',
+          nbNo: '0',
+          startingTime: '1617878162',
+          gracePeriodStartingTime: '1617964640',
+          forceFailed: false,
+          isChallenged: false,
+          fallbackVotesCount: '0',
+        }
+      );
+
+      // Assert initial state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.STANDBY);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
 
       await waitForValueToChange(() => result.current.proposalsVotesStatus);
 
+      // Mock votes data responses
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameters(
+          ['uint256', 'bytes[]'],
+          [0, [offchainVotesDataResponse]]
+        )
+      );
+
+      // Assert pending state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.PENDING);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
 
       await waitForValueToChange(() => result.current.proposalsVotesStatus);
 
+      // Assert fulfilled state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.FULFILLED);
-      expect(result.current.proposalsVotesError?.message).toBe(undefined);
+      expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([
         [
           '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
@@ -440,59 +412,18 @@ describe('useProposalsVotes unit tests', () => {
           initialProps: {
             useInit: true,
             useWallet: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              /**
-               * @note Maintain the same order as the contract's struct.
-               */
-              const offchainVotesDataResponse =
-                web3Instance.eth.abi.encodeParameter(
-                  {
-                    Voting: {
-                      snapshot: 'uint256',
-                      proposalHash: 'bytes32',
-                      reporter: 'address',
-                      resultRoot: 'bytes32',
-                      nbYes: 'uint256',
-                      nbNo: 'uint256',
-                      startingTime: 'uint256',
-                      gracePeriodStartingTime: 'uint256',
-                      isChallenged: 'bool',
-                      fallbackVotesCount: 'uint256',
-                    },
-                  },
-                  {
-                    snapshot: '8376297',
-                    proposalHash: DEFAULT_PROPOSAL_HASH,
-                    reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-                    resultRoot:
-                      '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                    nbYes: '1',
-                    nbNo: '0',
-                    startingTime: '1617878162',
-                    gracePeriodStartingTime: '1617964640',
-                    isChallenged: false,
-                    fallbackVotesCount: '0',
-                  }
-                );
-
-              // Mock votes data responses
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [0, [offchainVotesDataResponse]]
-                )
-              );
-            },
           },
         }
       );
 
+      // Assert initial state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.STANDBY);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
 
       await waitForValueToChange(() => result.current.proposalsVotesStatus);
 
+      // Assert fulfilled state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.FULFILLED);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);
@@ -511,53 +442,11 @@ describe('useProposalsVotes unit tests', () => {
           initialProps: {
             useInit: true,
             useWallet: true,
-            getProps: ({mockWeb3Provider, web3Instance}) => {
-              /**
-               * @note Maintain the same order as the contract's struct.
-               */
-              const offchainVotesDataResponse =
-                web3Instance.eth.abi.encodeParameter(
-                  {
-                    Voting: {
-                      snapshot: 'uint256',
-                      proposalHash: 'bytes32',
-                      reporter: 'address',
-                      resultRoot: 'bytes32',
-                      nbYes: 'uint256',
-                      nbNo: 'uint256',
-                      startingTime: 'uint256',
-                      gracePeriodStartingTime: 'uint256',
-                      isChallenged: 'bool',
-                      fallbackVotesCount: 'uint256',
-                    },
-                  },
-                  {
-                    snapshot: '8376297',
-                    proposalHash: DEFAULT_PROPOSAL_HASH,
-                    reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-                    resultRoot:
-                      '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-                    nbYes: '1',
-                    nbNo: '0',
-                    startingTime: '1617878162',
-                    gracePeriodStartingTime: '1617964640',
-                    isChallenged: false,
-                    fallbackVotesCount: '0',
-                  }
-                );
-
-              // Mock votes data responses
-              mockWeb3Provider.injectResult(
-                web3Instance.eth.abi.encodeParameters(
-                  ['uint256', 'bytes[]'],
-                  [0, [offchainVotesDataResponse]]
-                )
-              );
-            },
           },
         }
       );
 
+      // Assert initial state
       expect(result.current.proposalsVotesStatus).toBe(AsyncStatus.STANDBY);
       expect(result.current.proposalsVotesError).toBe(undefined);
       expect(result.current.proposalsVotes).toMatchObject([]);

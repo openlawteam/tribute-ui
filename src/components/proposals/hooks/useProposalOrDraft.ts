@@ -4,6 +4,7 @@ import {
   SnapshotProposalResponse,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
+import {useQueryClient} from 'react-query';
 
 import {
   Proposal,
@@ -94,6 +95,12 @@ export function useProposalOrDraft(
   } = useProposalsVotingAdapter(proposalVotingAdapterId);
 
   /**
+   * Their hooks
+   */
+
+  const queryClient = useQueryClient();
+
+  /**
    * Cached callbacks
    */
 
@@ -175,12 +182,30 @@ export function useProposalOrDraft(
     if (refetchCount === 0) return;
 
     /**
-     * Provide a different Array reference to force a re-render
-     * of the `useProposalsVotingAdapter` hook. If the `id` argument changes,
-     * that's fine as well, but it's unlikely.
+     * Provide a different Array reference to force a re-render of the
+     * `useProposalsVotingAdapter` hook. If the `id` argument changes, that's
+     * fine as well, but it's unlikely.
      */
     setProposalVotingAdapterId([id]);
   }, [id, refetchCount]);
+
+  useEffect(() => {
+    async function resetQueries() {
+      if (refetchCount === 0) return;
+
+      /**
+       * Reset React Queries when `refetchCount` is incremented (proposal is
+       * sponsored/submitted on chain, proposal is voted on)
+       *
+       * Needed so queries can fetch data that has been updated by the change in
+       * proposal status
+       *
+       */
+      await queryClient.resetQueries();
+    }
+
+    resetQueries();
+  }, [queryClient, refetchCount]);
 
   // Set overall async status
   useEffect(() => {

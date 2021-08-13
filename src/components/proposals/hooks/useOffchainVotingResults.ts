@@ -3,6 +3,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {VoteChoicesIndex} from '@openlaw/snapshot-js-erc712';
 import Web3 from 'web3';
+import {useQuery} from 'react-query';
 
 import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
@@ -58,12 +59,9 @@ export function useOffchainVotingResults(
     Error | undefined
   >();
 
-  /**
-   * Our hooks
-   */
-
-  const {web3Instance} = useWeb3Modal();
-  const {isMountedRef} = useIsMounted();
+  const [proposalsToMap, setProposalsToMap] = useState<
+    (SnapshotProposal | undefined)[]
+  >([]);
 
   /**
    * Variables
@@ -74,6 +72,81 @@ export function useOffchainVotingResults(
   );
 
   /**
+   * Our hooks
+   */
+
+  const {web3Instance} = useWeb3Modal();
+  const {isMountedRef} = useIsMounted();
+
+  /**
+   * React Query
+   */
+
+  const {data: votingResultsToSetData, error: votingResultsToSetError} =
+    useQuery(
+      ['votingResultsToSet', proposalsToMap],
+      async () => {
+        if (
+          !bankAddress ||
+          !getPriorAmountABI ||
+          !proposalsToMap.length ||
+          !web3Instance
+        )
+          return;
+
+        return await Promise.all(
+          proposalsToMap.map(async (p) => {
+            const snapshot = p?.msg.payload.snapshot;
+            const idInSnapshot = p?.idInSnapshot;
+
+            if (!idInSnapshot || !snapshot) return;
+
+            const voterEntries = p?.votes?.map((v): [string, number] => {
+              const vote = v[Object.keys(v)[0]];
+
+              return [
+                /**
+                 * Must be the true member's address for calculating voting power.
+                 * This value is (or at least should be) derived from `OffchainVoting.memberAddressesByDelegatedKey`.
+                 */
+                vote.msg.payload.metadata.memberAddress,
+                vote.msg.payload.choice,
+              ];
+            });
+
+            if (!voterEntries || !voterEntries.length) return;
+
+            // Dedupe any duplicate addresses to be safe.
+            const voterAddressesAndChoices = Object.entries(
+              Object.fromEntries(voterEntries)
+            );
+
+            try {
+              const result = await getUnitsPerChoiceCached({
+                bankAddress,
+                getPriorAmountABI,
+                snapshot,
+                voterAddressesAndChoices,
+                web3Instance,
+              });
+
+              return [idInSnapshot, result];
+            } catch (error) {
+              return;
+            }
+          })
+        );
+      },
+      {
+        enabled:
+          !!bankAddress &&
+          !!getPriorAmountABI &&
+          !!proposalsToMap.length &&
+          !!web3Instance,
+      }
+    );
+
+  /**
    * Cached callbacks
    */
 
@@ -82,14 +155,41 @@ export function useOffchainVotingResults(
     []
   );
 
+  const buildOffchainVotingResultEntriesCached = useCallback(
+    buildOffchainVotingResultEntries,
+    [
+      bankAddress,
+      getPriorAmountABI,
+      isMountedRef,
+      proposalsToMap.length,
+      votingResultsToSetData,
+      votingResultsToSetError,
+      web3Instance,
+    ]
+  );
+
   /**
    * Effects
    */
 
   // Build result entries of `OffchainVotingResultEntries`
   useEffect(() => {
-    const proposalsToMap = Array.isArray(proposals) ? proposals : [proposals];
+    buildOffchainVotingResultEntriesCached();
+  }, [buildOffchainVotingResultEntriesCached]);
 
+  useEffect(() => {
+    const proposalsToMapToSet = Array.isArray(proposals)
+      ? proposals
+      : [proposals];
+
+    setProposalsToMap(proposalsToMapToSet);
+  }, [proposals]);
+
+  /**
+   * Functions
+   */
+
+  async function buildOffchainVotingResultEntries() {
     if (
       !bankAddress ||
       !getPriorAmountABI ||
@@ -99,77 +199,34 @@ export function useOffchainVotingResults(
       return;
     }
 
-    setOffchainVotingResultsStatus(AsyncStatus.PENDING);
+    try {
+      setOffchainVotingResultsStatus(AsyncStatus.PENDING);
 
-    const votingResultPromises = proposalsToMap.map(async (p) => {
-      const snapshot = p?.msg.payload.snapshot;
-      const idInSnapshot = p?.idInSnapshot;
-
-      if (!idInSnapshot || !snapshot) return;
-
-      const voterEntries = p?.votes?.map((v): [string, number] => {
-        const vote = v[Object.keys(v)[0]];
-
-        return [
-          /**
-           * Must be the true member's address for calculating voting power.
-           * This value is (or at least should be) derived from `OffchainVoting.memberAddressesByDelegatedKey`.
-           */
-          vote.msg.payload.metadata.memberAddress,
-          vote.msg.payload.choice,
-        ];
-      });
-
-      if (!voterEntries || !voterEntries.length) return;
-
-      // Dedupe any duplicate addresses to be safe.
-      const voterAddressesAndChoices = Object.entries(
-        Object.fromEntries(voterEntries)
-      );
-
-      try {
-        const result = await getUnitsPerChoiceCached({
-          bankAddress,
-          getPriorAmountABI,
-          snapshot,
-          voterAddressesAndChoices,
-          web3Instance,
-        });
-
-        return [idInSnapshot, result];
-      } catch (error) {
-        return;
+      if (votingResultsToSetError) {
+        throw votingResultsToSetError;
       }
-    });
 
-    Promise.all(votingResultPromises)
-      .then((p) => p.filter((p) => p) as OffchainVotingResultEntries)
-      .then((r) => {
+      if (votingResultsToSetData) {
+        const filteredVotingResultsToSetData = votingResultsToSetData.filter(
+          (p) => p
+        );
+
         if (!isMountedRef.current) return;
 
         setOffchainVotingResultsStatus(AsyncStatus.FULFILLED);
-        setVotingResults(r);
+        setVotingResults(
+          filteredVotingResultsToSetData as OffchainVotingResultEntries
+        );
         setOffchainVotingResultsError(undefined);
-      })
-      .catch((error) => {
-        if (!isMountedRef.current) return;
+      }
+    } catch (error) {
+      if (!isMountedRef.current) return;
 
-        setOffchainVotingResultsStatus(AsyncStatus.REJECTED);
-        setVotingResults([]);
-        setOffchainVotingResultsError(error);
-      });
-  }, [
-    bankAddress,
-    getPriorAmountABI,
-    getUnitsPerChoiceCached,
-    isMountedRef,
-    proposals,
-    web3Instance,
-  ]);
-
-  /**
-   * Functions
-   */
+      setOffchainVotingResultsStatus(AsyncStatus.REJECTED);
+      setVotingResults([]);
+      setOffchainVotingResultsError(error);
+    }
+  }
 
   async function getUnitsPerChoiceFromContract({
     bankAddress,
@@ -225,7 +282,7 @@ export function useOffchainVotingResults(
       const calls = [totalUnitsCall, ...unitsCalls];
 
       const [totalUnitsResult, ...votingResults]: string[] = await multicall({
-        calls,
+        calls: calls,
         web3Instance,
       });
 

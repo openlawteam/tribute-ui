@@ -1,10 +1,11 @@
-import {Store} from 'redux';
+import {ApolloProvider} from '@apollo/react-hooks';
 import {MemoryRouter} from 'react-router-dom';
-import type {LocationDescriptor} from 'history';
 import {provider as Web3Provider} from 'web3-core/types';
 import {Provider} from 'react-redux';
-import {ApolloProvider} from '@apollo/react-hooks';
+import {QueryClient, QueryClientProvider} from 'react-query';
+import {Store} from 'redux';
 import React, {useEffect, useMemo, useState} from 'react';
+import type {LocationDescriptor} from 'history';
 import Web3 from 'web3';
 
 import {
@@ -77,8 +78,25 @@ export default function Wrapper(
 
   const [store] = useState<Store>(getNewStore());
   const [mockWeb3Provider] = useState<FakeHttpProvider>(new FakeHttpProvider());
+
   const [web3Instance] = useState<Web3>(
     new Web3(mockWeb3Provider as unknown as Web3Provider)
+  );
+
+  const [queryClient] = useState<QueryClient>(
+    new QueryClient({
+      defaultOptions: {
+        queries: {
+          /**
+           * Turn retries off for `react-query`,
+           * unless retries are set when using `useQuery`.
+           *
+           * @see https://react-query.tanstack.com/guides/testing#turn-off-retries
+           */
+          retry: false,
+        },
+      },
+    })
   );
 
   /**
@@ -158,25 +176,32 @@ export default function Wrapper(
    */
 
   useEffect(() => {
-    return () => {
+    return function cleanup() {
       // When `<Wrapper />` unmounts, restore the original function.
       getAdapterAddressMock.then((v) => v?.mockRestore());
     };
   }, [getAdapterAddressMock]);
 
   useEffect(() => {
-    return () => {
+    return function cleanup() {
       // When `<Wrapper />` unmounts, restore the original function.
       getExtensionAddressMock.then((v) => v?.mockRestore());
     };
   }, [getExtensionAddressMock]);
 
   useEffect(() => {
-    return () => {
+    return function cleanup() {
       // When `<Wrapper />` unmounts, restore the original function.
       getVotingAdapterNameMock.then((v) => v?.mockRestore());
     };
   }, [getVotingAdapterNameMock]);
+
+  // Clear `queryClient` cache on unmount
+  useEffect(() => {
+    return function cleanup() {
+      queryClient.clear();
+    };
+  }, [queryClient]);
 
   useEffect(() => {
     /**
@@ -257,7 +282,9 @@ export default function Wrapper(
         value={web3ContextValues as Web3ModalContextValue}>
         <MemoryRouter initialEntries={locationEntries || [{pathname: '/'}]}>
           <ApolloProvider client={getApolloClient(store)}>
-            {renderChildren(props.children)}
+            <QueryClientProvider client={queryClient}>
+              {renderChildren(props.children)}
+            </QueryClientProvider>
           </ApolloProvider>
         </MemoryRouter>
       </Web3ModalContext.Provider>
