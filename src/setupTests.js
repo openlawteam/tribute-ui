@@ -1,13 +1,14 @@
-const {act} = require('@testing-library/react-hooks');
-const {queryClient} = require('./test/Wrapper');
-
 // Adds jest-dom's custom assertions
 require('@testing-library/jest-dom/extend-expect');
+const {setLogger} = require('react-query');
 const path = require('path');
 
 /**
  * Require any env vars for testing environment
  * as early as possible
+ *
+ * @note Do not import anything which `<Wrapper />` uses before the env vars are merged
+ *   to avoid the `<Wrapper />` using outdated env vars.
  */
 const {parsed: parsedEnv} = require('dotenv').config({
   path: `${path.resolve(process.cwd(), 'src/test/.env')}`,
@@ -43,6 +44,18 @@ beforeAll(() => {
   });
 
   /**
+   * Turn off `react-query` network error logging
+   *
+   * @see https://react-query.tanstack.com/guides/testing#turn-off-network-error-logging
+   */
+  setLogger({
+    log: console.log,
+    warn: console.warn,
+    // no more errors on the console
+    error: () => {},
+  });
+
+  /**
    * Mock window.matchMedia which is not supported in JSDOM.
    *
    * @see https://jestjs.io/docs/en/manual-mocks#mocking-methods-which-are-not-implemented-in-jsdom
@@ -69,12 +82,14 @@ beforeAll(() => {
     value: () => {},
   });
 });
+
 // If you need to add a handler after calling setupServer for some specific test
 // this will remove that handler for the rest of them
 // (which is important for test isolation):
 afterEach(() => {
   server.resetHandlers();
-  // clear global cache
-  act(() => queryClient.clear());
 });
-afterAll(() => server.close());
+
+afterAll(() => {
+  server.close();
+});
