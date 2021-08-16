@@ -1,19 +1,18 @@
-import {useState} from 'react';
+import {AbiItem} from 'web3-utils/types';
 import {useForm} from 'react-hook-form';
 import {useSelector} from 'react-redux';
-import {AbiItem} from 'web3-utils/types';
+import {useState} from 'react';
 
-import {DaoAdapterConstants} from './enums';
 import {AdaptersOrExtensions} from './types';
-import {StoreState} from '../../store/types';
-import {Web3TxStatus} from '../web3/types';
+import {BURN_ADDRESS} from '../../util/constants';
+import {DaoAdapterConstants} from './enums';
 import {FormFieldErrors} from '../../util/enums';
 import {getValidationError} from '../../util/helpers';
-import {BURN_ADDRESS} from '../../util/constants';
-import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
-import {useAdaptersOrExtensions, useValidation} from './hooks';
 import {ParamInputType, ParamType} from './hooks/useValidation';
-
+import {StoreState} from '../../store/types';
+import {useAdaptersOrExtensions, useValidation} from './hooks';
+import {useContractSend, useWeb3Modal} from '../web3/hooks';
+import {Web3TxStatus} from '../web3/types';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import InputError from '../common/InputError';
 import Loader from '../feedback/Loader';
@@ -67,7 +66,7 @@ export default function ConfigurationForm({
   );
 
   /**
-   * Hooks
+   * Our hooks
    */
   const {
     txError,
@@ -76,10 +75,11 @@ export default function ConfigurationForm({
     txSend,
     txStatus,
   } = useContractSend();
-  const {fast: fastGasPrice} = useETHGasPrice();
-  const {connected, account} = useWeb3Modal();
+
   const {isParamInputValid, getFormFieldError, formatInputByType} =
     useValidation();
+
+  const {connected, account} = useWeb3Modal();
   const {getAdapterOrExtensionFromRedux} = useAdaptersOrExtensions();
 
   /**
@@ -111,6 +111,7 @@ export default function ConfigurationForm({
       txStatus === Web3TxStatus.PENDING) &&
     (configureAdapterStatus === Web3TxStatus.AWAITING_CONFIRM ||
       configureAdapterStatus === Web3TxStatus.PENDING);
+
   const isRemoveInProcess =
     (txStatus === Web3TxStatus.AWAITING_CONFIRM ||
       txStatus === Web3TxStatus.PENDING) &&
@@ -120,12 +121,14 @@ export default function ConfigurationForm({
   const isConfigureDone =
     txStatus === Web3TxStatus.FULFILLED &&
     configureAdapterStatus === Web3TxStatus.FULFILLED;
+
   const isRemoveDone =
     txStatus === Web3TxStatus.FULFILLED &&
     removeStatus === Web3TxStatus.FULFILLED;
 
   const isConfigureInProcessOrDone =
     (isConfigureInProcess || isConfigureDone) && txIsPromptOpen;
+
   const isRemoveInProcessOrDone =
     (isRemoveInProcess || isRemoveDone) && txIsPromptOpen;
 
@@ -152,7 +155,6 @@ export default function ConfigurationForm({
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       // Execute contract call to `removeExtension` or `replaceAdapter`
@@ -227,7 +229,6 @@ export default function ConfigurationForm({
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       setConfigureAdapterStatus(Web3TxStatus.AWAITING_CONFIRM);
