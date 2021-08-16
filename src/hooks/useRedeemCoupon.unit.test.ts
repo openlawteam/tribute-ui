@@ -3,6 +3,7 @@ import {waitFor} from '@testing-library/react';
 import Web3 from 'web3';
 
 import {
+  ethBlockNumber,
   ethEstimateGas,
   ethGasPrice,
   getTransactionReceipt,
@@ -69,6 +70,7 @@ describe('useRedeemCoupon unit tests', () => {
 
       act(() => {
         mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+        mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
         mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
         mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
         mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
@@ -128,6 +130,7 @@ describe('useRedeemCoupon unit tests', () => {
       act(() => {
         // Mock tx result
         mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+        mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
         mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
         mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
         mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
@@ -304,6 +307,7 @@ describe('useRedeemCoupon unit tests', () => {
       act(() => {
         // Mock tx result
         mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+        mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
         mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
         mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
         mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));

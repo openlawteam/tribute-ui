@@ -8,6 +8,7 @@ import {
   SET_CONNECTED_MEMBER,
 } from '../../store/actions';
 import {
+  ethBlockNumber,
   ethEstimateGas,
   ethGasPrice,
   getTransactionReceipt,
@@ -77,6 +78,7 @@ describe('ProcessAction unit tests', () => {
     // Setup: Mock RPC calls for `processProposal`
     await waitFor(() => {
       mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
       mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
@@ -156,6 +158,7 @@ describe('ProcessAction unit tests', () => {
     // Setup: Mock RPC calls for `processProposal`
     await waitFor(() => {
       mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
       mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
@@ -230,6 +233,7 @@ describe('ProcessAction unit tests', () => {
         code: 1234,
         message: 'Estimating gas failed',
       });
+      mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
       mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));

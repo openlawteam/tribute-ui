@@ -9,6 +9,7 @@ import userEvent from '@testing-library/user-event';
 import Web3 from 'web3';
 
 import {
+  ethBlockNumber,
   ethEstimateGas,
   ethGasPrice,
   getTransactionReceipt,
@@ -121,7 +122,8 @@ function mockInitialCallsHelper(
   // Mock RPC call for `getNbMembers`
   options?.getNbMembers?.() ||
     mockWeb3Provider.injectResult(
-      web3Instance.eth.abi.encodeParameter('uint256', 4)
+      web3Instance.eth.abi.encodeParameter('uint256', 4),
+      {debugName: 'getNbMembers'}
     );
 
   // Mock `multicall` for `getMemberAddress`
@@ -153,7 +155,8 @@ function mockInitialCallsHelper(
             ),
           ],
         ]
-      )
+      ),
+      {debugName: 'getMemberAddress multicall'}
     );
 
   // Mock `multicall` for `getPriorAmount`
@@ -171,13 +174,15 @@ function mockInitialCallsHelper(
             web3Instance.eth.abi.encodeParameter('uint256', '100000'),
           ],
         ]
-      )
+      ),
+      {debugName: 'getPriorAmount multicall'}
     );
 
   // Mock `getBadNodeError` call `BadNodeError.OK`
   options?.getBadNodeError?.() ||
     mockWeb3Provider.injectResult(
-      web3Instance.eth.abi.encodeParameter('uint256', '0')
+      web3Instance.eth.abi.encodeParameter('uint256', '0'),
+      {debugName: 'getBadNodeError'}
     );
 
   // Mock signature
@@ -255,6 +260,7 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
     // Mock RPC calls for `submitVoteResult`
     await waitFor(() => {
       mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
       mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
@@ -330,6 +336,7 @@ describe('OffchainOpRollupVotingSubmitResultAction unit tests', () => {
     // Mock RPC calls for `submitVoteResult`
     await waitFor(() => {
       mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
       mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
