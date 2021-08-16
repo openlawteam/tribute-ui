@@ -8,7 +8,7 @@ import {getConnectedMember} from '../../store/actions';
 import {ProposalData, SnapshotProposal} from './types';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
-import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
+import {useContractSend, useWeb3Modal} from '../web3/hooks';
 import {useDaoTokenDetails} from '../dao-token/hooks';
 import {useMemberActionDisabled} from '../../hooks';
 import {Web3TxStatus} from '../web3/types';
@@ -108,7 +108,6 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
     setOtherDisabledReasons,
   } = useMemberActionDisabled(useMemberActionDisabledProps);
 
-  const {fast: fastGasPrice} = useETHGasPrice();
   const {daoTokenDetails} = useDaoTokenDetails();
 
   /**
@@ -257,7 +256,6 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
           ];
           const txArguments = {
             from: account || '',
-            ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
           };
 
           // Execute contract call for `approve`
@@ -307,7 +305,6 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       const tx = await txSend(

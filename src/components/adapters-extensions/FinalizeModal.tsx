@@ -1,21 +1,20 @@
 import {useState} from 'react';
 import {useSelector} from 'react-redux';
 
+import {CycleEllipsis} from '../feedback';
 import {StoreState} from '../../store/types';
-import {Web3TxStatus} from '../web3/types';
-import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
-import {useDao} from '../../hooks';
 import {truncateEthAddress} from '../../util/helpers';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
-
-import {CycleEllipsis} from '../feedback';
-import Modal from '../common/Modal';
-import Loader from '../feedback/Loader';
-import TimesSVG from '../../assets/svg/TimesSVG';
+import {useContractSend, useWeb3Modal} from '../web3/hooks';
+import {useDao} from '../../hooks';
+import {Web3TxStatus} from '../web3/types';
 import CycleMessage from '../feedback/CycleMessage';
-import EtherscanURL from '../web3/EtherscanURL';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
+import EtherscanURL from '../web3/EtherscanURL';
 import FadeIn from '../common/FadeIn';
+import Loader from '../feedback/Loader';
+import Modal from '../common/Modal';
+import TimesSVG from '../../assets/svg/TimesSVG';
 
 type FinalizeModalProps = {
   isOpen: boolean;
@@ -39,11 +38,12 @@ export default function FinalizeModal({
   );
 
   /**
-   * Hooks
+   * Our hooks
    */
+
   const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
     useContractSend();
-  const {fast: fastGasPrice} = useETHGasPrice();
+
   const {dao} = useDao();
   const {connected, account} = useWeb3Modal();
 
@@ -52,9 +52,11 @@ export default function FinalizeModal({
    */
   const TIMEOUT_INTERVAL = 3000;
   const isConnected = connected && account;
+
   const isInProcess =
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
     txStatus === Web3TxStatus.PENDING;
+
   const isDone = txStatus === Web3TxStatus.FULFILLED;
   const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
   const finalizeError = submitError || txError;
@@ -129,7 +131,6 @@ export default function FinalizeModal({
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       // Execute contract call for `finalizeDao`

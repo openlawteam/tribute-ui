@@ -1,15 +1,15 @@
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
-
 import {
   prepareVoteProposalData,
   SnapshotType,
 } from '@openlaw/snapshot-js-erc712';
+
 import {getContractByAddress} from '../web3/helpers';
 import {ProposalData} from './types';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
-import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
+import {useContractSend, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
 import {useSignAndSubmitProposal} from './hooks';
 import {Web3TxStatus} from '../web3/types';
@@ -62,8 +62,6 @@ export default function SponsorAction(props: SponsorActionProps) {
 
   const {proposalSignAndSendStatus, signAndSendProposal} =
     useSignAndSubmitProposal<SnapshotType.proposal>();
-
-  const {fast: fastGasPrice} = useETHGasPrice();
 
   /**
    * Variables
@@ -147,7 +145,6 @@ export default function SponsorAction(props: SponsorActionProps) {
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       await txSend(

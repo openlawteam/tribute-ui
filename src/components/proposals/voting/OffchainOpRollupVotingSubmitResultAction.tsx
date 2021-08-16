@@ -29,7 +29,7 @@ import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
 import {useMemberActionDisabled} from '../../../hooks';
-import {useWeb3Modal, useContractSend, useETHGasPrice} from '../../web3/hooks';
+import {useWeb3Modal, useContractSend} from '../../web3/hooks';
 import CycleMessage from '../../feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../common/ErrorMessageWithDetails';
 import EtherscanURL from '../../web3/EtherscanURL';
@@ -104,8 +104,6 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
   const {isDisabled, openWhyDisabledModal, WhyDisabledModal} =
     useMemberActionDisabled();
-
-  const {fast: fastGasPrice} = useETHGasPrice();
 
   /**
    * Variables
@@ -326,7 +324,6 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       // Send the tx

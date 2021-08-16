@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {CycleEllipsis} from '../feedback';
@@ -6,7 +6,7 @@ import {getConnectedMember} from '../../store/actions';
 import {ProposalData, DistributionStatus} from './types';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
-import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
+import {useContractSend, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
 import {Web3TxStatus} from '../web3/types';
 import CycleMessage from '../feedback/CycleMessage';
@@ -66,13 +66,13 @@ export default function PostProcessActionTransfer(
 
   const {account, web3Instance} = useWeb3Modal();
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
+
   const {
     isDisabled,
     openWhyDisabledModal,
     WhyDisabledModal,
     setOtherDisabledReasons,
   } = useMemberActionDisabled();
-  const {fast: fastGasPrice} = useETHGasPrice();
 
   /**
    * Their hooks
@@ -87,6 +87,7 @@ export default function PostProcessActionTransfer(
   const isInProcess =
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
     txStatus === Web3TxStatus.PENDING;
+
   const isDone = txStatus === Web3TxStatus.FULFILLED;
   const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
   const areSomeDisabled = isDisabled || isInProcessOrDone;
@@ -104,9 +105,11 @@ export default function PostProcessActionTransfer(
         if (!snapshotProposal) {
           throw new Error('No Snapshot proposal was found.');
         }
+
         if (!daoRegistryContract) {
           throw new Error('No DAO Registry contract was found.');
         }
+
         if (!DistributeContract) {
           throw new Error('No DistributeContract found.');
         }
@@ -189,7 +192,6 @@ export default function PostProcessActionTransfer(
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       const tx = await txSend(

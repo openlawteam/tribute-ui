@@ -10,18 +10,17 @@ import {useSelector} from 'react-redux';
 import {useState, useCallback, useEffect} from 'react';
 
 import {
+  useContractSend,
+  useIsDefaultChain,
+  useWeb3Modal,
+} from '../../components/web3/hooks';
+import {
   getValidationError,
   stripFormatNumber,
   formatNumber,
   formatDecimal,
   truncateEthAddress,
 } from '../../util/helpers';
-import {
-  useContractSend,
-  useETHGasPrice,
-  useIsDefaultChain,
-  useWeb3Modal,
-} from '../../components/web3/hooks';
 import {BURN_ADDRESS} from '../../util/constants';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
 import {default as ERC20ABI} from '../../abis/ERC20.json';
@@ -100,9 +99,10 @@ export default function CreateTransferProposal() {
 
   const {defaultChainError} = useIsDefaultChain();
   const {connected, account, web3Instance} = useWeb3Modal();
-  const {fast: fastGasPrice} = useETHGasPrice();
+
   const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
     useContractSend();
+
   const {proposalData, proposalSignAndSendStatus, signAndSendProposal} =
     useSignAndSubmitProposal<SnapshotType.proposal>();
 
@@ -467,7 +467,6 @@ export default function CreateTransferProposal() {
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       // Execute contract call for `submitProposal`

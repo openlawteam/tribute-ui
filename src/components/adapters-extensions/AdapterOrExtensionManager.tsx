@@ -1,8 +1,14 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {StoreState} from '../../store/types';
-import {AsyncStatus} from '../../util/types';
+import {
+  defaultAdaptersAndExtensions,
+  AdaptersAndExtensionsType,
+} from './config';
+import {
+  useAdaptersOrExtensions,
+  useInitAdapterExtensionContracts,
+} from './hooks';
 import {
   AddAdapterArguments,
   AddAdaptersArguments,
@@ -10,32 +16,17 @@ import {
   AdaptersOrExtensions,
 } from './types';
 
+import {AsyncStatus} from '../../util/types';
 import {DaoAdapterConstants, DaoExtensionConstants} from './enums';
-
-import {
-  defaultAdaptersAndExtensions,
-  AdaptersAndExtensionsType,
-} from './config';
-
 import {getAdapterOrExtensionId, getAccessControlLayer} from './helpers';
 import {getDaoState, DaoState} from '../web3/helpers';
+import {StoreState} from '../../store/types';
 import {truncateEthAddress} from '../../util/helpers';
-
-import {
-  useAdaptersOrExtensions,
-  useInitAdapterExtensionContracts,
-} from './hooks';
+import {useContractSend, useWeb3Modal, useIsDefaultChain} from '../web3/hooks';
 import {useDao, useMemberActionDisabled} from '../../hooks';
-import {
-  useContractSend,
-  useETHGasPrice,
-  useWeb3Modal,
-  useIsDefaultChain,
-} from '../web3/hooks';
-
 import AdapterExtensionSelectTarget from './AdapterOrExtensionSelectTarget';
-import ConfigurationModal from './ConfigurationModal';
 import Checkbox, {CheckboxSize} from '../common/Checkbox';
+import ConfigurationModal from './ConfigurationModal';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import FadeIn from '../common/FadeIn';
 import FinalizeModal from './FinalizeModal';
@@ -46,6 +37,7 @@ enum WhyDisableModalTitles {
   FINALIZED_REASON = 'Why is finalizing disabled?',
   CONFIGURATION_REASON = 'Why are configurations disabled?',
 }
+
 /**
  * AdapterOrExtensionManager()
  *
@@ -93,21 +85,24 @@ export default function AdapterOrExtensionManager() {
   >();
 
   /**
-   * Hooks
+   * Our hooks
    */
+
   const {defaultChainError} = useIsDefaultChain();
   const {connected, account, web3Instance} = useWeb3Modal();
   const {dao, gqlError} = useDao();
+
   const {
     adapterExtensionStatus,
     getAdapterOrExtensionFromRedux,
     registeredAdaptersOrExtensions,
     unRegisteredAdaptersOrExtensions,
   } = useAdaptersOrExtensions();
+
   const {initAdapterExtensionContract} = useInitAdapterExtensionContracts();
 
   const {txSend} = useContractSend();
-  const {fast: fastGasPrice} = useETHGasPrice();
+
   const {
     isDisabled,
     openWhyDisabledModal,
@@ -339,7 +334,6 @@ export default function AdapterOrExtensionManager() {
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       const txSendMethod =
@@ -447,7 +441,6 @@ export default function AdapterOrExtensionManager() {
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       // Execute contract call for `addAdapters`
