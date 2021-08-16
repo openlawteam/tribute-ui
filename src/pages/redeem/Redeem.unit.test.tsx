@@ -2,8 +2,6 @@ import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Web3 from 'web3';
 
-import {COUPON_API_URL} from '../../config';
-import {server, rest} from '../../test/server';
 import {
   DEFAULT_DAO_REGISTRY_ADDRESS,
   DEFAULT_ETH_ADDRESS,
@@ -11,11 +9,14 @@ import {
   FakeHttpProvider,
 } from '../../test/helpers';
 import {
+  ethBlockNumber,
   ethEstimateGas,
   ethGasPrice,
   getTransactionReceipt,
   sendTransaction,
 } from '../../test/web3Responses';
+import {COUPON_API_URL} from '../../config';
+import {server, rest} from '../../test/server';
 import Redeem from './Redeem';
 import Wrapper from '../../test/Wrapper';
 
@@ -132,6 +133,7 @@ describe('RedeemManager unit tests', () => {
     await waitFor(() => {
       // Mock the RPC calls for `redeemCoupon`
       mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
       mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
