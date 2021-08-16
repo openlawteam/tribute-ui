@@ -3,6 +3,7 @@ import {renderHook, act} from '@testing-library/react-hooks';
 import Web3 from 'web3';
 
 import {
+  ethBlockNumber,
   ethEstimateGas,
   ethGasPrice,
   getTransactionReceipt,
@@ -54,6 +55,7 @@ describe('useContractSend unit tests', () => {
 
       // Mock RPC responses
       mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
       mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
