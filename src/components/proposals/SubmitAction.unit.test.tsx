@@ -169,6 +169,7 @@ describe('SubmitAction unit tests', () => {
 
       // Mock rest of transaction responses
       mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
       mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
@@ -230,6 +231,7 @@ describe('SubmitAction unit tests', () => {
     // Setup: Mock RPC calls for `submitProposal`
     await waitFor(() => {
       mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+      mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
       mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
       mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
       mockWeb3Provider.injectResult(...getTransactionReceipt({web3Instance}));
