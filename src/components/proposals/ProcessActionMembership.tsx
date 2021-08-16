@@ -2,12 +2,12 @@ import {useState, useRef, useEffect, useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {CycleEllipsis} from '../feedback';
-import {useDaoTokenDetails} from '../dao-token/hooks';
 import {getConnectedMember} from '../../store/actions';
 import {ProposalData, SnapshotProposal} from './types';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
-import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
+import {useContractSend, useWeb3Modal} from '../web3/hooks';
+import {useDaoTokenDetails} from '../dao-token/hooks';
 import {useMemberActionDisabled} from '../../hooks';
 import {Web3TxStatus} from '../web3/types';
 import CycleMessage from '../feedback/CycleMessage';
@@ -82,13 +82,14 @@ export default function ProcessActionMembership(
 
   const {account, web3Instance} = useWeb3Modal();
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
+
   const {
     isDisabled,
     openWhyDisabledModal,
     WhyDisabledModal,
     setOtherDisabledReasons,
   } = useMemberActionDisabled(useMemberActionDisabledProps);
-  const {fast: fastGasPrice} = useETHGasPrice();
+
   const {daoTokenDetails} = useDaoTokenDetails();
 
   /**
@@ -211,7 +212,6 @@ export default function ProcessActionMembership(
       const txArguments = {
         from: account || '',
         value: membershipProposalAmount,
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       const tx = await txSend(
