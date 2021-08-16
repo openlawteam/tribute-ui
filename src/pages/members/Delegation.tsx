@@ -3,29 +3,25 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useForm} from 'react-hook-form';
 import {toChecksumAddress} from 'web3-utils';
 
-import {
-  useWeb3Modal,
-  useContractSend,
-  useETHGasPrice,
-} from '../../components/web3/hooks';
-import {Web3TxStatus} from '../../components/web3/types';
-import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
-import EtherscanURL from '../../components/web3/EtherscanURL';
-import {FormFieldErrors} from '../../util/enums';
-import {isEthAddressValid} from '../../util/validation';
-import {getValidationError, truncateEthAddress} from '../../util/helpers';
 import {BURN_ADDRESS} from '../../util/constants';
-import {getConnectedMember} from '../../store/actions';
-import {ReduxDispatch, StoreState} from '../../store/types';
 import {CheckboxSize} from '../../components/common/Checkbox';
-import Loader from '../../components/feedback/Loader';
+import {FormFieldErrors} from '../../util/enums';
+import {getConnectedMember} from '../../store/actions';
+import {getValidationError, truncateEthAddress} from '../../util/helpers';
+import {isEthAddressValid} from '../../util/validation';
+import {ReduxDispatch, StoreState} from '../../store/types';
+import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
+import {useWeb3Modal, useContractSend} from '../../components/web3/hooks';
+import {Web3TxStatus} from '../../components/web3/types';
 import CycleMessage from '../../components/feedback/CycleMessage';
+import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
+import EtherscanURL from '../../components/web3/EtherscanURL';
+import FadeIn from '../../components/common/FadeIn';
+import InputError from '../../components/common/InputError';
+import Loader from '../../components/feedback/Loader';
 import Modal from '../../components/common/Modal';
 import TimesSVG from '../../assets/svg/TimesSVG';
 import UserSVG from '../../assets/svg/UserSVG';
-import FadeIn from '../../components/common/FadeIn';
-import InputError from '../../components/common/InputError';
-import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 
 enum DelegationStatus {
   DELEGATE_VOTES = 'Delegate Votes',
@@ -84,7 +80,7 @@ function DelegationModal({
    */
 
   const {account, web3Instance} = useWeb3Modal();
-  const {fast: fastGasPrice} = useETHGasPrice();
+
   const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
     useContractSend();
 
@@ -318,7 +314,6 @@ function DelegationModal({
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       // Execute contract call for `updateDelegateKey`
@@ -385,7 +380,6 @@ function DelegationModal({
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       // Execute contract call for `updateDelegateKey`
