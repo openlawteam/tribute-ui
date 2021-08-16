@@ -7,7 +7,7 @@ import {getContractByAddress} from '../web3/helpers';
 import {ProposalData} from './types';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
-import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
+import {useContractSend, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
 import {Web3TxStatus} from '../web3/types';
 import CycleMessage from '../feedback/CycleMessage';
@@ -64,9 +64,9 @@ export default function ProcessAction(props: ProcessActionProps) {
 
   const {account, web3Instance} = useWeb3Modal();
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
+
   const {isDisabled, openWhyDisabledModal, WhyDisabledModal} =
     useMemberActionDisabled(useMemberActionDisabledProps);
-  const {fast: fastGasPrice} = useETHGasPrice();
 
   /**
    * Their hooks
@@ -120,7 +120,6 @@ export default function ProcessAction(props: ProcessActionProps) {
 
       const txArguments = {
         from: account || '',
-        ...(fastGasPrice ? {gasPrice: fastGasPrice} : null),
       };
 
       const tx = await txSend(
