@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import {Fragment, useEffect, useMemo, useState} from 'react';
 
 import {
   DaoAdapterConstants,
@@ -93,10 +93,15 @@ export default function Proposals(props: ProposalsProps): JSX.Element {
     daoConfigurations: [offchainVotingPeriod, offchainGracePeriod],
   } = useDaoConfigurations(configurationKeysToGet);
 
-  const {proposals, proposalsError, proposalsStatus} = useProposals({
-    adapterName,
-    includeProposalsExistingOnlyOffchain,
-  });
+  const {proposals, proposalsError, proposalsStatus} = useProposals(
+    useMemo(
+      () => ({
+        adapterName,
+        includeProposalsExistingOnlyOffchain,
+      }),
+      [adapterName, includeProposalsExistingOnlyOffchain]
+    )
+  );
 
   const {
     offchainVotingResults,
