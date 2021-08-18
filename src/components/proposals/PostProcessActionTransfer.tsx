@@ -66,7 +66,7 @@ export default function PostProcessActionTransfer(
 
   const {account, web3Instance} = useWeb3Modal();
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
-  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
+  const {average: gasPrice} = useETHGasPrice();
 
   const {
     isDisabled,

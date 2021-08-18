@@ -82,7 +82,7 @@ export default function ConfigurationForm({
 
   const {connected, account} = useWeb3Modal();
   const {getAdapterOrExtensionFromRedux} = useAdaptersOrExtensions();
-  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
+  const {average: gasPrice} = useETHGasPrice();
 
   /**
    * Their hooks

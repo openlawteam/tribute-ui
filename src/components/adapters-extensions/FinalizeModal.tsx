@@ -46,7 +46,7 @@ export default function FinalizeModal({
 
   const {dao} = useDao();
   const {connected, account} = useWeb3Modal();
-  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
+  const {average: gasPrice} = useETHGasPrice();
 
   /**
    * Variables
