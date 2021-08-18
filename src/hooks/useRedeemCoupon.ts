@@ -4,6 +4,7 @@ import {toChecksumAddress} from 'web3-utils';
 
 import {
   useContractSend,
+  useETHGasPrice,
   useIsDefaultChain,
   useWeb3Modal,
 } from '../components/web3/hooks';
@@ -70,6 +71,8 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
 
   const {account, web3Instance} = useWeb3Modal();
   const {defaultChainError} = useIsDefaultChain();
+  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
+
   const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
     useContractSend();
 
@@ -137,6 +140,7 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       // Execute contract call for `redeemCoupon`

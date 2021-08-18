@@ -29,7 +29,7 @@ import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
 import {useMemberActionDisabled} from '../../../hooks';
-import {useWeb3Modal, useContractSend} from '../../web3/hooks';
+import {useWeb3Modal, useContractSend, useETHGasPrice} from '../../web3/hooks';
 import CycleMessage from '../../feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../common/ErrorMessageWithDetails';
 import EtherscanURL from '../../web3/EtherscanURL';
@@ -68,6 +68,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
   const [signatureStatus, setSignatureStatus] = useState<Web3TxStatus>(
     Web3TxStatus.STANDBY
   );
+
   const [submitError, setSubmitError] = useState<Error>();
 
   /**
@@ -77,17 +78,21 @@ export function OffchainOpRollupVotingSubmitResultAction(
   const bankExtensionAddress = useSelector(
     (s: StoreState) => s.contracts.BankExtensionContract?.contractAddress
   );
+
   const bankExtensionMethods = useSelector(
     (s: StoreState) => s.contracts.BankExtensionContract?.instance.methods
   );
+
   const getPriorAmountABI = useSelector((s: StoreState) =>
     s.contracts.BankExtensionContract?.abi.find(
       (ai) => ai.name === 'getPriorAmount'
     )
   );
+
   const daoRegistryAddress = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.contractAddress
   );
+
   const getMemberAddressABI = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.abi
   )?.find((ai) => ai.name === 'getMemberAddress');
@@ -99,8 +104,8 @@ export function OffchainOpRollupVotingSubmitResultAction(
    */
 
   const {account, provider, web3Instance} = useWeb3Modal();
-
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
+  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
 
   const {isDisabled, openWhyDisabledModal, WhyDisabledModal} =
     useMemberActionDisabled();
@@ -324,6 +329,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       // Send the tx

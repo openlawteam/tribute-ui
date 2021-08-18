@@ -5,7 +5,7 @@ import {CycleEllipsis} from '../feedback';
 import {StoreState} from '../../store/types';
 import {truncateEthAddress} from '../../util/helpers';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
-import {useContractSend, useWeb3Modal} from '../web3/hooks';
+import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useDao} from '../../hooks';
 import {Web3TxStatus} from '../web3/types';
 import CycleMessage from '../feedback/CycleMessage';
@@ -46,10 +46,12 @@ export default function FinalizeModal({
 
   const {dao} = useDao();
   const {connected, account} = useWeb3Modal();
+  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
 
   /**
    * Variables
    */
+
   const TIMEOUT_INTERVAL = 3000;
   const isConnected = connected && account;
 
@@ -131,6 +133,7 @@ export default function FinalizeModal({
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       // Execute contract call for `finalizeDao`

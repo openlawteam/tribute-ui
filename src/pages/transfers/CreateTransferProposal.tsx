@@ -11,6 +11,7 @@ import {useState, useCallback, useEffect} from 'react';
 
 import {
   useContractSend,
+  useETHGasPrice,
   useIsDefaultChain,
   useWeb3Modal,
 } from '../../components/web3/hooks';
@@ -99,6 +100,7 @@ export default function CreateTransferProposal() {
 
   const {defaultChainError} = useIsDefaultChain();
   const {connected, account, web3Instance} = useWeb3Modal();
+  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
 
   const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
     useContractSend();
@@ -467,6 +469,7 @@ export default function CreateTransferProposal() {
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       // Execute contract call for `submitProposal`

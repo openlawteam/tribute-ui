@@ -13,7 +13,7 @@ import {SPACE} from '../../config';
 import {StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES, VOTE_CHOICES} from '../web3/config';
 import {useCheckApplicant, useSignAndSubmitProposal} from './hooks';
-import {useContractSend, useWeb3Modal} from '../web3/hooks';
+import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
 import {Web3TxStatus} from '../web3/types';
 import CycleMessage from '../feedback/CycleMessage';
@@ -123,8 +123,8 @@ export default function SubmitAction(props: SubmitActionProps) {
    */
 
   const {account, web3Instance} = useWeb3Modal();
-
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
+  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
 
   const {
     isDisabled,
@@ -293,6 +293,7 @@ export default function SubmitAction(props: SubmitActionProps) {
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       await txSend(

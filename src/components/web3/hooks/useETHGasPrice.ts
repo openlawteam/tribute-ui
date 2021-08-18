@@ -1,10 +1,11 @@
-import {useEffect, useState} from 'react';
 import {toWei} from 'web3-utils';
+import {useCallback, useEffect, useState} from 'react';
 import BigNumber from 'bignumber.js';
 
 import {AsyncStatus} from '../../../util/types';
 import {ENVIRONMENT} from '../../../config';
 import {useAbortController} from '../../../hooks';
+import {useWeb3Modal} from './useWeb3Modal';
 
 type GasStationResponse = {
   average: number;
@@ -67,8 +68,15 @@ const INITIAL_GAS_PRICES: GasPrices = {
  */
 export function useETHGasPrice(props?: {
   ignoreEnvironment?: boolean;
+  /**
+   * The network is EIP-1559 compatible and we do not want to use the gas price.
+   *
+   * The gas station prices can still be used for EIP-1559.
+   * For example, to set `maxFeePerGas` (base fee plus tip).
+   */
+  noRunIfEIP1559?: boolean;
 }): UseETHGasPriceReturn {
-  const {ignoreEnvironment = false} = props || {};
+  const {ignoreEnvironment = false, noRunIfEIP1559 = false} = props || {};
 
   /**
    * State
@@ -85,7 +93,19 @@ export function useETHGasPrice(props?: {
    * Our hooks
    */
 
+  const {web3Instance} = useWeb3Modal();
   const {abortController, isMountedRef} = useAbortController();
+
+  /**
+   * Cached callbacks
+   */
+
+  const handleGetGasPricesCached = useCallback(handleGetGasPrices, [
+    abortController,
+    isMountedRef,
+    noRunIfEIP1559,
+    web3Instance,
+  ]);
 
   /**
    * Variables
@@ -102,50 +122,68 @@ export function useETHGasPrice(props?: {
    */
 
   useEffect(() => {
-    if (!abortController?.signal) return;
     if (shouldExitIfNotProduction) return;
+
+    handleGetGasPricesCached();
+
+    return function cleanup() {
+      abortController?.abort();
+    };
+  }, [abortController, handleGetGasPricesCached, shouldExitIfNotProduction]);
+
+  /**
+   * Functions
+   */
+
+  async function handleGetGasPrices() {
+    if (!abortController?.signal) return;
+    if (!web3Instance) return;
+
+    if (noRunIfEIP1559) {
+      // Check EIP-1559 support
+      const {isEIP1559Compatible} = await import(
+        '../helpers/isEIP1559Compatible'
+      );
+
+      if (await isEIP1559Compatible(web3Instance)) {
+        return;
+      }
+    }
 
     setGasPriceError(undefined);
     setGasPriceStatus(AsyncStatus.PENDING);
 
-    fetch(URL, {signal: abortController.signal})
-      .then((response) => {
-        if (!isMountedRef.current) return;
+    try {
+      const response = await fetch(URL, {signal: abortController.signal});
 
-        if (!response.ok) {
-          throw new Error(
-            'Something went wrong while getting the latest gas price.'
-          );
-        }
+      if (!response.ok) {
+        throw new Error(
+          'Something went wrong while getting the latest gas price.'
+        );
+      }
 
-        setGasPriceStatus(AsyncStatus.FULFILLED);
+      const responseJSON: GasStationResponse = await response.json();
 
-        return response.json();
-      })
-      .then((jsonResponse: GasStationResponse) => {
-        if (!isMountedRef.current) return;
+      if (!isMountedRef.current) return;
 
-        const {average, fast, fastest, safeLow} = jsonResponse;
+      const {average, fast, fastest, safeLow} = responseJSON;
 
-        setGasPrices({
-          average: convertGasToWEI(average),
-          fast: convertGasToWEI(fast),
-          fastest: convertGasToWEI(fastest),
-          safeLow: convertGasToWEI(safeLow),
-        });
-      })
-      .catch((error) => {
-        if (!isMountedRef.current) return;
-
-        setGasPriceError(error);
-        setGasPrices(INITIAL_GAS_PRICES);
-        setGasPriceStatus(AsyncStatus.REJECTED);
+      setGasPrices({
+        average: convertGasToWEI(average),
+        fast: convertGasToWEI(fast),
+        fastest: convertGasToWEI(fastest),
+        safeLow: convertGasToWEI(safeLow),
       });
 
-    return () => {
-      abortController.abort();
-    };
-  }, [abortController, isMountedRef, shouldExitIfNotProduction]);
+      setGasPriceStatus(AsyncStatus.FULFILLED);
+    } catch (error) {
+      if (!isMountedRef.current) return;
+
+      setGasPriceError(error);
+      setGasPrices(INITIAL_GAS_PRICES);
+      setGasPriceStatus(AsyncStatus.REJECTED);
+    }
+  }
 
   /**
    * Result

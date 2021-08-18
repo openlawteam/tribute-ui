@@ -11,7 +11,11 @@ import {getValidationError, truncateEthAddress} from '../../util/helpers';
 import {isEthAddressValid} from '../../util/validation';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
-import {useWeb3Modal, useContractSend} from '../../components/web3/hooks';
+import {
+  useWeb3Modal,
+  useContractSend,
+  useETHGasPrice,
+} from '../../components/web3/hooks';
 import {Web3TxStatus} from '../../components/web3/types';
 import CycleMessage from '../../components/feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
@@ -80,6 +84,7 @@ function DelegationModal({
    */
 
   const {account, web3Instance} = useWeb3Modal();
+  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
 
   const {txError, txEtherscanURL, txIsPromptOpen, txSend, txStatus} =
     useContractSend();
@@ -314,6 +319,7 @@ function DelegationModal({
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       // Execute contract call for `updateDelegateKey`
@@ -380,6 +386,7 @@ function DelegationModal({
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       // Execute contract call for `updateDelegateKey`

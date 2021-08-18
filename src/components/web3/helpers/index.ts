@@ -4,6 +4,7 @@ export * from './getAdapterAddressFromContracts';
 export * from './getContractByAddress';
 export * from './getDAOConfigEntry';
 export * from './getDaoState';
+export * from './isEIP1559Compatible';
 export * from './getExtensionAddress';
 export * from './getVotingAdapterName';
 export * from './hasFlag';

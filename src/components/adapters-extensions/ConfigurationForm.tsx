@@ -11,7 +11,7 @@ import {getValidationError} from '../../util/helpers';
 import {ParamInputType, ParamType} from './hooks/useValidation';
 import {StoreState} from '../../store/types';
 import {useAdaptersOrExtensions, useValidation} from './hooks';
-import {useContractSend, useWeb3Modal} from '../web3/hooks';
+import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {Web3TxStatus} from '../web3/types';
 import ErrorMessageWithDetails from '../common/ErrorMessageWithDetails';
 import InputError from '../common/InputError';
@@ -68,6 +68,7 @@ export default function ConfigurationForm({
   /**
    * Our hooks
    */
+
   const {
     txError,
     // txEtherscanURL,
@@ -81,6 +82,7 @@ export default function ConfigurationForm({
 
   const {connected, account} = useWeb3Modal();
   const {getAdapterOrExtensionFromRedux} = useAdaptersOrExtensions();
+  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
 
   /**
    * Their hooks
@@ -155,6 +157,7 @@ export default function ConfigurationForm({
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       // Execute contract call to `removeExtension` or `replaceAdapter`
@@ -229,6 +232,7 @@ export default function ConfigurationForm({
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       setConfigureAdapterStatus(Web3TxStatus.AWAITING_CONFIRM);

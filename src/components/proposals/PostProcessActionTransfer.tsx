@@ -6,7 +6,7 @@ import {getConnectedMember} from '../../store/actions';
 import {ProposalData, DistributionStatus} from './types';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
-import {useContractSend, useWeb3Modal} from '../web3/hooks';
+import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useMemberActionDisabled} from '../../hooks';
 import {Web3TxStatus} from '../web3/types';
 import CycleMessage from '../feedback/CycleMessage';
@@ -66,6 +66,7 @@ export default function PostProcessActionTransfer(
 
   const {account, web3Instance} = useWeb3Modal();
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
+  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
 
   const {
     isDisabled,
@@ -172,8 +173,10 @@ export default function PostProcessActionTransfer(
       }
 
       let toIndexArg = '0';
+
       const isTypeAllMembers =
         snapshotProposal?.msg.payload.metadata.isTypeAllMembers;
+
       if (isTypeAllMembers) {
         try {
           const nbMembers = await daoRegistryContract.instance.methods
@@ -192,6 +195,7 @@ export default function PostProcessActionTransfer(
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       const tx = await txSend(
