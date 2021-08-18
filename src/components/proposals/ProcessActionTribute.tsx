@@ -8,7 +8,7 @@ import {getConnectedMember} from '../../store/actions';
 import {ProposalData, SnapshotProposal} from './types';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../web3/config';
-import {useContractSend, useWeb3Modal} from '../web3/hooks';
+import {useContractSend, useETHGasPrice, useWeb3Modal} from '../web3/hooks';
 import {useDaoTokenDetails} from '../dao-token/hooks';
 import {useMemberActionDisabled} from '../../hooks';
 import {Web3TxStatus} from '../web3/types';
@@ -93,6 +93,7 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
   const {account, web3Instance} = useWeb3Modal();
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
+  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
 
   const {
     txEtherscanURL: txEtherscanURLTokenApprove,
@@ -256,6 +257,7 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
           ];
           const txArguments = {
             from: account || '',
+            ...(gasPrice ? {gasPrice} : null),
           };
 
           // Execute contract call for `approve`
@@ -305,6 +307,7 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       const tx = await txSend(

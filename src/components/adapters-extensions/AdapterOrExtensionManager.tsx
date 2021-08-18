@@ -15,14 +15,18 @@ import {
   AddExtensionArguments,
   AdaptersOrExtensions,
 } from './types';
-
+import {
+  useContractSend,
+  useWeb3Modal,
+  useIsDefaultChain,
+  useETHGasPrice,
+} from '../web3/hooks';
 import {AsyncStatus} from '../../util/types';
 import {DaoAdapterConstants, DaoExtensionConstants} from './enums';
 import {getAdapterOrExtensionId, getAccessControlLayer} from './helpers';
 import {getDaoState, DaoState} from '../web3/helpers';
 import {StoreState} from '../../store/types';
 import {truncateEthAddress} from '../../util/helpers';
-import {useContractSend, useWeb3Modal, useIsDefaultChain} from '../web3/hooks';
 import {useDao, useMemberActionDisabled} from '../../hooks';
 import AdapterExtensionSelectTarget from './AdapterOrExtensionSelectTarget';
 import Checkbox, {CheckboxSize} from '../common/Checkbox';
@@ -91,6 +95,7 @@ export default function AdapterOrExtensionManager() {
   const {defaultChainError} = useIsDefaultChain();
   const {connected, account, web3Instance} = useWeb3Modal();
   const {dao, gqlError} = useDao();
+  const {average: gasPrice} = useETHGasPrice({noRunIfEIP1559: true});
 
   const {
     adapterExtensionStatus,
@@ -113,13 +118,16 @@ export default function AdapterOrExtensionManager() {
   /**
    * Variables
    */
+
   const isConnected = connected && account;
   const isDAOExisting: Record<string, any> | undefined = dao;
   const isDAOReady: boolean = daoState === DaoState.READY;
+
   const isUnavailable: boolean =
     adapterExtensionStatus === AsyncStatus.REJECTED &&
     registeredAdaptersOrExtensions === undefined &&
     unRegisteredAdaptersOrExtensions === undefined;
+
   const isLoading: boolean = adapterExtensionStatus === AsyncStatus.PENDING;
   const nothingToAdd = unRegisteredAdaptersOrExtensions?.length === 0;
   // @todo track the prior selection of a dropdown target
@@ -334,6 +342,7 @@ export default function AdapterOrExtensionManager() {
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       const txSendMethod =
@@ -441,6 +450,7 @@ export default function AdapterOrExtensionManager() {
 
       const txArguments = {
         from: account || '',
+        ...(gasPrice ? {gasPrice} : null),
       };
 
       // Execute contract call for `addAdapters`
