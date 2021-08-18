@@ -97,6 +97,14 @@ export function useETHGasPrice(props?: {
   const {abortController, isMountedRef} = useAbortController();
 
   /**
+   * Variables
+   */
+
+  // Sometimes using mainnet gas prices for testnets won't work well with wallets.
+  const shouldExitIfNotProduction: boolean =
+    ignoreEnvironment === false && ENVIRONMENT !== 'production';
+
+  /**
    * Cached callbacks
    */
 
@@ -104,32 +112,21 @@ export function useETHGasPrice(props?: {
     abortController,
     isMountedRef,
     noRunIfEIP1559,
+    shouldExitIfNotProduction,
     web3Instance,
   ]);
-
-  /**
-   * Variables
-   */
-
-  /**
-   * Sometimes using mainnet gas prices for testnets won't work well with wallets.
-   */
-  const shouldExitIfNotProduction: boolean =
-    ignoreEnvironment === false && ENVIRONMENT !== 'production';
 
   /**
    * Effects
    */
 
   useEffect(() => {
-    if (shouldExitIfNotProduction) return;
-
     handleGetGasPricesCached();
 
     return function cleanup() {
       abortController?.abort();
     };
-  }, [abortController, handleGetGasPricesCached, shouldExitIfNotProduction]);
+  }, [abortController, handleGetGasPricesCached]);
 
   /**
    * Functions
@@ -137,7 +134,16 @@ export function useETHGasPrice(props?: {
 
   async function handleGetGasPrices() {
     if (!abortController?.signal) return;
+
     if (!web3Instance) return;
+
+    setGasPriceError(undefined);
+
+    if (shouldExitIfNotProduction) {
+      setGasPriceStatus(AsyncStatus.FULFILLED);
+
+      return;
+    }
 
     if (noRunIfEIP1559) {
       // Check EIP-1559 support
@@ -146,11 +152,12 @@ export function useETHGasPrice(props?: {
       );
 
       if (await isEIP1559Compatible(web3Instance)) {
+        setGasPriceStatus(AsyncStatus.FULFILLED);
+
         return;
       }
     }
 
-    setGasPriceError(undefined);
     setGasPriceStatus(AsyncStatus.PENDING);
 
     try {

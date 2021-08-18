@@ -126,8 +126,15 @@ describe('useETHGasPrice unit tests', () => {
 
   test('should return correct data when using prop `ignoreEnvironment: false`', async () => {
     await act(async () => {
-      const {result} = await renderHook(() =>
-        useETHGasPrice({ignoreEnvironment: false})
+      const {result} = await renderHook(
+        () => useETHGasPrice({ignoreEnvironment: false}),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            useInit: true,
+            useWallet: true,
+          },
+        }
       );
 
       // Assert initial data
@@ -151,7 +158,7 @@ describe('useETHGasPrice unit tests', () => {
         fast: undefined,
         fastest: undefined,
         gasPriceError: undefined,
-        gasPriceStatus: AsyncStatus.STANDBY,
+        gasPriceStatus: AsyncStatus.FULFILLED,
         safeLow: undefined,
       });
     });
@@ -196,7 +203,7 @@ describe('useETHGasPrice unit tests', () => {
         fast: undefined,
         fastest: undefined,
         gasPriceError: undefined,
-        gasPriceStatus: AsyncStatus.STANDBY,
+        gasPriceStatus: AsyncStatus.FULFILLED,
         safeLow: undefined,
       });
     });
