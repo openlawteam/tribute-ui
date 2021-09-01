@@ -17,7 +17,7 @@
     "@apollo/client": "^3.3.17",
     "@apollo/react-hooks": "^4.0.0",
     "@openlaw/snapshot-js-erc712": "^1.1.2",
-    "@walletconnect/web3-provider": "^1.5.2",
+    "@walletconnect/web3-provider": "^1.6.5",
     "aos": "^2.3.4",
     "ethers": "^5.4.0",
     "markdown-to-jsx": "^7.1.2",
