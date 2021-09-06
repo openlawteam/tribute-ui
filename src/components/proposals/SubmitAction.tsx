@@ -35,6 +35,7 @@ type SubmitActionProps = {
 };
 
 type ActionDisabledReasons = {
+  daoUpgradeMessage: string;
   invalidApplicantMessage: string;
 };
 
@@ -105,6 +106,7 @@ export default function SubmitAction(props: SubmitActionProps) {
    */
 
   const actionDisabledReasonsRef = useRef<ActionDisabledReasons>({
+    daoUpgradeMessage: '',
     invalidApplicantMessage: '',
   });
 
@@ -167,6 +169,18 @@ export default function SubmitAction(props: SubmitActionProps) {
   useEffect(() => {
     if (checkApplicant && checkApplicantStatus === FULFILLED) {
       // 1. Determine and set reasons why action would be disabled
+
+      // @todo Remove this disabled reason after the OffchainVoting contract is
+      // upgraded.
+      /**
+       * Reason: Pending proposals are temporarily blocked from being sponsored
+       * until the OffchainVoting contract is upgraded.
+       */
+      actionDisabledReasonsRef.current = {
+        ...actionDisabledReasonsRef.current,
+        daoUpgradeMessage:
+          'Sponsoring is temporarily disabled while the DAO voting contract is being upgraded.',
+      };
 
       /**
        * Reason: If the applicant address is invalid (see `useCheckApplicant`
