@@ -29,7 +29,8 @@ import {TX_CYCLE_MESSAGES} from '../web3/config';
 import SubmitAction from './SubmitAction';
 import Wrapper from '../../test/Wrapper';
 
-describe('SubmitAction unit tests', () => {
+// @todo Enable tests after the OffchainVoting contract is upgraded.
+describe.skip('SubmitAction unit tests', () => {
   const sponsorButtonRegex: RegExp = /^sponsor$/i;
   const awaitingConfirmationRegex: RegExp = /^awaiting your confirmation/i;
   const viewProgressRegex: RegExp = /^view progress$/i;
