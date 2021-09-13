@@ -66,10 +66,10 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
    */
 
   useEffect(() => {
-    if (!called) {
+    if (!called && erc20ExtensionContract?.contractAddress) {
       getTokenHolderBalances();
     }
-  }, [called, getTokenHolderBalances]);
+  }, [called, erc20ExtensionContract?.contractAddress, getTokenHolderBalances]);
 
   useEffect(() => {
     if (!loading && erc20ExtensionContract?.contractAddress) {
