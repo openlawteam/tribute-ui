@@ -49,6 +49,7 @@ type SubmitVoteResultArguments = [
   daoAddress: string,
   proposalId: string,
   resultRoot: string,
+  reporter: string,
   lastResult: Node,
   rootSig: string
 ];
@@ -170,6 +171,10 @@ export function OffchainOpRollupVotingSubmitResultAction(
 
       if (!bankExtensionMethods) {
         throw new Error('No BankExtension methods were found.');
+      }
+
+      if (!account) {
+        throw new Error('No account found.');
       }
 
       setSignatureStatus(Web3TxStatus.AWAITING_CONFIRM);
@@ -323,6 +328,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         daoRegistryAddress,
         proposalHash,
         voteResultTreeHexRoot,
+        account,
         resultNodeLast,
         signature,
       ];
