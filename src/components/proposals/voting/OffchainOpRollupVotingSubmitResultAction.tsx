@@ -38,7 +38,7 @@ import Loader from '../../feedback/Loader';
 
 type Node = Parameters<
   OffchainVotingContract['methods']['submitVoteResult']
->['3'];
+>['4'];
 
 type OffchainVotingSubmitResultActionProps = {
   adapterName: ContractAdapterNames;
@@ -269,6 +269,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
           snapshot,
           // `gracePeriodStartingTime` should be `0` as `submitNewVote` is `true`
           0,
+          numberOfDAOMembersAtSnapshot,
           resultNodeLast
         )
         .call();
