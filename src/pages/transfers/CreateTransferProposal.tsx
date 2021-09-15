@@ -450,6 +450,7 @@ export default function CreateTransferProposal() {
                 start: data.payload.start,
                 end: data.payload.end,
               },
+              submitter: data.address,
               sig: signature,
               space: data.space,
               timestamp: parseInt(data.timestamp),

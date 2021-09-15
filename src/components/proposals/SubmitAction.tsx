@@ -277,6 +277,7 @@ export default function SubmitAction(props: SubmitActionProps) {
             snapshot: snapshot.toString(),
             start,
           },
+          submitter: data.address,
           sig,
           space,
           timestamp: parseInt(timestamp),
