@@ -103,7 +103,7 @@ export default function SponsorAction(props: SponsorActionProps) {
       } = snapshotDraft;
 
       // Sign and submit draft for snapshot-hub
-      const {data, signature} = await signAndSendProposal({
+      const {data, signature, submitter} = await signAndSendProposal({
         partialProposalData: {
           name,
           body,
@@ -130,7 +130,7 @@ export default function SponsorAction(props: SponsorActionProps) {
             start: data.payload.start,
             end: data.payload.end,
           },
-          submitter: data.address,
+          submitter,
           sig: signature,
           space: data.space,
           timestamp: parseInt(data.timestamp),
