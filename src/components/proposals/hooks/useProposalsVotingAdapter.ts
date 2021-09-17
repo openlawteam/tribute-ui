@@ -43,6 +43,9 @@ export function useProposalsVotingAdapter(
   const registryABI = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.abi
   );
+  const currentVotingAdapterAddress = useSelector(
+    (s: StoreState) => s.contracts.VotingContract?.contractAddress
+  );
 
   /**
    * Our hooks
@@ -70,7 +73,13 @@ export function useProposalsVotingAdapter(
 
   const getProposalsVotingAdaptersOnchainCached = useCallback(
     getProposalsVotingAdaptersOnchain,
-    [proposalIds, registryABI, registryAddress, web3Instance]
+    [
+      currentVotingAdapterAddress,
+      proposalIds,
+      registryABI,
+      registryAddress,
+      web3Instance,
+    ]
   );
 
   /**
@@ -90,7 +99,8 @@ export function useProposalsVotingAdapter(
       !proposalIds.length ||
       !registryABI ||
       !registryAddress ||
-      !web3Instance
+      !web3Instance ||
+      !currentVotingAdapterAddress
     ) {
       return;
     }
@@ -185,10 +195,15 @@ export function useProposalsVotingAdapter(
       const votingAdaptersToSet = await Promise.all(
         filteredProposalIds.map(
           async (id, i): Promise<ProposalVotingAdapterTuple> => {
-            const votingAdapterABI = await getVotingAdapterABI(
-              adapterNameResults[i]
-            );
             const votingAdapterAddress = filteredVotingAdapterAddressResults[i];
+            const votingAdapterABI = await getVotingAdapterABI(
+              adapterNameResults[i],
+              // @todo This is part of a temporary solution to switch
+              // OffchainVoting ABI based on the adapter address used by the
+              // proposal.
+              votingAdapterAddress.toLowerCase() ===
+                currentVotingAdapterAddress.toLowerCase()
+            );
 
             return [
               id,
