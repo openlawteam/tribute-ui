@@ -1,12 +1,43 @@
-# Tribute DAO DApp
+# Ready Player DAO
 
 Related supporting repositories:
 
+- [openlawteam/tribute-ui](https://github.com/openlawteam/tribute-ui)
 - [openlawteam/tribute-contracts](https://github.com/openlawteam/tribute-contracts)
 - [openlawteam/snapshot-hub (erc-712 branch)](https://github.com/openlawteam/snapshot-hub/tree/erc-712)
 - [openlawteam/snapshot-js-erc712](https://github.com/openlawteam/snapshot-js-erc712)
 
 ## Developer Setup
+
+This repository was duplicated from [openlawteam/tribute-ui](https://github.com/openlawteam/tribute-ui). Although it is not an actual fork of the original, we will try to treat it in a similar manner. Any relevant changes made to the upstream repository (e.g., enhancements, bug fixes) should also by synced here.
+
+_Note: Because this repository is not an actual fork, you won’t be able to create pull requests between the two repositories. However, you can still push and pull changes between the two repositories by adding the original repository as remote for the new repository._
+
+After you have cloned this repository locally, add the [openlawteam/tribute-ui](https://github.com/openlawteam/tribute-ui) repository as a remote repository:
+
+```
+git remote add upstream https://github.com/openlawteam/tribute-ui.git
+```
+
+Verify your remote repositories:
+
+`git remote -v` should return
+
+```
+origin  https://github.com/openlawteam/ready-player.git (fetch)
+origin  https://github.com/openlawteam/ready-player.git (push)
+upstream        https://github.com/openlawteam/tribute-ui.git (fetch)
+upstream        https://github.com/openlawteam/tribute-ui.git (push)
+```
+
+Then changes made to the upstream repository can be synced to this repository in a manner similar to [syncing a fork](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/syncing-a-fork):
+
+- `git checkout main`
+- `git pull origin main`
+- `git fetch upstream --no-tags` (`--no-tags` prevents fetching the tags from the upstream repository so this repository can maintain its own tags)
+- `git merge upstream/main`
+- resolve any conflicts
+- `git push origin main`
 
 ### Local `.env` File
 
@@ -19,7 +50,9 @@ REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS=...
 REACT_APP_MULTICALL_CONTRACT_ADDRESS=...
 REACT_APP_SNAPSHOT_HUB_API_URL=http://localhost:8081
 REACT_APP_COUPON_API_URL=http://localhost:8080
-REACT_APP_SNAPSHOT_SPACE=tribute
+REACT_APP_KYC_BACKEND_URL=http://localhost:3003/kyc-certificate
+REACT_APP_KYC_FORMS_URL=...
+REACT_APP_SNAPSHOT_SPACE=fashion
 REACT_APP_GRAPH_API_URL=...
 ```
 
@@ -29,12 +62,19 @@ NOTE:
 - `REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS` is the address of the `DaoRegistry` smart contract deployed to your network.
 - `REACT_APP_MULTICALL_CONTRACT_ADDRESS` is the address of the `Multicall` smart contract deployed to your network.
 - `REACT_APP_SNAPSHOT_HUB_API_URL` is the url of [snaphot-hub](https://github.com/openlawteam/snapshot-hub/tree/erc-712) running locally in a container.
+- `REACT_APP_COUPON_API_URL` is the url of the [coupon-manager](https://github.com/openlawteam/coupon-manager) running locally in a container.
+- `REACT_APP_KYC_BACKEND_URL` is the url of the [KYC backend service](https://github.com/openlawteam/lao-backends) running locally in a container.
+- `REACT_APP_KYC_FORMS_URL` is the url of the KYC forms interface.
 - `REACT_APP_SNAPSHOT_SPACE` is the unique name registered in Snapshot Hub under which proposals, votes, etc. will be stored.
 - `REACT_APP_GRAPH_API_URL` is the url of the [subgraph](#running-the-local-graph-node) running locally in a container.
 
 #### Optional env vars for local development
 
 `REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>`
+
+NOTE:
+
+- `REACT_APP_DEFAULT_CHAIN_NAME_LOCAL` can be set to override using the Ganache private network as the default local development chain.
 
 ### Ganache Blockchain Setup
 
@@ -70,11 +110,19 @@ Clone the https://github.com/openlawteam/tribute-contracts repo and from the roo
 
 Follow the instructions [here](https://github.com/openlawteam/tribute-contracts/tree/master/docker) to setup and run the local graph-node.
 
-## GitHub Pages Deployments
+## Netlify Deployments
 
-Deployments for the development environment are handled automatically with a GitHub Action:
+[![Netlify Status](https://api.netlify.com/api/v1/badges/b61a1fef-cc3c-4e36-8499-bc630c9f39d7/deploy-status)](https://app.netlify.com/sites/reddao/deploys)
 
-- `GitHub Pages development deployment`: push to `main` branch -> https://demo.tributedao.com
+Deployments to production and develop environments are handled automatically via Netlify and GH actions:
+
+- `Netlify develop deployment`: push to `main` branch -> https://develop--reddao.netlify.app
+
+- `Netlify production deployment`: push `v*` tag (will presumably be part of a release) -> https://reddao.xyz
+
+_Note for this deployment implementation with a single `main` branch to work, the Netlify automatic builds/deploys are stopped (you'll see evidence of that in the [Netlify project UI](https://app.netlify.com/sites/reddao/overview)). They are now handled through these GH actions and Netlify CLI. See @note in `netlify.toml` for more info._
+
+For production deployments, simply run `npm run release` and follow the interactive UI in your console. The release script runs [np](https://github.com/sindresorhus/np). We have initially configured `np` (in `package.json`) to automatically handle only versioning, release drafts, and git tagging. We can enable additional features as needed, such as publishing to npm.
 
 ## Developer notes
 
