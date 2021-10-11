@@ -65,7 +65,6 @@ export function useInitContracts(): (data: {
       await dispatch(initContractRagequit(web3Instance));
       await dispatch(initContractBankAdapter(web3Instance));
       await dispatch(initContractBankExtension(web3Instance));
-      await dispatch(initContractManaging(web3Instance));
       await dispatch(initContractOnboarding(web3Instance));
       await dispatch(initContractTribute(web3Instance));
       await dispatch(initContractDistribute(web3Instance));
