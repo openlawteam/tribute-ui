@@ -1,5 +1,10 @@
 [
   {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -247,30 +252,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "flags",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "flag",
-        "type": "uint256"
-      }
-    ],
-    "name": "getFlag",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "initialized",
     "outputs": [
@@ -321,6 +302,11 @@
         "internalType": "bytes32",
         "name": "id",
         "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "deleted",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -348,44 +334,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "addr",
-        "type": "address"
-      }
-    ],
-    "name": "isNotReservedAddress",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "addr",
-        "type": "address"
-      }
-    ],
-    "name": "isNotZeroAddress",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -483,35 +431,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "flags",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "flag",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "value",
-        "type": "bool"
-      }
-    ],
-    "name": "setFlag",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "state",
     "outputs": [
@@ -542,10 +461,6 @@
     ],
     "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   },
   {
     "inputs": [
@@ -676,29 +591,6 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "extensionId",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "contract IExtension",
-        "name": "extension",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "creator",
-        "type": "address"
-      }
-    ],
-    "name": "addExtension",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "extensionAddress",
         "type": "address"
@@ -748,6 +640,29 @@
       }
     ],
     "name": "replaceAdapter",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "extensionId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "contract IExtension",
+        "name": "extension",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      }
+    ],
+    "name": "addExtension",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

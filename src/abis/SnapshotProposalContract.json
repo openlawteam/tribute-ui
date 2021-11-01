@@ -202,6 +202,11 @@
             "type": "bytes32"
           },
           {
+            "internalType": "address",
+            "name": "submitter",
+            "type": "address"
+          },
+          {
             "components": [
               {
                 "internalType": "bytes32",
@@ -273,6 +278,11 @@
             "internalType": "bytes32",
             "name": "spaceHash",
             "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "submitter",
+            "type": "address"
           },
           {
             "components": [

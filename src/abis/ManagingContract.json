@@ -2,92 +2,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "flags",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "flag",
-        "type": "uint256"
-      }
-    ],
-    "name": "getFlag",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract DaoRegistry",
-        "name": "dao",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_addr",
-        "type": "address"
-      }
-    ],
-    "name": "isActiveMember",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "addr",
-        "type": "address"
-      }
-    ],
-    "name": "isNotReservedAddress",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "addr",
-        "type": "address"
-      }
-    ],
-    "name": "isNotZeroAddress",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "",
         "type": "address"
@@ -102,13 +16,18 @@
     "outputs": [
       {
         "internalType": "bytes32",
-        "name": "adapterId",
+        "name": "adapterOrExtensionId",
         "type": "bytes32"
       },
       {
         "internalType": "address",
-        "name": "adapterAddress",
+        "name": "adapterOrExtensionAddr",
         "type": "address"
+      },
+      {
+        "internalType": "enum IManaging.UpdateType",
+        "name": "updateType",
+        "type": "uint8"
       },
       {
         "internalType": "uint128",
@@ -118,39 +37,6 @@
     ],
     "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "flags",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "flag",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "value",
-        "type": "bool"
-      }
-    ],
-    "name": "setFlag",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   },
   {
     "inputs": [
@@ -168,33 +54,48 @@
         "components": [
           {
             "internalType": "bytes32",
-            "name": "adapterId",
+            "name": "adapterOrExtensionId",
             "type": "bytes32"
           },
           {
             "internalType": "address",
-            "name": "adapterAddress",
+            "name": "adapterOrExtensionAddr",
             "type": "address"
+          },
+          {
+            "internalType": "enum IManaging.UpdateType",
+            "name": "updateType",
+            "type": "uint8"
           },
           {
             "internalType": "uint128",
             "name": "flags",
             "type": "uint128"
+          },
+          {
+            "internalType": "bytes32[]",
+            "name": "keys",
+            "type": "bytes32[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "values",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "address[]",
+            "name": "extensionAddresses",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint128[]",
+            "name": "extensionAclFlags",
+            "type": "uint128[]"
           }
         ],
-        "internalType": "struct IManaging.ProposalInput",
+        "internalType": "struct IManaging.ProposalDetails",
         "name": "proposal",
         "type": "tuple"
-      },
-      {
-        "internalType": "bytes32[]",
-        "name": "keys",
-        "type": "bytes32[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "values",
-        "type": "uint256[]"
       },
       {
         "internalType": "bytes",
