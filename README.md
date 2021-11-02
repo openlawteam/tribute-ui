@@ -29,12 +29,17 @@ NOTE:
 - `REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS` is the address of the `DaoRegistry` smart contract deployed to your network.
 - `REACT_APP_MULTICALL_CONTRACT_ADDRESS` is the address of the `Multicall` smart contract deployed to your network.
 - `REACT_APP_SNAPSHOT_HUB_API_URL` is the url of [snaphot-hub](https://github.com/openlawteam/snapshot-hub/tree/erc-712) running locally in a container.
+- `REACT_APP_COUPON_API_URL` is the url of the [coupon-manager](https://github.com/openlawteam/coupon-manager) running locally in a container.
 - `REACT_APP_SNAPSHOT_SPACE` is the unique name registered in Snapshot Hub under which proposals, votes, etc. will be stored.
 - `REACT_APP_GRAPH_API_URL` is the url of the [subgraph](#running-the-local-graph-node) running locally in a container.
 
 #### Optional env vars for local development
 
 `REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>`
+
+NOTE:
+
+- `REACT_APP_DEFAULT_CHAIN_NAME_LOCAL` can be set to override using the Ganache private network as the default local development chain.
 
 ### Ganache Blockchain Setup
 
