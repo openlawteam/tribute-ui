@@ -66,6 +66,7 @@ type UseSignAndSubmitProposalReturn<T extends ProposalOrDraftSnapshotType> = {
 type SignAndSendProposalReturn<T extends ProposalOrDraftSnapshotType> = {
   data: ProposalOrDraftSignDataFromType<T>;
   signature: string;
+  submitter: string;
   uniqueId: SnapshotSubmitBaseReturn['uniqueId'];
   uniqueIdDraft: SnapshotSubmitProposalReturn['uniqueIdDraft'];
 };
@@ -261,6 +262,7 @@ export function useSignAndSubmitProposal<
       const dataToReturn = {
         data: message,
         signature,
+        submitter: account,
         uniqueId: data.uniqueId,
         uniqueIdDraft: data.uniqueIdDraft || '',
       };

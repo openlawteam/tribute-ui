@@ -47,6 +47,7 @@ type ProposalDataForDao = {
   snapshot: number;
   space: string;
   start: number;
+  submitter: string;
   timestamp: string;
 };
 
@@ -65,6 +66,7 @@ export default function SubmitAction(props: SubmitActionProps) {
    * This will be used for `proposalDataForDaoRef`.
    */
   const {
+    address: signerAddress = '',
     msg: {
       payload: {
         choices: proposalChoices = defaultChoices,
@@ -95,6 +97,7 @@ export default function SubmitAction(props: SubmitActionProps) {
     snapshot: proposalSnapshot,
     space: SPACE || '',
     start: proposalStart,
+    submitter: signerAddress,
     timestamp: proposalTimestamp,
   });
 
@@ -231,7 +234,7 @@ export default function SubmitAction(props: SubmitActionProps) {
         } = snapshotDraft;
 
         // Sign and submit draft for snapshot-hub
-        const {data, signature} = await signAndSendProposal({
+        const {data, signature, submitter} = await signAndSendProposal({
           partialProposalData: {
             name: draftName,
             body: draftBody,
@@ -252,14 +255,25 @@ export default function SubmitAction(props: SubmitActionProps) {
           snapshot: data.payload.snapshot,
           space: data.space,
           start: data.payload.start,
+          submitter,
           timestamp: data.timestamp,
         };
 
         setSnapshotProposalSubmitted(true);
       }
 
-      const {body, choices, end, name, sig, snapshot, space, start, timestamp} =
-        proposalDataForDaoRef.current;
+      const {
+        body,
+        choices,
+        end,
+        name,
+        sig,
+        snapshot,
+        space,
+        start,
+        submitter,
+        timestamp,
+      } = proposalDataForDaoRef.current;
 
       /**
        * Prepare `data` argument for submission to DAO
@@ -277,6 +291,7 @@ export default function SubmitAction(props: SubmitActionProps) {
             snapshot: snapshot.toString(),
             start,
           },
+          submitter,
           sig,
           space,
           timestamp: parseInt(timestamp),

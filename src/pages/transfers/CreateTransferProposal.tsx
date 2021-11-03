@@ -386,6 +386,7 @@ export default function CreateTransferProposal() {
       let proposalId: string = proposalData?.uniqueId || '';
       let data: SnapshotProposalData | undefined = proposalData?.data;
       let signature: string = proposalData?.signature || '';
+      let submitter: string = proposalData?.submitter || '';
 
       const bodyIntro = isTypeAllMembers
         ? 'Transfer to all members pro rata.'
@@ -411,6 +412,7 @@ export default function CreateTransferProposal() {
           uniqueId,
           data: returnData,
           signature: returnSignature,
+          submitter: returnSubmitter,
         } = await signAndSendProposal({
           partialProposalData: {
             name,
@@ -428,6 +430,7 @@ export default function CreateTransferProposal() {
         proposalId = uniqueId;
         data = returnData;
         signature = returnSignature;
+        submitter = returnSubmitter;
       }
 
       const memberAddressArg = isTypeAllMembers
@@ -450,6 +453,7 @@ export default function CreateTransferProposal() {
                 start: data.payload.start,
                 end: data.payload.end,
               },
+              submitter,
               sig: signature,
               space: data.space,
               timestamp: parseInt(data.timestamp),

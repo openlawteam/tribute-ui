@@ -38,7 +38,7 @@ import Loader from '../../feedback/Loader';
 
 type Node = Parameters<
   OffchainVotingContract['methods']['submitVoteResult']
->['3'];
+>['4'];
 
 type OffchainVotingSubmitResultActionProps = {
   adapterName: ContractAdapterNames;
@@ -49,6 +49,7 @@ type SubmitVoteResultArguments = [
   daoAddress: string,
   proposalId: string,
   resultRoot: string,
+  reporter: string,
   lastResult: Node,
   rootSig: string
 ];
@@ -172,6 +173,10 @@ export function OffchainOpRollupVotingSubmitResultAction(
         throw new Error('No BankExtension methods were found.');
       }
 
+      if (!account) {
+        throw new Error('No account found.');
+      }
+
       setSignatureStatus(Web3TxStatus.AWAITING_CONFIRM);
 
       const {idInDAO: proposalHash} = snapshotProposal;
@@ -264,6 +269,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
           snapshot,
           // `gracePeriodStartingTime` should be `0` as `submitNewVote` is `true`
           0,
+          numberOfDAOMembersAtSnapshot,
           resultNodeLast
         )
         .call();
@@ -323,6 +329,7 @@ export function OffchainOpRollupVotingSubmitResultAction(
         daoRegistryAddress,
         proposalHash,
         voteResultTreeHexRoot,
+        account,
         resultNodeLast,
         signature,
       ];
