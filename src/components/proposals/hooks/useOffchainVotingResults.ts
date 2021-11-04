@@ -1,4 +1,4 @@
-import {AbiItem} from 'web3-utils/types';
+import {AbiItem, toBN} from 'web3-utils';
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {VoteChoicesIndex} from '@openlaw/snapshot-js-erc712';
@@ -9,7 +9,7 @@ import {AsyncStatus} from '../../../util/types';
 import {multicall, MulticallTuple} from '../../web3/helpers';
 import {SnapshotProposal, VotingResult} from '../types';
 import {StoreState} from '../../../store/types';
-import {UNITS_ADDRESS, TOTAL_ADDRESS} from '../../../config';
+import {UNITS_ADDRESS, TOTAL_ADDRESS, GUILD_ADDRESS} from '../../../config';
 import {useIsMounted} from '../../../hooks';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VoteChoices} from '../../web3/types';
@@ -255,12 +255,23 @@ export function useOffchainVotingResults(
         totalUnits: 0,
       };
 
-      // Build a call for total units
+      // Build a call for total units minted/authorized for the DAO
       const totalUnitsCall: MulticallTuple = [
         bankAddress,
         getPriorAmountABI,
         [
           TOTAL_ADDRESS, // account
+          UNITS_ADDRESS, // tokenAddr
+          snapshot.toString(), // blockNumber
+        ],
+      ];
+
+      // Build a call for balance of units owned by the guild bank
+      const balanceOfGuildUnitsCall: MulticallTuple = [
+        bankAddress,
+        getPriorAmountABI,
+        [
+          GUILD_ADDRESS, // account
           UNITS_ADDRESS, // tokenAddr
           snapshot.toString(), // blockNumber
         ],
@@ -279,12 +290,21 @@ export function useOffchainVotingResults(
         ]
       );
 
-      const calls = [totalUnitsCall, ...unitsCalls];
+      const calls = [totalUnitsCall, balanceOfGuildUnitsCall, ...unitsCalls];
 
-      const [totalUnitsResult, ...votingResults]: string[] = await multicall({
+      const [
+        totalUnitsResult,
+        balanceOfGuildResult,
+        ...votingResults
+      ]: string[] = await multicall({
         calls: calls,
         web3Instance,
       });
+
+      // Calculate total units issued and outstanding (not owned by guild bank)
+      const totalUnitsIssued = toBN(totalUnitsResult).sub(
+        toBN(balanceOfGuildResult)
+      );
 
       // Set Units values for choices
       votingResults.forEach((units, i) => {
@@ -298,13 +318,13 @@ export function useOffchainVotingResults(
 
       // Set percentages
       results[VoteChoices.Yes].percentage =
-        (results[VoteChoices.Yes].units / Number(totalUnitsResult)) * 100;
+        (results[VoteChoices.Yes].units / Number(totalUnitsIssued)) * 100;
 
       results[VoteChoices.No].percentage =
-        (results[VoteChoices.No].units / Number(totalUnitsResult)) * 100;
+        (results[VoteChoices.No].units / Number(totalUnitsIssued)) * 100;
 
       // Set total units
-      results.totalUnits = Number(totalUnitsResult);
+      results.totalUnits = Number(totalUnitsIssued);
 
       return results;
     } catch (error) {
