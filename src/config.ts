@@ -456,7 +456,7 @@ export const MULTICALL_CONTRACT_ADDRESS = REACT_APP_MULTICALL_CONTRACT_ADDRESS;
  *
  * @todo Remove and get from the chain/subgraph?
  *
- * @see https://github.com/openlawteam/tribute-contracts/blob/9e0e03616a00e41e666351e146ee109b9fe37fb2/utils/DaoFactory.js
+ * @see https://github.com/openlawteam/tribute-contracts/blob/master/utils/contract-util.js
  */
 export const GUILD_ADDRESS: string =
   '0x000000000000000000000000000000000000dead';
@@ -472,6 +472,8 @@ export const ETH_TOKEN_ADDRESS: string =
   '0x0000000000000000000000000000000000000000';
 export const DAI_TOKEN_ADDRESS: string =
   '0x95b58a6bff3d14b7db2f5cb5f0ad413dc2940658';
+export const ESCROW_ADDRESS: string =
+  '0x0000000000000000000000000000000000004bec';
 
 /**
  * `SPACE` is used inside Snapshot Hub for matching a `space`

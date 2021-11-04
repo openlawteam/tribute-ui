@@ -23,8 +23,8 @@ import {VotingState} from './voting/types';
  * the results of checking the proposal's state via flag will be wrong.
  *
  * @see `ProposalFlag` `DaoRegistry.sol`
- * @see `getFlag` `DaoConstants.sol`
- * @see `setFlag` `DaoConstants.sol`
+ * @see `getFlag` `DaoHelper.sol`
+ * @see `setFlag` `DaoHelper.sol`
  */
 export enum ProposalFlag {
   EXISTS,

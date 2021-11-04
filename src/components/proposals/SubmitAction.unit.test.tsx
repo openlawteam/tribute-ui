@@ -378,11 +378,7 @@ describe('SubmitAction unit tests', () => {
               [
                 0,
                 [
-                  // `isNotReservedAddress`
-                  web3Instance.eth.abi.encodeParameter('bool', true),
-                  // `isNotZeroAddress`
-                  web3Instance.eth.abi.encodeParameter('bool', true),
-                  // `isNotReservedAddress`
+                  // `getAddressIfDelegated`
                   web3Instance.eth.abi.encodeParameter(
                     'address',
                     '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'

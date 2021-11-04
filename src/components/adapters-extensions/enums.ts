@@ -1,7 +1,6 @@
 /**
- * DaoConstants as defined in the solidity DaoConstants.sol contract
- * and the available adapters as detailed here:
- * https://github.com/openlawteam/tribute-contracts
+ * Constants as defined in the solidity DaoHelper.sol contract and the available
+ * adapters as detailed here: https://github.com/openlawteam/tribute-contracts
  */
 export enum DaoAdapterConstants {
   BANK = 'bank',

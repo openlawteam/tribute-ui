@@ -81,10 +81,6 @@ describe('CreateMembershipProposal unit tests', () => {
               [
                 0,
                 [
-                  // For `isNotReservedAddress` call
-                  web3Instance.eth.abi.encodeParameter('bool', true),
-                  // For `isNotZeroAddress` call
-                  web3Instance.eth.abi.encodeParameter('bool', true),
                   // For `getAddressIfDelegated` call
                   web3Instance.eth.abi.encodeParameter(
                     'address',
