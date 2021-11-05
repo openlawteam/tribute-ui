@@ -1,7 +1,9 @@
 import {useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
 import {useHistory, useParams} from 'react-router-dom';
 
 import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
+import {StoreState} from '../../store/types';
 import {AsyncStatus} from '../../util/types';
 import {CopyWithTooltip} from '../../components/common/CopyWithTooltip';
 import {formatNumber, normalizeString} from '../../util/helpers';
@@ -17,6 +19,14 @@ import useMembers from './hooks/useMembers';
 import Wrap from '../../components/common/Wrap';
 
 export default function MemberProfile() {
+  /**
+   * Selectors
+   */
+
+  const ERC20ExtensionContract = useSelector(
+    (state: StoreState) => state.contracts?.ERC20ExtensionContract
+  );
+
   /**
    * Our hooks
    */
@@ -78,7 +88,7 @@ export default function MemberProfile() {
   const isLoading: boolean =
     membersStatus === AsyncStatus.STANDBY ||
     membersStatus === AsyncStatus.PENDING ||
-    daoTokenDetailsStatus === AsyncStatus.STANDBY ||
+    (ERC20ExtensionContract && daoTokenDetailsStatus === AsyncStatus.STANDBY) ||
     daoTokenDetailsStatus === AsyncStatus.PENDING ||
     totalUnitsStatus === AsyncStatus.STANDBY ||
     totalUnitsStatus === AsyncStatus.PENDING;
