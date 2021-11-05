@@ -12,14 +12,31 @@
         "type": "bytes32"
       },
       {
-        "internalType": "bytes32[]",
-        "name": "keys",
-        "type": "bytes32[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "values",
-        "type": "uint256[]"
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "key",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "numericValue",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "addressValue",
+            "type": "address"
+          },
+          {
+            "internalType": "enum IConfiguration.ConfigType",
+            "name": "configType",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct IConfiguration.Configuration[]",
+        "name": "configs",
+        "type": "tuple[]"
       },
       {
         "internalType": "bytes",
