@@ -255,7 +255,7 @@ export function useOffchainVotingResults(
         totalUnits: 0,
       };
 
-      // Build a call for total units minted/authorized for the DAO
+      // Build a call for total units minted for the DAO
       const totalUnitsCall: MulticallTuple = [
         bankAddress,
         getPriorAmountABI,

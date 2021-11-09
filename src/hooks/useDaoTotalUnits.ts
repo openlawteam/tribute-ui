@@ -19,8 +19,8 @@ type UseDaoTotalUnitsReturn = {
 /**
  * useDaoTotalUnits
  *
- * Gets DAO (1) total units minted/authorized and (2) total units issued and
- * outstanding from subgraph with direct onchain fallback.
+ * Gets DAO (1) total units minted and (2) total units issued and outstanding
+ * from subgraph with direct onchain fallback.
  *
  * @returns {UseDaoTotalUnitsReturn}
  */
@@ -150,7 +150,7 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
     try {
       setTotalUnitsStatus(AsyncStatus.PENDING);
 
-      // total units minted/authorized for the DAO
+      // total units minted for the DAO
       const totalUnitsToSet = await BankExtensionContract.instance.methods
         .balanceOf(TOTAL_ADDRESS, UNITS_ADDRESS)
         .call();

@@ -328,8 +328,9 @@ describe('ProposalCard unit tests', () => {
           nbNo: 'uint256',
           startingTime: 'uint256',
           gracePeriodStartingTime: 'uint256',
-          forceFailed: 'bool',
           isChallenged: 'bool',
+          stepRequested: 'uint256',
+          forceFailed: 'bool',
           fallbackVotesCount: 'uint256',
         },
       },
@@ -342,8 +343,9 @@ describe('ProposalCard unit tests', () => {
         nbNo: '0',
         startingTime: '1617878162',
         gracePeriodStartingTime: '1617964640',
-        forceFailed: false,
         isChallenged: false,
+        stepRequested: '0',
+        forceFailed: false,
         fallbackVotesCount: '0',
       }
     );
@@ -410,8 +412,10 @@ describe('ProposalCard unit tests', () => {
         [
           0,
           [
-            // Total units
-            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            // Total units minted
+            web3Instance.eth.abi.encodeParameter('uint256', '30000000'),
+            // Balance of units owned by the guild bank
+            web3Instance.eth.abi.encodeParameter('uint256', '20000000'),
             // Units for "yes" voter
             web3Instance.eth.abi.encodeParameter('uint256', '200000'),
             // Units for "no" voter
@@ -428,8 +432,10 @@ describe('ProposalCard unit tests', () => {
         [
           0,
           [
-            // Total units
-            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            // Total units minted
+            web3Instance.eth.abi.encodeParameter('uint256', '30000000'),
+            // Balance of units owned by the guild bank
+            web3Instance.eth.abi.encodeParameter('uint256', '20000000'),
             // Units for "yes" voter
             web3Instance.eth.abi.encodeParameter('uint256', '200000'),
             // Units for "no" voter
@@ -446,8 +452,10 @@ describe('ProposalCard unit tests', () => {
         [
           0,
           [
-            // Total units
-            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            // Total units minted
+            web3Instance.eth.abi.encodeParameter('uint256', '30000000'),
+            // Balance of units owned by the guild bank
+            web3Instance.eth.abi.encodeParameter('uint256', '20000000'),
             // Units for "yes" voter
             web3Instance.eth.abi.encodeParameter('uint256', '100000'),
             // Units for "no" voter
@@ -726,8 +734,9 @@ describe('ProposalCard unit tests', () => {
             nbNo: 'uint256',
             startingTime: 'uint256',
             gracePeriodStartingTime: 'uint256',
-            forceFailed: 'bool',
             isChallenged: 'bool',
+            stepRequested: 'uint256',
+            forceFailed: 'bool',
             fallbackVotesCount: 'uint256',
           },
         },
@@ -740,8 +749,9 @@ describe('ProposalCard unit tests', () => {
           nbNo: '0',
           startingTime: '1617878162',
           gracePeriodStartingTime: '1617964640',
-          forceFailed: false,
           isChallenged: false,
+          stepRequested: '0',
+          forceFailed: false,
           fallbackVotesCount: '0',
         }
       );
@@ -985,8 +995,10 @@ describe('ProposalCard unit tests', () => {
           [
             0,
             [
-              // Total units
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+              // Total units minted
+              web3Instance.eth.abi.encodeParameter('uint256', '30000000'),
+              // Balance of units owned by the guild bank
+              web3Instance.eth.abi.encodeParameter('uint256', '20000000'),
             ],
           ]
         )
@@ -1209,8 +1221,10 @@ describe('ProposalCard unit tests', () => {
           [
             0,
             [
-              // Total units
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+              // Total units minted
+              web3Instance.eth.abi.encodeParameter('uint256', '30000000'),
+              // Balance of units owned by the guild bank
+              web3Instance.eth.abi.encodeParameter('uint256', '20000000'),
               // Units for "yes" voter
               web3Instance.eth.abi.encodeParameter('uint256', '200000'),
               // Units for "no" voter

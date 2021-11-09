@@ -99,7 +99,8 @@ describe('GovernanceProposals unit tests', () => {
           [
             0,
             [
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+              web3Instance.eth.abi.encodeParameter('uint256', '30000000'),
+              web3Instance.eth.abi.encodeParameter('uint256', '20000000'),
               web3Instance.eth.abi.encodeParameter('uint256', '200000'),
             ],
           ]

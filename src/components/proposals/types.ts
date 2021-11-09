@@ -196,6 +196,7 @@ export type OffchainVotingAdapterVote = {
   resultRoot: string;
   snapshot: string;
   startingTime: string;
+  stepRequested: string;
 };
 
 /**
