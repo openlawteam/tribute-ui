@@ -200,11 +200,6 @@
         "internalType": "uint88",
         "name": "maxAmount",
         "type": "uint88"
-      },
-      {
-        "internalType": "uint256",
-        "name": "chainId",
-        "type": "uint256"
       }
     ],
     "name": "configureDao",
