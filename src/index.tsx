@@ -9,12 +9,14 @@ import {
   InMemoryCache,
   NormalizedCacheObject,
   HttpLink,
+  split,
 } from '@apollo/client';
 import {QueryClient, QueryClientProvider} from 'react-query';
 
 import {
   ENVIRONMENT,
   GRAPH_CORE_URL,
+  GRAPH_COUPON_ONBOARDING_URL,
   WALLETCONNECT_PROVIDER_OPTIONS,
 } from './config';
 import {clearConnectedMember, clearContracts} from './store/actions';
@@ -40,17 +42,25 @@ window.ethereum &&
   window.ethereum.autoRefreshOnNetworkChange &&
   (window.ethereum.autoRefreshOnNetworkChange = false);
 
+// Set graphql endpoints for `ApolloClient`
+const defaultGraphqlEndpoint = new HttpLink({
+  uri: ({operationName}) => `${GRAPH_CORE_URL}?${operationName}`,
+});
+const couponOnboardingGraphqlEndpoint = new HttpLink({
+  uri: ({operationName}) => `${GRAPH_COUPON_ONBOARDING_URL}?${operationName}`,
+});
+const graphqlEndpoints = split(
+  (operation) => operation.getContext().serviceName === 'coupon-onboarding',
+  couponOnboardingGraphqlEndpoint,
+  defaultGraphqlEndpoint
+);
+
 // Create `ApolloClient`
 export const getApolloClient = (
   store: Store
 ): ApolloClient<NormalizedCacheObject> =>
   new ApolloClient({
-    link: concat(
-      handleSubgraphError(store),
-      new HttpLink({
-        uri: ({operationName}) => `${GRAPH_CORE_URL}?${operationName}`,
-      })
-    ),
+    link: concat(handleSubgraphError(store), graphqlEndpoints),
     cache: new InMemoryCache({
       // Cache data may be lost when replacing the `adapters|extensions`
       // field of a Query object. To address this problem

@@ -17,6 +17,7 @@ const {
   REACT_APP_DEFAULT_CHAIN_NAME_LOCAL,
   REACT_APP_ENVIRONMENT,
   REACT_APP_GRAPH_CORE_URL,
+  REACT_APP_GRAPH_COUPON_ONBOARDING_URL,
   REACT_APP_INFURA_PROJECT_ID_DEV,
   REACT_APP_INFURA_PROJECT_ID_LOCAL,
   REACT_APP_INFURA_PROJECT_ID_PROD,
@@ -44,8 +45,10 @@ export const SNAPSHOT_HUB_API_URL: string | undefined =
 
 export const COUPON_API_URL: string | undefined = REACT_APP_COUPON_API_URL;
 
-// The Graph API CORE URL
-export const GRAPH_CORE_URL = REACT_APP_GRAPH_CORE_URL;
+// The Graph API URLs
+export const GRAPH_CORE_URL: string | undefined = REACT_APP_GRAPH_CORE_URL;
+export const GRAPH_COUPON_ONBOARDING_URL: string | undefined =
+  REACT_APP_GRAPH_COUPON_ONBOARDING_URL;
 
 // Network IDs, when users change wallet networks
 export const CHAINS = {
