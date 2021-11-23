@@ -14,7 +14,7 @@ import {QueryClient, QueryClientProvider} from 'react-query';
 
 import {
   ENVIRONMENT,
-  GRAPH_API_URL,
+  GRAPH_CORE_URL,
   WALLETCONNECT_PROVIDER_OPTIONS,
 } from './config';
 import {clearConnectedMember, clearContracts} from './store/actions';
@@ -48,7 +48,7 @@ export const getApolloClient = (
     link: concat(
       handleSubgraphError(store),
       new HttpLink({
-        uri: ({operationName}) => `${GRAPH_API_URL}?${operationName}`,
+        uri: ({operationName}) => `${GRAPH_CORE_URL}?${operationName}`,
       })
     ),
     cache: new InMemoryCache({

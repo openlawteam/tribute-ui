@@ -20,7 +20,7 @@ REACT_APP_MULTICALL_CONTRACT_ADDRESS=...
 REACT_APP_SNAPSHOT_HUB_API_URL=http://localhost:8081
 REACT_APP_COUPON_API_URL=http://localhost:8080
 REACT_APP_SNAPSHOT_SPACE=tribute
-REACT_APP_GRAPH_API_URL=...
+REACT_APP_GRAPH_CORE_URL=...
 ```
 
 NOTE:
@@ -31,11 +31,13 @@ NOTE:
 - `REACT_APP_SNAPSHOT_HUB_API_URL` is the url of [snaphot-hub](https://github.com/openlawteam/snapshot-hub/tree/erc-712) running locally in a container.
 - `REACT_APP_COUPON_API_URL` is the url of the [coupon-manager](https://github.com/openlawteam/coupon-manager) running locally in a container.
 - `REACT_APP_SNAPSHOT_SPACE` is the unique name registered in Snapshot Hub under which proposals, votes, etc. will be stored.
-- `REACT_APP_GRAPH_API_URL` is the url of the [subgraph](#running-the-local-graph-node) running locally in a container.
+- `REACT_APP_GRAPH_CORE_URL` is the url of the core [subgraph](#running-the-local-graph-node) running locally in a container.
 
 #### Optional env vars for local development
 
-`REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>`
+```
+REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>
+```
 
 NOTE:
 
@@ -71,9 +73,7 @@ If you want to use the same accounts (`-d`) and data (`--db`) from a previous Ga
 
 ## Running the local graph-node
 
-Clone the https://github.com/openlawteam/tribute-contracts repo and from the root open up a terminal, `npm ci`.
-
-Follow the instructions [here](https://github.com/openlawteam/tribute-contracts/tree/master/docker) to setup and run the local graph-node.
+Follow the instructions [here](https://github.com/openlawteam/tribute-subgraph/blob/main/docker/README.md) to set up and run the local graph-node and to deploy the mandatory core subgraph and any optional adapter/extension subgraphs.
 
 ## GitHub Pages Deployments
 
