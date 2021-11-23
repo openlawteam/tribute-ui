@@ -37,11 +37,15 @@ NOTE:
 
 ```
 REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>
+REACT_APP_GRAPH_COUPON_ONBOARDING_URL=...
+REACT_APP_GRAPH_NFT_EXTENSION_URL=...
 ```
 
 NOTE:
 
 - `REACT_APP_DEFAULT_CHAIN_NAME_LOCAL` can be set to override using the Ganache private network as the default local development chain.
+- `REACT_APP_GRAPH_COUPON_ONBOARDING_URL` is the url of the optional coupon onboarding [subgraph](#running-the-local-graph-node) running locally in a container.
+- `REACT_APP_GRAPH_NFT_EXTENSION_URL` is the url of the optional NFT extension [subgraph](#running-the-local-graph-node) running locally in a container.
 
 ### Ganache Blockchain Setup
 
