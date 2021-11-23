@@ -1,19 +1,24 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {useLazyQuery} from '@apollo/react-hooks';
+import {AbiItem, toBN, toChecksumAddress} from 'web3-utils';
 
 import {StoreState} from '../../../store/types';
 import {GET_TOKEN_HOLDER_BALANCES} from '../../../gql';
+import {useWeb3Modal} from '../../../components/web3/hooks';
+import {SubgraphNetworkStatus} from '../../../store/subgraphNetworkStatus/types';
+import {multicall, MulticallTuple} from '../../../components/web3/helpers';
 
 type UseTokenHolderBalancesReturn = {
   tokenHolderBalances: Record<string, any> | undefined;
-  gqlError: Error | undefined;
+  tokenHolderBalancesError: Error | undefined;
 };
 
 /**
  * useTokenHolderBalances
  *
- * This component queries The Graph API to get data on the token holders
+ * This component queries The Graph API to get data on the token holders with
+ * direct onchain fallback.
  *
  * @returns {UseTokenHolderBalancesReturn}
  */
@@ -22,18 +27,32 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
    * Selectors
    */
 
+  const daoRegistryContract = useSelector(
+    (state: StoreState) => state.contracts.DaoRegistryContract
+  );
+
   const erc20ExtensionContract = useSelector(
     (s: StoreState) => s.contracts?.ERC20ExtensionContract
   );
 
   const connectedMember = useSelector((s: StoreState) => s.connectedMember);
 
+  const subgraphNetworkStatus = useSelector(
+    (state: StoreState) => state.subgraphNetworkStatus.status
+  );
+
+  /**
+   * Our hooks
+   */
+
+  const {web3Instance} = useWeb3Modal();
+
   /**
    * GQL Query
    */
 
   const [
-    getTokenHolderBalances,
+    getTokenHolderBalancesFromSubgraphResult,
     {called, loading, data, error, startPolling, stopPolling},
   ] = useLazyQuery(GET_TOKEN_HOLDER_BALANCES, {
     variables: {
@@ -48,18 +67,29 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
   const [tokenHolderBalances, setTokenHolderBalances] = useState<
     Record<string, any> | undefined
   >();
-  const [gqlError, setGqlError] = useState<Error>();
+
+  const [tokenHolderBalancesError, setTokenHolderBalancesError] =
+    useState<Error>();
 
   /**
    * Cached callbacks
    */
 
-  const getTokenBalanceCallback = useCallback(getTokenBalance, [
-    erc20ExtensionContract?.contractAddress,
-    data,
-    error,
-    loading,
-  ]);
+  const getTokenHolderBalancesFromExtensionCached = useCallback(
+    getTokenHolderBalancesFromExtension,
+    [daoRegistryContract, erc20ExtensionContract, web3Instance]
+  );
+
+  const getTokenHolderBalancesFromSubgraphCached = useCallback(
+    getTokenHolderBalancesFromSubgraph,
+    [
+      data,
+      erc20ExtensionContract?.contractAddress,
+      error,
+      getTokenHolderBalancesFromExtensionCached,
+      loading,
+    ]
+  );
 
   /**
    * Effects
@@ -67,18 +97,30 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
 
   useEffect(() => {
     if (!called && erc20ExtensionContract?.contractAddress) {
-      getTokenHolderBalances();
+      getTokenHolderBalancesFromSubgraphResult();
     }
-  }, [called, erc20ExtensionContract?.contractAddress, getTokenHolderBalances]);
+  }, [
+    called,
+    erc20ExtensionContract?.contractAddress,
+    getTokenHolderBalancesFromSubgraphResult,
+  ]);
 
   useEffect(() => {
-    if (!loading && erc20ExtensionContract?.contractAddress) {
-      getTokenBalanceCallback();
+    if (subgraphNetworkStatus === SubgraphNetworkStatus.OK) {
+      if (!loading && erc20ExtensionContract?.contractAddress) {
+        getTokenHolderBalancesFromSubgraphCached();
+      }
+    } else {
+      // If there is a subgraph network error fallback to fetching members info
+      // directly from smart contract
+      getTokenHolderBalancesFromExtensionCached();
     }
   }, [
     erc20ExtensionContract?.contractAddress,
-    getTokenBalanceCallback,
+    getTokenHolderBalancesFromExtensionCached,
+    getTokenHolderBalancesFromSubgraphCached,
     loading,
+    subgraphNetworkStatus,
   ]);
 
   // When the `SET_CONNECTED_MEMBER` redux action is dispatched in other
@@ -100,35 +142,123 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
     return function cleanup() {
       pollingTimeoutId && clearTimeout(pollingTimeoutId);
     };
-  }, [connectedMember, startPolling, stopPolling]);
+  }, [connectedMember, error, startPolling, stopPolling]);
 
   /**
    * Functions
    */
 
-  function getTokenBalance() {
+  function getTokenHolderBalancesFromSubgraph() {
     try {
       if (!loading && data) {
-        setTokenHolderBalances(data.tokens[0]);
         if (data.tokens.length === 0) {
-          const error = new Error(
+          throw new Error(
             `"${erc20ExtensionContract?.contractAddress}" erc20 address not found.`
           );
-          throw error;
         }
+
+        setTokenHolderBalances(data.tokens[0]);
       } else {
         if (error) {
-          const error = new Error(
+          throw new Error(
             `"${erc20ExtensionContract?.contractAddress}" is not a valid erc20 address.`
           );
-
-          throw error;
         }
       }
     } catch (error) {
-      setGqlError(error);
+      // If there is a subgraph query error fallback to fetching token holder
+      // info directly from smart contract
+      console.log(`subgraph query error: ${error.message}`);
+      getTokenHolderBalancesFromExtensionCached();
     }
   }
 
-  return {tokenHolderBalances, gqlError};
+  async function getTokenHolderBalancesFromExtension() {
+    if (!daoRegistryContract || !erc20ExtensionContract || !web3Instance) {
+      return;
+    }
+
+    try {
+      const {
+        abi: daoRegistryABI,
+        contractAddress: daoRegistryAddress,
+        instance: {methods: daoRegistryMethods},
+      } = daoRegistryContract;
+
+      const nbMembers = await daoRegistryMethods.getNbMembers().call();
+
+      if (Number(nbMembers) > 0) {
+        // Build calls to get list of member addresses
+        const getMemberAddressABI = daoRegistryABI.find(
+          (item) => item.name === 'getMemberAddress'
+        );
+        const getMemberAddressCalls = [...Array(Number(nbMembers)).keys()].map(
+          (index): MulticallTuple => [
+            daoRegistryAddress,
+            getMemberAddressABI as AbiItem,
+            [index.toString()],
+          ]
+        );
+        const memberAddresses: string[] = await multicall({
+          calls: getMemberAddressCalls,
+          web3Instance,
+        });
+
+        // Build calls to get member balances in DAO ERC20 token
+        const {abi: erc20ExtensionABI, contractAddress: erc20ExtensionAddress} =
+          erc20ExtensionContract;
+
+        const balanceOfABI = erc20ExtensionABI.find(
+          (item) => item.name === 'balanceOf'
+        );
+        const erc20ExtensionBalanceOfCalls = memberAddresses.map(
+          (address): MulticallTuple => [
+            erc20ExtensionAddress,
+            balanceOfABI as AbiItem,
+            [address],
+          ]
+        );
+        const erc20ExtensionBalances: string[] = await multicall({
+          calls: erc20ExtensionBalanceOfCalls,
+          web3Instance,
+        });
+
+        const holdersWithDetails = memberAddresses.map((address, index) => ({
+          member: {
+            id: address,
+          },
+          balance: erc20ExtensionBalances[index],
+        }));
+
+        // Filter out any member addresses that don't have a positive balance in
+        // DAO ERC20 token
+        const filteredHoldersWithDetails = holdersWithDetails.filter((holder) =>
+          toBN(holder.balance).gt(toBN(0))
+        );
+
+        // DAO ERC20 token info
+        const tokenAddress = toChecksumAddress(
+          erc20ExtensionContract.contractAddress
+        );
+
+        const tokenSymbol = await erc20ExtensionContract.instance.methods
+          .symbol()
+          .call();
+
+        setTokenHolderBalances({
+          holders: filteredHoldersWithDetails,
+          symbol: tokenSymbol,
+          tokenAddress,
+        });
+      }
+    } catch (error) {
+      setTokenHolderBalances(undefined);
+      setTokenHolderBalancesError(error);
+    }
+  }
+
+  return {
+    tokenHolderBalances,
+    tokenHolderBalancesError,
+  };
 }
