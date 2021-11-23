@@ -17,6 +17,7 @@ import {
   ENVIRONMENT,
   GRAPH_CORE_URL,
   GRAPH_COUPON_ONBOARDING_URL,
+  GRAPH_NFT_EXTENSION_URL,
   WALLETCONNECT_PROVIDER_OPTIONS,
 } from './config';
 import {clearConnectedMember, clearContracts} from './store/actions';
@@ -49,10 +50,17 @@ const defaultGraphqlEndpoint = new HttpLink({
 const couponOnboardingGraphqlEndpoint = new HttpLink({
   uri: ({operationName}) => `${GRAPH_COUPON_ONBOARDING_URL}?${operationName}`,
 });
+const nftExtensionGraphqlEndpoint = new HttpLink({
+  uri: ({operationName}) => `${GRAPH_NFT_EXTENSION_URL}?${operationName}`,
+});
 const graphqlEndpoints = split(
   (operation) => operation.getContext().serviceName === 'coupon-onboarding',
   couponOnboardingGraphqlEndpoint,
-  defaultGraphqlEndpoint
+  split(
+    (operation) => operation.getContext().serviceName === 'nft-extension',
+    nftExtensionGraphqlEndpoint,
+    defaultGraphqlEndpoint
+  )
 );
 
 // Create `ApolloClient`
