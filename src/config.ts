@@ -47,11 +47,18 @@ export const SNAPSHOT_HUB_API_URL: string | undefined =
 export const COUPON_API_URL: string | undefined = REACT_APP_COUPON_API_URL;
 
 // The Graph API URLs
-export const GRAPH_CORE_URL: string | undefined = REACT_APP_GRAPH_CORE_URL;
-export const GRAPH_COUPON_ONBOARDING_URL: string | undefined =
-  REACT_APP_GRAPH_COUPON_ONBOARDING_URL;
-export const GRAPH_NFT_EXTENSION_URL: string | undefined =
-  REACT_APP_GRAPH_NFT_EXTENSION_URL;
+export const GRAPH_API_URL = {
+  CORE: REACT_APP_GRAPH_CORE_URL,
+  COUPON_ONBOARDING: REACT_APP_GRAPH_COUPON_ONBOARDING_URL,
+  NFT_EXTENSION: REACT_APP_GRAPH_NFT_EXTENSION_URL,
+};
+
+// The Graph API service names
+export const GRAPH_API_SERVICE_NAME = {
+  CORE: 'core',
+  COUPON_ONBOARDING: 'coupon-onboarding',
+  NFT_EXTENSION: 'nft-extension',
+};
 
 // Network IDs, when users change wallet networks
 export const CHAINS = {

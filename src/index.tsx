@@ -15,9 +15,8 @@ import {QueryClient, QueryClientProvider} from 'react-query';
 
 import {
   ENVIRONMENT,
-  GRAPH_CORE_URL,
-  GRAPH_COUPON_ONBOARDING_URL,
-  GRAPH_NFT_EXTENSION_URL,
+  GRAPH_API_SERVICE_NAME,
+  GRAPH_API_URL,
   WALLETCONNECT_PROVIDER_OPTIONS,
 } from './config';
 import {clearConnectedMember, clearContracts} from './store/actions';
@@ -45,19 +44,26 @@ window.ethereum &&
 
 // Set graphql endpoints for `ApolloClient`
 const defaultGraphqlEndpoint = new HttpLink({
-  uri: ({operationName}) => `${GRAPH_CORE_URL}?${operationName}`,
+  uri: ({operationName}) => `${GRAPH_API_URL.CORE}?${operationName}`,
 });
 const couponOnboardingGraphqlEndpoint = new HttpLink({
-  uri: ({operationName}) => `${GRAPH_COUPON_ONBOARDING_URL}?${operationName}`,
+  uri: ({operationName}) =>
+    `${GRAPH_API_URL.COUPON_ONBOARDING}?${operationName}`,
 });
 const nftExtensionGraphqlEndpoint = new HttpLink({
-  uri: ({operationName}) => `${GRAPH_NFT_EXTENSION_URL}?${operationName}`,
+  uri: ({operationName}) => `${GRAPH_API_URL.NFT_EXTENSION}?${operationName}`,
 });
+
+// Apollo link directional composition (https://www.apollographql.com/docs/react/api/link/introduction/#directional-composition) can be chained to allow for more than two endpoints.
 const graphqlEndpoints = split(
-  (operation) => operation.getContext().serviceName === 'coupon-onboarding',
+  (operation) =>
+    operation.getContext().serviceName ===
+    GRAPH_API_SERVICE_NAME.COUPON_ONBOARDING,
   couponOnboardingGraphqlEndpoint,
   split(
-    (operation) => operation.getContext().serviceName === 'nft-extension',
+    (operation) =>
+      operation.getContext().serviceName ===
+      GRAPH_API_SERVICE_NAME.NFT_EXTENSION,
     nftExtensionGraphqlEndpoint,
     defaultGraphqlEndpoint
   )
