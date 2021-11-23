@@ -142,7 +142,7 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
     return function cleanup() {
       pollingTimeoutId && clearTimeout(pollingTimeoutId);
     };
-  }, [connectedMember, startPolling, stopPolling]);
+  }, [connectedMember, error, startPolling, stopPolling]);
 
   /**
    * Functions
