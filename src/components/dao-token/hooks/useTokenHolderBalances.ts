@@ -111,8 +111,8 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
         getTokenHolderBalancesFromSubgraphCached();
       }
     } else {
-      // If there is a subgraph network error fallback to fetching members info
-      // directly from smart contract
+      // If there is a subgraph network error fallback to fetching token holder
+      // info directly from smart contract
       getTokenHolderBalancesFromExtensionCached();
     }
   }, [
@@ -137,12 +137,12 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
     // we poll but only for a short time period
     connectedMember && startPolling && startPolling(2000);
 
-    const pollingTimeoutId = stopPolling && setTimeout(stopPolling, 10000);
+    const pollingTimeoutId = stopPolling && setTimeout(stopPolling, 8000);
 
     return function cleanup() {
       pollingTimeoutId && clearTimeout(pollingTimeoutId);
     };
-  }, [connectedMember, error, startPolling, stopPolling]);
+  }, [connectedMember, startPolling, stopPolling]);
 
   /**
    * Functions
