@@ -41,7 +41,6 @@ type ContractAction =
   | typeof CONTRACT_FINANCING
   | typeof CONTRACT_GUILDKICK
   | typeof CONTRACT_MANAGING
-  | typeof CONTRACT_NFT_ADAPTER
   | typeof CONTRACT_NFT_EXTENSION
   | typeof CONTRACT_ONBOARDING
   | typeof CONTRACT_RAGEQUIT
@@ -64,7 +63,6 @@ export const CONTRACT_ERC20_EXTENSION = 'CONTRACT_ERC20_EXTENSION';
 export const CONTRACT_FINANCING = 'CONTRACT_FINANCING';
 export const CONTRACT_GUILDKICK = 'CONTRACT_GUILDKICK';
 export const CONTRACT_MANAGING = 'CONTRACT_MANAGING';
-export const CONTRACT_NFT_ADAPTER = 'CONTRACT_NFT_ADAPTER';
 export const CONTRACT_NFT_EXTENSION = 'CONTRACT_NFT_EXTENSION';
 export const CONTRACT_ONBOARDING = 'CONTRACT_ONBOARDING';
 export const CONTRACT_RAGEQUIT = 'CONTRACT_RAGEQUIT';
@@ -281,20 +279,6 @@ export function initContractBankAdapter(
     adapterOrExtensionName: ContractAdapterNames.bank,
     contractAddress,
     lazyImport: () => import('../../abis/BankAdapterContract.json'),
-    web3Instance,
-  });
-}
-
-export function initContractNFTAdapter(
-  web3Instance: Web3,
-  contractAddress?: string
-) {
-  return initContractThunkFactory({
-    actionType: CONTRACT_NFT_ADAPTER,
-    adapterNameForRedux: DaoAdapterConstants.NFT,
-    adapterOrExtensionName: ContractAdapterNames.nft,
-    contractAddress,
-    lazyImport: () => import('../../abis/NFTAdapterContract.json'),
     web3Instance,
   });
 }

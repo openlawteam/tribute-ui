@@ -16,7 +16,6 @@ import {
   initContractFinancing,
   initContractGuildKick,
   initContractManaging,
-  initContractNFTAdapter,
   initContractNFTExtension,
   initContractOnboarding,
   initContractRagequit,
@@ -71,7 +70,6 @@ export function useInitContracts(): (data: {
       await dispatch(initRegisteredVotingAdapter(web3Instance));
       await dispatch(initContractTributeNFT(web3Instance));
       await dispatch(initContractNFTExtension(web3Instance));
-      await dispatch(initContractNFTAdapter(web3Instance));
       await dispatch(initContractCouponOnboarding(web3Instance));
       await dispatch(initContractDaoRegistryAdapter(web3Instance));
       await dispatch(initContractERC20Extension(web3Instance));

@@ -11,7 +11,6 @@ import {
   initContractFinancing,
   initContractGuildKick,
   initContractManaging,
-  initContractNFTAdapter,
   initContractNFTExtension,
   initContractOnboarding,
   initContractRagequit,
@@ -84,9 +83,6 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
         break;
       case DaoAdapterConstants.TRIBUTE_NFT:
         await dispatch(initContractTributeNFT(web3Instance));
-        break;
-      case DaoAdapterConstants.NFT:
-        await dispatch(initContractNFTAdapter(web3Instance));
         break;
       case DaoAdapterConstants.DAO_REGISTRY:
         await dispatch(initContractDaoRegistryAdapter(web3Instance));

@@ -13,7 +13,6 @@ import {ERC20Extension} from '../../../abi-types/ERC20Extension';
 import {FinancingContract} from '../../../abi-types/FinancingContract';
 import {GuildKickContract} from '../../../abi-types/GuildKickContract';
 import {ManagingContract} from '../../../abi-types/ManagingContract';
-import {NFTAdapterContract} from '../../../abi-types/NFTAdapterContract';
 import {NFTExtension} from '../../../abi-types/NFTExtension';
 import {OnboardingContract} from '../../../abi-types/OnboardingContract';
 import {RagequitContract} from '../../../abi-types/RagequitContract';
@@ -64,7 +63,6 @@ export type ContractsState = {
   FinancingContract: ContractsStateEntry<FinancingContract> | null;
   GuildKickContract: ContractsStateEntry<GuildKickContract> | null;
   ManagingContract: ContractsStateEntry<ManagingContract> | null;
-  NFTAdapterContract: ContractsStateEntry<NFTAdapterContract> | null;
   NFTExtensionContract: ContractsStateEntry<NFTExtension> | null;
   OnboardingContract: ContractsStateEntry<OnboardingContract> | null;
   RagequitContract: ContractsStateEntry<RagequitContract> | null;

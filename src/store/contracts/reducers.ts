@@ -13,7 +13,6 @@ import {
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
   CONTRACT_MANAGING,
-  CONTRACT_NFT_ADAPTER,
   CONTRACT_NFT_EXTENSION,
   CONTRACT_ONBOARDING,
   CONTRACT_RAGEQUIT,
@@ -38,7 +37,6 @@ const initialState = {
   FinancingContract: null,
   GuildKickContract: null,
   ManagingContract: null,
-  NFTAdapterContract: null,
   NFTExtensionContract: null,
   OnboardingContract: null,
   RagequitContract: null,
@@ -82,8 +80,6 @@ export default function reducer(
       return contractGuildKick(state, payload);
     case CONTRACT_MANAGING:
       return contractManaging(state, payload);
-    case CONTRACT_NFT_ADAPTER:
-      return contractNFTAdapter(state, payload);
     case CONTRACT_NFT_EXTENSION:
       return contractNFTExtension(state, payload);
     case CONTRACT_ONBOARDING:
@@ -178,13 +174,6 @@ function contractBankAdapter(
   payload: any
 ): ContractsState {
   return {...state, BankAdapterContract: {...payload}};
-}
-
-function contractNFTAdapter(
-  state: ContractsState,
-  payload: any
-): ContractsState {
-  return {...state, NFTAdapterContract: {...payload}};
 }
 
 function contractTributeNFT(
