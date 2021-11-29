@@ -369,12 +369,11 @@ export default function AdapterOrExtensionManager() {
 
       // init adapter/extension contracts
       initAdapterExtensionContract(adapterOrExtensionName, web3Instance);
-    } catch (error) {
+    } catch (error: any) {
       setIsInProcess((prevState) => ({
         ...prevState,
         [adapterOrExtensionName]: false,
       }));
-
       const errorMessage = new Error(
         error && error?.code === 4001
           ? error.message
@@ -471,7 +470,7 @@ export default function AdapterOrExtensionManager() {
             );
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       const errorMessage = new Error(
         error && error?.code === 4001
           ? error.message
@@ -519,7 +518,7 @@ export default function AdapterOrExtensionManager() {
       setConfigureAdapterOrExtension(adapterOrExtension);
       setInputParameters(inputs);
       setOpenConfigureModal(true);
-    } catch (error) {
+    } catch (error: any) {
       const errorMessage = new Error(
         error && error?.code === 4001
           ? error.message

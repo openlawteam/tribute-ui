@@ -17,8 +17,6 @@ const TributeCube = memo(() => {
       data-aos="fade-up"
       data-aos-delay="150">
       <div className="cube__segment--top"></div>
-      <div className="cube__segment--left"></div>
-      <div className="cube__segment--right"></div>
     </div>
   );
 });
@@ -66,7 +64,7 @@ export default function GetStarted() {
 
           <div className="landing">
             <div className="landing__subtitle">
-              A next generation DAO framework
+              A next generation company framework
             </div>
 
             <div className="landing__img">
