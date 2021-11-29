@@ -1,7 +1,7 @@
+import {AbiItem, toBN, toChecksumAddress} from 'web3-utils';
 import {useCallback, useEffect, useState} from 'react';
 import {useLazyQuery} from '@apollo/react-hooks';
 import {useSelector} from 'react-redux';
-import {AbiItem, toBN, toChecksumAddress} from 'web3-utils';
 
 import {AsyncStatus} from '../../../util/types';
 import {GET_MEMBERS} from '../../../gql';
@@ -151,9 +151,12 @@ export default function useMembers(): UseMembersReturn {
         }
       }
     } catch (error) {
+      const {message} = error as Error;
+
       // If there is a subgraph query error fallback to fetching members info
       // directly from smart contracts
-      console.log(`subgraph query error: ${error.message}`);
+      console.log(`subgraph query error: ${message}`);
+
       getMembersFromRegistryCached();
     }
   }
@@ -246,9 +249,11 @@ export default function useMembers(): UseMembersReturn {
 
       setMembersStatus(AsyncStatus.FULFILLED);
     } catch (error) {
+      const e = error as Error;
+
       setMembersStatus(AsyncStatus.REJECTED);
       setMembers([]);
-      setMembersError(error);
+      setMembersError(e);
     }
   }
 

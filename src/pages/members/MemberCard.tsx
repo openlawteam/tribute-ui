@@ -1,7 +1,7 @@
 import {Link} from 'react-router-dom';
 import {Member} from './types';
 
-import {truncateEthAddress} from '../../util/helpers';
+import {normalizeString, truncateEthAddress} from '../../util/helpers';
 import {useWeb3Modal} from '../../components/web3/hooks';
 
 type MemberCardProps = {
@@ -12,7 +12,7 @@ type MemberCardProps = {
 const DEFAULT_CARD_LINK: string = '#';
 
 /**
- * Shows a preview of a members's profile
+ * Shows a preview of a member's profile
  *
  * @param {MemberCardProps} props
  * @returns {JSX.Element}
@@ -34,7 +34,8 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
     <Link className={'membercard__link'} to={to}>
       <div
         className={`membercard ${
-          account && account.toLowerCase() === member.address.toLowerCase()
+          account &&
+          normalizeString(account) === normalizeString(member.address)
             ? `membercard--connected-account`
             : ''
         }`}>

@@ -2,22 +2,18 @@ import {useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
 import {AsyncStatus} from '../../util/types';
+import {formatNumber, normalizeString} from '../../util/helpers';
 import {Member} from './types';
-import {
-  truncateEthAddress,
-  normalizeString,
-  formatNumber,
-} from '../../util/helpers';
+import {useDaoTokenDetails} from '../../components/dao-token/hooks';
+import {useDaoTotalUnits} from '../../hooks';
 import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
+import DaoToken from '../../components/dao-token/DaoToken';
+import Delegation from './Delegation';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderLarge from '../../components/feedback/LoaderLarge';
 import useMembers from './hooks/useMembers';
 import Wrap from '../../components/common/Wrap';
-import {useDaoTokenDetails} from '../../components/dao-token/hooks';
-import DaoToken from '../../components/dao-token/DaoToken';
-import {useDaoTotalUnits} from '../../hooks';
-import Delegation from './Delegation';
 
 export default function MemberProfile() {
   /**
@@ -66,6 +62,9 @@ export default function MemberProfile() {
    * Variables
    */
 
+  const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
+  const error: Error | undefined = membersError || defaultChainError;
+
   const isLoading: boolean =
     membersStatus === AsyncStatus.STANDBY ||
     membersStatus === AsyncStatus.PENDING ||
@@ -73,14 +72,14 @@ export default function MemberProfile() {
     daoTokenDetailsStatus === AsyncStatus.PENDING ||
     totalUnitsStatus === AsyncStatus.STANDBY ||
     totalUnitsStatus === AsyncStatus.PENDING;
-  const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
-  const error: Error | undefined = membersError || defaultChainError;
+
   const isCurrentMemberConnected: boolean =
     account &&
     memberDetails &&
     normalizeString(account) === normalizeString(memberDetails.address)
       ? true
       : false;
+
   const votingWeight =
     memberDetails && typeof totalUnits === 'number'
       ? ((Number(memberDetails.units) / totalUnits) * 100).toFixed(2)
@@ -193,7 +192,7 @@ export default function MemberProfile() {
 
             <div className="memberprofile__left-column">
               {/* MEMBER ADDRESS */}
-              <h3>{truncateEthAddress(memberDetails.address, 7)}</h3>
+              <h3>{memberDetails.address}</h3>
 
               {/* MEMBER INFO */}
               {renderMemberInfo()}

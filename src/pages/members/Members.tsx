@@ -8,6 +8,18 @@ import MemberCard from './MemberCard';
 import useMembers from './hooks/useMembers';
 import Wrap from '../../components/common/Wrap';
 
+function renderMemberCards(members: Member[]): JSX.Element[] {
+  return members.map((member) => {
+    return (
+      <MemberCard
+        key={member.address}
+        to={`/members/${member.address}`}
+        member={member}
+      />
+    );
+  });
+}
+
 export default function Members() {
   /**
    * Our hooks
@@ -27,22 +39,6 @@ export default function Members() {
   const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
 
   const error: Error | undefined = membersError || defaultChainError;
-
-  /**
-   * Functions
-   */
-
-  function renderMemberCards(members: Member[]) {
-    return members.map((member) => {
-      return (
-        <MemberCard
-          key={member.address}
-          to={`/members/${member.address}`}
-          member={member}
-        />
-      );
-    });
-  }
 
   /**
    * Render
