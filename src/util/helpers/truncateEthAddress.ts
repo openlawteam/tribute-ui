@@ -10,17 +10,19 @@ import {isEthAddressValid} from '../validation';
  * @returns {string}
  */
 export function truncateEthAddress(
-  addr: string,
+  address: string,
   maxLength: number = 5
 ): string {
-  if (addr === null || typeof addr === 'undefined') return '---';
+  // Fallback if empty `address`
+  if (!address) return '---';
 
-  if (isEthAddressValid(addr)) {
-    const firstSegment = addr.substring(0, maxLength);
-    const secondPart = addr.substring(addr.length - 3);
-    return firstSegment + '...' + secondPart;
-  } else {
-    // in case string argument is not actually an Ethereum address
-    return addr;
+  // In case `address` is not an Ethereum address
+  if (!isEthAddressValid(address)) {
+    return address;
   }
+
+  const firstSegment = address.substring(0, maxLength);
+  const secondPart = address.substring(address.length - 4);
+
+  return `${firstSegment}...${secondPart}`;
 }
