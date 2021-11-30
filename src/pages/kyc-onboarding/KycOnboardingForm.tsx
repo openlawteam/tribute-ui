@@ -19,14 +19,13 @@ import {
   useWeb3Modal,
 } from '../../components/web3/hooks';
 import {AsyncStatus} from '../../util/types';
-import {BURN_ADDRESS} from '../../util/constants';
 import {ContractDAOConfigKeys, Web3TxStatus} from '../../components/web3/types';
 import {CycleEllipsis} from '../../components/feedback';
 import {FormFieldErrors} from '../../util/enums';
 import {getConnectedMember} from '../../store/actions';
 import {getDAOConfigEntry} from '../../components/web3/helpers';
 import {isEthAddressValid} from '../../util/validation';
-import {KYC_BACKEND_URL, KYC_FORMS_URL} from '../../config';
+import {ETH_TOKEN_ADDRESS, KYC_BACKEND_URL, KYC_FORMS_URL} from '../../config';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
 import {useAbortController} from '../../hooks';
@@ -283,7 +282,7 @@ export default function KycOnboardingForm() {
         await getDAOConfigEntry(
           daoRegistryContract.instance,
           ContractDAOConfigKeys.kycOnboardingChunkSize,
-          BURN_ADDRESS
+          ETH_TOKEN_ADDRESS
         )
       );
 
@@ -291,7 +290,7 @@ export default function KycOnboardingForm() {
         await getDAOConfigEntry(
           daoRegistryContract.instance,
           ContractDAOConfigKeys.kycOnboardingMaximumChunks,
-          BURN_ADDRESS
+          ETH_TOKEN_ADDRESS
         )
       );
 
@@ -299,7 +298,7 @@ export default function KycOnboardingForm() {
         await getDAOConfigEntry(
           daoRegistryContract.instance,
           ContractDAOConfigKeys.kycOnboardingMaxMembers,
-          BURN_ADDRESS
+          ETH_TOKEN_ADDRESS
         )
       );
 
@@ -307,7 +306,7 @@ export default function KycOnboardingForm() {
         await getDAOConfigEntry(
           daoRegistryContract.instance,
           ContractDAOConfigKeys.kycOnboardingUnitsPerChunk,
-          BURN_ADDRESS
+          ETH_TOKEN_ADDRESS
         )
       );
 
