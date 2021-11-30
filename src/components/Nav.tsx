@@ -12,6 +12,7 @@ import HamburgerSVG from '../assets/svg/HamburgerSVG';
 import TimesSVG from '../assets/svg/TimesSVG';
 import Web3ModalButton from './web3/Web3ModalButton';
 import DaoTokenHolder from './dao-token/DaoTokenHolder';
+import {featureFlags} from '../util/features';
 
 // see: http://reactcommunity.org/react-transition-group/transition
 const duration = 200;
@@ -38,11 +39,13 @@ export function NavLinks() {
   return (
     <nav role="navigation" id="navigation">
       <ul className="nav__list" data-testid="nav__list">
-        <li tabIndex={0}>
-          <NavLink to="/membership">
-            <span>Membership</span>
-          </NavLink>
-        </li>
+        {!featureFlags?.useKycOnboarding && (
+          <li tabIndex={0}>
+            <NavLink to="/membership">
+              <span>Membership</span>
+            </NavLink>
+          </li>
+        )}
         <li tabIndex={0}>
           <NavLink to="/governance">
             <span>Governance</span>
@@ -192,10 +195,20 @@ export function NavHamburger() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink to="/membership">
-                      <span>Membership</span>
+                    <NavLink to="/join">
+                      <span>Join</span>
                     </NavLink>
                   </li>
+                  {!featureFlags?.useKycOnboarding && (
+                    <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to="/membership">
+                        <span>Membership</span>
+                      </NavLink>
+                    </li>
+                  )}
                   <li
                     onClick={() => {
                       handleMenuModalClose(false);
@@ -218,6 +231,14 @@ export function NavHamburger() {
                     }}>
                     <NavLink to="/tributes">
                       <span>Tribute</span>
+                    </NavLink>
+                  </li>
+                  <li
+                    onClick={() => {
+                      handleMenuModalClose(false);
+                    }}>
+                    <NavLink to="/members">
+                      <span>Members</span>
                     </NavLink>
                   </li>
                   {/* The Profile link is available to only the connected member user (not any delegate) because the profile exists for the member account. */}

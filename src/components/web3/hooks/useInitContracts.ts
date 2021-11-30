@@ -15,6 +15,7 @@ import {
   initContractERC20Extension,
   initContractFinancing,
   initContractGuildKick,
+  initContractKycOnboarding,
   initContractManaging,
   initContractNFTExtension,
   initContractOnboarding,
@@ -55,24 +56,25 @@ export function useInitContracts(): (data: {
       // Must init registry first
       await dispatch(initContractDaoRegistry(web3Instance));
 
-      await dispatch(initContractDaoFactory(web3Instance));
-      await dispatch(initContractBankFactory(web3Instance));
-      await dispatch(initContractConfiguration(web3Instance));
-      await dispatch(initContractFinancing(web3Instance));
-      await dispatch(initContractGuildKick(web3Instance));
-      await dispatch(initContractManaging(web3Instance));
-      await dispatch(initContractRagequit(web3Instance));
       await dispatch(initContractBankAdapter(web3Instance));
       await dispatch(initContractBankExtension(web3Instance));
-      await dispatch(initContractOnboarding(web3Instance));
-      await dispatch(initContractTribute(web3Instance));
-      await dispatch(initContractDistribute(web3Instance));
-      await dispatch(initRegisteredVotingAdapter(web3Instance));
-      await dispatch(initContractTributeNFT(web3Instance));
-      await dispatch(initContractNFTExtension(web3Instance));
+      await dispatch(initContractBankFactory(web3Instance));
+      await dispatch(initContractConfiguration(web3Instance));
       await dispatch(initContractCouponOnboarding(web3Instance));
+      await dispatch(initContractDaoFactory(web3Instance));
       await dispatch(initContractDaoRegistryAdapter(web3Instance));
+      await dispatch(initContractDistribute(web3Instance));
       await dispatch(initContractERC20Extension(web3Instance));
+      await dispatch(initContractFinancing(web3Instance));
+      await dispatch(initContractGuildKick(web3Instance));
+      await dispatch(initContractKycOnboarding(web3Instance));
+      await dispatch(initContractManaging(web3Instance));
+      await dispatch(initContractNFTExtension(web3Instance));
+      await dispatch(initContractOnboarding(web3Instance));
+      await dispatch(initContractRagequit(web3Instance));
+      await dispatch(initContractTribute(web3Instance));
+      await dispatch(initContractTributeNFT(web3Instance));
+      await dispatch(initRegisteredVotingAdapter(web3Instance));
     } catch (error) {
       throw error;
     }

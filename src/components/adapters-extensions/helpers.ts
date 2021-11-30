@@ -100,6 +100,10 @@ export function getAccessControlLayer(
       UPDATE_DELEGATE_KEY: false,
       NEW_MEMBER: true,
     },
+    [DaoAdapterConstants.KYC_ONBOARDING]: {
+      ADD_TO_BALANCE: true,
+      NEW_MEMBER: true,
+    },
     [DaoAdapterConstants.TRIBUTE_NFT]: {
       SUBMIT_PROPOSAL: true,
       NEW_MEMBER: true,

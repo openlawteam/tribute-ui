@@ -45,6 +45,9 @@ jobs:
           REACT_APP_COUPON_API_URL: https://coupon.dev.openlaw.io
           REACT_APP_SNAPSHOT_SPACE: tribute
           REACT_APP_GRAPH_CORE_URL: https://api.thegraph.com/subgraphs/name/openlawteam/tribute-dev
+          REACT_APP_KYC_BACKEND_URL: https://kyc-backend.dev.thelao.io/kyc-certificate
+          # @todo use generalized development Tribute KYC site (needs to be created)
+          REACT_APP_KYC_FORMS_URL: https://develop--kyc.neondao.xyz/verify-start
         run: npm run build
 
       - name: Deploy to GitHub Pages site

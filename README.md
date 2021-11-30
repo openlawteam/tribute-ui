@@ -10,7 +10,7 @@ Related supporting repositories:
 
 ### Local `.env` File
 
-When running locally you'll need a `.env` file in the root directory with the following:
+When running locally you'll need a `.env` file in the root directory with the following environment variables:
 
 ```
 REACT_APP_ENVIRONMENT=localhost
@@ -33,7 +33,21 @@ NOTE:
 - `REACT_APP_SNAPSHOT_SPACE` is the unique name registered in Snapshot Hub under which proposals, votes, etc. will be stored.
 - `REACT_APP_GRAPH_CORE_URL` is the url of the core [subgraph](#running-the-local-graph-node) running locally in a container.
 
-#### Optional env vars for local development
+#### Additional Required Environment Variables for KYC Onboarding
+
+If `useKycOnboarding` is enabled in `src/features.ts`, you will also need the following environment variables:
+
+```
+REACT_APP_KYC_BACKEND_URL=http://localhost:3003/kyc-certificate
+REACT_APP_KYC_FORMS_URL=...
+```
+
+NOTE:
+
+- `REACT_APP_KYC_BACKEND_URL` is the url of the [KYC backend service](https://github.com/openlawteam/lao-backends) running locally in a container.
+- `REACT_APP_KYC_FORMS_URL` is the url of the KYC forms interface.
+
+#### Optional Environment Variables for Local Development
 
 ```
 REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>
@@ -63,7 +77,7 @@ NOTE:
 
 **Remember**: After you deploy the `DaoRegistry` and `Multicall` smart contracts on your local Ganache network you must include the deployed contract's address in your local root `.env` file. Additionally, you will need to add the contract addresses for the deployed adapters and extensions contracts to the config in `/src/config.ts`.
 
-#### Saving Ganache data
+#### Saving Ganache Data
 
 If you want to use the same accounts (`-d`) and data (`--db`) from a previous Ganache chain, you can add the below arguments to the `ganache-cli` command. The `--db` path can be any path with any structure. Ganache creates many "loose" files, so it may be easiest to keep each chain in its own directory (e.g. `some/path/your-ganache-dbs/01-01-1999`).
 
@@ -75,7 +89,7 @@ If you want to use the same accounts (`-d`) and data (`--db`) from a previous Ga
 
 - **Invalid address, and/or nonce-related errors:** If you're developing on Ganache and the app will not start due to a vague error about an "invalid address", or you're receiving transaction errors from the app related to an incorrect nonce(s), then resetting your Ganache account(s) in MetaMask (or other wallet, if possible) should fix this. To reset your accounts in MetaMask (or other wallet) click: _Settings->Advanced->Reset Account_.
 
-## Running the local graph-node
+## Running the Local graph-node
 
 Follow the instructions [here](https://github.com/openlawteam/tribute-subgraph/blob/main/docker/README.md) to set up and run the local graph-node and to deploy the mandatory core subgraph and any optional adapter/extension subgraphs.
 
@@ -85,7 +99,7 @@ Deployments for the development environment are handled automatically with a Git
 
 - `GitHub Pages development deployment`: push to `main` branch -> https://demo.tributedao.com
 
-## Developer notes
+## Developer Notes
 
 ### Node Version
 

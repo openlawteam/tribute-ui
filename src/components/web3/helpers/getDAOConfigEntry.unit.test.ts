@@ -22,8 +22,8 @@ describe('getDAOConfigEntry unit tests', () => {
     mockWeb3Provider.injectResult(...result);
 
     const configEntry = await getDAOConfigEntry(
-      ContractDAOConfigKeys.offchainVotingVotingPeriod,
-      instance
+      instance,
+      ContractDAOConfigKeys.offchainVotingVotingPeriod
     );
 
     expect(configEntry).toBe('1000');
@@ -34,8 +34,8 @@ describe('getDAOConfigEntry unit tests', () => {
 
     try {
       await getDAOConfigEntry(
-        ContractDAOConfigKeys.offchainVotingVotingPeriod,
-        undefined
+        undefined,
+        ContractDAOConfigKeys.offchainVotingVotingPeriod
       );
     } catch (error) {
       capturedError = error.message;

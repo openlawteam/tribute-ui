@@ -10,6 +10,7 @@ import {
   initContractERC20Extension,
   initContractFinancing,
   initContractGuildKick,
+  initContractKycOnboarding,
   initContractManaging,
   initContractNFTExtension,
   initContractOnboarding,
@@ -53,6 +54,9 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
         break;
       case DaoAdapterConstants.GUILDKICK:
         await dispatch(initContractGuildKick(web3Instance));
+        break;
+      case DaoAdapterConstants.KYC_ONBOARDING:
+        await dispatch(initContractKycOnboarding(web3Instance));
         break;
       case DaoAdapterConstants.MANAGING:
         await dispatch(initContractManaging(web3Instance));

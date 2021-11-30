@@ -1,5 +1,6 @@
 import {Route, Switch} from 'react-router-dom';
 
+import {featureFlags} from './util/features';
 import AdapterOrExtensionManager from './components/adapters-extensions/AdapterOrExtensionManager';
 import CreateGovernanceProposal from './pages/governance/CreateGovernanceProposal';
 import CreateMembershipProposal from './pages/membership/CreateMembershipProposal';
@@ -8,6 +9,7 @@ import CreateTributeProposal from './pages/tributes/CreateTributeProposal';
 import GetStarted from './pages/start/GetStarted';
 import GovernanceProposalDetails from './pages/governance/GovernanceProposalDetails';
 import GovernanceProposals from './pages/governance/GovernanceProposals';
+import KycOnboardingForm from './pages/kyc-onboarding/KycOnboardingForm';
 import MemberProfile from './pages/members/MemberProfile';
 import Members from './pages/members/Members';
 import Membership from './pages/membership/Membership';
@@ -31,20 +33,30 @@ export default function Routes() {
           key="join"
           exact
           path="/join"
-          render={() => <CreateMembershipProposal />}
+          render={() =>
+            featureFlags?.useKycOnboarding ? (
+              <KycOnboardingForm />
+            ) : (
+              <CreateMembershipProposal />
+            )
+          }
         />,
-        <Route
-          key="membership"
-          exact
-          path="/membership"
-          render={() => <Membership />}
-        />,
-        <Route
-          key="membership-details"
-          exact
-          path={`/membership/${proposalIdParameter}`}
-          render={() => <MembershipDetails />}
-        />,
+        !featureFlags?.useKycOnboarding && (
+          <Route
+            key="membership"
+            exact
+            path="/membership"
+            render={() => <Membership />}
+          />
+        ),
+        !featureFlags?.useKycOnboarding && (
+          <Route
+            key="membership-details"
+            exact
+            path={`/membership/${proposalIdParameter}`}
+            render={() => <MembershipDetails />}
+          />
+        ),
         <Route
           key="transfer"
           exact

@@ -4,15 +4,27 @@ import {ContractDAOConfigKeys} from '../types';
 import {DaoRegistry} from '../../../../abi-types/DaoRegistry';
 
 export async function getDAOConfigEntry(
+  daoContractInstance: DaoRegistry | undefined,
   configKey: ContractDAOConfigKeys,
-  daoContractInstance: DaoRegistry | undefined
+  address?: string
 ): Promise<string> {
   try {
     if (!daoContractInstance) {
       throw new Error('No DaoRegistry contract instance provided.');
     }
 
-    const configKeySha3 = Web3.utils.sha3(configKey);
+    let configKeySha3 = Web3.utils.sha3(configKey);
+
+    if (address) {
+      const web3 = new Web3();
+
+      configKeySha3 = Web3.utils.sha3(
+        web3.eth.abi.encodeParameters(
+          ['address', 'bytes32'],
+          [address, Web3.utils.sha3(configKey)]
+        )
+      );
+    }
 
     if (!configKeySha3) {
       throw new Error('No sha3 config key was returned.');

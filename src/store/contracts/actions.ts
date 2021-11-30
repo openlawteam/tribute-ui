@@ -40,6 +40,7 @@ type ContractAction =
   | typeof CONTRACT_ERC20_EXTENSION
   | typeof CONTRACT_FINANCING
   | typeof CONTRACT_GUILDKICK
+  | typeof CONTRACT_KYC_ONBOARDING
   | typeof CONTRACT_MANAGING
   | typeof CONTRACT_NFT_EXTENSION
   | typeof CONTRACT_ONBOARDING
@@ -62,6 +63,7 @@ export const CONTRACT_DISTRIBUTE = 'CONTRACT_DISTRIBUTE';
 export const CONTRACT_ERC20_EXTENSION = 'CONTRACT_ERC20_EXTENSION';
 export const CONTRACT_FINANCING = 'CONTRACT_FINANCING';
 export const CONTRACT_GUILDKICK = 'CONTRACT_GUILDKICK';
+export const CONTRACT_KYC_ONBOARDING = 'CONTRACT_KYC_ONBOARDING';
 export const CONTRACT_MANAGING = 'CONTRACT_MANAGING';
 export const CONTRACT_NFT_EXTENSION = 'CONTRACT_NFT_EXTENSION';
 export const CONTRACT_ONBOARDING = 'CONTRACT_ONBOARDING';
@@ -377,6 +379,20 @@ export function initContractCouponOnboarding(
     adapterOrExtensionName: ContractAdapterNames.coupon_onboarding,
     contractAddress,
     lazyImport: () => import('../../abis/CouponOnboardingContract.json'),
+    web3Instance,
+  });
+}
+
+export function initContractKycOnboarding(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_KYC_ONBOARDING,
+    adapterNameForRedux: DaoAdapterConstants.KYC_ONBOARDING,
+    adapterOrExtensionName: ContractAdapterNames.kyc_onboarding,
+    contractAddress,
+    lazyImport: () => import('../../abis/KycOnboardingContract.json'),
     web3Instance,
   });
 }

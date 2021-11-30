@@ -137,8 +137,8 @@ export function useSignAndSubmitProposal<
 
     const votingTimeSeconds: number = parseInt(
       await getDAOConfigEntry(
-        ContractDAOConfigKeys.offchainVotingVotingPeriod,
-        daoRegistryInstance
+        daoRegistryInstance,
+        ContractDAOConfigKeys.offchainVotingVotingPeriod
       )
     );
 

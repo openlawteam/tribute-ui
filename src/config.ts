@@ -23,6 +23,8 @@ const {
   REACT_APP_INFURA_PROJECT_ID_DEV,
   REACT_APP_INFURA_PROJECT_ID_LOCAL,
   REACT_APP_INFURA_PROJECT_ID_PROD,
+  REACT_APP_KYC_BACKEND_URL,
+  REACT_APP_KYC_FORMS_URL,
   REACT_APP_MULTICALL_CONTRACT_ADDRESS,
   REACT_APP_SNAPSHOT_HUB_API_URL,
   REACT_APP_SNAPSHOT_SPACE,
@@ -44,7 +46,15 @@ export const SNAPSHOT_HUB_API_URL: string | undefined =
     ? '/snapshot-hub'
     : REACT_APP_SNAPSHOT_HUB_API_URL;
 
+// Coupon Manager API URL (for coupon onboarding)
 export const COUPON_API_URL: string | undefined = REACT_APP_COUPON_API_URL;
+
+// KYC Backend URL (for KYC onboarding)
+export const KYC_BACKEND_URL: string | undefined = REACT_APP_KYC_BACKEND_URL;
+
+// KYC Forms URL (for redirecting to separate moloch v2 instance that will be
+// used for KYC verification)
+export const KYC_FORMS_URL: string | undefined = REACT_APP_KYC_FORMS_URL;
 
 // The Graph API URLs
 export const GRAPH_API_URL = {
@@ -263,6 +273,7 @@ export const ERC20_TOKEN_FACTORY_CONTRACT_ADDRESS = {
  * - BankAdapter
  * - TributeNFT
  * - DaoRegistryAdapter
+ * - KycOnboarding
  */
 
 export const VOTING_CONTRACT_ADDRESS = {
@@ -447,8 +458,18 @@ export const OFFCHAINVOTING_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
 };
 
+export const KYC_ONBOARDING_CONTRACT_ADDRESS = {
+  [CHAINS.MAINNET]: '',
+  [CHAINS.ROPSTEN]: '',
+  [CHAINS.RINKEBY]: '',
+  [CHAINS.GOERLI]: '',
+  [CHAINS.KOVAN]: '',
+  [CHAINS.GANACHE]: '',
+};
+
 // If developing locally, include your Multicall contract address in your `.env` file.
-export const MULTICALL_CONTRACT_ADDRESS = REACT_APP_MULTICALL_CONTRACT_ADDRESS;
+export const MULTICALL_CONTRACT_ADDRESS: string | undefined =
+  REACT_APP_MULTICALL_CONTRACT_ADDRESS;
 
 /**
  * These addresses are important as the contracts use them in their configs.
