@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
 import {AsyncStatus} from '../../util/types';
+import {CopyWithTooltip} from '../../components/common/CopyWithTooltip';
 import {formatNumber, normalizeString} from '../../util/helpers';
 import {Member} from './types';
 import {useDaoTokenDetails} from '../../components/dao-token/hooks';
@@ -192,7 +193,18 @@ export default function MemberProfile() {
 
             <div className="memberprofile__left-column">
               {/* MEMBER ADDRESS */}
-              <h3>{memberDetails.address}</h3>
+              <CopyWithTooltip
+                render={({elementRef, isCopied, setCopied, tooltipID}) => (
+                  <h3
+                    data-for={tooltipID}
+                    data-tip={isCopied ? 'copied!' : memberDetails.address}
+                    onClick={setCopied}
+                    ref={elementRef}>
+                    {memberDetails.address}
+                  </h3>
+                )}
+                textToCopy={memberDetails.address}
+              />
 
               {/* MEMBER INFO */}
               {renderMemberInfo()}
