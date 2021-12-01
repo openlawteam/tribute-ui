@@ -180,7 +180,7 @@ export default function KycOnboardingForm() {
   } = useCheckApplicant(ethAddressValue);
 
   const maxMembersText = kycOnboardingConfigs
-    ? formatNumber(Number(kycOnboardingConfigs.maxMembers) - 2) // accounts for config being set to max members + 1 to handle DAO creator being counted as a member + 1 to handle DaoFactory being counted as a member
+    ? formatNumber(Number(kycOnboardingConfigs.maxMembers) - 2) // accounts for config being set to max actual members + 1 DAO creator + 1 DaoFactory
     : PLACEHOLDER;
 
   const minUnitsText = kycOnboardingConfigs
@@ -683,17 +683,14 @@ export default function KycOnboardingForm() {
           <div className="form-wrapper">
             <div className="form__description">
               <p>
-                Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
-                consectetur id nec massa. Tribute DAO will have up to{' '}
-                {maxMembersText} initial members, who will pool their capital to
-                make investments. Each member can purchase {minUnitsText} units
-                for {minEthAmountText} ETH (up to {maxUnitsText} units for{' '}
-                {maxEthAmountText} ETH).
+                Tribute DAO will have up to {maxMembersText} initial members,
+                who will pool their capital to make investments. Each member can
+                purchase {minUnitsText} units for {minEthAmountText} ETH (up to{' '}
+                {maxUnitsText} units for {maxEthAmountText} ETH).
               </p>
               <p>
                 Please put your preferred ETH address below and the amount of
-                ETH you&apos;d like to contribute. Aliquam erat volutpat. Sed ut
-                dui ut lacus dictum fermentum vel tincidunt neque.
+                ETH you&apos;d like to contribute.
               </p>
             </div>
 
@@ -716,17 +713,14 @@ export default function KycOnboardingForm() {
         <div className="form-wrapper">
           <div className="form__description">
             <p>
-              Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
-              consectetur id nec massa. Tribute DAO will have up to{' '}
-              {maxMembersText} initial members, who will pool their capital to
-              make investments. Each member can purchase {minUnitsText} units
-              for {minEthAmountText} ETH (up to {maxUnitsText} units for{' '}
-              {maxEthAmountText} ETH).
+              Tribute DAO will have up to {maxMembersText} initial members, who
+              will pool their capital to make investments. Each member can
+              purchase {minUnitsText} units for {minEthAmountText} ETH (up to{' '}
+              {maxUnitsText} units for {maxEthAmountText} ETH).
             </p>
             <p>
               Please put your preferred ETH address below and the amount of ETH
-              you&apos;d like to contribute. Aliquam erat volutpat. Sed ut dui
-              ut lacus dictum fermentum vel tincidunt neque.
+              you&apos;d like to contribute.
             </p>
           </div>
 
