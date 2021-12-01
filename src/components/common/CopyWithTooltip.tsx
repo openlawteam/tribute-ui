@@ -4,20 +4,44 @@ import ReactTooltip from 'react-tooltip';
 import useClipboard from 'react-use-clipboard';
 
 type CopyWithTooltipProps = {
+  /**
+   * How long to wait before resetting `isCopied` in milliseconds. Defaults to `3000`.
+   */
+  copySuccessResetMs?: number;
   render: (p: CopyWithTooltipRenderProps) => JSX.Element;
   textToCopy: string;
+  /**
+   * Props for `react-tooltip`
+   */
   tooltipProps?: ReactTooltip['props'];
 };
 
 type CopyWithTooltipRenderProps = {
+  /**
+   * Ref for attaching to the rendered element's `ref` prop
+   */
   elementRef: React.RefObject<any>;
-  tooltipID: string;
+  /**
+   * Whether or not a copy event has completed. Can be reset using `copySuccessResetMs`.
+   */
   isCopied: boolean;
+  /**
+   * Callback to trigger a copy event
+   */
   setCopied: ReturnType<typeof useClipboard>[1];
+  /**
+   * ID for attaching to the rendered element's `data-for` prop
+   */
+  tooltipID: string;
 };
 
 export function CopyWithTooltip(props: CopyWithTooltipProps): JSX.Element {
-  const {render, textToCopy = '', tooltipProps} = props;
+  const {
+    copySuccessResetMs = 3000,
+    render,
+    textToCopy = '',
+    tooltipProps,
+  } = props;
 
   /**
    * Their hooks
@@ -25,7 +49,7 @@ export function CopyWithTooltip(props: CopyWithTooltipProps): JSX.Element {
 
   const [isCopied, setCopied] = useClipboard(textToCopy, {
     // `isCopied` will go back to `false` after 3 seconds.
-    successDuration: 3000,
+    successDuration: copySuccessResetMs,
   });
 
   /**
