@@ -1,7 +1,7 @@
 import {Link} from 'react-router-dom';
-import {Member} from './types';
 
-import {normalizeString, truncateEthAddress} from '../../util/helpers';
+import {Member} from './types';
+import {normalizeString} from '../../util/helpers';
 import {useWeb3Modal} from '../../components/web3/hooks';
 
 type MemberCardProps = {
@@ -40,9 +40,7 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
             : ''
         }`}>
         {/* TITLE */}
-        <h3 className="membercard__title">
-          {truncateEthAddress(member.address, 7)}
-        </h3>
+        <h3 className="membercard__title">{member.address}</h3>
       </div>
     </Link>
   );

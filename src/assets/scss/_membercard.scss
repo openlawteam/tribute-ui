@@ -31,6 +31,10 @@
   line-height: 1.6;
   text-align: center;
   font-weight: normal;
+  // ellipsis overflow
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   &:last-child {
     margin: 0;
