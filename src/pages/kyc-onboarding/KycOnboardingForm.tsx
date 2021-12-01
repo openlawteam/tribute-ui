@@ -683,10 +683,10 @@ export default function KycOnboardingForm() {
           <div className="form-wrapper">
             <div className="form__description">
               <p>
-                Tribute DAO will have up to {maxMembersText} initial members,
-                who will pool their capital to make investments. Each member can
-                purchase {minUnitsText} units for {minEthAmountText} ETH (up to{' '}
-                {maxUnitsText} units for {maxEthAmountText} ETH).
+                Tribute DAO will have up to {maxMembersText} initial members.
+                Each member can purchase {minUnitsText} units for{' '}
+                {minEthAmountText} ETH (up to {maxUnitsText} units for{' '}
+                {maxEthAmountText} ETH).
               </p>
               <p>
                 Please put your preferred ETH address below and the amount of
@@ -713,10 +713,9 @@ export default function KycOnboardingForm() {
         <div className="form-wrapper">
           <div className="form__description">
             <p>
-              Tribute DAO will have up to {maxMembersText} initial members, who
-              will pool their capital to make investments. Each member can
-              purchase {minUnitsText} units for {minEthAmountText} ETH (up to{' '}
-              {maxUnitsText} units for {maxEthAmountText} ETH).
+              Tribute DAO will have up to {maxMembersText} initial members. Each
+              member can purchase {minUnitsText} units for {minEthAmountText}{' '}
+              ETH (up to {maxUnitsText} units for {maxEthAmountText} ETH).
             </p>
             <p>
               Please put your preferred ETH address below and the amount of ETH
