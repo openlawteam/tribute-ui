@@ -1,14 +1,13 @@
 import {useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
+import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
 import {AsyncStatus} from '../../util/types';
 import {CopyWithTooltip} from '../../components/common/CopyWithTooltip';
 import {formatNumber, normalizeString} from '../../util/helpers';
 import {Member} from './types';
 import {useDaoTokenDetails} from '../../components/dao-token/hooks';
 import {useDaoTotalUnits} from '../../hooks';
-import {useENSName} from '../../components/web3/hooks/useENSName';
-import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
 import DaoToken from '../../components/dao-token/DaoToken';
 import Delegation from './Delegation';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
@@ -27,9 +26,6 @@ export default function MemberProfile() {
   const {defaultChainError} = useIsDefaultChain();
   const {members, membersError, membersStatus} = useMembers();
   const {totalUnits, totalUnitsStatus} = useDaoTotalUnits();
-
-  const [ensReverseResolvedAddress, setAddressToENSReverseResolve] =
-    useENSName();
 
   /**
    * Their hooks
@@ -65,25 +61,16 @@ export default function MemberProfile() {
     }
   }, [ethereumAddress, members, membersStatus]);
 
-  // Set address to ENS reverse resolve
-  useEffect(() => {
-    if (!memberDetails?.address) return;
-
-    setAddressToENSReverseResolve([memberDetails.address]);
-  }, [memberDetails?.address, setAddressToENSReverseResolve]);
-
   /**
    * Variables
    */
 
   const error: Error | undefined = membersError || defaultChainError;
   const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
-  const memberENSNameOrAddress = ensReverseResolvedAddress[0];
 
   const ensNameFound: boolean =
-    memberENSNameOrAddress?.length > 0 &&
-    normalizeString(memberENSNameOrAddress) !==
-      normalizeString(memberDetails?.address);
+    normalizeString(memberDetails?.addressENS) !==
+    normalizeString(memberDetails?.address);
 
   const isLoading: boolean =
     membersStatus === AsyncStatus.STANDBY ||
@@ -222,11 +209,11 @@ export default function MemberProfile() {
                           ? 'copied!'
                           : ensNameFound
                           ? // e.g. someone.eth (0x0...)
-                            `${memberENSNameOrAddress} (${memberDetails.address})`
+                            `${memberDetails.addressENS} (${memberDetails.address})`
                           : 'copy'
                       }
                       ref={elementRef}>
-                      {memberENSNameOrAddress || memberDetails.address}
+                      {memberDetails.addressENS || memberDetails.address}
                     </span>
                   </h3>
                 )}

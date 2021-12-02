@@ -40,7 +40,9 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
             : ''
         }`}>
         {/* TITLE */}
-        <h3 className="membercard__title">{member.address}</h3>
+        <h3 className="membercard__title">
+          {member?.addressENS || member.address}
+        </h3>
       </div>
     </Link>
   );
