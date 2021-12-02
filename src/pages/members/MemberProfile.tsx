@@ -7,6 +7,7 @@ import {formatNumber, normalizeString} from '../../util/helpers';
 import {Member} from './types';
 import {useDaoTokenDetails} from '../../components/dao-token/hooks';
 import {useDaoTotalUnits} from '../../hooks';
+import {useENSName} from '../../components/web3/hooks/useENSName';
 import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
 import DaoToken from '../../components/dao-token/DaoToken';
 import Delegation from './Delegation';
@@ -21,11 +22,14 @@ export default function MemberProfile() {
    * Our hooks
    */
 
-  const {members, membersError, membersStatus} = useMembers();
-  const {defaultChainError} = useIsDefaultChain();
   const {account} = useWeb3Modal();
   const {daoTokenDetails, daoTokenDetailsStatus} = useDaoTokenDetails();
+  const {defaultChainError} = useIsDefaultChain();
+  const {members, membersError, membersStatus} = useMembers();
   const {totalUnits, totalUnitsStatus} = useDaoTotalUnits();
+
+  const [ensReverseResolvedAddress, setAddressToENSReverseResolve] =
+    useENSName();
 
   /**
    * Their hooks
@@ -45,6 +49,7 @@ export default function MemberProfile() {
    * Effects
    */
 
+  // Set member details
   useEffect(() => {
     if (membersStatus !== AsyncStatus.FULFILLED) return;
 
@@ -54,17 +59,31 @@ export default function MemberProfile() {
     );
 
     setMemberDetails(activeMember);
+
     if (!activeMember) {
       setMemberNotFound(true);
     }
   }, [ethereumAddress, members, membersStatus]);
 
+  // Set address to ENS reverse resolve
+  useEffect(() => {
+    if (!memberDetails?.address) return;
+
+    setAddressToENSReverseResolve([memberDetails.address]);
+  }, [memberDetails?.address, setAddressToENSReverseResolve]);
+
   /**
    * Variables
    */
 
-  const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
   const error: Error | undefined = membersError || defaultChainError;
+  const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
+  const memberENSNameOrAddress = ensReverseResolvedAddress[0];
+
+  const ensNameFound: boolean =
+    memberENSNameOrAddress?.length > 0 &&
+    normalizeString(memberENSNameOrAddress) !==
+      normalizeString(memberDetails?.address);
 
   const isLoading: boolean =
     membersStatus === AsyncStatus.STANDBY ||
@@ -195,12 +214,20 @@ export default function MemberProfile() {
               {/* MEMBER ADDRESS */}
               <CopyWithTooltip
                 render={({elementRef, isCopied, setCopied, tooltipID}) => (
-                  <h3
-                    data-for={tooltipID}
-                    data-tip={isCopied ? 'copied!' : memberDetails.address}
-                    onClick={setCopied}
-                    ref={elementRef}>
-                    {memberDetails.address}
+                  <h3 onClick={setCopied}>
+                    <span
+                      data-for={tooltipID}
+                      data-tip={
+                        isCopied
+                          ? 'copied!'
+                          : ensNameFound
+                          ? // e.g. someone.eth (0x0...)
+                            `${memberENSNameOrAddress} (${memberDetails.address})`
+                          : 'copy'
+                      }
+                      ref={elementRef}>
+                      {memberENSNameOrAddress || memberDetails.address}
+                    </span>
                   </h3>
                 )}
                 textToCopy={memberDetails.address}

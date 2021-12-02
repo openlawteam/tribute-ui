@@ -6,6 +6,6 @@
  * @param {string} stringToNormalize
  * @returns {string} The normalized string lowercased and trimmed.
  */
-export function normalizeString(stringToNormalize: string): string {
+export function normalizeString(stringToNormalize: string = ''): string {
   return stringToNormalize.toLowerCase().trim();
 }

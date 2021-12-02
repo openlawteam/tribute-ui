@@ -57,7 +57,7 @@ export const CHAINS = {
   GANACHE: 1337,
   HARMONY_TEST: 1666700000,
   HARMONY_MAIN: 1666600000,
-};
+} as const;
 
 // Network names for modal messaging
 export const CHAIN_NAME_FULL = {
