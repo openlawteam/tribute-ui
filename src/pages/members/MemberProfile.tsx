@@ -69,8 +69,11 @@ export default function MemberProfile() {
   const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
 
   const ensNameFound: boolean =
+    memberDetails?.addressENS !== undefined &&
+    memberDetails?.addressENS !== null &&
+    memberDetails?.addressENS !== '' &&
     normalizeString(memberDetails?.addressENS) !==
-    normalizeString(memberDetails?.address);
+      normalizeString(memberDetails?.address);
 
   const isLoading: boolean =
     membersStatus === AsyncStatus.STANDBY ||
