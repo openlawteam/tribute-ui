@@ -57,6 +57,9 @@ export default function ProcessAction(props: ProcessActionProps) {
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
   );
+  const bankExtensionContract = useSelector(
+    (s: StoreState) => s.contracts.BankExtensionContract
+  );
 
   /**
    * Our hooks
@@ -95,6 +98,10 @@ export default function ProcessAction(props: ProcessActionProps) {
     try {
       if (!daoRegistryContract) {
         throw new Error('No DAO Registry contract was found.');
+      }
+
+      if (!bankExtensionContract) {
+        throw new Error('No Bank Extension contract was found.');
       }
 
       if (!snapshotProposal) {
@@ -137,6 +144,7 @@ export default function ProcessAction(props: ProcessActionProps) {
           getConnectedMember({
             account,
             daoRegistryContract,
+            bankExtensionContract,
             web3Instance,
           })
         );

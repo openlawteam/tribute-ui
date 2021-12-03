@@ -1,5 +1,6 @@
 import {Dispatch} from 'redux';
 import Web3 from 'web3';
+import {toBN} from 'web3-utils';
 
 import {BURN_ADDRESS} from '../../util/constants';
 import {ConnectedMemberState} from '../connectedMember/types';
@@ -8,6 +9,8 @@ import {DaoRegistry} from '../../abis/types/DaoRegistry';
 import {hasFlag, multicall} from '../../components/web3/helpers';
 import {MemberFlag} from '../../components/web3/types';
 import {normalizeString} from '../../util/helpers';
+import {BankExtension} from '../../abis/types/BankExtension';
+import {UNITS_ADDRESS} from '../../config';
 
 export const SET_CONNECTED_MEMBER = 'SET_CONNECTED_MEMBER';
 export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
@@ -26,14 +29,17 @@ export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
 export function getConnectedMember({
   account,
   daoRegistryContract,
+  bankExtensionContract,
   web3Instance,
 }: {
   account: string;
   daoRegistryContract: ContractsStateEntry<DaoRegistry>;
+  bankExtensionContract: ContractsStateEntry<BankExtension>;
   web3Instance: Web3;
 }) {
   return async function (dispatch: Dispatch<any>) {
     const daoRegistryAddress = daoRegistryContract?.contractAddress;
+    const bankExtensionInstance = bankExtensionContract?.instance;
 
     const getAddressIfDelegatedABI = daoRegistryContract?.abi.find(
       (ai) => ai.name === 'getAddressIfDelegated'
@@ -41,19 +47,16 @@ export function getConnectedMember({
     const membersABI = daoRegistryContract?.abi.find(
       (ai) => ai.name === 'members'
     );
-    const isActiveMemberABI = daoRegistryContract?.abi.find(
-      (ai) => ai.name === 'isActiveMember'
-    );
     const getCurrentDelegateKeyABI = daoRegistryContract?.abi.find(
       (ai) => ai.name === 'getCurrentDelegateKey'
     );
 
     if (
       !account ||
+      !bankExtensionInstance ||
       !daoRegistryAddress ||
       !getAddressIfDelegatedABI ||
       !getCurrentDelegateKeyABI ||
-      !isActiveMemberABI ||
       !membersABI
     ) {
       dispatch(clearConnectedMember());
@@ -66,24 +69,20 @@ export function getConnectedMember({
        * @link https://github.com/openlawteam/tribute-contracts/blob/master/docs/core/DaoRegistry.md
        */
 
-      const [
-        addressIfDelegated,
-        memberFlag,
-        isActiveMember,
-        currentDelegateKey,
-      ] = await multicall({
-        calls: [
-          [daoRegistryAddress, getAddressIfDelegatedABI, [account]],
-          [daoRegistryAddress, membersABI, [account]],
-          [
-            daoRegistryAddress,
-            isActiveMemberABI,
-            [daoRegistryAddress, account],
+      const [addressIfDelegated, memberFlag, currentDelegateKey] =
+        await multicall({
+          calls: [
+            [daoRegistryAddress, getAddressIfDelegatedABI, [account]],
+            [daoRegistryAddress, membersABI, [account]],
+            [daoRegistryAddress, getCurrentDelegateKeyABI, [account]],
           ],
-          [daoRegistryAddress, getCurrentDelegateKeyABI, [account]],
-        ],
-        web3Instance,
-      });
+          web3Instance,
+        });
+
+      const memberUnitsBalance = await bankExtensionInstance.methods
+        .balanceOf(addressIfDelegated, UNITS_ADDRESS)
+        .call();
+      const isActiveMember = toBN(memberUnitsBalance).gt(toBN(0));
 
       // A member can exist in the DAO, yet not be an active member (has units > 0)
       const doesMemberExist: boolean = hasFlag(MemberFlag.EXISTS, memberFlag);

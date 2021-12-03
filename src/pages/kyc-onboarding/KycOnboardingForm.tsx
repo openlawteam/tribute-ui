@@ -82,6 +82,10 @@ export default function KycOnboardingForm() {
     (s: StoreState) => s.contracts.DaoRegistryContract
   );
 
+  const bankExtensionContract = useSelector(
+    (s: StoreState) => s.contracts.BankExtensionContract
+  );
+
   const kycOnboardingContract = useSelector(
     (s: StoreState) => s.contracts.KycOnboardingContract
   );
@@ -488,6 +492,10 @@ export default function KycOnboardingForm() {
         throw new Error('No DAO Registry contract was found.');
       }
 
+      if (!bankExtensionContract) {
+        throw new Error('No Bank Extension contract was found.');
+      }
+
       if (!kycOnboardingContract) {
         throw new Error('No KYC Onboarding contract was found.');
       }
@@ -570,6 +578,7 @@ export default function KycOnboardingForm() {
             getConnectedMember({
               account,
               daoRegistryContract,
+              bankExtensionContract,
               web3Instance,
             })
           );
