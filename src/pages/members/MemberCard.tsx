@@ -40,10 +40,10 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
    */
 
   const ensNameFound: boolean =
-    member?.addressENS !== undefined &&
-    member?.addressENS !== null &&
-    member?.addressENS !== '' &&
-    normalizeString(member?.addressENS) !== normalizeString(member?.address);
+    member?.addressENS &&
+    normalizeString(member?.addressENS) !== normalizeString(member?.address)
+      ? true
+      : false;
 
   /**
    * Render
