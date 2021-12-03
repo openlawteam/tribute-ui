@@ -41,7 +41,7 @@
     "redux": "^4.1.0",
     "redux-thunk": "^2.4.1",
     "uuid": "^8.3.2",
-    "tribute-contracts": "^2.3.0",
+    "tribute-contracts": "^2.2.5",
     "web-vitals": "^2.1.0",
     "web3": "^1.5.3",
     "web3modal": "^1.9.4"
@@ -89,7 +89,7 @@
     "start": "npm run compile && react-scripts start",
     "style:fix": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
     "style": "prettier --check 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
-    "test": "react-scripts test"
+    "test": "npm run compile && react-scripts test"
   },
   "eslintConfig": {
     "extends": [
