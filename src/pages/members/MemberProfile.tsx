@@ -208,8 +208,7 @@ export default function MemberProfile() {
                         isCopied
                           ? 'copied!'
                           : ensNameFound
-                          ? // e.g. someone.eth (0x0...)
-                            `${memberDetails.addressENS} (${memberDetails.address})`
+                          ? `${memberDetails.addressENS} (${memberDetails.address})`
                           : 'copy'
                       }
                       ref={elementRef}>
