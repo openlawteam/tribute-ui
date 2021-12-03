@@ -31,5 +31,8 @@ yarn-error.log*
 # We need the `[..]/test/.env` for tests
 !src/test/.env
 
+# tribute-contract ABI files generated on compile
+src/abis/tribute-contracts
+
 # types
-abi-types
+src/abis/types

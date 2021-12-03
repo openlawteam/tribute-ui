@@ -11,8 +11,8 @@ import {AsyncStatus} from '../../../util/types';
 import {ProposalVotingAdapterData, ProposalVotingAdapterTuple} from '../types';
 import {useProposalsVotes} from './useProposalsVotes';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
-import OffchainVotingABI from '../../../abis/OffchainVotingContract.json';
-import VotingABI from '../../../abis/VotingContract.json';
+import OffchainVotingABI from '../../../abis/tribute-contracts/OffchainVotingContract.json';
+import VotingABI from '../../../abis/tribute-contracts/VotingContract.json';
 import Wrapper from '../../../test/Wrapper';
 
 describe('useProposalsVotes unit tests', () => {

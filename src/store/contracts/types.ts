@@ -1,27 +1,27 @@
 import {AbiItem} from 'web3-utils/types';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
 
-import {BankAdapterContract} from '../../../abi-types/BankAdapterContract';
-import {BankExtension} from '../../../abi-types/BankExtension';
-import {ConfigurationContract} from '../../../abi-types/ConfigurationContract';
-import {CouponOnboardingContract} from '../../../abi-types/CouponOnboardingContract';
-import {DaoFactory} from '../../../abi-types/DaoFactory';
-import {DaoRegistry} from '../../../abi-types/DaoRegistry';
-import {DaoRegistryAdapterContract} from '../../../abi-types/DaoRegistryAdapterContract';
-import {DistributeContract} from '../../../abi-types/DistributeContract';
-import {ERC20Extension} from '../../../abi-types/ERC20Extension';
-import {FinancingContract} from '../../../abi-types/FinancingContract';
-import {GuildKickContract} from '../../../abi-types/GuildKickContract';
-import {KycOnboardingContract} from '../../../abi-types/KycOnboardingContract';
-import {ManagingContract} from '../../../abi-types/ManagingContract';
-import {NFTExtension} from '../../../abi-types/NFTExtension';
-import {OnboardingContract} from '../../../abi-types/OnboardingContract';
-import {RagequitContract} from '../../../abi-types/RagequitContract';
-import {TributeContract} from '../../../abi-types/TributeContract';
-import {TributeNFTContract} from '../../../abi-types/TributeNFTContract';
+import {BankAdapterContract} from '../../abis/types/BankAdapterContract';
+import {BankExtension} from '../../abis/types/BankExtension';
+import {ConfigurationContract} from '../../abis/types/ConfigurationContract';
+import {CouponOnboardingContract} from '../../abis/types/CouponOnboardingContract';
+import {DaoFactory} from '../../abis/types/DaoFactory';
+import {DaoRegistry} from '../../abis/types/DaoRegistry';
+import {DaoRegistryAdapterContract} from '../../abis/types/DaoRegistryAdapterContract';
+import {DistributeContract} from '../../abis/types/DistributeContract';
+import {ERC20Extension} from '../../abis/types/ERC20Extension';
+import {FinancingContract} from '../../abis/types/FinancingContract';
+import {GuildKickContract} from '../../abis/types/GuildKickContract';
+import {KycOnboardingContract} from '../../abis/types/KycOnboardingContract';
+import {ManagingContract} from '../../abis/types/ManagingContract';
+import {NFTExtension} from '../../abis/types/NFTExtension';
+import {OnboardingContract} from '../../abis/types/OnboardingContract';
+import {RagequitContract} from '../../abis/types/RagequitContract';
+import {TributeContract} from '../../abis/types/TributeContract';
+import {TributeNFTContract} from '../../abis/types/TributeNFTContract';
 
-import {OffchainVotingContract} from '../../../abi-types/OffchainVotingContract';
-import {VotingContract} from '../../../abi-types/VotingContract';
+import {OffchainVotingContract} from '../../abis/types/OffchainVotingContract';
+import {VotingContract} from '../../abis/types/VotingContract';
 
 import {
   DaoAdapterConstants,

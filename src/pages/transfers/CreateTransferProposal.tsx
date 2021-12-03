@@ -24,7 +24,7 @@ import {
 } from '../../util/helpers';
 import {BURN_ADDRESS} from '../../util/constants';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
-import {default as ERC20ABI} from '../../abis/ERC20.json';
+import {default as ERC20ABI} from '../../abis/external/ERC20.json';
 import {ETH_TOKEN_ADDRESS, GUILD_ADDRESS, UNITS_ADDRESS} from '../../config';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';

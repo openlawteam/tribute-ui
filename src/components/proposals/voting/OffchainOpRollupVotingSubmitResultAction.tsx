@@ -24,7 +24,7 @@ import {BadNodeError} from './types';
 import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {getOffchainVotingProof, submitOffchainVotingProof} from '../helpers';
 import {normalizeString, numberRangeArray} from '../../../util/helpers';
-import {OffchainVotingContract} from '../../../../abi-types/OffchainVotingContract';
+import {OffchainVotingContract} from '../../../abis/types/OffchainVotingContract';
 import {PRIMARY_TYPE_ERC712, TX_CYCLE_MESSAGES} from '../../web3/config';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';

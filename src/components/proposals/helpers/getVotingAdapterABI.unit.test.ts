@@ -2,8 +2,8 @@ import {waitFor} from '@testing-library/react';
 
 import {getVotingAdapterABI} from './';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
-import OffchainVotingContractABI from '../../../abis/OffchainVotingContract.json';
-import VotingContractABI from '../../../abis/VotingContract.json';
+import OffchainVotingContractABI from '../../../abis/tribute-contracts/OffchainVotingContract.json';
+import VotingContractABI from '../../../abis/tribute-contracts/VotingContract.json';
 
 describe('getVotingAdapterABI unit tests', () => {
   test('can return off-chain voting abi', async () => {

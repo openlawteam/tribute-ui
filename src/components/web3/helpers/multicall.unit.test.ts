@@ -4,7 +4,7 @@ import {ContractAdapterNames} from '../types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
 import {getWeb3Instance} from '../../../test/helpers';
 import {multicall} from './multicall';
-import DaoRegistryABI from '../../../abis/DaoRegistry.json';
+import DaoRegistryABI from '../../../abis/tribute-contracts/DaoRegistry.json';
 
 describe('multicall unit tests', () => {
   test('should return correct data', async () => {

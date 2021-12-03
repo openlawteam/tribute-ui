@@ -1,4 +1,4 @@
-import {DaoRegistry} from '../../../../abi-types/DaoRegistry';
+import {DaoRegistry} from '../../../abis/types/DaoRegistry';
 
 export enum DaoState {
   CREATION = 'CREATION',

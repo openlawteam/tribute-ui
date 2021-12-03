@@ -2,10 +2,10 @@ import {AbiItem} from 'web3-utils/types';
 
 import {ContractDAOConfigKeys} from '../types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
-import {DaoRegistry} from '../../../../abi-types/DaoRegistry';
+import {DaoRegistry} from '../../../abis/types/DaoRegistry';
 import {getDAOConfigEntry} from '.';
 import {getWeb3Instance} from '../../../test/helpers';
-import DaoRegistryABI from '../../../abis/DaoRegistry.json';
+import DaoRegistryABI from '../../../abis/tribute-contracts/DaoRegistry.json';
 
 describe('getDAOConfigEntry unit tests', () => {
   test('should return correct config value', async () => {

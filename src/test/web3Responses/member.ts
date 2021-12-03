@@ -1,7 +1,7 @@
 import {DEFAULT_ETH_ADDRESS} from '../helpers';
 import {TestWeb3ResponseArgs, TestWeb3ResponseReturn} from './types';
-import DAORegistryABI from '../../abis/DaoRegistry.json';
-import BankExtensionABI from '../../abis/BankExtension.json';
+import DAORegistryABI from '../../abis/tribute-contracts/DaoRegistry.json';
+import BankExtensionABI from '../../abis/tribute-contracts/BankExtension.json';
 
 /**
  * memberAddressesByDelegatedKey

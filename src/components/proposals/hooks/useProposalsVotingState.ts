@@ -128,8 +128,9 @@ export function useProposalsVotingState(
     async function setProposalsVotingStateCallsPrepData() {
       if (!registryAddress || !safeProposalVotingAdapters?.length) return;
 
-      const lazyIVotingABI = (await import('../../../abis/IVoting.json'))
-        .default as AbiItem[];
+      const lazyIVotingABI = (
+        await import('../../../abis/tribute-contracts/IVoting.json')
+      ).default as AbiItem[];
 
       const votingResultABI = lazyIVotingABI.find(
         (ai) => ai.name === 'voteResult'

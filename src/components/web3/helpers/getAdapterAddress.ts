@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 
 import {ContractAdapterNames} from '../types';
-import {DaoRegistry} from '../../../../abi-types/DaoRegistry';
+import {DaoRegistry} from '../../../abis/types/DaoRegistry';
 
 export async function getAdapterAddress(
   adapterName: ContractAdapterNames,

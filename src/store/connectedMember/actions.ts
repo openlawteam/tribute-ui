@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import {BURN_ADDRESS} from '../../util/constants';
 import {ConnectedMemberState} from '../connectedMember/types';
 import {ContractsStateEntry} from '../contracts/types';
-import {DaoRegistry} from '../../../abi-types/DaoRegistry';
+import {DaoRegistry} from '../../abis/types/DaoRegistry';
 import {hasFlag, multicall} from '../../components/web3/helpers';
 import {MemberFlag} from '../../components/web3/types';
 import {normalizeString} from '../../util/helpers';

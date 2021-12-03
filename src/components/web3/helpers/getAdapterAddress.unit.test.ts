@@ -2,10 +2,10 @@ import {AbiItem} from 'web3-utils/types';
 
 import {ContractAdapterNames} from '../types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
-import {DaoRegistry} from '../../../../abi-types/DaoRegistry';
+import {DaoRegistry} from '../../../abis/types/DaoRegistry';
 import {DEFAULT_ETH_ADDRESS, getWeb3Instance} from '../../../test/helpers';
 import {getAdapterAddress} from '.';
-import DaoRegistryABI from '../../../abis/DaoRegistry.json';
+import DaoRegistryABI from '../../../abis/tribute-contracts/DaoRegistry.json';
 
 describe('getAdapterAddress unit tests', () => {
   test('should return correct address', async () => {
