@@ -389,7 +389,7 @@ describe('OffchainVotingAction unit tests', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          /your member address is delegated to 0xE11BA\.\.\.82d\. You must use that address to vote\./i
+          /your member address is delegated to 0xE11BA\.\.\.882d\. You must use that address to vote\./i
         )
       ).toBeInTheDocument();
     });
