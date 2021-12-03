@@ -82,7 +82,7 @@
   },
   "scripts": {
     "build": "npm run compile && react-scripts build",
-    "compile": "rimraf build && mkdir -p build/contracts && cp -r node_modules/tribute-contracts/contracts/** build/contracts && hardhat compile",
+    "compile": "rimraf build && mkdir -p build/contracts && cp -r node_modules/tribute-contracts/contracts/** build/contracts && hardhat clean && hardhat compile",
     "eject": "react-scripts eject",
     "postinstall": "npm run compile",
     "release": "np",
