@@ -53,13 +53,10 @@
       20px,
       28px
     ); /* min font-size 1.25rem, max 1.75rem */
+    @include text-truncate;
     font-weight: bold;
     margin: 0 0 1.5rem;
     letter-spacing: 1px;
-    // ellipsis overflow
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   @include size-medium-down {
