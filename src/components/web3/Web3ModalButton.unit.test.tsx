@@ -3,6 +3,8 @@ import Core from 'web3modal';
 import userEvent from '@testing-library/user-event';
 
 import {CHAINS} from '../../config';
+import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
+import {REVERSE_RECORDS_ADDRESS} from './helpers';
 import {truncateEthAddress} from '../../util/helpers';
 import Web3ModalButton from './Web3ModalButton';
 import Wrapper from '../../test/Wrapper';
@@ -39,6 +41,36 @@ describe('Web3ModalButton unit tests', () => {
     await waitFor(() => {
       expect(screen.getByText(/connect/i)).toBeInTheDocument();
     });
+  });
+
+  test('should render button with ENS name', async () => {
+    // Set up `ReverseRecords` contract address for testing
+    REVERSE_RECORDS_ADDRESS[1337] = DEFAULT_ETH_ADDRESS;
+
+    render(
+      <Wrapper
+        useWallet
+        getProps={(p) => {
+          // Mock the `ReverseRecords.getNames` response
+          p.mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter('string[]', ['someone.eth'])
+          );
+        }}
+        web3ModalContext={{
+          web3Modal: {cachedProvider: 'injected'} as Core,
+        }}>
+        <Web3ModalButton />
+      </Wrapper>
+    );
+
+    // Assert connected
+    await waitFor(() => {
+      expect(screen.getByText(/^someone\.eth$/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/^metamask logo/i)).toBeInTheDocument();
+    });
+
+    // Cleanup
+    delete REVERSE_RECORDS_ADDRESS[1337];
   });
 
   test('should render custom wallet text (`String`)', async () => {
