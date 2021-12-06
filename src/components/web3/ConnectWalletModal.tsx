@@ -136,6 +136,7 @@ export default function ConnectWalletModal(
     }
   }, [isOpen, memberProfilePath, onRequestClose, pathname, previousPathname]);
 
+  // Set eth addresses to ENS reverse resolve
   useEffect(() => {
     if (!account) return;
 
