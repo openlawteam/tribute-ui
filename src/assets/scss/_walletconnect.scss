@@ -1,5 +1,6 @@
 @use "./variables" as *; /* load without namespace for convenience */
 @use "./button";
+@use "./mixins" as *;
 
 .walletconnect__options {
   display: grid;
@@ -59,6 +60,11 @@
   vertical-align: middle;
 }
 
+.walletconnect__connected-address {
+  display: flex;
+  justify-content: center;
+}
+
 .walletconnect__connected-address-text {
   display: inline-block;
   background-color: rgba(214, 216, 218, 0.2);
@@ -67,6 +73,7 @@
   margin: 1rem 0;
   font-family: $font-accent;
   padding: 0.5rem;
+  @include text-truncate;
 }
 
 .walletconnect__disconnect-link-button {
@@ -106,6 +113,8 @@
 
     &--ethAddress {
       text-transform: none;
+      max-width: 8em;
+      @include text-truncate;
     }
   }
 }

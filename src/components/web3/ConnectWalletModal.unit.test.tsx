@@ -10,6 +10,7 @@ import {
 } from '../../store/actions';
 import {CHAINS} from '../../config';
 import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
+import {REVERSE_RECORDS_ADDRESS} from './helpers';
 import {StoreState} from '../../store/types';
 import {useEffect} from 'react';
 import {useHistory, useLocation} from 'react-router';
@@ -73,6 +74,184 @@ describe('ConnectWalletModal unit tests', () => {
       expect(screen.getByText(/^walletconnect$/i)).toBeInTheDocument();
       expect(screen.getByText(/^disconnect wallet$/i)).toBeInTheDocument();
     });
+  });
+
+  test('should show ENS address', async () => {
+    // Set up `ReverseRecords` contract address for testing
+    REVERSE_RECORDS_ADDRESS[1337] = DEFAULT_ETH_ADDRESS;
+
+    let store: Store;
+
+    function TestApp() {
+      const dispatch = useDispatch();
+
+      const isOpen = useSelector(
+        ({connectModal}: StoreState) => connectModal.isOpen
+      );
+
+      return (
+        <ConnectWalletModal
+          modalProps={{
+            isOpen,
+            onRequestClose: () => {
+              dispatch(connectModalClose());
+            },
+          }}
+        />
+      );
+    }
+
+    render(
+      <Wrapper
+        useWallet
+        getProps={(p) => {
+          store = p.store;
+
+          // Mock the `ReverseRecords.getNames` response
+          p.mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter('string[]', ['someone.eth'])
+          );
+        }}>
+        <TestApp />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      store.dispatch(connectModalOpen());
+    });
+
+    // Assert ENS
+    await waitFor(() => {
+      expect(screen.getByText(/^someone\.eth$/i)).toBeInTheDocument();
+    });
+
+    // Cleanup
+    delete REVERSE_RECORDS_ADDRESS[1337];
+  });
+
+  test('should show "copy" tooltip for account address', async () => {
+    let store: Store;
+
+    function TestApp() {
+      const dispatch = useDispatch();
+
+      const isOpen = useSelector(
+        ({connectModal}: StoreState) => connectModal.isOpen
+      );
+
+      return (
+        <ConnectWalletModal
+          modalProps={{
+            isOpen,
+            onRequestClose: () => {
+              dispatch(connectModalClose());
+            },
+          }}
+        />
+      );
+    }
+
+    const {getByText} = render(
+      <Wrapper
+        useWallet
+        getProps={(p) => {
+          store = p.store;
+        }}>
+        <TestApp />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      store.dispatch(connectModalOpen());
+    });
+
+    // Assert account
+    await waitFor(() => {
+      expect(screen.getByText(DEFAULT_ETH_ADDRESS)).toBeInTheDocument();
+    });
+
+    userEvent.click(getByText(DEFAULT_ETH_ADDRESS));
+
+    // Assert tooltip text
+    await waitFor(() => {
+      expect(getByText(/copied!/i)).toBeInTheDocument();
+    });
+
+    // Assert tooltip text reset
+    await waitFor(
+      () => {
+        expect(getByText(/copy/i)).toBeInTheDocument();
+      },
+      {timeout: 5000}
+    );
+  });
+
+  test('should show "copy" tooltip for ENS address', async () => {
+    // Set up `ReverseRecords` contract address for testing
+    REVERSE_RECORDS_ADDRESS[1337] = DEFAULT_ETH_ADDRESS;
+
+    let store: Store;
+
+    function TestApp() {
+      const dispatch = useDispatch();
+
+      const isOpen = useSelector(
+        ({connectModal}: StoreState) => connectModal.isOpen
+      );
+
+      return (
+        <ConnectWalletModal
+          modalProps={{
+            isOpen,
+            onRequestClose: () => {
+              dispatch(connectModalClose());
+            },
+          }}
+        />
+      );
+    }
+
+    const {getByText} = render(
+      <Wrapper
+        useWallet
+        getProps={(p) => {
+          store = p.store;
+
+          // Mock the `ReverseRecords.getNames` response
+          p.mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter('string[]', ['someone.eth'])
+          );
+        }}>
+        <TestApp />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      store.dispatch(connectModalOpen());
+    });
+
+    // Assert ENS
+    await waitFor(() => {
+      expect(screen.getByText(/^someone\.eth$/i)).toBeInTheDocument();
+    });
+
+    userEvent.click(getByText(/^someone\.eth$/i));
+
+    // Assert tooltip text
+    await waitFor(() => {
+      expect(getByText(/copied!/i)).toBeInTheDocument();
+    });
+
+    // Assert tooltip text reset
+    await waitFor(
+      () => {
+        expect(getByText(/someone\.eth \(.*\)/i)).toBeInTheDocument();
+      },
+      {timeout: 5000}
+    );
+
+    // Cleanup
+    delete REVERSE_RECORDS_ADDRESS[1337];
   });
 
   test('should close modal', async () => {

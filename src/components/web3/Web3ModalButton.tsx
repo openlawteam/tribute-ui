@@ -1,9 +1,10 @@
 import {isMobile} from '@walletconnect/browser-utils';
 import {useDispatch} from 'react-redux';
+import {useEffect} from 'react';
 
 import {connectModalOpen} from '../../store/actions';
-import {truncateEthAddress} from '../../util/helpers';
-import {useIsDefaultChain} from './hooks';
+import {normalizeString, truncateEthAddress} from '../../util/helpers';
+import {useENSName, useIsDefaultChain} from './hooks';
 import {useWeb3Modal} from './hooks';
 import {WalletIcon} from './';
 
@@ -28,8 +29,10 @@ export default function ConnectWalletButton({
    */
 
   const {account, connected, web3Modal} = useWeb3Modal();
-
   const {isDefaultChain} = useIsDefaultChain();
+
+  const [ensReverseResolvedAddresses, setAddressesToENSReverseResolve] =
+    useENSName();
 
   /**
    * Their hooks
@@ -41,7 +44,24 @@ export default function ConnectWalletButton({
    * Variables
    */
 
+  const [ensName] = ensReverseResolvedAddresses;
   const isWrongNetwork: boolean = isDefaultChain === false;
+
+  const ensNameFound: boolean =
+    account && normalizeString(ensName) !== normalizeString(account)
+      ? true
+      : false;
+
+  /**
+   * Effects
+   */
+
+  // Set eth addresses to ENS reverse resolve
+  useEffect(() => {
+    if (!account) return;
+
+    setAddressesToENSReverseResolve([account]);
+  }, [account, setAddressesToENSReverseResolve]);
 
   /**
    * Functions
@@ -55,7 +75,7 @@ export default function ConnectWalletButton({
     }
 
     if (account) {
-      return truncateEthAddress(account);
+      return ensNameFound ? ensName : truncateEthAddress(account);
     }
 
     return 'Connect';

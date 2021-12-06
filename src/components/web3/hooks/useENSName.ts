@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import Web3 from 'web3';
 
-import {reverseResolveENS} from '../helpers/reverseResolveENS';
+import {reverseResolveENS} from '../helpers';
 import {useWeb3Modal} from '.';
 
 export function useENSName(): [
