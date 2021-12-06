@@ -35,6 +35,8 @@ type CopyWithTooltipRenderProps = {
   tooltipID: string;
 };
 
+const DELAY_TOOLTIP_SHOW_MS: number = 200;
+
 export function CopyWithTooltip(props: CopyWithTooltipProps): JSX.Element {
   const {
     copySuccessResetMs = 3000,
@@ -91,7 +93,7 @@ export function CopyWithTooltip(props: CopyWithTooltipProps): JSX.Element {
       })}
 
       <ReactTooltip
-        delayShow={200}
+        delayShow={DELAY_TOOLTIP_SHOW_MS}
         effect="solid"
         {...tooltipProps}
         afterHide={(args) => {
