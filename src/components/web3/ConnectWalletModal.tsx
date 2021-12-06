@@ -5,16 +5,16 @@ import {usePrevious} from 'react-use';
 import {useSelector} from 'react-redux';
 
 import {CHAINS} from '../../config';
+import {CopyWithTooltip} from '../common/CopyWithTooltip';
 import {CycleEllipsis} from '../feedback';
 import {StoreState} from '../../store/types';
-import {truncateEthAddress} from '../../util/helpers';
-import {useIsDefaultChain} from './hooks';
+import {useENSName, useIsDefaultChain} from './hooks';
 import {useWeb3Modal} from './hooks';
 import {WalletIcon} from '.';
 import LoaderLarge from '../feedback/LoaderLarge';
 import Modal from '../common/Modal';
-
 import TimesSVG from '../../assets/svg/TimesSVG';
+import {normalizeString} from '../../util/helpers';
 
 type ConnectWalletModalProps = {
   modalProps: {
@@ -63,6 +63,9 @@ export default function ConnectWalletModal(
 
   const {defaultChainError, isDefaultChain} = useIsDefaultChain();
 
+  const [ensReverseResolvedAddresses, setAddressesToENSReverseResolve] =
+    useENSName();
+
   /**
    * Their hooks
    */
@@ -77,6 +80,12 @@ export default function ConnectWalletModal(
   const isWrongNetwork: boolean = isDefaultChain === false;
   const isChainGanache = networkId === CHAINS.GANACHE;
   const memberProfilePath: string = `/members/${connectedMemberAddress}`;
+  const [ensName] = ensReverseResolvedAddresses;
+
+  const ensNameFound: boolean =
+    account && normalizeString(ensName) !== normalizeString(account)
+      ? true
+      : false;
 
   const displayOptions: JSX.Element[] = Object.entries(providerOptions)
     // If mobile, filter-out `"injected"`
@@ -126,6 +135,12 @@ export default function ConnectWalletModal(
       setTimeout(onRequestClose, 0);
     }
   }, [isOpen, memberProfilePath, onRequestClose, pathname, previousPathname]);
+
+  useEffect(() => {
+    if (!account) return;
+
+    setAddressesToENSReverseResolve([account]);
+  }, [account, setAddressesToENSReverseResolve]);
 
   /**
    * Functions
@@ -214,10 +229,26 @@ export default function ConnectWalletModal(
 
         {/* CONNECTED ACCOUNT TEXT */}
         {account && (
-          <div>
-            <span className="walletconnect__connected-address-text">
-              {truncateEthAddress(account, 7)}
-            </span>
+          <div className="walletconnect__connected-address">
+            <CopyWithTooltip
+              render={({elementRef, isCopied, setCopied, tooltipID}) => (
+                <span
+                  className="walletconnect__connected-address-text"
+                  data-for={tooltipID}
+                  data-tip={
+                    isCopied
+                      ? 'copied!'
+                      : ensNameFound
+                      ? `${ensName} (${account})`
+                      : 'copy'
+                  }
+                  onClick={setCopied}
+                  ref={elementRef}>
+                  {ensName || account}
+                </span>
+              )}
+              textToCopy={account}
+            />
           </div>
         )}
 
