@@ -129,7 +129,7 @@ describe('useCheckApplicant unit tests', () => {
         // assert FULFILLED state
         expect(result.current.checkApplicantError).toBe(undefined);
         expect(result.current.checkApplicantInvalidMsg).toMatch(
-          /The applicant address 0x00000...ead is invalid because it is a DAO reserved address\./i
+          /The applicant address 0x00000...dead is invalid because it is a DAO reserved address\./i
         );
         expect(result.current.checkApplicantStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.isApplicantValid).toBe(false);
@@ -179,7 +179,7 @@ describe('useCheckApplicant unit tests', () => {
         // assert FULFILLED state
         expect(result.current.checkApplicantError).toBe(undefined);
         expect(result.current.checkApplicantInvalidMsg).toMatch(
-          /The applicant address 0x00000...000 is invalid\./i
+          /The applicant address 0x00000...0000 is invalid\./i
         );
         expect(result.current.checkApplicantStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.isApplicantValid).toBe(false);
@@ -232,7 +232,7 @@ describe('useCheckApplicant unit tests', () => {
         // assert FULFILLED state
         expect(result.current.checkApplicantError).toBe(undefined);
         expect(result.current.checkApplicantInvalidMsg).toMatch(
-          /The applicant address 0x04028...11D is already in use as a delegate key. The address must be removed as a delegate before it can become a member\./i
+          /The applicant address 0x04028...211D is already in use as a delegate key. The address must be removed as a delegate before it can become a member\./i
         );
         expect(result.current.checkApplicantStatus).toBe(AsyncStatus.FULFILLED);
         expect(result.current.isApplicantValid).toBe(false);

@@ -104,17 +104,11 @@ $map-grid-props: (
 
 .grid__cards {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  column-gap: 30px;
-  row-gap: 30px;
-  margin-bottom: 2.75rem;
-
-  @media only screen and (max-width: em($bp-lg)) {
-    grid-template-columns: 1fr 1fr;
-  }
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  column-gap: 2em;
+  row-gap: 2em;
 
   @media only screen and (max-width: em($bp-sm)) {
-    grid-template-columns: 1fr;
-    margin-bottom: 2rem;
+    row-gap: 1em;
   }
 }

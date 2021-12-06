@@ -122,7 +122,7 @@ describe('RedeemManager unit tests', () => {
     ).toBeInTheDocument();
 
     expect(await screen.findByText(/recipient/i)).toBeInTheDocument();
-    expect(await screen.findByText(/^0x04028/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^0x040\.\.\.211D/i)).toBeInTheDocument();
     expect(await screen.findByText(/^10,000/i)).toBeInTheDocument();
 
     await waitFor(() => {

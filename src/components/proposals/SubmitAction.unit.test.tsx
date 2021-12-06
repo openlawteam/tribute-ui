@@ -428,7 +428,7 @@ describe('SubmitAction unit tests', () => {
     // Disabled reason
     expect(
       screen.getByText(
-        /the applicant address 0x04028\.\.\.11d is already in use as a delegate key\. the address must be removed as a delegate before it can become a member\./i
+        /the applicant address 0x04028\.\.\.211d is already in use as a delegate key\. the address must be removed as a delegate before it can become a member\./i
       )
     ).toBeInTheDocument();
   });

@@ -3,8 +3,8 @@ import {useCallback, useEffect, useState} from 'react';
 import {Web3Provider} from '@ethersproject/providers';
 
 import {isPossibleContractWallet} from '../../../util/helpers';
-import Web3 from 'web3';
 import {useIsMounted} from '../../../hooks';
+import Web3 from 'web3';
 
 const INITIAL_MAYBE_CONTRACT_WALLET_STATE: boolean = false;
 

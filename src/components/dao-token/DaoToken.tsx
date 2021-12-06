@@ -1,3 +1,6 @@
+import ReactTooltip from 'react-tooltip';
+
+import {CopyWithTooltip} from '../common/CopyWithTooltip';
 import {truncateEthAddress} from '../../util/helpers/truncateEthAddress';
 import CopySVG from '../../assets/svg/CopySVG';
 import WalletSVG from '../../assets/svg/WalletSVG';
@@ -36,25 +39,6 @@ export default function DaoToken({
     }
   }
 
-  function copyAddressToClipboard() {
-    if (!daoTokenDetails) return;
-
-    const copyText = document.createElement('input');
-    document.body.appendChild(copyText);
-    copyText.setAttribute('value', daoTokenDetails.address);
-    copyText.select();
-    document.execCommand('copy');
-    document.body.removeChild(copyText);
-
-    const tooltip = document.getElementById('copyTooltip');
-    (tooltip as HTMLElement).innerHTML = 'copied!';
-  }
-
-  function resetCopyTooltip() {
-    const tooltip = document.getElementById('copyTooltip');
-    (tooltip as HTMLElement).innerHTML = 'copy address';
-  }
-
   /**
    * Render
    */
@@ -62,24 +46,43 @@ export default function DaoToken({
   if (daoTokenDetails) {
     return (
       <div>
-        Token: <span>{truncateEthAddress(daoTokenDetails.address, 7)}</span>
-        <div className="daotoken__tooltip">
-          <button
-            className="daotoken__button"
-            onClick={copyAddressToClipboard}
-            onMouseLeave={resetCopyTooltip}>
-            <span className="daotoken__tooltiptext" id="copyTooltip">
-              copy address
+        Token:{' '}
+        <CopyWithTooltip
+          render={({elementRef, isCopied, setCopied, tooltipID}) => (
+            <span
+              data-for={tooltipID}
+              data-tip={isCopied ? 'copied!' : daoTokenDetails.address}
+              onClick={setCopied}
+              ref={elementRef}>
+              {truncateEthAddress(daoTokenDetails.address, 5)}
             </span>
-            <CopySVG />
-          </button>
-        </div>
-        <div className="daotoken__tooltip">
-          <button className="daotoken__button" onClick={addTokenToWallet}>
-            <span className="daotoken__tooltiptext">add to wallet</span>
-            <WalletSVG />
-          </button>
-        </div>
+          )}
+          textToCopy={daoTokenDetails.address}
+        />
+        <ReactTooltip effect="solid" id="daotoken-address" />
+        {/* Copy */}
+        <CopyWithTooltip
+          render={({elementRef, isCopied, setCopied, tooltipID}) => (
+            <button
+              className="daotoken__button"
+              data-for={tooltipID}
+              data-tip={isCopied ? 'copied!' : 'copy address'}
+              onClick={setCopied}
+              ref={elementRef}>
+              <CopySVG aria-label="copy address" />
+            </button>
+          )}
+          textToCopy={daoTokenDetails.address}
+        />
+        {/* Wallet */}
+        <button
+          className="daotoken__button"
+          data-for="daotoken-wallet"
+          data-tip="add to wallet"
+          onClick={addTokenToWallet}>
+          <WalletSVG aria-label="add to wallet" />
+        </button>
+        <ReactTooltip delayShow={200} effect="solid" id="daotoken-wallet" />
       </div>
     );
   }

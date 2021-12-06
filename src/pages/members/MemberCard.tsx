@@ -1,8 +1,11 @@
 import {Link} from 'react-router-dom';
-import {Member} from './types';
+import {v4 as uuidv4} from 'uuid';
 
-import {truncateEthAddress} from '../../util/helpers';
+import {Member} from './types';
+import {normalizeString} from '../../util/helpers';
+import {useRef} from 'react';
 import {useWeb3Modal} from '../../components/web3/hooks';
+import ReactTooltip from 'react-tooltip';
 
 type MemberCardProps = {
   member: Member;
@@ -12,7 +15,7 @@ type MemberCardProps = {
 const DEFAULT_CARD_LINK: string = '#';
 
 /**
- * Shows a preview of a members's profile
+ * Shows a preview of a member's profile
  *
  * @param {MemberCardProps} props
  * @returns {JSX.Element}
@@ -27,6 +30,22 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
   const {account} = useWeb3Modal();
 
   /**
+   * Refs
+   */
+
+  const tooltipIDRef = useRef<string>(uuidv4());
+
+  /**
+   * Variables
+   */
+
+  const ensNameFound: boolean =
+    member?.addressENS &&
+    normalizeString(member?.addressENS) !== normalizeString(member?.address)
+      ? true
+      : false;
+
+  /**
    * Render
    */
 
@@ -34,14 +53,28 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
     <Link className={'membercard__link'} to={to}>
       <div
         className={`membercard ${
-          account && account.toLowerCase() === member.address.toLowerCase()
+          account &&
+          normalizeString(account) === normalizeString(member.address)
             ? `membercard--connected-account`
             : ''
         }`}>
         {/* TITLE */}
-        <h3 className="membercard__title">
-          {truncateEthAddress(member.address, 7)}
+        <h3
+          className="membercard__title"
+          data-for={tooltipIDRef.current}
+          data-tip={
+            ensNameFound
+              ? `${member.addressENS} (${member.address})`
+              : member.address
+          }>
+          {member?.addressENS || member.address}
         </h3>
+
+        <ReactTooltip
+          delayShow={200}
+          effect="solid"
+          id={tooltipIDRef.current}
+        />
       </div>
     </Link>
   );

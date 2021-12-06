@@ -1,33 +1,30 @@
 import {useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 
-import {AsyncStatus} from '../../util/types';
-import {Member} from './types';
-import {
-  truncateEthAddress,
-  normalizeString,
-  formatNumber,
-} from '../../util/helpers';
 import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
+import {AsyncStatus} from '../../util/types';
+import {CopyWithTooltip} from '../../components/common/CopyWithTooltip';
+import {formatNumber, normalizeString} from '../../util/helpers';
+import {Member} from './types';
+import {useDaoTokenDetails} from '../../components/dao-token/hooks';
+import {useDaoTotalUnits} from '../../hooks';
+import DaoToken from '../../components/dao-token/DaoToken';
+import Delegation from './Delegation';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import LoaderLarge from '../../components/feedback/LoaderLarge';
 import useMembers from './hooks/useMembers';
 import Wrap from '../../components/common/Wrap';
-import {useDaoTokenDetails} from '../../components/dao-token/hooks';
-import DaoToken from '../../components/dao-token/DaoToken';
-import {useDaoTotalUnits} from '../../hooks';
-import Delegation from './Delegation';
 
 export default function MemberProfile() {
   /**
    * Our hooks
    */
 
-  const {members, membersError, membersStatus} = useMembers();
-  const {defaultChainError} = useIsDefaultChain();
   const {account} = useWeb3Modal();
   const {daoTokenDetails, daoTokenDetailsStatus} = useDaoTokenDetails();
+  const {defaultChainError} = useIsDefaultChain();
+  const {members, membersError, membersStatus} = useMembers();
   const {totalUnits, totalUnitsStatus} = useDaoTotalUnits();
 
   /**
@@ -48,6 +45,7 @@ export default function MemberProfile() {
    * Effects
    */
 
+  // Set member details
   useEffect(() => {
     if (membersStatus !== AsyncStatus.FULFILLED) return;
 
@@ -57,6 +55,7 @@ export default function MemberProfile() {
     );
 
     setMemberDetails(activeMember);
+
     if (!activeMember) {
       setMemberNotFound(true);
     }
@@ -66,6 +65,16 @@ export default function MemberProfile() {
    * Variables
    */
 
+  const error: Error | undefined = membersError || defaultChainError;
+  const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
+
+  const ensNameFound: boolean =
+    memberDetails?.addressENS &&
+    normalizeString(memberDetails?.addressENS) !==
+      normalizeString(memberDetails?.address)
+      ? true
+      : false;
+
   const isLoading: boolean =
     membersStatus === AsyncStatus.STANDBY ||
     membersStatus === AsyncStatus.PENDING ||
@@ -73,14 +82,14 @@ export default function MemberProfile() {
     daoTokenDetailsStatus === AsyncStatus.PENDING ||
     totalUnitsStatus === AsyncStatus.STANDBY ||
     totalUnitsStatus === AsyncStatus.PENDING;
-  const isLoadingDone: boolean = membersStatus === AsyncStatus.FULFILLED;
-  const error: Error | undefined = membersError || defaultChainError;
+
   const isCurrentMemberConnected: boolean =
     account &&
     memberDetails &&
     normalizeString(account) === normalizeString(memberDetails.address)
       ? true
       : false;
+
   const votingWeight =
     memberDetails && typeof totalUnits === 'number'
       ? ((Number(memberDetails.units) / totalUnits) * 100).toFixed(2)
@@ -193,7 +202,25 @@ export default function MemberProfile() {
 
             <div className="memberprofile__left-column">
               {/* MEMBER ADDRESS */}
-              <h3>{truncateEthAddress(memberDetails.address, 7)}</h3>
+              <CopyWithTooltip
+                render={({elementRef, isCopied, setCopied, tooltipID}) => (
+                  <h3 onClick={setCopied}>
+                    <span
+                      data-for={tooltipID}
+                      data-tip={
+                        isCopied
+                          ? 'copied!'
+                          : ensNameFound
+                          ? `${memberDetails.addressENS} (${memberDetails.address})`
+                          : 'copy'
+                      }
+                      ref={elementRef}>
+                      {memberDetails.addressENS || memberDetails.address}
+                    </span>
+                  </h3>
+                )}
+                textToCopy={memberDetails.address}
+              />
 
               {/* MEMBER INFO */}
               {renderMemberInfo()}
