@@ -113,6 +113,8 @@
 
     &--ethAddress {
       text-transform: none;
+      max-width: 8em;
+      @include text-truncate;
     }
   }
 }
