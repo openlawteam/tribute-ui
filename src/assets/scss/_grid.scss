@@ -107,6 +107,7 @@ $map-grid-props: (
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   column-gap: 2em;
   row-gap: 2em;
+  margin-bottom: 2.75rem;
 
   @media only screen and (max-width: em($bp-sm)) {
     row-gap: 1em;
