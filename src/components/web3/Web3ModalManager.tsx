@@ -8,6 +8,8 @@ import useWeb3ModalManager, {
 } from './hooks/useWeb3ModalManager';
 import {AsyncStatus} from '../../util/types';
 import {ETHEREUM_PROVIDER_URL} from '../../config';
+import {normalizeString} from '../../util/helpers';
+import {useENSName} from './hooks';
 
 type Web3ModalProviderArguments = {
   defaultChain?: number;
@@ -33,6 +35,7 @@ type Web3ModalManagerProps = {
 
 export type Web3ModalContextValue = {
   account: string | undefined;
+  accountENS?: string;
   connected: boolean | undefined;
   connectWeb3Modal: (providerName: string) => void;
   disconnectWeb3Modal: () => void;
@@ -119,6 +122,20 @@ export default function Web3ModalManager({
     web3Modal,
   } = useWeb3ModalManager(web3ModalProviderArguments);
 
+  const [ensReverseResolvedAddresses, setAddressesToENSReverseResolve] =
+    useENSName(web3Instance);
+
+  /**
+   * Variables
+   */
+
+  const [ensName] = ensReverseResolvedAddresses;
+
+  const accountENS: string | undefined =
+    ensName && normalizeString(ensName) !== normalizeString(account)
+      ? ensName
+      : undefined;
+
   /**
    * Effects
    */
@@ -136,12 +153,20 @@ export default function Web3ModalManager({
     }
   }, [connected, initialCachedConnectorCheckStatus]);
 
+  // Set eth addresses to ENS reverse resolve
+  useEffect(() => {
+    if (!account) return;
+
+    setAddressesToENSReverseResolve([account]);
+  }, [account, setAddressesToENSReverseResolve]);
+
   /**
    * Render
    */
 
   const web3ModalContext: Web3ModalContextValue = {
     account,
+    accountENS,
     connected,
     connectWeb3Modal,
     disconnectWeb3Modal,

@@ -8,13 +8,12 @@ import {CHAINS} from '../../config';
 import {CopyWithTooltip} from '../common/CopyWithTooltip';
 import {CycleEllipsis} from '../feedback';
 import {StoreState} from '../../store/types';
-import {useENSName, useIsDefaultChain} from './hooks';
+import {useIsDefaultChain} from './hooks';
 import {useWeb3Modal} from './hooks';
 import {WalletIcon} from '.';
 import LoaderLarge from '../feedback/LoaderLarge';
 import Modal from '../common/Modal';
 import TimesSVG from '../../assets/svg/TimesSVG';
-import {normalizeString} from '../../util/helpers';
 
 type ConnectWalletModalProps = {
   modalProps: {
@@ -53,6 +52,7 @@ export default function ConnectWalletModal(
     // @todo Use and handle error in the UI
     // error,
     account,
+    accountENS,
     connected,
     connectWeb3Modal,
     disconnectWeb3Modal,
@@ -62,9 +62,6 @@ export default function ConnectWalletModal(
   } = useWeb3Modal();
 
   const {defaultChainError, isDefaultChain} = useIsDefaultChain();
-
-  const [ensReverseResolvedAddresses, setAddressesToENSReverseResolve] =
-    useENSName();
 
   /**
    * Their hooks
@@ -80,12 +77,6 @@ export default function ConnectWalletModal(
   const isWrongNetwork: boolean = isDefaultChain === false;
   const isChainGanache = networkId === CHAINS.GANACHE;
   const memberProfilePath: string = `/members/${connectedMemberAddress}`;
-  const [ensName] = ensReverseResolvedAddresses;
-
-  const ensNameFound: boolean =
-    account && normalizeString(ensName) !== normalizeString(account)
-      ? true
-      : false;
 
   const displayOptions: JSX.Element[] = Object.entries(providerOptions)
     // If mobile, filter-out `"injected"`
@@ -135,13 +126,6 @@ export default function ConnectWalletModal(
       setTimeout(onRequestClose, 0);
     }
   }, [isOpen, memberProfilePath, onRequestClose, pathname, previousPathname]);
-
-  // Set eth addresses to ENS reverse resolve
-  useEffect(() => {
-    if (!account) return;
-
-    setAddressesToENSReverseResolve([account]);
-  }, [account, setAddressesToENSReverseResolve]);
 
   /**
    * Functions
@@ -239,13 +223,13 @@ export default function ConnectWalletModal(
                   data-tip={
                     isCopied
                       ? 'copied!'
-                      : ensNameFound
-                      ? `${ensName} (${account})`
+                      : accountENS
+                      ? `${accountENS} (${account})`
                       : 'copy'
                   }
                   onClick={setCopied}
                   ref={elementRef}>
-                  {ensName || account}
+                  {accountENS || account}
                 </span>
               )}
               textToCopy={account}

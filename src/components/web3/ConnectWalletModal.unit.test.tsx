@@ -2,6 +2,7 @@ import {render, screen, waitFor} from '@testing-library/react';
 import {Store} from 'redux';
 import {useDispatch, useSelector} from 'react-redux';
 import userEvent from '@testing-library/user-event';
+import Web3 from 'web3';
 
 import {
   connectModalClose,
@@ -9,7 +10,7 @@ import {
   setConnectedMember,
 } from '../../store/actions';
 import {CHAINS} from '../../config';
-import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
+import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../test/helpers';
 import {REVERSE_RECORDS_ADDRESS} from './helpers';
 import {StoreState} from '../../store/types';
 import {useEffect} from 'react';
@@ -104,13 +105,9 @@ describe('ConnectWalletModal unit tests', () => {
     render(
       <Wrapper
         useWallet
+        web3ModalContext={{accountENS: 'someone.eth'}}
         getProps={(p) => {
           store = p.store;
-
-          // Mock the `ReverseRecords.getNames` response
-          p.mockWeb3Provider.injectResult(
-            p.web3Instance.eth.abi.encodeParameter('string[]', ['someone.eth'])
-          );
         }}>
         <TestApp />
       </Wrapper>
@@ -214,6 +211,7 @@ describe('ConnectWalletModal unit tests', () => {
     const {getByText} = render(
       <Wrapper
         useWallet
+        web3ModalContext={{accountENS: 'someone.eth'}}
         getProps={(p) => {
           store = p.store;
 

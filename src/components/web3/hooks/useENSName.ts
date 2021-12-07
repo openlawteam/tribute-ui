@@ -2,12 +2,18 @@ import {useCallback, useEffect, useState} from 'react';
 import Web3 from 'web3';
 
 import {reverseResolveENS} from '../helpers';
-import {useWeb3Modal} from '.';
 
-export function useENSName(): [
-  state: string[],
-  setState: (a: string[]) => void
-] {
+/**
+ * A hook to reverse resolve ENS addresses by setting
+ * the addresses, using the returned callback, and then receving
+ * the response.
+ *
+ * @param web3Instance `Web3`
+ * @returns `[state: string[], setState: (a: string[]) => void]`
+ */
+export function useENSName(
+  web3Instance: Web3 | undefined
+): [state: string[], setState: (a: string[]) => void] {
   /**
    * State
    */
@@ -17,12 +23,6 @@ export function useENSName(): [
   const [reverseResolvedAddresses, setReverseResolvedAddresses] = useState<
     string[]
   >([]);
-
-  /**
-   * Our hooks
-   */
-
-  const {web3Instance} = useWeb3Modal();
 
   /**
    * Cached callbacks
