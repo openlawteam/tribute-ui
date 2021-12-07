@@ -57,6 +57,7 @@ describe('Web3ModalButton unit tests', () => {
           );
         }}
         web3ModalContext={{
+          accountENS: 'someone.eth',
           web3Modal: {cachedProvider: 'injected'} as Core,
         }}>
         <Web3ModalButton />
