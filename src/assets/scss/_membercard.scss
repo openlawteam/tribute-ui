@@ -2,11 +2,13 @@
 @use "./mixins" as *; /* load without namespace for convenience */
 
 .membercard {
+  align-items: center;
   background-color: $color-background-primary;
   border-radius: 15px;
+  box-shadow: 0 2px 2px 0 $color-shadow-primary;
+  display: flex;
   padding: 2rem;
   position: relative;
-  box-shadow: 0 2px 2px 0 $color-shadow-primary;
 
   &:hover {
     cursor: pointer;
@@ -36,4 +38,18 @@
   &:last-child {
     margin: 0;
   }
+}
+
+.membercard__units {
+  @include fluid-type(
+    $bp-sm,
+    $bp-xl,
+    16px,
+    20px
+  ); /* min font-size 1rem, max 1.25rem */
+  background: $color-shadow-primary;
+  border-radius: 0.25em;
+  font-family: $font-accent;
+  margin-left: 0.25em;
+  padding: 0 0.33em;
 }
