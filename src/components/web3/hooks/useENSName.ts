@@ -36,6 +36,7 @@ export function useENSName(
 
   useEffect(() => {
     if (!web3Instance || !addresses.length) return;
+
     handleGetENSNamesCached(addresses, web3Instance);
   }, [addresses, handleGetENSNamesCached, web3Instance]);
 
