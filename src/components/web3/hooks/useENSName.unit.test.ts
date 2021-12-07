@@ -16,7 +16,7 @@ describe('useENSName unit tests', () => {
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useENSName(),
+        () => useENSName(web3Instance),
         {
           wrapper: Wrapper,
           initialProps: {
@@ -64,7 +64,7 @@ describe('useENSName unit tests', () => {
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useENSName(),
+        () => useENSName(web3Instance),
         {
           wrapper: Wrapper,
           initialProps: {

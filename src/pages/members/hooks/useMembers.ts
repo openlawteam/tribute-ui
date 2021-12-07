@@ -48,7 +48,7 @@ export default function useMembers(): UseMembersReturn {
   const {web3Instance} = useWeb3Modal();
 
   const [ensReverseResolvedAddresses, setAddressesToENSReverseResolve] =
-    useENSName();
+    useENSName(web3Instance);
 
   /**
    * GQL Query
