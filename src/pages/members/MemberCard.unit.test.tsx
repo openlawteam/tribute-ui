@@ -70,15 +70,41 @@ describe('MemberCard unit tests', () => {
   });
 
   test('should render tooltip with member units', async () => {
-    const {getByText} = render(
+    // Assert >1 units
+
+    const {getByText, rerender} = render(
       <Wrapper>
         <MemberCard member={DEFAULT_MEMBER} />
       </Wrapper>
     );
 
-    userEvent.hover(getByText('100,000'));
+    userEvent.hover(getByText(/^100,000$/));
 
-    expect(getByText(/100,000 units/i)).toBeInTheDocument();
+    expect(getByText(/^100,000 units$/i)).toBeInTheDocument();
+
+    // Assert 0 units
+
+    rerender(
+      <Wrapper>
+        <MemberCard member={{...DEFAULT_MEMBER, units: '0'}} />
+      </Wrapper>
+    );
+
+    userEvent.hover(getByText(/^0$/));
+
+    expect(getByText(/^0 units$/i)).toBeInTheDocument();
+
+    // Assert 1 unit
+
+    rerender(
+      <Wrapper>
+        <MemberCard member={{...DEFAULT_MEMBER, units: '1'}} />
+      </Wrapper>
+    );
+
+    userEvent.hover(getByText(/^1$/));
+
+    expect(getByText(/^1 unit$/i)).toBeInTheDocument();
   });
 
   test('should render tooltip with member ens address', async () => {
