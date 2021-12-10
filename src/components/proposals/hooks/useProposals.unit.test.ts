@@ -171,7 +171,7 @@ const mockWeb3Responses: Parameters<typeof Wrapper>[0]['getProps'] = ({
    */
   const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
     {
-      Voting: {
+      VotingDetail: {
         snapshot: 'uint256',
         reporter: 'address',
         resultRoot: 'bytes32',
@@ -395,18 +395,6 @@ describe('useProposals unit tests', () => {
 
       expect(result.current.proposals[1].daoProposalVote).toEqual({
         OffchainVotingContract: {
-          '0': '8376297',
-          '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-          '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-          '3': '1',
-          '4': '0',
-          '5': '1617878162',
-          '6': '1617964640',
-          '7': false,
-          '8': '0',
-          '9': false,
-          '10': '0',
-          __length__: 11,
           snapshot: '8376297',
           reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
           resultRoot:
@@ -701,7 +689,7 @@ describe('useProposals unit tests', () => {
        */
       const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
         {
-          Voting: {
+          VotingDetail: {
             snapshot: 'uint256',
             reporter: 'address',
             resultRoot: 'bytes32',
@@ -848,18 +836,6 @@ describe('useProposals unit tests', () => {
 
       expect(result.current.proposals[1].daoProposalVote).toEqual({
         OffchainVotingContract: {
-          '0': '8376297',
-          '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-          '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-          '3': '1',
-          '4': '0',
-          '5': '1617878162',
-          '6': '1617964640',
-          '7': false,
-          '8': '0',
-          '9': false,
-          '10': '0',
-          __length__: 11,
           snapshot: '8376297',
           reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
           resultRoot:

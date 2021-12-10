@@ -161,8 +161,6 @@ describe('useRedeemCoupon unit tests', () => {
                 ),
                 // For `members` call
                 web3Instance.eth.abi.encodeParameter('uint8', '1'),
-                // For `isActiveMember` call
-                web3Instance.eth.abi.encodeParameter('bool', true),
                 // For `getCurrentDelegateKey` call
                 web3Instance.eth.abi.encodeParameter(
                   'address',
@@ -172,6 +170,10 @@ describe('useRedeemCoupon unit tests', () => {
             ]
           ),
           {debugName: '`getConnectedMember`'}
+        );
+        // For `balanceOf` call
+        mockWeb3Provider.injectResult(
+          web3Instance.eth.abi.encodeParameter('uint160', 100)
         );
       });
 
@@ -338,8 +340,6 @@ describe('useRedeemCoupon unit tests', () => {
                 ),
                 // For `members` call
                 web3Instance.eth.abi.encodeParameter('uint8', '1'),
-                // For `isActiveMember` call
-                web3Instance.eth.abi.encodeParameter('bool', true),
                 // For `getCurrentDelegateKey` call
                 web3Instance.eth.abi.encodeParameter(
                   'address',
@@ -349,6 +349,10 @@ describe('useRedeemCoupon unit tests', () => {
             ]
           ),
           {debugName: '`getConnectedMember`'}
+        );
+        // For `balanceOf` call
+        mockWeb3Provider.injectResult(
+          web3Instance.eth.abi.encodeParameter('uint160', 100)
         );
       });
 

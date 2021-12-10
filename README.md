@@ -66,12 +66,12 @@ NOTE:
 #### Using [Ganache CLI](https://github.com/trufflesuite/ganache-cli) (more stable):
 
 - `npm install -g ganache-cli` (if not already installed)
-- `ganache-cli --port 7545 --networkId 1337 --blockTime 10`
+- `ganache-cli --port 7545 --networkId 1337 --chainId 1337 --blockTime 3`
 
 #### Using [Ganache GUI app](https://www.trufflesuite.com/ganache):
 
 - Change the Network ID to `1337`. That is necessary in order to connect MetaMask to your Ganache network. The DApp is configured for Ganache to be `chainId` `1337`.
-- Turn off Automine and set the Mining Block Time (Seconds) to `10`.
+- Turn off Automine and set the Mining Block Time (Seconds) to `3`.
 
 ---
 

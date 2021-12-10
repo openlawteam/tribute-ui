@@ -423,7 +423,7 @@ export function useProposalWithOffchainVoteStatus({
       )[0];
 
       const voteABI = offchainVotingABI.filter(
-        (item) => item.name === 'votes'
+        (item) => item.name === 'getVote'
       )[0];
 
       const calls: MulticallTuple[] = [
@@ -444,8 +444,22 @@ export function useProposalWithOffchainVoteStatus({
         web3Instance,
       });
 
+      const votesToSet = {
+        snapshot: votes[0],
+        reporter: votes[1],
+        resultRoot: votes[2],
+        nbYes: votes[3],
+        nbNo: votes[4],
+        startingTime: votes[5],
+        gracePeriodStartingTime: votes[6],
+        isChallenged: votes[7],
+        stepRequested: votes[8],
+        forceFailed: votes[9],
+        fallbackVotesCount: votes[10],
+      };
+
       setDAOProposal(proposal);
-      setDAOProposalVote(votes);
+      setDAOProposalVote(votesToSet);
       setDAOProposalVoteResult(voteResult);
       // Set last
       setInitComplete(true);

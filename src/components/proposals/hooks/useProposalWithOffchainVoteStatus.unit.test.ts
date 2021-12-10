@@ -79,7 +79,7 @@ const fakeSnapshotDraft: SnapshotDraft = {
 
 const defaultVotesMock = [
   {
-    Voting: {
+    VotingDetails: {
       snapshot: 'uint256',
       reporter: 'address',
       resultRoot: 'bytes32',
@@ -110,18 +110,6 @@ const defaultVotesMock = [
 ];
 
 const defaultVotesResult = {
-  '0': '8376297',
-  '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-  '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-  '3': '1',
-  '4': '0',
-  '5': '1617878162',
-  '6': '1617964640',
-  '7': false,
-  '8': '0',
-  '9': false,
-  '10': '0',
-  __length__: 11,
   snapshot: '8376297',
   reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
   resultRoot:
@@ -138,7 +126,7 @@ const defaultVotesResult = {
 
 const defaultNoVotesMock = [
   {
-    Voting: {
+    VotingDetails: {
       snapshot: 'uint256',
       reporter: 'address',
       resultRoot: 'bytes32',
@@ -169,18 +157,6 @@ const defaultNoVotesMock = [
 ];
 
 const defaultNoVotesResult = {
-  '0': '0',
-  '1': BURN_ADDRESS,
-  '2': '0x0000000000000000000000000000000000000000000000000000000000000000',
-  '3': '0',
-  '4': '0',
-  '5': '0',
-  '6': '0',
-  '7': false,
-  '8': '0',
-  '9': false,
-  '10': '0',
-  __length__: 11,
   snapshot: '0',
   reporter: BURN_ADDRESS,
   resultRoot:
