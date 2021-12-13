@@ -154,9 +154,11 @@ export function useCheckApplicant(address?: string): UseCheckApplicantReturn {
 
       setCheckApplicantStatus(AsyncStatus.FULFILLED);
     } catch (error) {
+      const e = error as Error;
+
       setIsApplicantValid(undefined);
       setCheckApplicantInvalidMsg(undefined);
-      setCheckApplicantError(error);
+      setCheckApplicantError(e);
       setCheckApplicantStatus(AsyncStatus.REJECTED);
     }
   }

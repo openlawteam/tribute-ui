@@ -25,12 +25,12 @@ import {FormFieldErrors} from '../../util/enums';
 import {getConnectedMember} from '../../store/actions';
 import {getDAOConfigEntry} from '../../components/web3/helpers';
 import {isEthAddressValid} from '../../util/validation';
-import {ETH_TOKEN_ADDRESS, KYC_BACKEND_URL, KYC_FORMS_URL} from '../../config';
+import {ETH_TOKEN_ADDRESS, KYC_FORMS_URL} from '../../config';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
-import {useAbortController} from '../../hooks';
 import {useCheckApplicant} from '../../components/proposals/hooks';
 import {useDaoTokenDetails} from '../../components/dao-token/hooks';
+import {useVerifyKYCApplicant} from '../../components/kyc-onboarding';
 import CycleMessage from '../../components/feedback/CycleMessage';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import EtherscanURL from '../../components/web3/EtherscanURL';
@@ -51,18 +51,10 @@ type FormInputs = {
 };
 
 type OnboardArguments = [
-  string, // `dao`
-  string, // `kycedMember`
-  string // `signature`
+  dao: string, // `dao`
+  kycedMember: string, // `kycedMember`
+  signature: string // `signature`
 ];
-
-type KycCertificate = {
-  signature: string;
-  isWhitelisted: boolean;
-  // `entityType` was used before to determine the minimum contribution amount,
-  // but is no longer needed in the current implementation.
-  // entityType: string;
-};
 
 type KycOnboardingConfigs = {
   chunkSize: string;
@@ -72,6 +64,89 @@ type KycOnboardingConfigs = {
 };
 
 const PLACEHOLDER = '\u2014'; /* em dash */
+
+/**
+ * @todo Move to SASS stylesheet in `tribute-ui`
+ * @todo Use existing SASS variables
+ */
+const FORM_HEADER_MESSAGE_STYLES: React.CSSProperties = {
+  border: ' 1px solid black',
+  padding: '2em 2em 0.875em',
+  textAlign: 'center',
+};
+
+function renderUserAccountBalance(userAccountBalance: string | undefined) {
+  if (!userAccountBalance) {
+    return '---';
+  }
+
+  const balanceToNumber: number = Number(userAccountBalance);
+
+  return Number.isInteger(balanceToNumber)
+    ? userAccountBalance
+    : formatDecimal(balanceToNumber);
+}
+
+function renderUnauthorizedMessage({
+  defaultChainError,
+  isConnected,
+}: {
+  defaultChainError: Error | undefined;
+  isConnected: boolean;
+}) {
+  // user is not connected
+  if (!isConnected) {
+    return 'Connect your wallet to get started.';
+  }
+
+  // user is on wrong network
+  if (defaultChainError) {
+    return defaultChainError.message;
+  }
+}
+
+function renderSubmitStatus({
+  txEtherscanURL,
+  txStatus,
+}: {
+  txEtherscanURL: string;
+  txStatus: Web3TxStatus;
+}): React.ReactNode {
+  switch (txStatus) {
+    case Web3TxStatus.AWAITING_CONFIRM:
+      return (
+        <>
+          Awaiting your confirmation
+          <CycleEllipsis intervalMs={500} />
+        </>
+      );
+    case Web3TxStatus.PENDING:
+      return (
+        <>
+          <CycleMessage
+            intervalMs={2000}
+            messages={TX_CYCLE_MESSAGES}
+            useFirstItemStart
+            render={(message) => {
+              return <FadeIn key={message}>{message}</FadeIn>;
+            }}
+          />
+
+          <EtherscanURL url={txEtherscanURL} isPending />
+        </>
+      );
+    case Web3TxStatus.FULFILLED:
+      return (
+        <>
+          <div>Onboarding done!</div>
+
+          <EtherscanURL url={txEtherscanURL} />
+        </>
+      );
+    default:
+      return null;
+  }
+}
 
 export default function KycOnboardingForm() {
   /**
@@ -100,7 +175,14 @@ export default function KycOnboardingForm() {
 
   const {daoTokenDetails} = useDaoTokenDetails();
 
-  const {abortController, isMountedRef} = useAbortController();
+  const {
+    kycCheckCertificate,
+    kycCheckError,
+    kycCheckMessageJSX,
+    kycCheckStatus,
+    setKYCCheckETHAddress,
+    setKYCCheckRedirect,
+  } = useVerifyKYCApplicant();
 
   /**
    * Their hooks
@@ -120,17 +202,6 @@ export default function KycOnboardingForm() {
   const [submitError, setSubmitError] = useState<Error>();
 
   const [userAccountBalance, setUserAccountBalance] = useState<string>();
-
-  const [kycCheckStatus, setKycCheckStatus] = useState<AsyncStatus>(
-    AsyncStatus.STANDBY
-  );
-
-  const [kycCheckCertificate, setKycCheckCertificate] =
-    useState<KycCertificate>();
-
-  const [kycCheckError, setKycCheckError] = useState<
-    Error | (() => React.ReactElement)
-  >();
 
   const [sliderStep, setSliderStep] = useState<number>();
 
@@ -162,7 +233,7 @@ export default function KycOnboardingForm() {
 
   const kycOnboardingError = submitError;
 
-  const isConnected = connected && account;
+  const isConnected: boolean = connected && account ? true : false;
 
   const isInProcess =
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
@@ -171,6 +242,12 @@ export default function KycOnboardingForm() {
   const isDone = txStatus === Web3TxStatus.FULFILLED;
 
   const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
+
+  const submitDisabled: boolean =
+    !kycCheckCertificate ||
+    isInProcessOrDone ||
+    kycCheckStatus === AsyncStatus.PENDING ||
+    kycCheckStatus === AsyncStatus.REJECTED;
 
   const {
     checkApplicantError,
@@ -221,14 +298,6 @@ export default function KycOnboardingForm() {
     web3Instance,
   ]);
 
-  const verifyApplicantKycCached = useCallback(verifyApplicantKyc, [
-    abortController?.signal,
-    daoRegistryContract,
-    defaultChainError,
-    ethAddressValue,
-    isMountedRef,
-  ]);
-
   const setSliderConfigsCached = useCallback(setSliderConfigs, [
     daoRegistryContract,
     kycCheckCertificate,
@@ -238,6 +307,7 @@ export default function KycOnboardingForm() {
 
   const getKycOnboardingConfigsCached = useCallback(getKycOnboardingConfigs, [
     daoRegistryContract,
+    defaultChainError,
   ]);
 
   /**
@@ -250,12 +320,24 @@ export default function KycOnboardingForm() {
 
   // Set the value of `ethAddress` if the `account` changes
   useEffect(() => {
-    setValue(Fields.ethAddress, account && toChecksumAddress(account));
-  }, [account, setValue]);
+    if (defaultChainError) return;
 
+    setValue(Fields.ethAddress, account && toChecksumAddress(account));
+  }, [account, defaultChainError, setValue]);
+
+  // Set the address to check JTC
   useEffect(() => {
-    verifyApplicantKycCached();
-  }, [verifyApplicantKycCached]);
+    setKYCCheckETHAddress(ethAddressValue);
+  }, [ethAddressValue, setKYCCheckETHAddress]);
+
+  // Set the redirect URL to the KYC form.
+  useEffect(() => {
+    if (!ethAddressValue || !KYC_FORMS_URL || defaultChainError) {
+      return;
+    }
+
+    setKYCCheckRedirect(KYC_FORMS_URL);
+  }, [defaultChainError, ethAddressValue, setKYCCheckRedirect]);
 
   useEffect(() => {
     setSliderConfigsCached();
@@ -274,9 +356,53 @@ export default function KycOnboardingForm() {
    * Functions
    */
 
+  function setSliderConfigs() {
+    try {
+      if (
+        !daoRegistryContract ||
+        !kycCheckCertificate ||
+        !kycOnboardingConfigs
+      ) {
+        setSliderStep(undefined);
+        setSliderMin(undefined);
+        setSliderMax(undefined);
+        setValue(Fields.ethAmount, PLACEHOLDER);
+
+        return;
+      }
+
+      setSliderStep(Number(fromWei(kycOnboardingConfigs.chunkSize, 'ether')));
+
+      setSliderMax(
+        Number(
+          fromWei(
+            toBN(kycOnboardingConfigs.chunkSize).mul(
+              toBN(kycOnboardingConfigs.maximumChunks)
+            ),
+            'ether'
+          )
+        )
+      );
+
+      setSliderMin(Number(fromWei(kycOnboardingConfigs.chunkSize, 'ether')));
+
+      setValue(
+        Fields.ethAmount,
+        fromWei(kycOnboardingConfigs.chunkSize, 'ether')
+      );
+    } catch (error) {
+      setSliderStep(undefined);
+      setSliderMin(undefined);
+      setSliderMax(undefined);
+      setValue(Fields.ethAmount, PLACEHOLDER);
+
+      console.error(error);
+    }
+  }
+
   async function getKycOnboardingConfigs() {
     try {
-      if (!daoRegistryContract) return;
+      if (!daoRegistryContract || defaultChainError) return;
 
       const chunkSize = String(
         await getDAOConfigEntry(
@@ -323,159 +449,20 @@ export default function KycOnboardingForm() {
     }
   }
 
-  async function setSliderConfigs() {
-    try {
-      if (
-        !daoRegistryContract ||
-        !kycCheckCertificate ||
-        !kycOnboardingConfigs
-      ) {
-        setSliderStep(undefined);
-        setSliderMin(undefined);
-        setSliderMax(undefined);
-        setValue(Fields.ethAmount, PLACEHOLDER);
-
-        return;
-      }
-
-      setSliderStep(Number(fromWei(kycOnboardingConfigs.chunkSize, 'ether')));
-
-      setSliderMax(
-        Number(
-          fromWei(
-            toBN(kycOnboardingConfigs.chunkSize).mul(
-              toBN(kycOnboardingConfigs.maximumChunks)
-            ),
-            'ether'
-          )
-        )
-      );
-
-      setSliderMin(Number(fromWei(kycOnboardingConfigs.chunkSize, 'ether')));
-
-      setValue(
-        Fields.ethAmount,
-        fromWei(kycOnboardingConfigs.chunkSize, 'ether')
-      );
-    } catch (error) {
-      console.error(error);
-
-      setSliderStep(undefined);
-      setSliderMin(undefined);
-      setSliderMax(undefined);
-      setValue(Fields.ethAmount, PLACEHOLDER);
-    }
-  }
-
-  async function verifyApplicantKyc() {
-    try {
-      if (!abortController?.signal) return;
-
-      if (!daoRegistryContract || !ethAddressValue || defaultChainError) {
-        setKycCheckError(undefined);
-        setKycCheckCertificate(undefined);
-        setKycCheckStatus(AsyncStatus.STANDBY);
-
-        return;
-      }
-
-      setKycCheckStatus(AsyncStatus.PENDING);
-
-      const response = await fetch(
-        `${KYC_BACKEND_URL}/${daoRegistryContract.contractAddress}/${ethAddressValue}`,
-        {signal: abortController.signal}
-      );
-
-      const responseJSON = await response.json();
-
-      if (response.status === 404) {
-        setKycCheckError(() => () => (
-          <>
-            The applicant address must be KYC verified first.
-            <br />
-            Access the KYC forms{' '}
-            <a
-              style={{fontWeight: 'bold'}}
-              href={KYC_FORMS_URL}
-              rel="noopener noreferrer"
-              target="_blank">
-              here
-            </a>{' '}
-            to get started.
-          </>
-        ));
-
-        setKycCheckCertificate(undefined);
-        setKycCheckStatus(AsyncStatus.REJECTED);
-
-        return;
-      }
-
-      if (!response.ok) {
-        if (responseJSON.message.includes('pending verification')) {
-          setKycCheckError(() => () => (
-            <>
-              KYC verification for the applicant address is pending and must be
-              completed first.
-              <br />
-              Please try again later.
-            </>
-          ));
-
-          setKycCheckCertificate(undefined);
-          setKycCheckStatus(AsyncStatus.REJECTED);
-
-          return;
-        } else {
-          throw new Error(responseJSON.message);
-        }
-      }
-
-      // If the whitelist flag is set, check if the verified address is
-      // whitelisted
-      if (
-        response.ok &&
-        featureFlags?.joinIsWhitelisted &&
-        !responseJSON.isWhitelisted
-      ) {
-        setKycCheckError(() => () => (
-          <>
-            The applicant address has been KYC verified, but has not been
-            authorized to join yet.
-          </>
-        ));
-
-        setKycCheckCertificate(undefined);
-        setKycCheckStatus(AsyncStatus.REJECTED);
-
-        return;
-      }
-
-      if (!isMountedRef.current) return;
-
-      setKycCheckError(undefined);
-      setKycCheckCertificate(responseJSON);
-      setKycCheckStatus(AsyncStatus.FULFILLED);
-    } catch (error) {
-      if (!isMountedRef.current) return;
-
-      setKycCheckError(error);
-      setKycCheckCertificate(undefined);
-      setKycCheckStatus(AsyncStatus.REJECTED);
-    }
-  }
-
   async function getUserAccountBalance() {
     if (!web3Instance || !account) {
       setUserAccountBalance(undefined);
+
       return;
     }
 
     try {
       // Ether wallet balance
-      const accountBalanceInWei = await web3Instance.eth.getBalance(account);
       setUserAccountBalance(
-        web3Instance.utils.fromWei(accountBalanceInWei, 'ether')
+        web3Instance.utils.fromWei(
+          await web3Instance.eth.getBalance(account),
+          'ether'
+        )
       );
     } catch (error) {
       setUserAccountBalance(undefined);
@@ -580,10 +567,11 @@ export default function KycOnboardingForm() {
       }
     } catch (error) {
       // Set any errors from Web3 utils or explicitly set above.
+      const e = error as Error;
 
-      let errorToSet = error;
+      let errorToSet: Error = e;
 
-      if (error.message.includes('already member')) {
+      if (e?.message?.includes('already member')) {
         errorToSet = new Error('The applicant address is already a member.');
       }
 
@@ -595,7 +583,7 @@ export default function KycOnboardingForm() {
     if (!daoTokenDetails) return;
 
     try {
-      await window.ethereum.request({
+      await window?.ethereum?.request({
         method: 'wallet_watchAsset',
         params: {
           type: 'ERC20',
@@ -603,67 +591,7 @@ export default function KycOnboardingForm() {
         },
       });
     } catch (error) {
-      console.log(error);
-    }
-  }
-
-  function renderSubmitStatus(): React.ReactNode {
-    switch (txStatus) {
-      case Web3TxStatus.AWAITING_CONFIRM:
-        return (
-          <>
-            Awaiting your confirmation
-            <CycleEllipsis intervalMs={500} />
-          </>
-        );
-      case Web3TxStatus.PENDING:
-        return (
-          <>
-            <CycleMessage
-              intervalMs={2000}
-              messages={TX_CYCLE_MESSAGES}
-              useFirstItemStart
-              render={(message) => {
-                return <FadeIn key={message}>{message}</FadeIn>;
-              }}
-            />
-
-            <EtherscanURL url={txEtherscanURL} isPending />
-          </>
-        );
-      case Web3TxStatus.FULFILLED:
-        return (
-          <>
-            <div>Onboarding done!</div>
-
-            <EtherscanURL url={txEtherscanURL} />
-          </>
-        );
-      default:
-        return null;
-    }
-  }
-
-  function renderUserAccountBalance() {
-    if (!userAccountBalance) {
-      return '---';
-    }
-
-    const isBalanceInt = Number.isInteger(Number(userAccountBalance));
-    return isBalanceInt
-      ? userAccountBalance
-      : formatDecimal(Number(userAccountBalance));
-  }
-
-  function getUnauthorizedMessage() {
-    // user is not connected
-    if (!isConnected) {
-      return 'Connect your wallet to get started.';
-    }
-
-    // user is on wrong network
-    if (defaultChainError) {
-      return defaultChainError.message;
+      console.error(error);
     }
   }
 
@@ -695,7 +623,9 @@ export default function KycOnboardingForm() {
             </div>
 
             <div className="form__description--unauthorized">
-              <p>{getUnauthorizedMessage()}</p>
+              <p>
+                {renderUnauthorizedMessage({defaultChainError, isConnected})}
+              </p>
             </div>
           </div>
         </FadeIn>
@@ -712,6 +642,15 @@ export default function KycOnboardingForm() {
 
         <div className="form-wrapper">
           <div className="form__description">
+            {/* KYC CHECK STATUS MESSAGE */}
+            {kycCheckMessageJSX && (
+              <div style={FORM_HEADER_MESSAGE_STYLES}>
+                <FadeIn>
+                  <p>{kycCheckMessageJSX}</p>
+                </FadeIn>
+              </div>
+            )}
+
             <p>
               Tribute DAO will have up to {maxMembersText} initial members. Each
               member can purchase {minUnitsText} units for {minEthAmountText}{' '}
@@ -788,7 +727,9 @@ export default function KycOnboardingForm() {
                       const amount = Number(stripFormatNumber(value));
 
                       return amount >= Number(userAccountBalance)
-                        ? `Insufficient funds. ${renderUserAccountBalance()} ETH available.`
+                        ? `Insufficient funds. ${renderUserAccountBalance(
+                            userAccountBalance
+                          )} ETH available.`
                         : true;
                     },
                   }}
@@ -811,20 +752,18 @@ export default function KycOnboardingForm() {
             <button
               aria-label={isInProcess ? 'Submitting your proposal.' : ''}
               className="button"
-              disabled={
-                isInProcessOrDone ||
-                kycCheckStatus === AsyncStatus.PENDING ||
-                kycCheckStatus === AsyncStatus.REJECTED
+              disabled={submitDisabled}
+              onClick={
+                submitDisabled
+                  ? () => {}
+                  : async () => {
+                      if (!(await trigger())) {
+                        return;
+                      }
+
+                      handleSubmit(getValues());
+                    }
               }
-              onClick={async () => {
-                if (isInProcessOrDone) return;
-
-                if (!(await trigger())) {
-                  return;
-                }
-
-                handleSubmit(getValues());
-              }}
               type="submit">
               {isInProcess ? <Loader /> : isDone ? 'Done' : 'Submit'}
             </button>
@@ -832,7 +771,7 @@ export default function KycOnboardingForm() {
             {/* SUBMIT STATUS */}
             {isInProcessOrDone && (
               <div className="form__submit-status-container">
-                {renderSubmitStatus()}
+                {renderSubmitStatus({txEtherscanURL, txStatus})}
               </div>
             )}
 
