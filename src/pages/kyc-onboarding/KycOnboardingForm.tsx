@@ -65,16 +65,6 @@ type KycOnboardingConfigs = {
 
 const PLACEHOLDER = '\u2014'; /* em dash */
 
-/**
- * @todo Move to SASS stylesheet in `tribute-ui`
- * @todo Use existing SASS variables
- */
-const FORM_HEADER_MESSAGE_STYLES: React.CSSProperties = {
-  border: ' 1px solid black',
-  padding: '2em 2em 0.875em',
-  textAlign: 'center',
-};
-
 function renderUserAccountBalance(userAccountBalance: string | undefined) {
   if (!userAccountBalance) {
     return '---';
@@ -644,7 +634,7 @@ export default function KycOnboardingForm() {
           <div className="form__description">
             {/* KYC CHECK STATUS MESSAGE */}
             {kycCheckMessageJSX && (
-              <div style={FORM_HEADER_MESSAGE_STYLES}>
+              <div className="form__header">
                 <FadeIn>
                   <p>{kycCheckMessageJSX}</p>
                 </FadeIn>

@@ -36,6 +36,16 @@
   color: $color-brightsalmon;
 }
 
+.form__header {
+  border: 1px solid $color-border-primary;
+  padding: 2em;
+  text-align: center;
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -143,6 +153,10 @@
   .form__input-addon {
     margin: 0.5rem 0 0;
   }
+
+  .form__header {
+    padding: 1.5em;
+  }
 }
 
 @media only screen and (max-width: em($bp-sm)) {
@@ -159,5 +173,9 @@
 
   .form__input-description {
     font-size: 0.8rem;
+  }
+
+  .form__header {
+    padding: 1em;
   }
 }
