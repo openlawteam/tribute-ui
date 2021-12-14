@@ -1,7 +1,11 @@
 import {Link} from 'react-router-dom';
 import {v4 as uuidv4} from 'uuid';
 
-import {formatNumber, normalizeString} from '../../util/helpers';
+import {
+  formatNumber,
+  formatNumberAbbreviated,
+  normalizeString,
+} from '../../util/helpers';
 import {Member} from './types';
 import {useRef} from 'react';
 import {useWeb3Modal} from '../../components/web3/hooks';
@@ -43,6 +47,7 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
    */
 
   const {units} = member;
+  const unitAbbreviated: string = formatNumberAbbreviated(Number(units));
   const unitsFormatted: string = formatNumber(units);
 
   const ensNameFound: boolean =
@@ -91,7 +96,7 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
             data-tip={`${unitsFormatted} unit${
               Number(units) === 1 ? '' : 's'
             }`}>
-            {unitsFormatted}
+            {unitAbbreviated}
           </span>
 
           <ReactTooltip

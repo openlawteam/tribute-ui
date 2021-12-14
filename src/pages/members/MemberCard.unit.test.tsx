@@ -32,7 +32,7 @@ describe('MemberCard unit tests', () => {
       </Wrapper>
     );
 
-    expect(getByText('100,000')).toBeInTheDocument();
+    expect(getByText('100k')).toBeInTheDocument();
   });
 
   test('should render with member ens address', () => {
@@ -54,7 +54,7 @@ describe('MemberCard unit tests', () => {
     );
 
     expect(
-      getByRole('link', {name: `${DEFAULT_ETH_ADDRESS} 100,000`})
+      getByRole('link', {name: `${DEFAULT_ETH_ADDRESS} 100k`})
     ).toBeInTheDocument();
   });
 
@@ -79,7 +79,7 @@ describe('MemberCard unit tests', () => {
       </Wrapper>
     );
 
-    userEvent.hover(getByText(/^100,000$/));
+    userEvent.hover(getByText(/^100k$/));
 
     expect(getByText(/^100,000 units$/i)).toBeInTheDocument();
 
