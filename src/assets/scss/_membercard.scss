@@ -67,7 +67,7 @@
   ); /* min font-size 1rem, max 1.125rem */
   @include text-truncate;
   font-weight: normal;
-  margin-top: 0.5 em;
+  margin-top: 0.5em;
   text-align: center;
 
   &:last-child {
