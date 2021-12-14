@@ -1,11 +1,11 @@
-import {render, waitFor} from '@testing-library/react';
+import {render} from '@testing-library/react';
 
 import {BURN_ADDRESS} from '../../util/constants';
 import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
 import {Member} from './types';
 import MemberCard from './MemberCard';
-import Wrapper from '../../test/Wrapper';
 import userEvent from '@testing-library/user-event';
+import Wrapper from '../../test/Wrapper';
 
 describe('MemberCard unit tests', () => {
   const DEFAULT_MEMBER: Member = {
@@ -42,7 +42,8 @@ describe('MemberCard unit tests', () => {
       </Wrapper>
     );
 
-    expect(getByText(/cool.eth/i)).toBeInTheDocument();
+    expect(getByText(DEFAULT_ETH_ADDRESS)).toBeInTheDocument();
+    expect(getByText(/cool\.eth/i)).toBeInTheDocument();
   });
 
   test('should render with link', () => {
@@ -107,7 +108,19 @@ describe('MemberCard unit tests', () => {
     expect(getByText(/^1 unit$/i)).toBeInTheDocument();
   });
 
-  test('should render tooltip with member ens address', async () => {
+  test('should render tooltip with member ens address on eth address hover', async () => {
+    const {getByText} = render(
+      <Wrapper>
+        <MemberCard member={{...DEFAULT_MEMBER, addressENS: 'cool.eth'}} />
+      </Wrapper>
+    );
+
+    userEvent.hover(getByText(DEFAULT_ETH_ADDRESS));
+
+    expect(getByText(`cool.eth (${DEFAULT_ETH_ADDRESS})`)).toBeInTheDocument();
+  });
+
+  test('should render tooltip with member ens address on ens name hover', async () => {
     const {getByText} = render(
       <Wrapper>
         <MemberCard member={{...DEFAULT_MEMBER, addressENS: 'cool.eth'}} />

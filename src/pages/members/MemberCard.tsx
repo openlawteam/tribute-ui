@@ -34,6 +34,7 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
    * Refs
    */
 
+  const ensTooltipIDRef = useRef<string>(uuidv4());
   const titleTooltipIDRef = useRef<string>(uuidv4());
   const unitsTooltipIDRef = useRef<string>(uuidv4());
 
@@ -50,6 +51,10 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
       ? true
       : false;
 
+  const addressTooltipText: string = ensNameFound
+    ? `${member.addressENS} (${member.address})`
+    : member.address;
+
   /**
    * Render
    */
@@ -63,37 +68,57 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
             ? `membercard--connected-account`
             : ''
         }`}>
-        {/* TITLE */}
-        <h3
-          className="membercard__title"
-          data-for={titleTooltipIDRef.current}
-          data-tip={
-            ensNameFound
-              ? `${member.addressENS} (${member.address})`
-              : member.address
-          }>
-          {member?.addressENS || member.address}
-        </h3>
+        {/* ROW 1 */}
+        <div className="membercard__row">
+          {/* TITLE */}
+          <h3
+            className="membercard__title"
+            data-for={titleTooltipIDRef.current}
+            data-tip={addressTooltipText}>
+            {member.address}
+          </h3>
 
-        <ReactTooltip
-          delayShow={TOOLTIP_DELAY}
-          effect="solid"
-          id={titleTooltipIDRef.current}
-        />
+          <ReactTooltip
+            delayShow={TOOLTIP_DELAY}
+            effect="solid"
+            id={titleTooltipIDRef.current}
+          />
 
-        {/* UNITS */}
-        <span
-          className="membercard__units"
-          data-for={unitsTooltipIDRef.current}
-          data-tip={`${unitsFormatted} unit${Number(units) === 1 ? '' : 's'}`}>
-          {unitsFormatted}
-        </span>
+          {/* UNITS */}
+          <span
+            className="membercard__units"
+            data-for={unitsTooltipIDRef.current}
+            data-tip={`${unitsFormatted} unit${
+              Number(units) === 1 ? '' : 's'
+            }`}>
+            {unitsFormatted}
+          </span>
 
-        <ReactTooltip
-          delayShow={TOOLTIP_DELAY}
-          effect="solid"
-          id={unitsTooltipIDRef.current}
-        />
+          <ReactTooltip
+            delayShow={TOOLTIP_DELAY}
+            effect="solid"
+            id={unitsTooltipIDRef.current}
+          />
+        </div>
+
+        {/* ROW 2 */}
+        {ensNameFound && member?.addressENS && (
+          <div className="membercard__row">
+            {/* ENS */}
+            <span
+              className="membercard__ens"
+              data-for={ensTooltipIDRef.current}
+              data-tip={addressTooltipText}>
+              {member?.addressENS}
+            </span>
+
+            <ReactTooltip
+              delayShow={TOOLTIP_DELAY}
+              effect="solid"
+              id={ensTooltipIDRef.current}
+            />
+          </div>
+        )}
       </div>
     </Link>
   );
