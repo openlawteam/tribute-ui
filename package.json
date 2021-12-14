@@ -51,7 +51,7 @@
     "@testing-library/user-event": "^13.1.9",
     "@typechain/web3-v1": "^3.0.0",
     "@types/aos": "^3.0.4",
-    "@types/jest": "^26.0.24",
+    "@types/jest": "^27.0.3",
     "@types/node": "^16.4.10",
     "@types/react": "^17.0.13",
     "@types/react-dom": "^17.0.6",
