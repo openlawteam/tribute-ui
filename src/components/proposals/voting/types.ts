@@ -22,6 +22,7 @@ export enum BadNodeError {
   AFTER_VOTING_PERIOD,
   BAD_SIGNATURE,
   INDEX_OUT_OF_BOUND,
+  VOTE_NOT_ALLOWED,
 }
 
 /**
