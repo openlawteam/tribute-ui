@@ -209,6 +209,12 @@ export default function Wrapper(
      * @note This should come first
      */
     if (useWallet) {
+      // For `getExtensionAddress` call
+      // mockWeb3Provider.injectResult(
+      //   web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
+      //   {debugName: '<Wrapper /> getExtensionAddress for `getConnectedMember`'}
+      // );
+      // For multicall
       mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameters(
           ['uint256', 'bytes[]'],
@@ -234,7 +240,8 @@ export default function Wrapper(
       );
       // For `balanceOf` call
       mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameter('uint160', 100)
+        web3Instance.eth.abi.encodeParameter('uint160', 100),
+        {debugName: '<Wrapper /> balanceOf for `getConnectedMember`'}
       );
     }
   }, [mockWeb3Provider, useInit, useWallet, web3Instance]);
