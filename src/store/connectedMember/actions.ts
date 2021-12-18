@@ -1,16 +1,16 @@
 import {Dispatch} from 'redux';
 import Web3 from 'web3';
-import {toBN} from 'web3-utils';
+import {toBN, AbiItem} from 'web3-utils';
 
 import {BURN_ADDRESS} from '../../util/constants';
 import {ConnectedMemberState} from '../connectedMember/types';
 import {ContractsStateEntry} from '../contracts/types';
 import {DaoRegistry} from '../../abis/types/DaoRegistry';
 import {hasFlag, multicall} from '../../components/web3/helpers';
-import {MemberFlag} from '../../components/web3/types';
+import {MemberFlag, ContractExtensionNames} from '../../components/web3/types';
 import {normalizeString} from '../../util/helpers';
-import {BankExtension} from '../../abis/types/BankExtension';
 import {UNITS_ADDRESS} from '../../config';
+import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
 
 export const SET_CONNECTED_MEMBER = 'SET_CONNECTED_MEMBER';
 export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
@@ -29,17 +29,14 @@ export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
 export function getConnectedMember({
   account,
   daoRegistryContract,
-  bankExtensionContract,
   web3Instance,
 }: {
   account: string;
   daoRegistryContract: ContractsStateEntry<DaoRegistry>;
-  bankExtensionContract: ContractsStateEntry<BankExtension>;
   web3Instance: Web3;
 }) {
   return async function (dispatch: Dispatch<any>) {
     const daoRegistryAddress = daoRegistryContract?.contractAddress;
-    const bankExtensionInstance = bankExtensionContract?.instance;
 
     const getAddressIfDelegatedABI = daoRegistryContract?.abi.find(
       (ai) => ai.name === 'getAddressIfDelegated'
@@ -49,6 +46,19 @@ export function getConnectedMember({
     );
     const getCurrentDelegateKeyABI = daoRegistryContract?.abi.find(
       (ai) => ai.name === 'getCurrentDelegateKey'
+    );
+
+    const bankExtensionAddress = await getExtensionAddress(
+      ContractExtensionNames.bank,
+      daoRegistryContract?.instance
+    );
+    const {default: lazyABI} = await import(
+      '../../abis/tribute-contracts/BankExtension.json'
+    );
+    const bankExtensionABI: AbiItem[] = lazyABI as any;
+    const bankExtensionInstance = new web3Instance.eth.Contract(
+      bankExtensionABI,
+      bankExtensionAddress
     );
 
     if (

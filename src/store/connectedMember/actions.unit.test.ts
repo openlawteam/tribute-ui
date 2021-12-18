@@ -7,9 +7,7 @@ import {
 } from '../../test/helpers';
 import {BURN_ADDRESS} from '../../util/constants';
 import {clearConnectedMember, getConnectedMember} from './actions';
-import {initContractDaoRegistry, initContractBankExtension} from '../actions';
-import {ContractsStateEntry} from '../contracts/types';
-import {BankExtension} from '../../abis/types/BankExtension';
+import {initContractDaoRegistry} from '../actions';
 
 describe('connectedMember actions unit tests', () => {
   test('"getConnectedMember" can set correct "connectedMember" when active member', async () => {
@@ -18,14 +16,17 @@ describe('connectedMember actions unit tests', () => {
 
     // Setup for necessary contracts
     store.dispatch(initContractDaoRegistry(web3));
-    store.dispatch(initContractBankExtension(web3, DEFAULT_ETH_ADDRESS));
 
     await waitFor(() => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
-      expect(store.getState().contracts.BankExtensionContract).not.toBe(null);
     });
 
     // Setup for `getConnectedMember`
+    // For `getExtensionAddress` call
+    mockWeb3Provider.injectResult(
+      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+    );
+    // For multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -51,8 +52,6 @@ describe('connectedMember actions unit tests', () => {
         account: DEFAULT_ETH_ADDRESS,
         web3Instance: web3,
         daoRegistryContract: store.getState().contracts.DaoRegistryContract,
-        bankExtensionContract: store.getState().contracts
-          .BankExtensionContract as ContractsStateEntry<BankExtension>,
       })
     );
 
@@ -72,17 +71,19 @@ describe('connectedMember actions unit tests', () => {
 
     // Setup for necessary contracts
     store.dispatch(initContractDaoRegistry(web3));
-    store.dispatch(initContractBankExtension(web3, DEFAULT_ETH_ADDRESS));
 
     await waitFor(() => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
-      expect(store.getState().contracts.BankExtensionContract).not.toBe(null);
     });
 
     // Setup for `getConnectedMember`
     const delegateAddress: string =
       '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1';
-
+    // For `getExtensionAddress` call
+    mockWeb3Provider.injectResult(
+      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+    );
+    // For multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -108,8 +109,6 @@ describe('connectedMember actions unit tests', () => {
         account: DEFAULT_ETH_ADDRESS,
         web3Instance: web3,
         daoRegistryContract: store.getState().contracts.DaoRegistryContract,
-        bankExtensionContract: store.getState().contracts
-          .BankExtensionContract as ContractsStateEntry<BankExtension>,
       })
     );
 
@@ -129,14 +128,17 @@ describe('connectedMember actions unit tests', () => {
 
     // Setup for necessary contracts
     store.dispatch(initContractDaoRegistry(web3));
-    store.dispatch(initContractBankExtension(web3, DEFAULT_ETH_ADDRESS));
 
     await waitFor(() => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
-      expect(store.getState().contracts.BankExtensionContract).not.toBe(null);
     });
 
     // Setup for `getConnectedMember`
+    // For `getExtensionAddress` call
+    mockWeb3Provider.injectResult(
+      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+    );
+    // For multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -162,8 +164,6 @@ describe('connectedMember actions unit tests', () => {
         account: DEFAULT_ETH_ADDRESS,
         web3Instance: web3,
         daoRegistryContract: store.getState().contracts.DaoRegistryContract,
-        bankExtensionContract: store.getState().contracts
-          .BankExtensionContract as ContractsStateEntry<BankExtension>,
       })
     );
 
@@ -183,14 +183,17 @@ describe('connectedMember actions unit tests', () => {
 
     // Setup for necessary contracts
     store.dispatch(initContractDaoRegistry(web3));
-    store.dispatch(initContractBankExtension(web3, DEFAULT_ETH_ADDRESS));
 
     await waitFor(() => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
-      expect(store.getState().contracts.BankExtensionContract).not.toBe(null);
     });
 
     // Setup for `getConnectedMember`
+    // For `getExtensionAddress` call
+    mockWeb3Provider.injectResult(
+      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+    );
+    // For multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -216,8 +219,6 @@ describe('connectedMember actions unit tests', () => {
         account: DEFAULT_ETH_ADDRESS,
         web3Instance: web3,
         daoRegistryContract: store.getState().contracts.DaoRegistryContract,
-        bankExtensionContract: store.getState().contracts
-          .BankExtensionContract as ContractsStateEntry<BankExtension>,
       })
     );
 
@@ -237,14 +238,17 @@ describe('connectedMember actions unit tests', () => {
 
     // Setup for necessary contracts
     store.dispatch(initContractDaoRegistry(web3));
-    store.dispatch(initContractBankExtension(web3, DEFAULT_ETH_ADDRESS));
 
     await waitFor(() => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
-      expect(store.getState().contracts.BankExtensionContract).not.toBe(null);
     });
 
     // Setup for `getConnectedMember`
+    // For `getExtensionAddress` call
+    mockWeb3Provider.injectResult(
+      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+    );
+    // For multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -275,8 +279,6 @@ describe('connectedMember actions unit tests', () => {
           account: DEFAULT_ETH_ADDRESS,
           web3Instance: web3,
           daoRegistryContract: store.getState().contracts.DaoRegistryContract,
-          bankExtensionContract: store.getState().contracts
-            .BankExtensionContract as ContractsStateEntry<BankExtension>,
         })
       );
     } catch (error) {
@@ -295,14 +297,17 @@ describe('connectedMember actions unit tests', () => {
 
     // Setup for necessary contracts
     store.dispatch(initContractDaoRegistry(web3));
-    store.dispatch(initContractBankExtension(web3, DEFAULT_ETH_ADDRESS));
 
     await waitFor(() => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
-      expect(store.getState().contracts.BankExtensionContract).not.toBe(null);
     });
 
     // Setup for `getConnectedMember`
+    // For `getExtensionAddress` call
+    mockWeb3Provider.injectResult(
+      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+    );
+    // For multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -332,8 +337,6 @@ describe('connectedMember actions unit tests', () => {
         account: DEFAULT_ETH_ADDRESS,
         web3Instance: web3,
         daoRegistryContract: store.getState().contracts.DaoRegistryContract,
-        bankExtensionContract: store.getState().contracts
-          .BankExtensionContract as ContractsStateEntry<BankExtension>,
       })
     );
 

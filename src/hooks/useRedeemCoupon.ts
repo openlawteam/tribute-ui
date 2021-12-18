@@ -52,9 +52,7 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
   );
-  const bankExtensionContract = useSelector(
-    (s: StoreState) => s.contracts.BankExtensionContract
-  );
+
   const couponOnboardingContract = useSelector(
     (s: StoreState) => s.contracts.CouponOnboardingContract
   );
@@ -116,10 +114,6 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
 
       if (!daoRegistryContract) {
         throw new Error('No DAO Registry contract was found.');
-      }
-
-      if (!bankExtensionContract) {
-        throw new Error('No Bank Extension contract was found.');
       }
 
       if (!couponOnboardingContract) {
@@ -187,7 +181,6 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
             getConnectedMember({
               account,
               daoRegistryContract,
-              bankExtensionContract,
               web3Instance,
             })
           );

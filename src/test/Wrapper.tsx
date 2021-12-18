@@ -209,12 +209,6 @@ export default function Wrapper(
      * @note This should come first
      */
     if (useWallet) {
-      // For `getExtensionAddress` call
-      // mockWeb3Provider.injectResult(
-      //   web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
-      //   {debugName: '<Wrapper /> getExtensionAddress for `getConnectedMember`'}
-      // );
-      // For multicall
       mockWeb3Provider.injectResult(
         web3Instance.eth.abi.encodeParameters(
           ['uint256', 'bytes[]'],
