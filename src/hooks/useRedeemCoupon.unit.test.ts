@@ -146,36 +146,7 @@ describe('useRedeemCoupon unit tests', () => {
 
       expect(result.current.txStatus).toMatch(Web3TxStatus.PENDING);
 
-      await waitFor(() => {
-        // Mock `getConnectedMember`
-        mockWeb3Provider.injectResult(
-          web3Instance.eth.abi.encodeParameters(
-            ['uint256', 'bytes[]'],
-            [
-              0,
-              [
-                // For `getAddressIfDelegated` call
-                web3Instance.eth.abi.encodeParameter(
-                  'address',
-                  DEFAULT_ETH_ADDRESS
-                ),
-                // For `members` call
-                web3Instance.eth.abi.encodeParameter('uint8', '1'),
-                // For `getCurrentDelegateKey` call
-                web3Instance.eth.abi.encodeParameter(
-                  'address',
-                  DEFAULT_ETH_ADDRESS
-                ),
-              ],
-            ]
-          ),
-          {debugName: '`getConnectedMember`'}
-        );
-        // For `balanceOf` call
-        mockWeb3Provider.injectResult(
-          web3Instance.eth.abi.encodeParameter('uint160', 100)
-        );
-      });
+      await waitForValueToChange(() => result.current.submitStatus);
 
       await waitFor(() => {
         expect(result.current.isInProcessOrDone).toBe(true);
@@ -201,22 +172,22 @@ describe('useRedeemCoupon unit tests', () => {
     };
 
     let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
     await act(async () => {
-      const {result, waitForNextUpdate} = await renderHook(
-        () => useRedeemCoupon(),
-        {
+      const {result, waitForNextUpdate, waitForValueToChange} =
+        await renderHook(() => useRedeemCoupon(), {
           initialProps: {
             useInit: true,
             useWallet: true,
             getProps: (p) => {
               mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
           },
 
           wrapper: Wrapper,
-        }
-      );
+        });
 
       // Assert initial state
       expect(result.current.isInProcessOrDone).toBe(false);
@@ -234,6 +205,10 @@ describe('useRedeemCoupon unit tests', () => {
 
       act(() => {
         // Mock tx error
+        mockWeb3Provider.injectResult(...ethEstimateGas({web3Instance}));
+        mockWeb3Provider.injectResult(...ethBlockNumber({web3Instance}));
+        mockWeb3Provider.injectResult(...ethGasPrice({web3Instance}));
+        mockWeb3Provider.injectResult(...sendTransaction({web3Instance}));
         mockWeb3Provider.injectError({code: 1234, message: 'Some tx error'});
 
         // Run redeem coupon
@@ -242,6 +217,8 @@ describe('useRedeemCoupon unit tests', () => {
 
       expect(result.current.txStatus).toMatch(Web3TxStatus.AWAITING_CONFIRM);
       expect(result.current.txIsPromptOpen).toBe(true);
+
+      await waitForValueToChange(() => result.current.submitStatus);
 
       await waitFor(() => {
         expect(result.current.isInProcessOrDone).toBe(false);
@@ -325,36 +302,7 @@ describe('useRedeemCoupon unit tests', () => {
 
       expect(result.current.txStatus).toMatch(Web3TxStatus.PENDING);
 
-      await waitFor(() => {
-        // Mock `getConnectedMember`
-        mockWeb3Provider.injectResult(
-          web3Instance.eth.abi.encodeParameters(
-            ['uint256', 'bytes[]'],
-            [
-              0,
-              [
-                // For `getAddressIfDelegated` call
-                web3Instance.eth.abi.encodeParameter(
-                  'address',
-                  DEFAULT_ETH_ADDRESS
-                ),
-                // For `members` call
-                web3Instance.eth.abi.encodeParameter('uint8', '1'),
-                // For `getCurrentDelegateKey` call
-                web3Instance.eth.abi.encodeParameter(
-                  'address',
-                  DEFAULT_ETH_ADDRESS
-                ),
-              ],
-            ]
-          ),
-          {debugName: '`getConnectedMember`'}
-        );
-        // For `balanceOf` call
-        mockWeb3Provider.injectResult(
-          web3Instance.eth.abi.encodeParameter('uint160', 100)
-        );
-      });
+      await waitForValueToChange(() => result.current.submitStatus);
 
       await waitFor(() => {
         expect(result.current.submitError?.message).toMatch(
