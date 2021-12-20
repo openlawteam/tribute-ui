@@ -35,4 +35,5 @@ yarn-error.log*
 src/abis/tribute-contracts
 
 # types
+abi-types
 src/abis/types
