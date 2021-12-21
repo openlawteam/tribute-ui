@@ -35,7 +35,11 @@ NOTE:
 #### Optional env vars
 
 ```sh
-# Alchemy API key. Currently used for their APIs (e.g. Transfers API for getting total ETH amount contributed to DAO multi-sig).
+##
+# Alchemy API key
+#
+# i.e. Transfers API for getting total ETH amount contributed to DAO multi-sig.
+##
 REACT_APP_ALCHEMY_API_KEY=...
 # Change the chain used in local development
 REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>
