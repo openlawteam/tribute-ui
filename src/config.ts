@@ -13,6 +13,7 @@ dotenvConfig({path: resolve(__dirname, '../.env')});
  */
 
 const {
+  REACT_APP_COUPON_API_URL,
   REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS,
   REACT_APP_DEFAULT_CHAIN_NAME_LOCAL,
   REACT_APP_ENVIRONMENT,
@@ -22,7 +23,6 @@ const {
   REACT_APP_INFURA_PROJECT_ID_PROD,
   REACT_APP_MULTICALL_CONTRACT_ADDRESS,
   REACT_APP_SNAPSHOT_HUB_API_URL,
-  REACT_APP_COUPON_API_URL,
   REACT_APP_SNAPSHOT_SPACE,
 } = process.env;
 
@@ -59,7 +59,19 @@ export const CHAINS = {
   HARMONY_MAIN: 1666600000,
 } as const;
 
-// Network names for modal messaging
+// Network names
+export const CHAIN_NAME = {
+  [CHAINS.MAINNET]: 'mainnet',
+  [CHAINS.ROPSTEN]: 'ropsten',
+  [CHAINS.RINKEBY]: 'rinkeby',
+  [CHAINS.GOERLI]: 'goerli',
+  [CHAINS.KOVAN]: 'kovan',
+  [CHAINS.GANACHE]: 'ganache',
+  [CHAINS.HARMONY_TEST]: 'harmony-testnet',
+  [CHAINS.HARMONY_MAIN]: 'harmony-mainnet',
+} as const;
+
+// Network names verbose
 export const CHAIN_NAME_FULL = {
   [CHAINS.MAINNET]: 'Main Ethereum Network',
   [CHAINS.ROPSTEN]: 'Ropsten Test Network',
@@ -71,7 +83,7 @@ export const CHAIN_NAME_FULL = {
   [CHAINS.HARMONY_MAIN]: 'Harmony Main Network',
 };
 
-export const DEFAULT_CHAIN =
+export const DEFAULT_CHAIN: typeof CHAINS[keyof typeof CHAINS] =
   REACT_APP_ENVIRONMENT === 'production'
     ? CHAINS.MAINNET
     : REACT_APP_ENVIRONMENT === 'development'

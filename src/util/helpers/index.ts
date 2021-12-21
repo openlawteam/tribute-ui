@@ -4,6 +4,7 @@ export * from './dontCloseWindowWarning';
 export * from './formatDecimal';
 export * from './formatNumber';
 export * from './formatNumberAbbreviated';
+export * from './getAlchemyURL';
 export * from './getTimeRemaining';
 export * from './getValidationError';
 export * from './isPossibleContractWallet';

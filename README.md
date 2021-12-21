@@ -12,7 +12,7 @@ Related supporting repositories:
 
 When running locally you'll need a `.env` file in the root directory with the following:
 
-```
+```sh
 REACT_APP_ENVIRONMENT=localhost
 REACT_APP_INFURA_PROJECT_ID_LOCAL=...
 REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS=...
@@ -32,9 +32,14 @@ NOTE:
 - `REACT_APP_SNAPSHOT_SPACE` is the unique name registered in Snapshot Hub under which proposals, votes, etc. will be stored.
 - `REACT_APP_GRAPH_API_URL` is the url of the [subgraph](#running-the-local-graph-node) running locally in a container.
 
-#### Optional env vars for local development
+#### Optional env vars
 
-`REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>`
+```sh
+# Alchemy API key. Currently used for their APIs (e.g. Transfers API for getting total ETH amount contributed to DAO multi-sig).
+REACT_APP_ALCHEMY_API_KEY=...
+# Change the chain used in local development
+REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>
+```
 
 ### Ganache Blockchain Setup
 
