@@ -58,7 +58,7 @@ export const CHAINS = {
   HARMONY_TEST: 1666700000,
   HARMONY_MAIN: 1666600000,
   POLYGON_TEST: 80001,
-  POLYGON: 137
+  POLYGON: 137,
 } as const;
 
 // Network names for modal messaging
@@ -105,7 +105,7 @@ export const INFURA_WS_URLS: {[chainId: number]: string} = {
   [CHAINS.HARMONY_TEST]: `wss://ws.s0.pops.one`,
   [CHAINS.HARMONY_MAIN]: `wss://ws.s0.t.hmny.io`,
   [CHAINS.POLYGON_TEST]: `wss://ws-matic-mumbai.chainstacklabs.com`,
-  [CHAINS.POLYGON]: `wss://ws-matic-mainnet.chainstacklabs.com`
+  [CHAINS.POLYGON]: `wss://ws-matic-mainnet.chainstacklabs.com`,
 };
 
 // Infura Project Id
@@ -264,7 +264,6 @@ export const VOTING_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
-
 };
 
 export const CONFIGURATION_CONTRACT_ADDRESS = {
@@ -278,7 +277,6 @@ export const CONFIGURATION_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
-
 };
 
 export const RAGEQUIT_CONTRACT_ADDRESS = {
@@ -305,7 +303,6 @@ export const MANAGING_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
-
 };
 
 export const FINANCING_CONTRACT_ADDRESS = {
@@ -345,7 +342,6 @@ export const GUILDKICK_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
-
 };
 
 export const DAO_REGISTRY_ADAPTER_CONTRACT_ADDRESS = {
