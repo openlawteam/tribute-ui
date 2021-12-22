@@ -126,7 +126,8 @@ export default function Wrapper(
     [mockWeb3Provider, useWallet, web3Instance, web3ModalContext]
   );
 
-  // If `useWallet` is enabled it will mock the `getAdapterAddress` response so we can init contracts.
+  // If `useWallet` is enabled it will mock the `getAdapterAddress` and
+  // `getExtensionAddress` responses so we can init contracts.
   const getAdapterAddressMock = useMemo(async () => {
     if (!useWallet) return;
 
