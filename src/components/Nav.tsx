@@ -39,26 +39,14 @@ export function NavLinks() {
   return (
     <nav role="navigation" id="navigation">
       <ul className="nav__list" data-testid="nav__list">
-        {!featureFlags?.useKycOnboarding && (
-          <li tabIndex={0}>
-            <NavLink to="/membership">
-              <span>Membership</span>
-            </NavLink>
-          </li>
-        )}
         <li tabIndex={0}>
           <NavLink to="/governance">
             <span>Governance</span>
           </NavLink>
         </li>
         <li tabIndex={0}>
-          <NavLink to="/transfers">
-            <span>Transfer</span>
-          </NavLink>
-        </li>
-        <li tabIndex={0}>
-          <NavLink to="/tributes">
-            <span>Tribute</span>
+          <NavLink to="/members">
+            <span>Members</span>
           </NavLink>
         </li>
       </ul>
@@ -109,8 +97,8 @@ export function NavHamburger() {
    * Variables
    */
 
-  const isCurrentMemberOrDelegateConnected: boolean =
-    account && connectedMember?.isActiveMember ? true : false;
+  // const isCurrentMemberOrDelegateConnected: boolean =
+  //   account && connectedMember?.isActiveMember ? true : false;
   const isCurrentMemberConnected: boolean =
     account &&
     connectedMember?.isActiveMember &&
@@ -195,26 +183,30 @@ export function NavHamburger() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink to="/join">
-                      <span>Join</span>
-                    </NavLink>
-                  </li>
-                  {!featureFlags?.useKycOnboarding && (
-                    <li
-                      onClick={() => {
-                        handleMenuModalClose(false);
-                      }}>
-                      <NavLink to="/membership">
-                        <span>Membership</span>
+                    {featureFlags?.useKycOnboarding ? (
+                      <NavLink to="/join">
+                        <span>Join (KYC)</span>
                       </NavLink>
-                    </li>
-                  )}
+                    ) : (
+                      <NavLink to="/onboard">
+                        <span>Onboard</span>
+                      </NavLink>
+                    )}
+                  </li>
                   <li
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink to="/governance">
-                      <span>Governance</span>
+                    <NavLink to="/membership">
+                      <span>Membership</span>
+                    </NavLink>
+                  </li>
+                  <li
+                    onClick={() => {
+                      handleMenuModalClose(false);
+                    }}>
+                    <NavLink to="/tributes">
+                      <span>Tribute</span>
                     </NavLink>
                   </li>
                   <li
@@ -229,8 +221,8 @@ export function NavHamburger() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink to="/tributes">
-                      <span>Tribute</span>
+                    <NavLink to="/governance">
+                      <span>Governance</span>
                     </NavLink>
                   </li>
                   <li
@@ -253,7 +245,8 @@ export function NavHamburger() {
                     </li>
                   )}
                   {/* The Manage DAO link is available to both connected member users and connected delegate users. */}
-                  {isCurrentMemberOrDelegateConnected && (
+                  {/* @note Hiding DAO Manager for now because we paused on maintaining it. */}
+                  {/* {isCurrentMemberOrDelegateConnected && (
                     <li
                       onClick={() => {
                         handleMenuModalClose(false);
@@ -262,7 +255,7 @@ export function NavHamburger() {
                         <span>Manage DAO</span>
                       </NavLink>
                     </li>
-                  )}
+                  )} */}
                 </ul>
               </div>
             </nav>

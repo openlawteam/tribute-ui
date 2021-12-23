@@ -8,6 +8,7 @@ import {NavHamburger} from '../../components/Nav';
 import FadeIn from '../../components/common/FadeIn';
 import SocialMedia from '../../components/common/SocialMedia';
 import Wrap from '../../components/common/Wrap';
+import {featureFlags} from '../../util/features';
 
 const TributeCube = memo(() => {
   return (
@@ -74,13 +75,23 @@ export default function GetStarted() {
             </div>
 
             <div className="landing__button">
-              <button
-                className="button"
-                onClick={() => {
-                  history.push('/join');
-                }}>
-                Join
-              </button>
+              {featureFlags?.useKycOnboarding ? (
+                <button
+                  className="button"
+                  onClick={() => {
+                    history.push('/join');
+                  }}>
+                  Join
+                </button>
+              ) : (
+                <button
+                  className="button"
+                  onClick={() => {
+                    history.push('/onboard');
+                  }}>
+                  Join
+                </button>
+              )}
             </div>
           </div>
         </FadeIn>

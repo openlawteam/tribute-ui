@@ -429,7 +429,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
     <Wrap className="section-wrapper">
       <FadeIn>
         <div className="titlebar">
-          <h2 className="titlebar__title">Join</h2>
+          <h2 className="titlebar__title">Onboard</h2>
         </div>
 
         <div className="form-wrapper">

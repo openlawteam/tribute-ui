@@ -41,9 +41,9 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
    * Functions
    */
 
-  function viewMembers(event: React.MouseEvent<HTMLButtonElement>) {
+  function goToNewProposal(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
-    history.push('/members');
+    history.push('/onboard');
   }
 
   /**
@@ -55,8 +55,8 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
       <FadeIn>
         <div className="titlebar">
           <h2 className="titlebar__title">Membership</h2>
-          <button className="titlebar__action" onClick={viewMembers}>
-            View members
+          <button className="titlebar__action" onClick={goToNewProposal}>
+            Onboard
           </button>
         </div>
 

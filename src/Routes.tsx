@@ -29,34 +29,33 @@ export default function Routes() {
       {[
         // Index page
         <Route key="splash" exact path="/" render={() => <GetStarted />} />,
+        featureFlags?.useKycOnboarding && (
+          <Route
+            key="join"
+            exact
+            path="/join"
+            render={() => <KycOnboardingForm />}
+          />
+        ),
         <Route
-          key="join"
+          key="onboard"
           exact
-          path="/join"
-          render={() =>
-            featureFlags?.useKycOnboarding ? (
-              <KycOnboardingForm />
-            ) : (
-              <CreateMembershipProposal />
-            )
-          }
+          path="/onboard"
+          render={() => <CreateMembershipProposal />}
         />,
-        !featureFlags?.useKycOnboarding && (
-          <Route
-            key="membership"
-            exact
-            path="/membership"
-            render={() => <Membership />}
-          />
-        ),
-        !featureFlags?.useKycOnboarding && (
-          <Route
-            key="membership-details"
-            exact
-            path={`/membership/${proposalIdParameter}`}
-            render={() => <MembershipDetails />}
-          />
-        ),
+
+        <Route
+          key="membership"
+          exact
+          path="/membership"
+          render={() => <Membership />}
+        />,
+        <Route
+          key="membership-details"
+          exact
+          path={`/membership/${proposalIdParameter}`}
+          render={() => <MembershipDetails />}
+        />,
         <Route
           key="transfer"
           exact
