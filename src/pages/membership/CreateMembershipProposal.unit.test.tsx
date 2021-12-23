@@ -15,7 +15,7 @@ describe('CreateMembershipProposal unit tests', () => {
       </Wrapper>
     );
 
-    expect(screen.getByText(/join/i)).toBeInTheDocument();
+    expect(screen.getByText(/onboard/i)).toBeInTheDocument();
     expect(() => screen.getByLabelText(/applicant address/i)).toThrow();
     expect(() => screen.getByLabelText(/amount/i)).toThrow();
     expect(
@@ -42,7 +42,7 @@ describe('CreateMembershipProposal unit tests', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/join/i)).toBeInTheDocument();
+      expect(screen.getByText(/onboard/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/applicant address/i)).toBeInTheDocument();
       expect(screen.getByDisplayValue(DEFAULT_ETH_ADDRESS)).toBeInTheDocument();
       expect((document.getElementById('ethAddress') as any)?.value).toBe(
