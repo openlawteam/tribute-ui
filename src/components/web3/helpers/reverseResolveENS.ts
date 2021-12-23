@@ -3,8 +3,8 @@ import namehash from '@ensdomains/eth-ens-namehash';
 import Web3 from 'web3';
 
 import {CHAINS, DEFAULT_CHAIN} from '../../../config';
-import {ReverseRecords} from '../../../../abi-types/ReverseRecords';
-import ReverseRecordsABI from '../../../abis/ReverseRecords.json';
+import {ReverseRecords} from '../../../abis/types/ReverseRecords';
+import ReverseRecordsABI from '../../../abis/external/ReverseRecords.json';
 
 /**
  * @see https://github.com/ensdomains/reverse-records#deployed-contract-address
