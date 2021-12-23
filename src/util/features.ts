@@ -1,4 +1,4 @@
 export const featureFlags = {
-  joinIsWhitelisted: false,
+  joinIsWhitelisted: true,
   useKycOnboarding: false,
 };
