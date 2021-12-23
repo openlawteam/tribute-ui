@@ -25,6 +25,7 @@ module.exports = {
   },
   abiExporter: {
     path: "src/abis/tribute-contracts",
+    runOnCompile: true,
     clear: true,
     flat: true,
     pretty: false,
