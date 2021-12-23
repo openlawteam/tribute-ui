@@ -4,22 +4,22 @@ import Web3 from 'web3';
 
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../test/helpers';
 import {signTypedDataV4} from '../../test/web3Responses';
-import CreateMembershipProposal from './CreateMembershipProposal';
+import CreateOnboardingProposal from './CreateOnboardingProposal';
 import Wrapper from '../../test/Wrapper';
 
-describe('CreateMembershipProposal unit tests', () => {
+describe('CreateOnboardingProposal unit tests', () => {
   test('should not render form if not connected to a wallet', () => {
     render(
       <Wrapper>
-        <CreateMembershipProposal />
+        <CreateOnboardingProposal />
       </Wrapper>
     );
 
-    expect(screen.getByText(/onboard/i)).toBeInTheDocument();
+    expect(screen.getByText(/Onboard/)).toBeInTheDocument();
     expect(() => screen.getByLabelText(/applicant address/i)).toThrow();
     expect(() => screen.getByLabelText(/amount/i)).toThrow();
     expect(
-      screen.getByText(/connect your wallet to submit a membership proposal/i)
+      screen.getByText(/connect your wallet to submit an onboarding proposal/i)
     ).toBeInTheDocument();
   });
 
@@ -37,7 +37,7 @@ describe('CreateMembershipProposal unit tests', () => {
             )
           );
         }}>
-        <CreateMembershipProposal />
+        <CreateOnboardingProposal />
       </Wrapper>
     );
 
@@ -91,7 +91,7 @@ describe('CreateMembershipProposal unit tests', () => {
             )
           );
         }}>
-        <CreateMembershipProposal />
+        <CreateOnboardingProposal />
       </Wrapper>
     );
 

@@ -197,8 +197,8 @@ export function NavHamburger() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink to="/membership">
-                      <span>Membership</span>
+                    <NavLink to="/onboarding">
+                      <span>Onboarding</span>
                     </NavLink>
                   </li>
                   <li

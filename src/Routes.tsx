@@ -3,7 +3,7 @@ import {Route, Switch} from 'react-router-dom';
 import {ENABLE_KYC_ONBOARDING} from './config';
 import AdapterOrExtensionManager from './components/adapters-extensions/AdapterOrExtensionManager';
 import CreateGovernanceProposal from './pages/governance/CreateGovernanceProposal';
-import CreateMembershipProposal from './pages/membership/CreateMembershipProposal';
+import CreateOnboardingProposal from './pages/onboarding/CreateOnboardingProposal';
 import CreateTransferProposal from './pages/transfers/CreateTransferProposal';
 import CreateTributeProposal from './pages/tributes/CreateTributeProposal';
 import GetStarted from './pages/start/GetStarted';
@@ -12,8 +12,8 @@ import GovernanceProposals from './pages/governance/GovernanceProposals';
 import KycOnboardingForm from './pages/kyc-onboarding/KycOnboardingForm';
 import MemberProfile from './pages/members/MemberProfile';
 import Members from './pages/members/Members';
-import Membership from './pages/membership/Membership';
-import MembershipDetails from './pages/membership/MembershipDetails';
+import Onboarding from './pages/onboarding/Onboarding';
+import OnboardingDetails from './pages/onboarding/OnboardingDetails';
 import NotFound from './pages/subpages/NotFound';
 import Redeem from './pages/redeem/Redeem';
 import TransferDetails from './pages/transfers/TransferDetails';
@@ -41,20 +41,20 @@ export default function Routes() {
           key="onboard"
           exact
           path="/onboard"
-          render={() => <CreateMembershipProposal />}
+          render={() => <CreateOnboardingProposal />}
         />,
 
         <Route
-          key="membership"
+          key="onboarding"
           exact
-          path="/membership"
-          render={() => <Membership />}
+          path="/onboarding"
+          render={() => <Onboarding />}
         />,
         <Route
-          key="membership-details"
+          key="onboarding-details"
           exact
-          path={`/membership/${proposalIdParameter}`}
-          render={() => <MembershipDetails />}
+          path={`/onboarding/${proposalIdParameter}`}
+          render={() => <OnboardingDetails />}
         />,
         <Route
           key="transfer"

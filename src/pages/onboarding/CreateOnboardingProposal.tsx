@@ -45,7 +45,7 @@ type SubmitActionArguments = [
   string // `tokenAmount`
 ];
 
-export default function CreateMembershipProposal() {
+export default function CreateOnboardingProposal() {
   /**
    * Our hooks
    */
@@ -203,8 +203,8 @@ export default function CreateMembershipProposal() {
       if (!proposalId) {
         const body =
           normalizeString(ethAddress) === normalizeString(account)
-            ? `Membership for ${truncateEthAddress(ethAddressToChecksum, 7)}.`
-            : `Membership proposal from ${truncateEthAddress(
+            ? `Onboarding ${truncateEthAddress(ethAddressToChecksum, 7)}.`
+            : `Onboarding proposal from ${truncateEthAddress(
                 proposerAddressToChecksum,
                 7
               )} for applicant ${truncateEthAddress(ethAddressToChecksum, 7)}.`;
@@ -228,8 +228,8 @@ export default function CreateMembershipProposal() {
         proposalId = uniqueId;
       }
 
-      // go to MembershipDetails page for newly created member proposal
-      history.push(`/membership/${proposalId}`);
+      // go to OnboardingDetails page for newly created member proposal
+      history.push(`/onboarding/${proposalId}`);
     } catch (error) {
       // Set any errors from Web3 utils or explicitly set above.
       setSubmitError(error);
@@ -270,7 +270,7 @@ export default function CreateMembershipProposal() {
   function getUnauthorizedMessage() {
     // user is not connected
     if (!isConnected) {
-      return 'Connect your wallet to submit a membership proposal.';
+      return 'Connect your wallet to submit an onboarding proposal.';
     }
 
     // user is on wrong network
