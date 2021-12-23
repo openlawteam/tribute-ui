@@ -320,7 +320,7 @@ describe('ProposalCard unit tests', () => {
      */
     const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
       {
-        Voting: {
+        VotingDetails: {
           snapshot: 'uint256',
           reporter: 'address',
           resultRoot: 'bytes32',
@@ -726,7 +726,7 @@ describe('ProposalCard unit tests', () => {
        */
       const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
         {
-          Voting: {
+          VotingDetails: {
             snapshot: 'uint256',
             reporter: 'address',
             resultRoot: 'bytes32',
@@ -953,7 +953,7 @@ describe('ProposalCard unit tests', () => {
             [
               web3Instance.eth.abi.encodeParameter(
                 {
-                  Voting: {
+                  VotingDetails: {
                     snapshot: 'uint256',
                     proposalHash: 'bytes32',
                     reporter: 'address',
@@ -1179,7 +1179,7 @@ describe('ProposalCard unit tests', () => {
             [
               web3Instance.eth.abi.encodeParameter(
                 {
-                  Voting: {
+                  VotingDetails: {
                     snapshot: 'uint256',
                     proposalHash: 'bytes32',
                     reporter: 'address',
