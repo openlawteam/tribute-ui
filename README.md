@@ -35,9 +35,10 @@ NOTE:
 
 #### Additional Required Environment Variables for KYC Onboarding
 
-If `useKycOnboarding` is enabled in `src/features.ts`, you will also need the following environment variables:
+If you want to use the [KYC Onboarding adapter](https://github.com/openlawteam/tribute-contracts/blob/master/website/docs/contracts/adapters/onboarding/KycOnboarding.md), you will also need the following environment variables:
 
 ```
+REACT_APP_ENABLE_KYC_ONBOARDING=true
 REACT_APP_KYC_BACKEND_URL=http://localhost:3003/kyc-certificate
 REACT_APP_KYC_FORMS_URL=...
 ```

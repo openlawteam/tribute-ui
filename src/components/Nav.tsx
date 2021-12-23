@@ -12,7 +12,7 @@ import HamburgerSVG from '../assets/svg/HamburgerSVG';
 import TimesSVG from '../assets/svg/TimesSVG';
 import Web3ModalButton from './web3/Web3ModalButton';
 import DaoTokenHolder from './dao-token/DaoTokenHolder';
-import {featureFlags} from '../util/features';
+import {ENABLE_KYC_ONBOARDING} from '../config';
 
 // see: http://reactcommunity.org/react-transition-group/transition
 const duration = 200;
@@ -183,7 +183,7 @@ export function NavHamburger() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    {featureFlags?.useKycOnboarding ? (
+                    {ENABLE_KYC_ONBOARDING ? (
                       <NavLink to="/join">
                         <span>Join (KYC)</span>
                       </NavLink>

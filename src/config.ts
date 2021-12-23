@@ -16,6 +16,7 @@ const {
   REACT_APP_COUPON_API_URL,
   REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS,
   REACT_APP_DEFAULT_CHAIN_NAME_LOCAL,
+  REACT_APP_ENABLE_KYC_ONBOARDING,
   REACT_APP_ENVIRONMENT,
   REACT_APP_GRAPH_CORE_URL,
   REACT_APP_GRAPH_COUPON_ONBOARDING_URL,
@@ -48,6 +49,10 @@ export const SNAPSHOT_HUB_API_URL: string | undefined =
 
 // Coupon Manager API URL (for coupon onboarding)
 export const COUPON_API_URL: string | undefined = REACT_APP_COUPON_API_URL;
+
+// KYC Onboarding feature
+export const ENABLE_KYC_ONBOARDING: boolean =
+  REACT_APP_ENABLE_KYC_ONBOARDING === 'true';
 
 // KYC Backend URL (for KYC onboarding)
 export const KYC_BACKEND_URL: string | undefined = REACT_APP_KYC_BACKEND_URL;

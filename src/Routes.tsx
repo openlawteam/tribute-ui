@@ -1,6 +1,6 @@
 import {Route, Switch} from 'react-router-dom';
 
-import {featureFlags} from './util/features';
+import {ENABLE_KYC_ONBOARDING} from './config';
 import AdapterOrExtensionManager from './components/adapters-extensions/AdapterOrExtensionManager';
 import CreateGovernanceProposal from './pages/governance/CreateGovernanceProposal';
 import CreateMembershipProposal from './pages/membership/CreateMembershipProposal';
@@ -29,7 +29,7 @@ export default function Routes() {
       {[
         // Index page
         <Route key="splash" exact path="/" render={() => <GetStarted />} />,
-        featureFlags?.useKycOnboarding && (
+        ENABLE_KYC_ONBOARDING && (
           <Route
             key="join"
             exact
