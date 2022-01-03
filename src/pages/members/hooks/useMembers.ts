@@ -87,7 +87,6 @@ export default function useMembers(): UseMembersReturn {
     data,
     error,
     getMembersFromRegistryCached,
-    loading,
     setAddressesToENSReverseResolve,
   ]);
 
@@ -103,7 +102,7 @@ export default function useMembers(): UseMembersReturn {
 
   useEffect(() => {
     if (subgraphNetworkStatus === SubgraphNetworkStatus.OK) {
-      if (!loading && DaoRegistryContract?.contractAddress) {
+      if (called && !loading && DaoRegistryContract?.contractAddress) {
         getMembersFromSubgraphCached();
       }
     } else {
@@ -113,6 +112,7 @@ export default function useMembers(): UseMembersReturn {
     }
   }, [
     DaoRegistryContract?.contractAddress,
+    called,
     getMembersFromRegistryCached,
     getMembersFromSubgraphCached,
     loading,
@@ -142,7 +142,7 @@ export default function useMembers(): UseMembersReturn {
     try {
       setMembersStatus(AsyncStatus.PENDING);
 
-      if (!loading && data) {
+      if (data) {
         // extract members from gql data
         const {members} = data.tributeDaos[0] as Record<string, any>;
 
@@ -174,7 +174,12 @@ export default function useMembers(): UseMembersReturn {
         );
       } else {
         if (error) {
-          throw new Error(error.message);
+          throw new Error(`subgraph query error: ${error.message}`);
+        } else if (typeof data === 'undefined') {
+          // Additional case to catch `{"errors":{"message":"No indexers found
+          // for subgraph deployment"}}` which does not get returned as an error
+          // by the graph query call.
+          throw new Error('subgraph query error: data is undefined');
         }
       }
     } catch (error) {
@@ -182,7 +187,7 @@ export default function useMembers(): UseMembersReturn {
 
       // If there is a subgraph query error fallback to fetching members info
       // directly from smart contracts
-      console.log(`subgraph query error: ${message}`);
+      console.log(message);
 
       getMembersFromRegistryCached();
     }

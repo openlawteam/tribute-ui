@@ -87,7 +87,6 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
       erc20ExtensionContract?.contractAddress,
       error,
       getTokenHolderBalancesFromExtensionCached,
-      loading,
     ]
   );
 
@@ -107,7 +106,7 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
 
   useEffect(() => {
     if (subgraphNetworkStatus === SubgraphNetworkStatus.OK) {
-      if (!loading && erc20ExtensionContract?.contractAddress) {
+      if (called && !loading && erc20ExtensionContract?.contractAddress) {
         getTokenHolderBalancesFromSubgraphCached();
       }
     } else {
@@ -116,6 +115,7 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
       getTokenHolderBalancesFromExtensionCached();
     }
   }, [
+    called,
     erc20ExtensionContract?.contractAddress,
     getTokenHolderBalancesFromExtensionCached,
     getTokenHolderBalancesFromSubgraphCached,
@@ -150,7 +150,7 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
 
   function getTokenHolderBalancesFromSubgraph() {
     try {
-      if (!loading && data) {
+      if (data) {
         if (data.tokens.length === 0) {
           throw new Error(
             `"${erc20ExtensionContract?.contractAddress}" erc20 address not found.`
@@ -160,15 +160,21 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
         setTokenHolderBalances(data.tokens[0]);
       } else {
         if (error) {
-          throw new Error(
-            `"${erc20ExtensionContract?.contractAddress}" is not a valid erc20 address.`
-          );
+          throw new Error(`subgraph query error: ${error.message}`);
+        } else if (typeof data === 'undefined') {
+          // Additional case to catch `{"errors":{"message":"No indexers found
+          // for subgraph deployment"}}` which does not get returned as an error
+          // by the graph query call.
+          throw new Error('subgraph query error: data is undefined');
         }
       }
     } catch (error) {
+      const {message} = error as Error;
+
       // If there is a subgraph query error fallback to fetching token holder
       // info directly from smart contract
-      console.log(`subgraph query error: ${error.message}`);
+      console.log(message);
+
       getTokenHolderBalancesFromExtensionCached();
     }
   }

@@ -94,7 +94,7 @@ export default function AdapterOrExtensionManager() {
 
   const {defaultChainError} = useIsDefaultChain();
   const {connected, account, web3Instance} = useWeb3Modal();
-  const {dao, gqlError} = useDao();
+  const {dao, daoError} = useDao();
   const {average: gasPrice} = useETHGasPrice();
 
   const {
@@ -559,7 +559,7 @@ export default function AdapterOrExtensionManager() {
   }
 
   function renderDaoName() {
-    if (!dao && gqlError) {
+    if (!dao && daoError) {
       window.scrollTo({
         top: 0,
         left: 200,
@@ -568,7 +568,7 @@ export default function AdapterOrExtensionManager() {
 
       return (
         <ErrorMessageWithDetails
-          error={gqlError}
+          error={daoError}
           renderText="Something went wrong"
         />
       );

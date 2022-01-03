@@ -8,7 +8,7 @@ import {GET_DAO} from '../gql';
 
 type UseDaoReturn = {
   dao: Record<string, any> | undefined;
-  gqlError: Error | undefined;
+  daoError: Error | undefined;
 };
 
 /**
@@ -28,13 +28,12 @@ export function useDao(): UseDaoReturn {
   });
 
   const [dao, setDao] = useState<Record<string, any> | undefined>();
-  const [gqlError, setGqlError] = useState<Error>();
+  const [daoError, setDaoError] = useState<Error>();
 
   const getDaoRegistryCallback = useCallback(getDaoRegistry, [
     daoRegistryContract?.contractAddress,
     data,
     error,
-    loading,
   ]);
 
   useEffect(() => {
@@ -44,36 +43,40 @@ export function useDao(): UseDaoReturn {
   }, [called, getDao]);
 
   useEffect(() => {
-    if (!loading && daoRegistryContract?.contractAddress) {
+    if (called && !loading && daoRegistryContract?.contractAddress) {
       getDaoRegistryCallback();
     }
-  }, [daoRegistryContract?.contractAddress, getDaoRegistryCallback, loading]);
+  }, [
+    called,
+    daoRegistryContract?.contractAddress,
+    getDaoRegistryCallback,
+    loading,
+  ]);
 
   function getDaoRegistry() {
     try {
-      if (!loading && data) {
-        setDao(data.tributeDaos[0]);
-
+      if (data) {
         if (data.tributeDaos.length === 0) {
-          const error = new Error(
+          throw new Error(
             `"${daoRegistryContract?.contractAddress}" dao address not found.`
           );
-
-          throw error;
         }
+
+        setDao(data.tributeDaos[0]);
       } else {
         if (error) {
-          const error = new Error(
-            `"${daoRegistryContract?.contractAddress}" is not a valid dao address.`
-          );
-
-          throw error;
+          throw new Error(`subgraph query error: ${error.message}`);
+        } else if (typeof data === 'undefined') {
+          // Additional case to catch `{"errors":{"message":"No indexers found
+          // for subgraph deployment"}}` which does not get returned as an error
+          // by the graph query call.
+          throw new Error('subgraph query error: data is undefined');
         }
       }
     } catch (error) {
-      setGqlError(error);
+      setDaoError(error);
     }
   }
 
-  return {dao, gqlError};
+  return {dao, daoError};
 }
