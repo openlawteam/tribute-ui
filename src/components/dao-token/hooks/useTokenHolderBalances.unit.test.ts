@@ -26,7 +26,7 @@ describe('useTokenHolderBalanceseDao unit tests', () => {
 
       // Assert initial state
       expect(result.current.tokenHolderBalances).toBe(undefined);
-      expect(result.current.gqlError).toBe(undefined);
+      expect(result.current.tokenHolderBalancesError).toBe(undefined);
     });
   });
 });

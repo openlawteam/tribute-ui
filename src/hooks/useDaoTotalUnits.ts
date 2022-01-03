@@ -68,7 +68,7 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
 
   const getTotalUnitsFromSubgraphCached = useCallback(
     getTotalUnitsFromSubgraph,
-    [data, error, getTotalUnitsFromExtensionCached, loading]
+    [data, error, getTotalUnitsFromExtensionCached]
   );
 
   /**
@@ -83,7 +83,7 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
 
   useEffect(() => {
     if (subgraphNetworkStatus === SubgraphNetworkStatus.OK) {
-      if (!loading && DaoRegistryContract?.contractAddress) {
+      if (called && !loading && DaoRegistryContract?.contractAddress) {
         getTotalUnitsFromSubgraphCached();
       }
     } else {
@@ -93,6 +93,7 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
     }
   }, [
     DaoRegistryContract?.contractAddress,
+    called,
     getTotalUnitsFromExtensionCached,
     getTotalUnitsFromSubgraphCached,
     loading,
@@ -107,20 +108,28 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
     try {
       setTotalUnitsStatus(AsyncStatus.PENDING);
 
-      if (!loading && data) {
+      if (data) {
         // extract totalUnits from gql data
         const {totalUnits} = data.tributeDaos[0] as Record<string, any>;
         setTotalUnits(Number(totalUnits));
         setTotalUnitsStatus(AsyncStatus.FULFILLED);
       } else {
         if (error) {
-          throw new Error(error.message);
+          throw new Error(`subgraph query error: ${error.message}`);
+        } else if (typeof data === 'undefined') {
+          // Additional case to catch `{"errors":{"message":"No indexers found
+          // for subgraph deployment"}}` which does not get returned as an error
+          // by the graph query call.
+          throw new Error('subgraph query error: data is undefined');
         }
       }
     } catch (error) {
+      const {message} = error as Error;
+
       // If there is a subgraph query error fallback to fetching totalUnits
       // directly from smart contract
-      console.log(`subgraph query error: ${error.message}`);
+      console.log(message);
+
       getTotalUnitsFromExtensionCached();
     }
   }

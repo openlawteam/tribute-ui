@@ -23,7 +23,7 @@ describe('useDao unit tests', () => {
 
       // Assert initial state
       expect(result.current.dao).toBe(undefined);
-      expect(result.current.gqlError).toBe(undefined);
+      expect(result.current.daoError).toBe(undefined);
     });
   });
 });

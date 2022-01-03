@@ -62,7 +62,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
   /**
    * Their hooks
    */
-  const [getRegisteredAdaptersAndExtensions, {called, data, error}] =
+  const [getRegisteredAdaptersAndExtensions, {called, data, error, loading}] =
     useLazyQuery(GET_ADAPTERS_AND_EXTENSIONS, {
       pollInterval: GQL_QUERY_POLLING_INTERVAL,
       variables: {
@@ -95,7 +95,7 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
 
   // Get adapters and extensions from GQL
   useEffect(() => {
-    if (!DaoRegistryContract?.contractAddress) return;
+    if (!DaoRegistryContract?.contractAddress || !called || loading) return;
 
     try {
       setAdapterExtensionStatus(AsyncStatus.PENDING);
@@ -118,16 +118,31 @@ export function useAdaptersOrExtensions(): UseAdaptersOrExtensionsReturn {
         setAdapterExtensionStatus(AsyncStatus.FULFILLED);
       } else {
         if (error) {
-          throw new Error(error.message);
+          throw new Error(`subgraph query error: ${error.message}`);
+        } else if (typeof data === 'undefined') {
+          // Additional case to catch `{"errors":{"message":"No indexers found
+          // for subgraph deployment"}}` which does not get returned as an error
+          // by the graph query call.
+          throw new Error('subgraph query error: data is undefined');
         }
       }
     } catch (error) {
+      const {message} = error as Error;
+      console.log(message);
+
       setRegisteredAdaptersOrExtensions(undefined);
       setUnRegisteredAdaptersOrExtensions(undefined);
 
       setAdapterExtensionStatus(AsyncStatus.REJECTED);
     }
-  }, [DaoRegistryContract, data, error, getAdaptersAndExtensionsCached]);
+  }, [
+    DaoRegistryContract,
+    called,
+    data,
+    error,
+    getAdaptersAndExtensionsCached,
+    loading,
+  ]);
 
   /**
    * getAdaptersAndExtensions
