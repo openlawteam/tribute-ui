@@ -8,6 +8,7 @@ import {useForm} from 'react-hook-form';
 import {useHistory} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import {useState, useCallback, useEffect} from 'react';
+import {debounce} from 'debounce';
 
 import {
   useContractSend,
@@ -16,10 +17,9 @@ import {
   useWeb3Modal,
 } from '../../components/web3/hooks';
 import {
+  formatNumber,
   getValidationError,
   stripFormatNumber,
-  formatNumber,
-  formatDecimal,
   truncateEthAddress,
 } from '../../util/helpers';
 import {BURN_ADDRESS} from '../../util/constants';
@@ -532,10 +532,7 @@ export default function CreateTransferProposal() {
       return '---';
     }
 
-    const isBalanceInt = Number.isInteger(Number(selectedTokenBalance));
-    return isBalanceInt
-      ? selectedTokenBalance
-      : formatDecimal(Number(selectedTokenBalance));
+    return formatNumber(selectedTokenBalance);
   }
 
   function getUnauthorizedMessage() {
@@ -679,9 +676,14 @@ export default function CreateTransferProposal() {
                 aria-describedby={`error-${Fields.amount}`}
                 aria-invalid={errors.amount ? 'true' : 'false'}
                 name={Fields.amount}
-                onChange={() =>
-                  setValue(Fields.amount, formatNumber(getValues().amount))
-                }
+                onChange={debounce(
+                  () =>
+                    setValue(
+                      Fields.amount,
+                      formatNumber(stripFormatNumber(getValues().amount))
+                    ),
+                  1000
+                )}
                 ref={register({
                   validate: (amount: string): string | boolean => {
                     const amountToNumber = Number(stripFormatNumber(amount));
