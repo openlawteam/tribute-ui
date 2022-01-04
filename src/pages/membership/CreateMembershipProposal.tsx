@@ -3,14 +3,14 @@ import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm} from 'react-hook-form';
 import {toWei, toChecksumAddress} from 'web3-utils';
 import {useHistory} from 'react-router-dom';
+import {debounce} from 'debounce';
 
 import {
-  getValidationError,
-  stripFormatNumber,
   formatNumber,
-  formatDecimal,
-  truncateEthAddress,
+  getValidationError,
   normalizeString,
+  stripFormatNumber,
+  truncateEthAddress,
 } from '../../util/helpers';
 import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
@@ -264,10 +264,7 @@ export default function CreateMembershipProposal() {
       return '---';
     }
 
-    const isBalanceInt = Number.isInteger(Number(userAccountBalance));
-    return isBalanceInt
-      ? userAccountBalance
-      : formatDecimal(Number(userAccountBalance));
+    return formatNumber(userAccountBalance);
   }
 
   function getUnauthorizedMessage() {
@@ -345,12 +342,14 @@ export default function CreateMembershipProposal() {
                 aria-invalid={errors.ethAmount ? 'true' : 'false'}
                 id={Fields.ethAmount}
                 name={Fields.ethAmount}
-                onChange={() =>
-                  setValue(
-                    Fields.ethAmount,
-                    formatNumber(getValues().ethAmount)
-                  )
-                }
+                onChange={debounce(
+                  () =>
+                    setValue(
+                      Fields.ethAmount,
+                      formatNumber(stripFormatNumber(getValues().ethAmount))
+                    ),
+                  1000
+                )}
                 ref={register({
                   validate: (value: string): string | boolean => {
                     const amount = Number(stripFormatNumber(value));
