@@ -14,7 +14,7 @@
     "npm": "^7.0.0"
   },
   "dependencies": {
-    "@apollo/client": "^3.4.17",
+    "@apollo/client": "^3.5.6",
     "@apollo/react-hooks": "^4.0.0",
     "@ensdomains/eth-ens-namehash": "^2.0.15",
     "@openlaw/snapshot-js-erc712": "^1.2.0",
