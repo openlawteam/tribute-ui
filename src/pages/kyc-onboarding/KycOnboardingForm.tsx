@@ -5,7 +5,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useForm, Controller} from 'react-hook-form';
 
 import {
-  formatDecimal,
   formatNumber,
   getValidationError,
   normalizeString,
@@ -70,11 +69,7 @@ function renderUserAccountBalance(userAccountBalance: string | undefined) {
     return '---';
   }
 
-  const balanceToNumber: number = Number(userAccountBalance);
-
-  return Number.isInteger(balanceToNumber)
-    ? userAccountBalance
-    : formatDecimal(balanceToNumber);
+  return formatNumber(userAccountBalance);
 }
 
 function renderUnauthorizedMessage({
