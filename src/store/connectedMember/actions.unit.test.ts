@@ -21,12 +21,7 @@ describe('connectedMember actions unit tests', () => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
     });
 
-    // Setup for `getConnectedMember`
-    // For `getExtensionAddress` call
-    mockWeb3Provider.injectResult(
-      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
-    );
-    // For multicall
+    // Setup for `getConnectedMember` multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -37,14 +32,14 @@ describe('connectedMember actions unit tests', () => {
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
             // For `members` call
             web3.eth.abi.encodeParameter('uint8', '1'),
+            // For `isActiveMember` call
+            web3.eth.abi.encodeParameter('bool', true),
             // For `getCurrentDelegateKey` call
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
           ],
         ]
       )
     );
-    // For `balanceOf` call
-    mockWeb3Provider.injectResult(web3.eth.abi.encodeParameter('uint160', 100));
 
     // Dispatch `getConnectedMember`
     store.dispatch(
@@ -79,10 +74,6 @@ describe('connectedMember actions unit tests', () => {
     // Setup for `getConnectedMember`
     const delegateAddress: string =
       '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1';
-    // For `getExtensionAddress` call
-    mockWeb3Provider.injectResult(
-      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
-    );
     // For multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
@@ -94,14 +85,14 @@ describe('connectedMember actions unit tests', () => {
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
             // For `members` call
             web3.eth.abi.encodeParameter('uint8', '1'),
+            // For `isActiveMember` call
+            web3.eth.abi.encodeParameter('bool', true),
             // For `getCurrentDelegateKey` call
             web3.eth.abi.encodeParameter('address', delegateAddress),
           ],
         ]
       )
     );
-    // For `balanceOf` call
-    mockWeb3Provider.injectResult(web3.eth.abi.encodeParameter('uint160', 100));
 
     // Dispatch `getConnectedMember`
     store.dispatch(
@@ -133,12 +124,7 @@ describe('connectedMember actions unit tests', () => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
     });
 
-    // Setup for `getConnectedMember`
-    // For `getExtensionAddress` call
-    mockWeb3Provider.injectResult(
-      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
-    );
-    // For multicall
+    // Setup for `getConnectedMember` multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -149,14 +135,14 @@ describe('connectedMember actions unit tests', () => {
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
             // For `members` call
             web3.eth.abi.encodeParameter('uint8', '1'),
+            // For `isActiveMember` call
+            web3.eth.abi.encodeParameter('bool', false),
             // For `getCurrentDelegateKey` call
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
           ],
         ]
       )
     );
-    // For `balanceOf` call
-    mockWeb3Provider.injectResult(web3.eth.abi.encodeParameter('uint160', 0));
 
     // Dispatch `getConnectedMember`
     store.dispatch(
@@ -188,12 +174,7 @@ describe('connectedMember actions unit tests', () => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
     });
 
-    // Setup for `getConnectedMember`
-    // For `getExtensionAddress` call
-    mockWeb3Provider.injectResult(
-      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
-    );
-    // For multicall
+    // Setup for `getConnectedMember` multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -204,14 +185,14 @@ describe('connectedMember actions unit tests', () => {
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
             // For `members` call
             web3.eth.abi.encodeParameter('uint8', '0'),
+            // For `isActiveMember` call
+            web3.eth.abi.encodeParameter('bool', false),
             // For `getCurrentDelegateKey` call
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
           ],
         ]
       )
     );
-    // For `balanceOf` call
-    mockWeb3Provider.injectResult(web3.eth.abi.encodeParameter('uint160', 0));
 
     // Dispatch `getConnectedMember`
     store.dispatch(
@@ -243,12 +224,7 @@ describe('connectedMember actions unit tests', () => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
     });
 
-    // Setup for `getConnectedMember`
-    // For `getExtensionAddress` call
-    mockWeb3Provider.injectResult(
-      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
-    );
-    // For multicall
+    // Setup for `getConnectedMember` multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -302,12 +278,7 @@ describe('connectedMember actions unit tests', () => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
     });
 
-    // Setup for `getConnectedMember`
-    // For `getExtensionAddress` call
-    mockWeb3Provider.injectResult(
-      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
-    );
-    // For multicall
+    // Setup for `getConnectedMember` multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -318,14 +289,14 @@ describe('connectedMember actions unit tests', () => {
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
             // For `members` call
             web3.eth.abi.encodeParameter('uint8', '1'),
+            // For `isActiveMember` call
+            web3.eth.abi.encodeParameter('bool', true),
             // For `getCurrentDelegateKey` call
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
           ],
         ]
       )
     );
-    // For `balanceOf` call
-    mockWeb3Provider.injectResult(web3.eth.abi.encodeParameter('uint160', 100));
 
     await waitFor(() => {
       expect(store.getState().connectedMember).toBe(null);

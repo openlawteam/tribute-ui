@@ -223,6 +223,8 @@ export default function Wrapper(
               ),
               // For `members` call
               web3Instance.eth.abi.encodeParameter('uint8', '1'),
+              // For `isActiveMember` call
+              web3Instance.eth.abi.encodeParameter('bool', true),
               // For `getCurrentDelegateKey` call
               web3Instance.eth.abi.encodeParameter(
                 'address',
@@ -232,11 +234,6 @@ export default function Wrapper(
           ]
         ),
         {debugName: '<Wrapper /> multicall for `getConnectedMember`'}
-      );
-      // For `balanceOf` call
-      mockWeb3Provider.injectResult(
-        web3Instance.eth.abi.encodeParameter('uint160', 100),
-        {debugName: '<Wrapper /> balanceOf for `getConnectedMember`'}
       );
     }
   }, [mockWeb3Provider, useInit, useWallet, web3Instance]);

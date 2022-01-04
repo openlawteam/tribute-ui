@@ -1,16 +1,13 @@
 import {Dispatch} from 'redux';
 import Web3 from 'web3';
-import {toBN, AbiItem} from 'web3-utils';
 
 import {BURN_ADDRESS} from '../../util/constants';
 import {ConnectedMemberState} from '../connectedMember/types';
 import {ContractsStateEntry} from '../contracts/types';
 import {DaoRegistry} from '../../abis/types/DaoRegistry';
 import {hasFlag, multicall} from '../../components/web3/helpers';
-import {MemberFlag, ContractExtensionNames} from '../../components/web3/types';
+import {MemberFlag} from '../../components/web3/types';
 import {normalizeString} from '../../util/helpers';
-import {UNITS_ADDRESS} from '../../config';
-import {getExtensionAddress} from '../../components/web3/helpers/getExtensionAddress';
 
 export const SET_CONNECTED_MEMBER = 'SET_CONNECTED_MEMBER';
 export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
@@ -44,29 +41,19 @@ export function getConnectedMember({
     const membersABI = daoRegistryContract?.abi.find(
       (ai) => ai.name === 'members'
     );
+    const isActiveMemberABI = daoRegistryContract?.abi.find(
+      (ai) => ai.name === 'isActiveMember'
+    );
     const getCurrentDelegateKeyABI = daoRegistryContract?.abi.find(
       (ai) => ai.name === 'getCurrentDelegateKey'
     );
 
-    const bankExtensionAddress = await getExtensionAddress(
-      ContractExtensionNames.bank,
-      daoRegistryContract?.instance
-    );
-    const {default: lazyABI} = await import(
-      '../../abis/tribute-contracts/BankExtension.json'
-    );
-    const bankExtensionABI: AbiItem[] = lazyABI as any;
-    const bankExtensionInstance = new web3Instance.eth.Contract(
-      bankExtensionABI,
-      bankExtensionAddress
-    );
-
     if (
       !account ||
-      !bankExtensionInstance ||
       !daoRegistryAddress ||
       !getAddressIfDelegatedABI ||
       !getCurrentDelegateKeyABI ||
+      !isActiveMemberABI ||
       !membersABI
     ) {
       dispatch(clearConnectedMember());
@@ -79,20 +66,24 @@ export function getConnectedMember({
        * @link https://github.com/openlawteam/tribute-contracts/blob/master/docs/core/DaoRegistry.md
        */
 
-      const [addressIfDelegated, memberFlag, currentDelegateKey] =
-        await multicall({
-          calls: [
-            [daoRegistryAddress, getAddressIfDelegatedABI, [account]],
-            [daoRegistryAddress, membersABI, [account]],
-            [daoRegistryAddress, getCurrentDelegateKeyABI, [account]],
+      const [
+        addressIfDelegated,
+        memberFlag,
+        isActiveMember,
+        currentDelegateKey,
+      ] = await multicall({
+        calls: [
+          [daoRegistryAddress, getAddressIfDelegatedABI, [account]],
+          [daoRegistryAddress, membersABI, [account]],
+          [
+            daoRegistryAddress,
+            isActiveMemberABI,
+            [daoRegistryAddress, account],
           ],
-          web3Instance,
-        });
-
-      const memberUnitsBalance = await bankExtensionInstance.methods
-        .balanceOf(addressIfDelegated, UNITS_ADDRESS)
-        .call();
-      const isActiveMember = toBN(memberUnitsBalance).gt(toBN(0));
+          [daoRegistryAddress, getCurrentDelegateKeyABI, [account]],
+        ],
+        web3Instance,
+      });
 
       // A member can exist in the DAO, yet not be an active member (has units > 0)
       const doesMemberExist: boolean = hasFlag(MemberFlag.EXISTS, memberFlag);
