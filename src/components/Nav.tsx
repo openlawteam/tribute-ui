@@ -179,20 +179,16 @@ export function NavHamburger() {
                   <Web3ModalButton />
                 </div>
                 <ul className="nav__list">
-                  <li
-                    onClick={() => {
-                      handleMenuModalClose(false);
-                    }}>
-                    {ENABLE_KYC_ONBOARDING ? (
+                  {ENABLE_KYC_ONBOARDING && (
+                    <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
                       <NavLink to="/join">
                         <span>Join (KYC)</span>
                       </NavLink>
-                    ) : (
-                      <NavLink to="/onboard">
-                        <span>Onboard</span>
-                      </NavLink>
-                    )}
-                  </li>
+                    </li>
+                  )}
                   <li
                     onClick={() => {
                       handleMenuModalClose(false);
