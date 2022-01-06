@@ -206,8 +206,8 @@ export default function KycOnboardingForm() {
     control,
     errors,
     getValues,
-    setValue,
     register,
+    setValue,
     trigger,
     watch,
   } = form;
@@ -587,36 +587,185 @@ export default function KycOnboardingForm() {
   // Render unauthorized message
   if (!isConnected || defaultChainError) {
     return (
-      <Wrap className="section-wrapper">
-        <FadeIn>
-          <div className="titlebar">
-            <h2 className="titlebar__title">Join</h2>
-          </div>
+      <RenderWrapper>
+        <div className="form__description">
+          <p>
+            Tribute DAO will have up to {maxMembersText} initial members. Each
+            member can purchase {minUnitsText} units for {minEthAmountText} ETH
+            (up to {maxUnitsText} units for {maxEthAmountText} ETH).
+          </p>
+          <p>
+            Please put your preferred ETH address below and the amount of ETH
+            you&apos;d like to contribute.
+          </p>
+        </div>
 
-          <div className="form-wrapper">
-            <div className="form__description">
-              <p>
-                Tribute DAO will have up to {maxMembersText} initial members.
-                Each member can purchase {minUnitsText} units for{' '}
-                {minEthAmountText} ETH (up to {maxUnitsText} units for{' '}
-                {maxEthAmountText} ETH).
-              </p>
-              <p>
-                Please put your preferred ETH address below and the amount of
-                ETH you&apos;d like to contribute.
-              </p>
-            </div>
-
-            <div className="form__description--unauthorized">
-              <p>
-                {renderUnauthorizedMessage({defaultChainError, isConnected})}
-              </p>
-            </div>
-          </div>
-        </FadeIn>
-      </Wrap>
+        <div className="form__description--unauthorized">
+          <p>{renderUnauthorizedMessage({defaultChainError, isConnected})}</p>
+        </div>
+      </RenderWrapper>
     );
   }
+
+  return (
+    <RenderWrapper>
+      <div className="form__description">
+        {/* KYC CHECK STATUS MESSAGE */}
+        {kycCheckMessageJSX && (
+          <div className="form__header">
+            <FadeIn>
+              <p>{kycCheckMessageJSX}</p>
+            </FadeIn>
+          </div>
+        )}
+
+        <p>
+          Tribute DAO will have up to {maxMembersText} initial members. Each
+          member can purchase {minUnitsText} units for {minEthAmountText} ETH
+          (up to {maxUnitsText} units for {maxEthAmountText} ETH).
+        </p>
+        <p>
+          Please put your preferred ETH address below and the amount of ETH
+          you&apos;d like to contribute.
+        </p>
+      </div>
+
+      <form className="form" onSubmit={(e) => e.preventDefault()}>
+        {/* ETH ADDRESS */}
+        <div className="form__input-row">
+          <label className="form__input-row-label" htmlFor={Fields.ethAddress}>
+            Applicant Address
+          </label>
+          <div className="form__input-row-fieldwrap">
+            {/* @note We don't need the default value as it's handled in the useEffect above. */}
+            <input
+              aria-describedby={`error-${Fields.ethAddress}`}
+              aria-invalid={errors.ethAddress ? 'true' : 'false'}
+              id={Fields.ethAddress}
+              name={Fields.ethAddress}
+              ref={register({
+                validate: (ethAddress: string): string | boolean => {
+                  return !ethAddress
+                    ? FormFieldErrors.REQUIRED
+                    : !isEthAddressValid(ethAddress)
+                    ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
+                    : true;
+                },
+              })}
+              type="text"
+              disabled={isInProcessOrDone}
+            />
+
+            <InputError
+              error={getValidationError(Fields.ethAddress, errors)}
+              id={`error-${Fields.ethAddress}`}
+            />
+          </div>
+        </div>
+
+        {/* ETH AMOUNT SLIDER */}
+        <div className="form__input-row">
+          <label
+            className="form__input-row-label"
+            htmlFor={Fields.ethAmount}
+            id={`${Fields.ethAmount}-label`}>
+            Amount
+          </label>
+          <div className="form__input-row-fieldwrap--narrow">
+            <Controller
+              render={({onChange}) => (
+                <Slider
+                  aria-labelledby={`${Fields.ethAmount}-label`}
+                  defaultValue={sliderMin || 0}
+                  id={Fields.ethAmount}
+                  max={sliderMax || 0}
+                  min={sliderMin || 0}
+                  step={sliderStep || 0}
+                  onChange={onChange}
+                  disabled={isInProcessOrDone}
+                />
+              )}
+              defaultValue={sliderMin || 0}
+              control={control}
+              name={Fields.ethAmount}
+              rules={{
+                validate: (value: string): string | boolean => {
+                  const amount = Number(stripFormatNumber(value));
+
+                  return amount >= Number(userAccountBalance)
+                    ? `Insufficient funds. ${renderUserAccountBalance(
+                        userAccountBalance
+                      )} ETH available.`
+                    : true;
+                },
+              }}
+            />
+
+            <InputError
+              error={getValidationError(Fields.ethAmount, errors)}
+              id={`error-${Fields.ethAmount}`}
+            />
+          </div>
+          <div className="form__input-addon">{ethAmountValue} ETH</div>
+        </div>
+
+        {/* SUBMIT */}
+        <button
+          aria-label={isInProcess ? 'Submitting your proposal.' : ''}
+          className="button"
+          disabled={submitDisabled}
+          onClick={
+            submitDisabled
+              ? () => {}
+              : async () => {
+                  if (!(await trigger())) {
+                    return;
+                  }
+
+                  handleSubmit(getValues());
+                }
+          }
+          type="submit">
+          {isInProcess ? <Loader /> : isDone ? 'Done' : 'Submit'}
+        </button>
+
+        {/* SUBMIT STATUS */}
+        {isInProcessOrDone && (
+          <div className="form__submit-status-container">
+            {renderSubmitStatus({txEtherscanURL, txStatus})}
+          </div>
+        )}
+
+        {/* SUBMIT ERROR */}
+        {kycOnboardingError && (
+          <div className="form__submit-error-container">
+            <ErrorMessageWithDetails
+              renderText="Something went wrong with the submission."
+              error={kycOnboardingError}
+              detailsProps={{open: true}}
+            />
+          </div>
+        )}
+
+        {/* KYC CHECK ERROR */}
+        {kycCheckError && (
+          <div className="form__submit-error-container">
+            <ErrorMessageWithDetails
+              renderText="There is a KYC check error."
+              error={kycCheckError}
+              detailsProps={{open: true}}
+            />
+          </div>
+        )}
+      </form>
+    </RenderWrapper>
+  );
+}
+
+function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
+  /**
+   * Render
+   */
 
   return (
     <Wrap className="section-wrapper">
@@ -626,162 +775,8 @@ export default function KycOnboardingForm() {
         </div>
 
         <div className="form-wrapper">
-          <div className="form__description">
-            {/* KYC CHECK STATUS MESSAGE */}
-            {kycCheckMessageJSX && (
-              <div className="form__header">
-                <FadeIn>
-                  <p>{kycCheckMessageJSX}</p>
-                </FadeIn>
-              </div>
-            )}
-
-            <p>
-              Tribute DAO will have up to {maxMembersText} initial members. Each
-              member can purchase {minUnitsText} units for {minEthAmountText}{' '}
-              ETH (up to {maxUnitsText} units for {maxEthAmountText} ETH).
-            </p>
-            <p>
-              Please put your preferred ETH address below and the amount of ETH
-              you&apos;d like to contribute.
-            </p>
-          </div>
-
-          <form className="form" onSubmit={(e) => e.preventDefault()}>
-            {/* ETH ADDRESS */}
-            <div className="form__input-row">
-              <label
-                className="form__input-row-label"
-                htmlFor={Fields.ethAddress}>
-                Applicant Address
-              </label>
-              <div className="form__input-row-fieldwrap">
-                {/* @note We don't need the default value as it's handled in the useEffect above. */}
-                <input
-                  aria-describedby={`error-${Fields.ethAddress}`}
-                  aria-invalid={errors.ethAddress ? 'true' : 'false'}
-                  id={Fields.ethAddress}
-                  name={Fields.ethAddress}
-                  ref={register({
-                    validate: (ethAddress: string): string | boolean => {
-                      return !ethAddress
-                        ? FormFieldErrors.REQUIRED
-                        : !isEthAddressValid(ethAddress)
-                        ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
-                        : true;
-                    },
-                  })}
-                  type="text"
-                  disabled={isInProcessOrDone}
-                />
-
-                <InputError
-                  error={getValidationError(Fields.ethAddress, errors)}
-                  id={`error-${Fields.ethAddress}`}
-                />
-              </div>
-            </div>
-
-            {/* ETH AMOUNT SLIDER */}
-            <div className="form__input-row">
-              <label
-                className="form__input-row-label"
-                htmlFor={Fields.ethAmount}
-                id={`${Fields.ethAmount}-label`}>
-                Amount
-              </label>
-              <div className="form__input-row-fieldwrap--narrow">
-                <Controller
-                  render={({onChange}) => (
-                    <Slider
-                      aria-labelledby={`${Fields.ethAmount}-label`}
-                      defaultValue={sliderMin || 0}
-                      id={Fields.ethAmount}
-                      max={sliderMax || 0}
-                      min={sliderMin || 0}
-                      step={sliderStep || 0}
-                      onChange={onChange}
-                      disabled={isInProcessOrDone}
-                    />
-                  )}
-                  defaultValue={sliderMin || 0}
-                  control={control}
-                  name={Fields.ethAmount}
-                  rules={{
-                    validate: (value: string): string | boolean => {
-                      const amount = Number(stripFormatNumber(value));
-
-                      return amount >= Number(userAccountBalance)
-                        ? `Insufficient funds. ${renderUserAccountBalance(
-                            userAccountBalance
-                          )} ETH available.`
-                        : true;
-                    },
-                  }}
-                />
-
-                <InputError
-                  error={getValidationError(Fields.ethAmount, errors)}
-                  id={`error-${Fields.ethAmount}`}
-                />
-
-                {/* <div className="form__input-description">
-              The minimum amount is set based on the entity type of the KYC
-              verified applicant address.
-            </div> */}
-              </div>
-              <div className="form__input-addon">{ethAmountValue} ETH</div>
-            </div>
-
-            {/* SUBMIT */}
-            <button
-              aria-label={isInProcess ? 'Submitting your proposal.' : ''}
-              className="button"
-              disabled={submitDisabled}
-              onClick={
-                submitDisabled
-                  ? () => {}
-                  : async () => {
-                      if (!(await trigger())) {
-                        return;
-                      }
-
-                      handleSubmit(getValues());
-                    }
-              }
-              type="submit">
-              {isInProcess ? <Loader /> : isDone ? 'Done' : 'Submit'}
-            </button>
-
-            {/* SUBMIT STATUS */}
-            {isInProcessOrDone && (
-              <div className="form__submit-status-container">
-                {renderSubmitStatus({txEtherscanURL, txStatus})}
-              </div>
-            )}
-
-            {/* SUBMIT ERROR */}
-            {kycOnboardingError && (
-              <div className="form__submit-error-container">
-                <ErrorMessageWithDetails
-                  renderText="Something went wrong with the submission."
-                  error={kycOnboardingError}
-                  detailsProps={{open: true}}
-                />
-              </div>
-            )}
-
-            {/* KYC CHECK ERROR */}
-            {kycCheckError && (
-              <div className="form__submit-error-container">
-                <ErrorMessageWithDetails
-                  renderText="There is a KYC check error."
-                  error={kycCheckError}
-                  detailsProps={{open: true}}
-                />
-              </div>
-            )}
-          </form>
+          {/* RENDER CHILDREN */}
+          {props.children}
         </div>
       </FadeIn>
     </Wrap>
