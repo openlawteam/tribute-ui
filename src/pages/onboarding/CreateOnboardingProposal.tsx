@@ -546,6 +546,7 @@ export default function CreateOnboardingProposal() {
             <Controller
               render={({onChange}) => (
                 <Slider
+                  data-testid="onboarding-slider"
                   aria-labelledby={`${Fields.ethAmount}-label`}
                   defaultValue={sliderMin || 0}
                   id={Fields.ethAmount}
