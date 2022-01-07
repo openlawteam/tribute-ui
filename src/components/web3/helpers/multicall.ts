@@ -1,9 +1,9 @@
 import Web3 from 'web3';
 import {AbiItem} from 'web3-utils/types';
 
-import {BlockType} from '../../../../abi-types/types';
+import {BlockType} from '../../../abis/types/types';
 import {MULTICALL_CONTRACT_ADDRESS} from '../../../config';
-import {Multicall} from '../../../../abi-types/Multicall';
+import {Multicall} from '../../../abis/types/Multicall';
 
 export type MulticallTuple = [
   contractAddress: string,
@@ -24,7 +24,7 @@ export async function multicall<T = any[]>({
   web3Instance: Web3;
 }): Promise<T> {
   const {default: lazyMulticallABI} = await import(
-    '../../../abis/Multicall.json'
+    '../../../abis/tribute-contracts/Multicall.json'
   );
 
   if (!MULTICALL_CONTRACT_ADDRESS) {

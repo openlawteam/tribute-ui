@@ -12,6 +12,7 @@ import HamburgerSVG from '../assets/svg/HamburgerSVG';
 import TimesSVG from '../assets/svg/TimesSVG';
 import Web3ModalButton from './web3/Web3ModalButton';
 import DaoTokenHolder from './dao-token/DaoTokenHolder';
+import {ENABLE_KYC_ONBOARDING} from '../config';
 
 // see: http://reactcommunity.org/react-transition-group/transition
 const duration = 200;
@@ -39,23 +40,13 @@ export function NavLinks() {
     <nav role="navigation" id="navigation">
       <ul className="nav__list" data-testid="nav__list">
         <li tabIndex={0}>
-          <NavLink to="/membership">
-            <span>Membership</span>
-          </NavLink>
-        </li>
-        <li tabIndex={0}>
           <NavLink to="/governance">
             <span>Governance</span>
           </NavLink>
         </li>
         <li tabIndex={0}>
-          <NavLink to="/transfers">
-            <span>Transfer</span>
-          </NavLink>
-        </li>
-        <li tabIndex={0}>
-          <NavLink to="/tributes">
-            <span>Tribute</span>
+          <NavLink to="/members">
+            <span>Members</span>
           </NavLink>
         </li>
       </ul>
@@ -106,8 +97,8 @@ export function NavHamburger() {
    * Variables
    */
 
-  const isCurrentMemberOrDelegateConnected: boolean =
-    account && connectedMember?.isActiveMember ? true : false;
+  // const isCurrentMemberOrDelegateConnected: boolean =
+  //   account && connectedMember?.isActiveMember ? true : false;
   const isCurrentMemberConnected: boolean =
     account &&
     connectedMember?.isActiveMember &&
@@ -188,20 +179,30 @@ export function NavHamburger() {
                   <Web3ModalButton />
                 </div>
                 <ul className="nav__list">
+                  {ENABLE_KYC_ONBOARDING && (
+                    <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to="/join">
+                        <span>Join (KYC)</span>
+                      </NavLink>
+                    </li>
+                  )}
                   <li
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink to="/membership">
-                      <span>Membership</span>
+                    <NavLink to="/onboarding">
+                      <span>Onboarding</span>
                     </NavLink>
                   </li>
                   <li
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink to="/governance">
-                      <span>Governance</span>
+                    <NavLink to="/tributes">
+                      <span>Tribute</span>
                     </NavLink>
                   </li>
                   <li
@@ -216,8 +217,16 @@ export function NavHamburger() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink to="/tributes">
-                      <span>Tribute</span>
+                    <NavLink to="/governance">
+                      <span>Governance</span>
+                    </NavLink>
+                  </li>
+                  <li
+                    onClick={() => {
+                      handleMenuModalClose(false);
+                    }}>
+                    <NavLink to="/members">
+                      <span>Members</span>
                     </NavLink>
                   </li>
                   {/* The Profile link is available to only the connected member user (not any delegate) because the profile exists for the member account. */}
@@ -232,7 +241,8 @@ export function NavHamburger() {
                     </li>
                   )}
                   {/* The Manage DAO link is available to both connected member users and connected delegate users. */}
-                  {isCurrentMemberOrDelegateConnected && (
+                  {/* @note Hiding DAO Manager for now because we paused on maintaining it. */}
+                  {/* {isCurrentMemberOrDelegateConnected && (
                     <li
                       onClick={() => {
                         handleMenuModalClose(false);
@@ -241,7 +251,7 @@ export function NavHamburger() {
                         <span>Manage DAO</span>
                       </NavLink>
                     </li>
-                  )}
+                  )} */}
                 </ul>
               </div>
             </nav>

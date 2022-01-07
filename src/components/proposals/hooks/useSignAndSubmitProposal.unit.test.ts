@@ -105,6 +105,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
         },
         signature:
           '0x6772656174207369676e61747572650000000000000000000000000000000000',
+        submitter: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
         /**
          * @note This actually matches a proposal ID (set in our mock server)
          *   This was done to make the mocked HTTP calls easier.
@@ -246,6 +247,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
         uniqueIdDraft: snapshotAPISubmitMessage.uniqueId,
         signature:
           '0x6772656174207369676e61747572650000000000000000000000000000000000',
+        submitter: '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D',
       });
       expect(result.current.proposalSignAndSendError).toBe(undefined);
       expect(result.current.proposalSignAndSendStatus).toBe(
@@ -277,7 +279,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
       });
 
       // Call signAndSendProposal
-      const {data, signature, uniqueId} =
+      const {data, signature, submitter, uniqueId} =
         await result.current.signAndSendProposal({
           partialProposalData: {
             name: 'Test Name',
@@ -311,6 +313,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
       expect(signature).toBe(
         '0x6772656174207369676e61747572650000000000000000000000000000000000'
       );
+      expect(submitter).toBe('0x04028Df0Cea639E97fDD3fC01bA5CC172613211D');
       expect(uniqueId).toBe(snapshotAPISubmitMessage.uniqueId);
     });
   });
@@ -365,7 +368,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
       });
 
       // Call signAndSendProposal
-      const {data, signature, uniqueId, uniqueIdDraft} =
+      const {data, signature, submitter, uniqueId, uniqueIdDraft} =
         await result.current.signAndSendProposal({
           partialProposalData: {
             name: 'Test Name',
@@ -408,6 +411,7 @@ describe('useSignAndSubmitProposal unit tests', () => {
       expect(signature).toBe(
         '0x6772656174207369676e61747572650000000000000000000000000000000000'
       );
+      expect(submitter).toBe('0x04028Df0Cea639E97fDD3fC01bA5CC172613211D');
       expect(uniqueId).toBe('1234567jkl');
       expect(uniqueIdDraft).toBe(snapshotAPISubmitMessage.uniqueId);
     });

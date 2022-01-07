@@ -122,7 +122,7 @@ select:-webkit-autofill:focus {
 // MIT License
 
 $track-color: $color-background-primary !default;
-$thumb-color: #b7c3d3 !default;
+$thumb-color: $color-primary !default;
 
 $thumb-radius: 50% !default;
 $thumb-height: 28px !default;
@@ -131,7 +131,7 @@ $thumb-shadow-size: 0 !default;
 $thumb-shadow-blur: 0 !default;
 $thumb-shadow-color: rgba(0, 0, 0, 0.2) !default;
 $thumb-border-width: 1px !default;
-$thumb-border-color: #b7c3d3 !default;
+$thumb-border-color: $color-background-primary !default;
 
 $track-width: 100% !default;
 $track-height: 18px !default;
@@ -172,7 +172,7 @@ $ie-bottom-track-color: darken($track-color, $contrast) !default;
 input[type="range"] {
   -webkit-appearance: none;
   background: transparent;
-  margin: math.div($thumb-height, 2) 0;
+  margin: math.div($thumb-height, 2) 0 0;
   width: $track-width;
 
   &::-moz-focus-outer {

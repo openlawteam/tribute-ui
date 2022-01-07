@@ -1,9 +1,9 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import {useState, useCallback, useEffect} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
-import {useForm} from 'react-hook-form';
-import {toWei, toChecksumAddress} from 'web3-utils';
+import {useForm, Controller} from 'react-hook-form';
+import {fromWei, toBN, toWei, toChecksumAddress} from 'web3-utils';
 import {useHistory} from 'react-router-dom';
-import {debounce} from 'debounce';
+import {useSelector} from 'react-redux';
 
 import {
   formatNumber,
@@ -13,8 +13,13 @@ import {
   truncateEthAddress,
 } from '../../util/helpers';
 import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
-import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
+import {
+  ContractAdapterNames,
+  ContractDAOConfigKeys,
+  Web3TxStatus,
+} from '../../components/web3/types';
 import {FormFieldErrors} from '../../util/enums';
+import {getDAOConfigEntry} from '../../components/web3/helpers';
 import {isEthAddressValid} from '../../util/validation';
 import {AsyncStatus} from '../../util/types';
 import {UNITS_ADDRESS} from '../../config';
@@ -23,10 +28,12 @@ import {
   useCheckApplicant,
   useSignAndSubmitProposal,
 } from '../../components/proposals/hooks';
+import {StoreState} from '../../store/types';
 import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDetails';
 import FadeIn from '../../components/common/FadeIn';
 import InputError from '../../components/common/InputError';
 import Loader from '../../components/feedback/Loader';
+import Slider from '../../components/common/Slider';
 import Wrap from '../../components/common/Wrap';
 
 enum Fields {
@@ -40,18 +47,87 @@ type FormInputs = {
 };
 
 type SubmitActionArguments = [
-  string, // `applicant`
-  string, // `tokenToMint`
-  string // `tokenAmount`
+  applicant: string, // `applicant`
+  tokenToMint: string, // `tokenToMint`
+  tokenAmount: string // `tokenAmount`
 ];
 
-export default function CreateMembershipProposal() {
+type OnboardingConfigs = {
+  chunkSize: string;
+  maximumChunks: string;
+  unitsPerChunk: string;
+};
+
+const PLACEHOLDER = '\u2014'; /* em dash */
+
+function renderUserAccountBalance(userAccountBalance: string | undefined) {
+  if (!userAccountBalance) {
+    return '---';
+  }
+
+  return formatNumber(userAccountBalance);
+}
+
+function renderUnauthorizedMessage({
+  defaultChainError,
+  isConnected,
+}: {
+  defaultChainError: Error | undefined;
+  isConnected: boolean;
+}) {
+  // user is not connected
+  if (!isConnected) {
+    return 'Connect your wallet to submit an onboarding proposal.';
+  }
+
+  // user is on wrong network
+  if (defaultChainError) {
+    return defaultChainError.message;
+  }
+}
+
+function renderSubmitStatus(
+  proposalSignAndSendStatus: Web3TxStatus
+): React.ReactNode {
+  switch (proposalSignAndSendStatus) {
+    case Web3TxStatus.AWAITING_CONFIRM:
+      return (
+        <>
+          Awaiting your confirmation
+          <CycleEllipsis intervalMs={500} />
+        </>
+      );
+    case Web3TxStatus.PENDING:
+      return (
+        <>
+          Submitting
+          <CycleEllipsis intervalMs={500} />
+        </>
+      );
+    case Web3TxStatus.FULFILLED:
+      return 'Done!';
+    default:
+      return null;
+  }
+}
+
+export default function CreateOnboardingProposal() {
+  /**
+   * Selectors
+   */
+
+  const daoRegistryContract = useSelector(
+    (s: StoreState) => s.contracts.DaoRegistryContract
+  );
+
   /**
    * Our hooks
    */
 
   const {defaultChainError} = useIsDefaultChain();
+
   const {connected, account, web3Instance} = useWeb3Modal();
+
   const {
     proposalData,
     proposalSignAndSendError,
@@ -67,6 +143,7 @@ export default function CreateMembershipProposal() {
     mode: 'onBlur',
     reValidateMode: 'onChange',
   });
+
   const history = useHistory();
 
   /**
@@ -74,18 +151,40 @@ export default function CreateMembershipProposal() {
    */
 
   const [submitError, setSubmitError] = useState<Error>();
+
   const [userAccountBalance, setUserAccountBalance] = useState<string>();
+
+  const [sliderStep, setSliderStep] = useState<number>();
+
+  const [sliderMin, setSliderMin] = useState<number>();
+
+  const [sliderMax, setSliderMax] = useState<number>();
+
+  const [onboardingConfigs, setOnboardingConfigs] =
+    useState<OnboardingConfigs>();
 
   /**
    * Variables
    */
 
-  const {errors, getValues, setValue, register, trigger, watch} = form;
+  const {
+    clearErrors,
+    control,
+    errors,
+    getValues,
+    register,
+    setValue,
+    trigger,
+    watch,
+  } = form;
 
   const ethAddressValue = watch(Fields.ethAddress);
 
-  const createMemberError = submitError || proposalSignAndSendError;
-  const isConnected = connected && account;
+  const ethAmountValue = watch(Fields.ethAmount);
+
+  const createOnboardError = submitError || proposalSignAndSendError;
+
+  const isConnected: boolean = connected && account ? true : false;
 
   const isInProcess =
     proposalSignAndSendStatus === Web3TxStatus.AWAITING_CONFIRM ||
@@ -102,6 +201,35 @@ export default function CreateMembershipProposal() {
     isApplicantValid,
   } = useCheckApplicant(ethAddressValue);
 
+  const minUnitsText = onboardingConfigs
+    ? formatNumber(onboardingConfigs.unitsPerChunk)
+    : PLACEHOLDER;
+
+  const minEthAmountText = onboardingConfigs
+    ? formatNumber(fromWei(toBN(onboardingConfigs.chunkSize), 'ether'))
+    : PLACEHOLDER;
+
+  const maxUnitsText = onboardingConfigs
+    ? formatNumber(
+        String(
+          toBN(onboardingConfigs.unitsPerChunk).mul(
+            toBN(onboardingConfigs.maximumChunks)
+          )
+        )
+      )
+    : PLACEHOLDER;
+
+  const maxEthAmountText = onboardingConfigs
+    ? formatNumber(
+        fromWei(
+          toBN(onboardingConfigs.chunkSize).mul(
+            toBN(onboardingConfigs.maximumChunks)
+          ),
+          'ether'
+        )
+      )
+    : PLACEHOLDER;
+
   /**
    * Cached callbacks
    */
@@ -109,6 +237,17 @@ export default function CreateMembershipProposal() {
   const getUserAccountBalanceCached = useCallback(getUserAccountBalance, [
     account,
     web3Instance,
+  ]);
+
+  const setSliderConfigsCached = useCallback(setSliderConfigs, [
+    daoRegistryContract,
+    onboardingConfigs,
+    setValue,
+  ]);
+
+  const getOnboardingConfigsCached = useCallback(getOnboardingConfigs, [
+    daoRegistryContract,
+    defaultChainError,
   ]);
 
   /**
@@ -121,12 +260,104 @@ export default function CreateMembershipProposal() {
 
   // Set the value of `ethAddress` if the `account` changes
   useEffect(() => {
-    setValue(Fields.ethAddress, account);
-  }, [account, setValue]);
+    if (defaultChainError) return;
+
+    setValue(Fields.ethAddress, account && toChecksumAddress(account));
+  }, [account, defaultChainError, setValue]);
+
+  useEffect(() => {
+    setSliderConfigsCached();
+  }, [setSliderConfigsCached]);
+
+  useEffect(() => {
+    setSubmitError(undefined);
+    clearErrors();
+  }, [clearErrors, ethAddressValue]);
+
+  useEffect(() => {
+    getOnboardingConfigsCached();
+  }, [getOnboardingConfigsCached]);
 
   /**
    * Functions
    */
+
+  function setSliderConfigs() {
+    try {
+      if (!daoRegistryContract || !onboardingConfigs) {
+        setSliderStep(undefined);
+        setSliderMin(undefined);
+        setSliderMax(undefined);
+        setValue(Fields.ethAmount, PLACEHOLDER);
+
+        return;
+      }
+
+      setSliderStep(Number(fromWei(onboardingConfigs.chunkSize, 'ether')));
+
+      setSliderMax(
+        Number(
+          fromWei(
+            toBN(onboardingConfigs.chunkSize).mul(
+              toBN(onboardingConfigs.maximumChunks)
+            ),
+            'ether'
+          )
+        )
+      );
+
+      setSliderMin(Number(fromWei(onboardingConfigs.chunkSize, 'ether')));
+
+      setValue(Fields.ethAmount, fromWei(onboardingConfigs.chunkSize, 'ether'));
+    } catch (error) {
+      setSliderStep(undefined);
+      setSliderMin(undefined);
+      setSliderMax(undefined);
+      setValue(Fields.ethAmount, PLACEHOLDER);
+
+      console.error(error);
+    }
+  }
+
+  async function getOnboardingConfigs() {
+    try {
+      if (!daoRegistryContract || defaultChainError) return;
+
+      const chunkSize = String(
+        await getDAOConfigEntry(
+          daoRegistryContract.instance,
+          ContractDAOConfigKeys.onboardingChunkSize,
+          UNITS_ADDRESS
+        )
+      );
+
+      const maximumChunks = String(
+        await getDAOConfigEntry(
+          daoRegistryContract.instance,
+          ContractDAOConfigKeys.onboardingMaximumChunks,
+          UNITS_ADDRESS
+        )
+      );
+
+      const unitsPerChunk = String(
+        await getDAOConfigEntry(
+          daoRegistryContract.instance,
+          ContractDAOConfigKeys.onboardingUnitsPerChunk,
+          UNITS_ADDRESS
+        )
+      );
+
+      setOnboardingConfigs({
+        chunkSize,
+        maximumChunks,
+        unitsPerChunk,
+      });
+    } catch (error) {
+      console.error(error);
+
+      setOnboardingConfigs(undefined);
+    }
+  }
 
   async function getUserAccountBalance() {
     if (!web3Instance || !account) {
@@ -136,9 +367,11 @@ export default function CreateMembershipProposal() {
 
     try {
       // Ether wallet balance
-      const accountBalanceInWei = await web3Instance.eth.getBalance(account);
       setUserAccountBalance(
-        web3Instance.utils.fromWei(accountBalanceInWei, 'ether')
+        web3Instance.utils.fromWei(
+          await web3Instance.eth.getBalance(account),
+          'ether'
+        )
       );
     } catch (error) {
       setUserAccountBalance(undefined);
@@ -203,8 +436,8 @@ export default function CreateMembershipProposal() {
       if (!proposalId) {
         const body =
           normalizeString(ethAddress) === normalizeString(account)
-            ? `Membership for ${truncateEthAddress(ethAddressToChecksum, 7)}.`
-            : `Membership proposal from ${truncateEthAddress(
+            ? `Onboarding ${truncateEthAddress(ethAddressToChecksum, 7)}.`
+            : `Onboarding proposal from ${truncateEthAddress(
                 proposerAddressToChecksum,
                 7
               )} for applicant ${truncateEthAddress(ethAddressToChecksum, 7)}.`;
@@ -228,54 +461,11 @@ export default function CreateMembershipProposal() {
         proposalId = uniqueId;
       }
 
-      // go to MembershipDetails page for newly created member proposal
-      history.push(`/membership/${proposalId}`);
+      // go to OnboardingDetails page for newly created member proposal
+      history.push(`/onboarding/${proposalId}`);
     } catch (error) {
       // Set any errors from Web3 utils or explicitly set above.
       setSubmitError(error);
-    }
-  }
-
-  function renderSubmitStatus(): React.ReactNode {
-    switch (proposalSignAndSendStatus) {
-      case Web3TxStatus.AWAITING_CONFIRM:
-        return (
-          <>
-            Awaiting your confirmation
-            <CycleEllipsis intervalMs={500} />
-          </>
-        );
-      case Web3TxStatus.PENDING:
-        return (
-          <>
-            Submitting
-            <CycleEllipsis intervalMs={500} />
-          </>
-        );
-      case Web3TxStatus.FULFILLED:
-        return 'Done!';
-      default:
-        return '';
-    }
-  }
-
-  function renderUserAccountBalance() {
-    if (!userAccountBalance) {
-      return '---';
-    }
-
-    return formatNumber(userAccountBalance);
-  }
-
-  function getUnauthorizedMessage() {
-    // user is not connected
-    if (!isConnected) {
-      return 'Connect your wallet to submit a membership proposal.';
-    }
-
-    // user is on wrong network
-    if (defaultChainError) {
-      return defaultChainError.message;
     }
   }
 
@@ -288,7 +478,7 @@ export default function CreateMembershipProposal() {
     return (
       <RenderWrapper>
         <div className="form__description--unauthorized">
-          <p>{getUnauthorizedMessage()}</p>
+          <p>{renderUnauthorizedMessage({defaultChainError, isConnected})}</p>
         </div>
       </RenderWrapper>
     );
@@ -296,6 +486,21 @@ export default function CreateMembershipProposal() {
 
   return (
     <RenderWrapper>
+      <div className="form__description">
+        <p>
+          Submit a proposal to join Tribute DAO. Each member can purchase{' '}
+          {minUnitsText} units for {minEthAmountText} ETH (up to {maxUnitsText}{' '}
+          units for {maxEthAmountText} ETH). Please put your preferred ETH
+          address below and the amount of ETH you&apos;d like to contribute.
+        </p>
+        <p>
+          Following your submission, existing members will consider your
+          proposal. If approved by vote, your proposal will be processed and you
+          will finalize the transfer of your allocated ETH in exchange for
+          membership units.
+        </p>
+      </div>
+
       <form className="form" onSubmit={(e) => e.preventDefault()}>
         {/* ETH ADDRESS */}
         <div className="form__input-row">
@@ -329,56 +534,51 @@ export default function CreateMembershipProposal() {
           </div>
         </div>
 
-        {/* ETH AMOUNT */}
+        {/* ETH AMOUNT SLIDER */}
         <div className="form__input-row">
-          <label className="form__input-row-label" htmlFor={Fields.ethAmount}>
+          <label
+            className="form__input-row-label"
+            htmlFor={Fields.ethAmount}
+            id={`${Fields.ethAmount}-label`}>
             Amount
           </label>
           <div className="form__input-row-fieldwrap--narrow">
-            <div className="input__suffix-wrap">
-              <input
-                className="input__suffix"
-                aria-describedby={`error-${Fields.ethAmount}`}
-                aria-invalid={errors.ethAmount ? 'true' : 'false'}
-                id={Fields.ethAmount}
-                name={Fields.ethAmount}
-                onChange={debounce(
-                  () =>
-                    setValue(
-                      Fields.ethAmount,
-                      formatNumber(stripFormatNumber(getValues().ethAmount))
-                    ),
-                  1000
-                )}
-                ref={register({
-                  validate: (value: string): string | boolean => {
-                    const amount = Number(stripFormatNumber(value));
+            <Controller
+              render={({onChange}) => (
+                <Slider
+                  data-testid="onboarding-slider"
+                  aria-labelledby={`${Fields.ethAmount}-label`}
+                  defaultValue={sliderMin || 0}
+                  id={Fields.ethAmount}
+                  max={sliderMax || 0}
+                  min={sliderMin || 0}
+                  step={sliderStep || 0}
+                  onChange={onChange}
+                  disabled={isInProcessOrDone}
+                />
+              )}
+              defaultValue={sliderMin || 0}
+              control={control}
+              name={Fields.ethAmount}
+              rules={{
+                validate: (value: string): string | boolean => {
+                  const amount = Number(stripFormatNumber(value));
 
-                    return value === ''
-                      ? FormFieldErrors.REQUIRED
-                      : isNaN(amount)
-                      ? FormFieldErrors.INVALID_NUMBER
-                      : amount <= 0
-                      ? 'The value must be greater than 0 ETH.'
-                      : amount >= Number(userAccountBalance)
-                      ? 'Insufficient funds.'
-                      : true;
-                  },
-                })}
-                type="text"
-                disabled={isInProcessOrDone}
-              />
-              <div className="input__suffix-item">ETH</div>
-            </div>
+                  return amount >= Number(userAccountBalance)
+                    ? `Insufficient funds. ${renderUserAccountBalance(
+                        userAccountBalance
+                      )} ETH available.`
+                    : true;
+                },
+              }}
+            />
 
             <InputError
               error={getValidationError(Fields.ethAmount, errors)}
               id={`error-${Fields.ethAmount}`}
             />
           </div>
-          <div className="form__input-addon">
-            available: <span>{renderUserAccountBalance()}</span>
-          </div>
+          <div className="form__input-addon">{ethAmountValue} ETH</div>
         </div>
 
         {/* SUBMIT */}
@@ -386,15 +586,17 @@ export default function CreateMembershipProposal() {
           aria-label={isInProcess ? 'Submitting your proposal.' : ''}
           className="button"
           disabled={isInProcessOrDone}
-          onClick={async () => {
-            if (isInProcessOrDone) return;
+          onClick={
+            isInProcessOrDone
+              ? () => {}
+              : async () => {
+                  if (!(await trigger())) {
+                    return;
+                  }
 
-            if (!(await trigger())) {
-              return;
-            }
-
-            handleSubmit(getValues());
-          }}
+                  handleSubmit(getValues());
+                }
+          }
           type="submit">
           {isInProcess ? <Loader /> : isDone ? 'Done' : 'Submit'}
         </button>
@@ -402,16 +604,16 @@ export default function CreateMembershipProposal() {
         {/* SUBMIT STATUS */}
         {isInProcessOrDone && (
           <div className="form__submit-status-container">
-            {renderSubmitStatus()}
+            {renderSubmitStatus(proposalSignAndSendStatus)}
           </div>
         )}
 
         {/* SUBMIT ERROR */}
-        {createMemberError && (
+        {createOnboardError && (
           <div className="form__submit-error-container">
             <ErrorMessageWithDetails
               renderText="Something went wrong while submitting the proposal."
-              error={createMemberError}
+              error={createOnboardError}
             />
           </div>
         )}
@@ -429,18 +631,10 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
     <Wrap className="section-wrapper">
       <FadeIn>
         <div className="titlebar">
-          <h2 className="titlebar__title">Join</h2>
+          <h2 className="titlebar__title">Onboard</h2>
         </div>
 
         <div className="form-wrapper">
-          <div className="form__description">
-            <p>
-              Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
-              consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut
-              lacus dictum fermentum vel tincidunt neque. Sed sed lacinia...
-            </p>
-          </div>
-
           {/* RENDER CHILDREN */}
           {props.children}
         </div>

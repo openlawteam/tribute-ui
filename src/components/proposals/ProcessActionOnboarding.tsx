@@ -21,7 +21,7 @@ type ProcessArguments = [
   string // `proposalId`
 ];
 
-type ProcessActionMembershipProps = {
+type ProcessActionOnboardingProps = {
   disabled?: boolean;
   proposal: ProposalData;
 };
@@ -41,8 +41,8 @@ const useMemberActionDisabledProps = {
   skipIsActiveMemberCheck: true,
 };
 
-export default function ProcessActionMembership(
-  props: ProcessActionMembershipProps
+export default function ProcessActionOnboarding(
+  props: ProcessActionOnboardingProps
 ) {
   const {
     disabled: propsDisabled,
@@ -54,7 +54,7 @@ export default function ProcessActionMembership(
    */
 
   const [submitError, setSubmitError] = useState<Error>();
-  const [membershipProposalAmount, setMembershipProposalAmount] =
+  const [onboardingProposalAmount, setOnboardingProposalAmount] =
     useState<string>();
 
   /**
@@ -114,8 +114,8 @@ export default function ProcessActionMembership(
    * Cached callbacks
    */
 
-  const getMembershipProposalAmountCached = useCallback(
-    getMembershipProposalAmount,
+  const getOnboardingProposalAmountCached = useCallback(
+    getOnboardingProposalAmount,
     [OnboardingContract, daoRegistryContract?.contractAddress, snapshotProposal]
   );
 
@@ -124,8 +124,8 @@ export default function ProcessActionMembership(
    */
 
   useEffect(() => {
-    getMembershipProposalAmountCached();
-  }, [getMembershipProposalAmountCached]);
+    getOnboardingProposalAmountCached();
+  }, [getOnboardingProposalAmountCached]);
 
   useEffect(() => {
     // 1. Determine and set reasons why action would be disabled
@@ -159,7 +159,7 @@ export default function ProcessActionMembership(
    * Functions
    */
 
-  async function getMembershipProposalAmount() {
+  async function getOnboardingProposalAmount() {
     try {
       if (
         !daoRegistryContract?.contractAddress ||
@@ -176,10 +176,10 @@ export default function ProcessActionMembership(
         )
         .call();
 
-      setMembershipProposalAmount(proposalDetails.amount);
+      setOnboardingProposalAmount(proposalDetails.amount);
     } catch (error) {
       console.error(error);
-      setMembershipProposalAmount(undefined);
+      setOnboardingProposalAmount(undefined);
     }
   }
 
@@ -212,7 +212,7 @@ export default function ProcessActionMembership(
 
       const txArguments = {
         from: account || '',
-        value: membershipProposalAmount,
+        value: onboardingProposalAmount,
         ...(gasPrice ? {gasPrice} : null),
       };
 

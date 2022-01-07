@@ -9,13 +9,13 @@
  */
 
 /**
- * Mapping of DaoRegistry member flags.
- * This should match the enum (including order) in the `DaoRegistry`. If it does not match,
+ * Mapping of DaoRegistry member flags. This should match the enum (including
+ * order) in the `DaoRegistry`. If it does not match,
  * the results of checking the proposal's state via flag will be wrong.
  *
  * @see `MemberFlag` `DaoRegistry.sol`
- * @see `getFlag` `DaoConstants.sol`
- * @see `setFlag` `DaoConstants.sol`
+ * @see `getFlag` `DaoHelper.sol`
+ * @see `setFlag` `DaoHelper.sol`
  */
 export enum MemberFlag {
   EXISTS,
@@ -34,6 +34,7 @@ export enum ContractAdapterNames {
   distribute = 'distribute',
   financing = 'financing',
   guildkick = 'guildkick',
+  kyc_onboarding = 'kyc-onboarding',
   managing = 'managing',
   nft = 'nft',
   onboarding = 'onboarding',
@@ -60,6 +61,13 @@ export enum ContractExtensionNames {
  * @todo Add other extensions as needs arise
  */
 export enum ContractDAOConfigKeys {
+  kycOnboardingChunkSize = 'kyc-onboarding.chunkSize',
+  kycOnboardingFundTargetAddress = 'kyc-onboarding.fundTargetAddress',
+  kycOnboardingMaximumChunks = 'kyc-onboarding.maximumChunks',
+  kycOnboardingMaxMembers = 'kyc-onboarding.maxMembers',
+  kycOnboardingSignerAddress = 'kyc-onboarding.signerAddress',
+  kycOnboardingTargetAddress = 'kyc-onboarding.tokenAddr',
+  kycOnboardingUnitsPerChunk = 'kyc-onboarding.unitsPerChunk',
   offchainVotingGracePeriod = 'offchainvoting.gracePeriod',
   offchainVotingStakingAmount = 'offchainvoting.stakingAmount',
   offchainVotingVotingPeriod = 'offchainvoting.votingPeriod',

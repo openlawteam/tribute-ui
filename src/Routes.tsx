@@ -1,17 +1,19 @@
 import {Route, Switch} from 'react-router-dom';
 
+import {ENABLE_KYC_ONBOARDING} from './config';
 import AdapterOrExtensionManager from './components/adapters-extensions/AdapterOrExtensionManager';
 import CreateGovernanceProposal from './pages/governance/CreateGovernanceProposal';
-import CreateMembershipProposal from './pages/membership/CreateMembershipProposal';
+import CreateOnboardingProposal from './pages/onboarding/CreateOnboardingProposal';
 import CreateTransferProposal from './pages/transfers/CreateTransferProposal';
 import CreateTributeProposal from './pages/tributes/CreateTributeProposal';
 import GetStarted from './pages/start/GetStarted';
 import GovernanceProposalDetails from './pages/governance/GovernanceProposalDetails';
 import GovernanceProposals from './pages/governance/GovernanceProposals';
+import KycOnboardingForm from './pages/kyc-onboarding/KycOnboardingForm';
 import MemberProfile from './pages/members/MemberProfile';
 import Members from './pages/members/Members';
-import Membership from './pages/membership/Membership';
-import MembershipDetails from './pages/membership/MembershipDetails';
+import Onboarding from './pages/onboarding/Onboarding';
+import OnboardingDetails from './pages/onboarding/OnboardingDetails';
 import NotFound from './pages/subpages/NotFound';
 import Redeem from './pages/redeem/Redeem';
 import TransferDetails from './pages/transfers/TransferDetails';
@@ -27,23 +29,32 @@ export default function Routes() {
       {[
         // Index page
         <Route key="splash" exact path="/" render={() => <GetStarted />} />,
+        ENABLE_KYC_ONBOARDING && (
+          <Route
+            key="join"
+            exact
+            path="/join"
+            render={() => <KycOnboardingForm />}
+          />
+        ),
         <Route
-          key="join"
+          key="onboard"
           exact
-          path="/join"
-          render={() => <CreateMembershipProposal />}
+          path="/onboard"
+          render={() => <CreateOnboardingProposal />}
+        />,
+
+        <Route
+          key="onboarding"
+          exact
+          path="/onboarding"
+          render={() => <Onboarding />}
         />,
         <Route
-          key="membership"
+          key="onboarding-details"
           exact
-          path="/membership"
-          render={() => <Membership />}
-        />,
-        <Route
-          key="membership-details"
-          exact
-          path={`/membership/${proposalIdParameter}`}
-          render={() => <MembershipDetails />}
+          path={`/onboarding/${proposalIdParameter}`}
+          render={() => <OnboardingDetails />}
         />,
         <Route
           key="transfer"

@@ -13,16 +13,21 @@ dotenvConfig({path: resolve(__dirname, '../.env')});
  */
 
 const {
+  REACT_APP_COUPON_API_URL,
   REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS,
   REACT_APP_DEFAULT_CHAIN_NAME_LOCAL,
+  REACT_APP_ENABLE_KYC_ONBOARDING,
   REACT_APP_ENVIRONMENT,
-  REACT_APP_GRAPH_API_URL,
+  REACT_APP_GRAPH_CORE_URL,
+  REACT_APP_GRAPH_COUPON_ONBOARDING_URL,
+  REACT_APP_GRAPH_NFT_EXTENSION_URL,
   REACT_APP_INFURA_PROJECT_ID_DEV,
   REACT_APP_INFURA_PROJECT_ID_LOCAL,
   REACT_APP_INFURA_PROJECT_ID_PROD,
+  REACT_APP_KYC_BACKEND_URL,
+  REACT_APP_KYC_FORMS_URL,
   REACT_APP_MULTICALL_CONTRACT_ADDRESS,
   REACT_APP_SNAPSHOT_HUB_API_URL,
-  REACT_APP_COUPON_API_URL,
   REACT_APP_SNAPSHOT_SPACE,
 } = process.env;
 
@@ -42,10 +47,33 @@ export const SNAPSHOT_HUB_API_URL: string | undefined =
     ? '/snapshot-hub'
     : REACT_APP_SNAPSHOT_HUB_API_URL;
 
+// Coupon Manager API URL (for coupon onboarding)
 export const COUPON_API_URL: string | undefined = REACT_APP_COUPON_API_URL;
 
-// The Graph API URL
-export const GRAPH_API_URL = REACT_APP_GRAPH_API_URL;
+// KYC Onboarding feature
+export const ENABLE_KYC_ONBOARDING: boolean =
+  REACT_APP_ENABLE_KYC_ONBOARDING === 'true';
+
+// KYC Backend URL (for KYC onboarding)
+export const KYC_BACKEND_URL: string | undefined = REACT_APP_KYC_BACKEND_URL;
+
+// KYC Forms URL (for redirecting to separate moloch v2 instance that will be
+// used for KYC verification)
+export const KYC_FORMS_URL: string | undefined = REACT_APP_KYC_FORMS_URL;
+
+// The Graph API URLs
+export const GRAPH_API_URL = {
+  CORE: REACT_APP_GRAPH_CORE_URL,
+  COUPON_ONBOARDING: REACT_APP_GRAPH_COUPON_ONBOARDING_URL,
+  NFT_EXTENSION: REACT_APP_GRAPH_NFT_EXTENSION_URL,
+};
+
+// The Graph API service names
+export const GRAPH_API_SERVICE_NAME = {
+  CORE: 'core',
+  COUPON_ONBOARDING: 'coupon-onboarding',
+  NFT_EXTENSION: 'nft-extension',
+};
 
 // Network IDs, when users change wallet networks
 export const CHAINS = {
@@ -249,8 +277,8 @@ export const ERC20_TOKEN_FACTORY_CONTRACT_ADDRESS = {
  * - Guild kick
  * - BankAdapter
  * - TributeNFT
- * - NFTAdapter
  * - DaoRegistryAdapter
+ * - KycOnboarding
  */
 
 export const VOTING_CONTRACT_ADDRESS = {
@@ -370,19 +398,6 @@ export const BANK_ADAPTER_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
 };
 
-export const NFT_ADAPTER_CONTRACT_ADDRESS = {
-  [CHAINS.MAINNET]: '',
-  [CHAINS.ROPSTEN]: '',
-  [CHAINS.RINKEBY]: '0xc69DF0C3855A6CaBF0c5983bD504770E5BFA8e84',
-  [CHAINS.GOERLI]: '',
-  [CHAINS.KOVAN]: '',
-  [CHAINS.GANACHE]: '0x538a4f00d64d2597717cAAd4D01C963317e3Ae40',
-  [CHAINS.HARMONY_TEST]: '',
-  [CHAINS.HARMONY_MAIN]: '',
-  [CHAINS.POLYGON_TEST]: '',
-  [CHAINS.POLYGON]: '',
-};
-
 export const COUPONONBOARDING_CONTRACT_ADDRESS = {
   [CHAINS.MAINNET]: '',
   [CHAINS.ROPSTEN]: '',
@@ -448,15 +463,25 @@ export const OFFCHAINVOTING_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
 };
 
+export const KYC_ONBOARDING_CONTRACT_ADDRESS = {
+  [CHAINS.MAINNET]: '',
+  [CHAINS.ROPSTEN]: '',
+  [CHAINS.RINKEBY]: '',
+  [CHAINS.GOERLI]: '',
+  [CHAINS.KOVAN]: '',
+  [CHAINS.GANACHE]: '',
+};
+
 // If developing locally, include your Multicall contract address in your `.env` file.
-export const MULTICALL_CONTRACT_ADDRESS = REACT_APP_MULTICALL_CONTRACT_ADDRESS;
+export const MULTICALL_CONTRACT_ADDRESS: string | undefined =
+  REACT_APP_MULTICALL_CONTRACT_ADDRESS;
 
 /**
  * These addresses are important as the contracts use them in their configs.
  *
  * @todo Remove and get from the chain/subgraph?
  *
- * @see https://github.com/openlawteam/tribute-contracts/blob/9e0e03616a00e41e666351e146ee109b9fe37fb2/utils/DaoFactory.js
+ * @see https://github.com/openlawteam/tribute-contracts/blob/master/utils/contract-util.js
  */
 export const GUILD_ADDRESS: string =
   '0x000000000000000000000000000000000000dead';
@@ -472,6 +497,8 @@ export const ETH_TOKEN_ADDRESS: string =
   '0x0000000000000000000000000000000000000000';
 export const DAI_TOKEN_ADDRESS: string =
   '0x95b58a6bff3d14b7db2f5cb5f0ad413dc2940658';
+export const ESCROW_ADDRESS: string =
+  '0x0000000000000000000000000000000000004bec';
 
 /**
  * `SPACE` is used inside Snapshot Hub for matching a `space`

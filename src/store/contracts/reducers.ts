@@ -12,8 +12,8 @@ import {
   CONTRACT_ERC20_EXTENSION,
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
+  CONTRACT_KYC_ONBOARDING,
   CONTRACT_MANAGING,
-  CONTRACT_NFT_ADAPTER,
   CONTRACT_NFT_EXTENSION,
   CONTRACT_ONBOARDING,
   CONTRACT_RAGEQUIT,
@@ -37,8 +37,8 @@ const initialState = {
   ERC20ExtensionContract: null,
   FinancingContract: null,
   GuildKickContract: null,
+  KycOnboardingContract: null,
   ManagingContract: null,
-  NFTAdapterContract: null,
   NFTExtensionContract: null,
   OnboardingContract: null,
   RagequitContract: null,
@@ -80,10 +80,10 @@ export default function reducer(
       return contractFinancing(state, payload);
     case CONTRACT_GUILDKICK:
       return contractGuildKick(state, payload);
+    case CONTRACT_KYC_ONBOARDING:
+      return contractKycOnboarding(state, payload);
     case CONTRACT_MANAGING:
       return contractManaging(state, payload);
-    case CONTRACT_NFT_ADAPTER:
-      return contractNFTAdapter(state, payload);
     case CONTRACT_NFT_EXTENSION:
       return contractNFTExtension(state, payload);
     case CONTRACT_ONBOARDING:
@@ -180,13 +180,6 @@ function contractBankAdapter(
   return {...state, BankAdapterContract: {...payload}};
 }
 
-function contractNFTAdapter(
-  state: ContractsState,
-  payload: any
-): ContractsState {
-  return {...state, NFTAdapterContract: {...payload}};
-}
-
 function contractTributeNFT(
   state: ContractsState,
   payload: any
@@ -199,6 +192,13 @@ function contractCouponOnboarding(
   payload: any
 ): ContractsState {
   return {...state, CouponOnboardingContract: {...payload}};
+}
+
+function contractKycOnboarding(
+  state: ContractsState,
+  payload: any
+): ContractsState {
+  return {...state, KycOnboardingContract: {...payload}};
 }
 
 function contractNFTExtension(

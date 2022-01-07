@@ -195,7 +195,10 @@ export function useProposalsVotes(
               ([proposalId, {votingAdapterName}], i) => [
                 proposalId,
                 {
-                  [votingAdapterName]: votesDataResults[i],
+                  [votingAdapterName]: buildVotesData(
+                    votingAdapterName,
+                    votesDataResults[i]
+                  ),
                 },
               ]
             )
@@ -208,6 +211,40 @@ export function useProposalsVotes(
       setProposalsVotes([]);
       setProposalsVotesStatus(AsyncStatus.REJECTED);
       setProposalsVotesError(error);
+    }
+  }
+
+  function buildVotesData(
+    votingAdapterName: VotingAdapterName,
+    votesData: any
+  ) {
+    try {
+      switch (votingAdapterName) {
+        case VotingAdapterName.OffchainVotingContract:
+          return {
+            snapshot: votesData[0],
+            reporter: votesData[1],
+            resultRoot: votesData[2],
+            nbYes: votesData[3],
+            nbNo: votesData[4],
+            startingTime: votesData[5],
+            gracePeriodStartingTime: votesData[6],
+            isChallenged: votesData[7],
+            stepRequested: votesData[8],
+            forceFailed: votesData[9],
+            fallbackVotesCount: votesData[10],
+          };
+
+        case VotingAdapterName.VotingContract:
+          return votesData;
+
+        default:
+          throw new Error(
+            `No voting adapter name was found for "${votingAdapterName}".`
+          );
+      }
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -227,7 +264,7 @@ export function useProposalsVotes(
       switch (votingAdapterName) {
         case VotingAdapterName.OffchainVotingContract:
           const offchainVotesDataABI = votingAdapterABI.find(
-            (ai) => ai.name === 'votes'
+            (ai) => ai.name === 'getVote'
           );
 
           if (!offchainVotesDataABI) {

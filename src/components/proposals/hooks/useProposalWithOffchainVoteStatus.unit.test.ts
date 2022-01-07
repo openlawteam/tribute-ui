@@ -20,7 +20,7 @@ import {proposalHasVotingState} from '../helpers';
 import {useProposalWithOffchainVoteStatus} from '.';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
 import {VotingState} from '../voting/types';
-import OffchainVotingABI from '../../../abis/OffchainVotingContract.json';
+import OffchainVotingABI from '../../../abis/tribute-contracts/OffchainVotingContract.json';
 import Wrapper from '../../../test/Wrapper';
 
 const nowSeconds = Date.now() / 1000;
@@ -79,7 +79,7 @@ const fakeSnapshotDraft: SnapshotDraft = {
 
 const defaultVotesMock = [
   {
-    Voting: {
+    VotingDetails: {
       snapshot: 'uint256',
       reporter: 'address',
       resultRoot: 'bytes32',
@@ -88,6 +88,7 @@ const defaultVotesMock = [
       startingTime: 'uint256',
       gracePeriodStartingTime: 'uint256',
       isChallenged: 'bool',
+      stepRequested: 'uint256',
       forceFailed: 'bool',
       fallbackVotesCount: 'uint256',
     },
@@ -104,21 +105,11 @@ const defaultVotesMock = [
       '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
     snapshot: '8376297',
     startingTime: '1617878162',
+    stepRequested: '0',
   },
 ];
 
 const defaultVotesResult = {
-  '0': '8376297',
-  '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-  '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-  '3': '1',
-  '4': '0',
-  '5': '1617878162',
-  '6': '1617964640',
-  '7': false,
-  '8': false,
-  '9': '0',
-  __length__: 10,
   snapshot: '8376297',
   reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
   resultRoot:
@@ -127,14 +118,15 @@ const defaultVotesResult = {
   nbNo: '0',
   startingTime: '1617878162',
   gracePeriodStartingTime: '1617964640',
-  forceFailed: false,
   isChallenged: false,
+  stepRequested: '0',
+  forceFailed: false,
   fallbackVotesCount: '0',
 };
 
 const defaultNoVotesMock = [
   {
-    Voting: {
+    VotingDetails: {
       snapshot: 'uint256',
       reporter: 'address',
       resultRoot: 'bytes32',
@@ -143,6 +135,7 @@ const defaultNoVotesMock = [
       startingTime: 'uint256',
       gracePeriodStartingTime: 'uint256',
       isChallenged: 'bool',
+      stepRequested: 'uint256',
       forceFailed: 'bool',
       fallbackVotesCount: 'uint256',
     },
@@ -157,23 +150,13 @@ const defaultNoVotesMock = [
     startingTime: '0',
     gracePeriodStartingTime: '0',
     isChallenged: false,
+    stepRequested: '0',
     forceFailed: false,
     fallbackVotesCount: '0',
   },
 ];
 
 const defaultNoVotesResult = {
-  '0': '0',
-  '1': BURN_ADDRESS,
-  '2': '0x0000000000000000000000000000000000000000000000000000000000000000',
-  '3': '0',
-  '4': '0',
-  '5': '0',
-  '6': '0',
-  '7': false,
-  '8': false,
-  '9': '0',
-  __length__: 10,
   snapshot: '0',
   reporter: BURN_ADDRESS,
   resultRoot:
@@ -183,6 +166,7 @@ const defaultNoVotesResult = {
   nbYes: '0',
   startingTime: '0',
   isChallenged: false,
+  stepRequested: '0',
   forceFailed: false,
   fallbackVotesCount: '0',
 };

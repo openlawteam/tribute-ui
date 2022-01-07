@@ -25,7 +25,7 @@ import {setConnectedMember} from '../../../store/actions';
 import {SNAPSHOT_HUB_API_URL} from '../../../config';
 import {snapshotAPIProposalResponse} from '../../../test/restResponses';
 import {TX_CYCLE_MESSAGES} from '../../web3/config';
-import OffchainVotingABI from '../../../abis/OffchainVotingContract.json';
+import OffchainVotingABI from '../../../abis/tribute-contracts/OffchainVotingContract.json';
 import Wrapper from '../../../test/Wrapper';
 
 const somethingWentWrongRegex: RegExp = /^something went wrong$/i;

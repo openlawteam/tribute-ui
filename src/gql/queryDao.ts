@@ -7,6 +7,7 @@ export const GET_DAO = gql`
       daoAddress
       name
       totalUnits
+      totalUnitsIssued
     }
   }
 `;

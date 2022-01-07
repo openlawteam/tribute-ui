@@ -13,8 +13,8 @@ import {ProposalFlag} from '../../proposals/types';
  * @returns {boolean}
  *
  * @see `ProposalFlag` `DaoRegistry.sol`
- * @see `getFlag` `DaoConstants.sol`
- * @see `setFlag` `DaoConstants.sol`
+ * @see `getFlag` `DaoHelper.sol`
+ * @see `setFlag` `DaoHelper.sol`
  */
 export function hasFlag(
   flagToCheck: ProposalFlag | MemberFlag,

@@ -8,6 +8,7 @@ import {NavHamburger} from '../../components/Nav';
 import FadeIn from '../../components/common/FadeIn';
 import SocialMedia from '../../components/common/SocialMedia';
 import Wrap from '../../components/common/Wrap';
+import {ENABLE_KYC_ONBOARDING} from '../../config';
 
 const TributeCube = memo(() => {
   return (
@@ -77,7 +78,7 @@ export default function GetStarted() {
               <button
                 className="button"
                 onClick={() => {
-                  history.push('/join');
+                  history.push(ENABLE_KYC_ONBOARDING ? '/join' : '/onboard');
                 }}>
                 Join
               </button>

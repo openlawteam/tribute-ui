@@ -40,8 +40,8 @@ type ContractAction =
   | typeof CONTRACT_ERC20_EXTENSION
   | typeof CONTRACT_FINANCING
   | typeof CONTRACT_GUILDKICK
+  | typeof CONTRACT_KYC_ONBOARDING
   | typeof CONTRACT_MANAGING
-  | typeof CONTRACT_NFT_ADAPTER
   | typeof CONTRACT_NFT_EXTENSION
   | typeof CONTRACT_ONBOARDING
   | typeof CONTRACT_RAGEQUIT
@@ -63,8 +63,8 @@ export const CONTRACT_DISTRIBUTE = 'CONTRACT_DISTRIBUTE';
 export const CONTRACT_ERC20_EXTENSION = 'CONTRACT_ERC20_EXTENSION';
 export const CONTRACT_FINANCING = 'CONTRACT_FINANCING';
 export const CONTRACT_GUILDKICK = 'CONTRACT_GUILDKICK';
+export const CONTRACT_KYC_ONBOARDING = 'CONTRACT_KYC_ONBOARDING';
 export const CONTRACT_MANAGING = 'CONTRACT_MANAGING';
-export const CONTRACT_NFT_ADAPTER = 'CONTRACT_NFT_ADAPTER';
 export const CONTRACT_NFT_EXTENSION = 'CONTRACT_NFT_EXTENSION';
 export const CONTRACT_ONBOARDING = 'CONTRACT_ONBOARDING';
 export const CONTRACT_RAGEQUIT = 'CONTRACT_RAGEQUIT';
@@ -84,7 +84,7 @@ export function initContractBankFactory(web3Instance: Web3) {
     try {
       if (web3Instance) {
         const {default: lazyBankFactoryABI} = await import(
-          '../../abis/BankFactory.json'
+          '../../abis/tribute-contracts/BankFactory.json'
         );
         const bankFactoryContract: AbiItem[] = lazyBankFactoryABI as any;
         const contractAddress = BANK_FACTORY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
@@ -113,7 +113,7 @@ export function initContractDaoFactory(web3Instance: Web3) {
     try {
       if (web3Instance) {
         const {default: lazyDaoFactoryABI} = await import(
-          '../../abis/DaoFactory.json'
+          '../../abis/tribute-contracts/DaoFactory.json'
         );
         const daoFactoryContract: AbiItem[] = lazyDaoFactoryABI as any;
         const contractAddress = DAO_FACTORY_CONTRACT_ADDRESS[DEFAULT_CHAIN];
@@ -142,7 +142,7 @@ export function initContractDaoRegistry(web3Instance: Web3) {
     try {
       if (web3Instance) {
         const {default: lazyDaoRegistryABI} = await import(
-          '../../abis/DaoRegistry.json'
+          '../../abis/tribute-contracts/DaoRegistry.json'
         );
 
         const daoRegistryContract: AbiItem[] = lazyDaoRegistryABI as any;
@@ -181,7 +181,8 @@ export function initContractVoting(
     adapterOrExtensionName: ContractAdapterNames.voting,
     adapterNameForRedux: VotingAdapterName.VotingContract,
     contractAddress,
-    lazyImport: () => import('../../abis/VotingContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/VotingContract.json'),
     web3Instance,
   });
 }
@@ -195,7 +196,8 @@ export function initContractVotingOpRollup(
     adapterOrExtensionName: ContractAdapterNames.voting,
     adapterNameForRedux: VotingAdapterName.OffchainVotingContract,
     contractAddress,
-    lazyImport: () => import('../../abis/OffchainVotingContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/OffchainVotingContract.json'),
     web3Instance,
   });
 }
@@ -209,7 +211,8 @@ export function initContractOnboarding(
     adapterNameForRedux: DaoAdapterConstants.ONBOARDING,
     adapterOrExtensionName: ContractAdapterNames.onboarding,
     contractAddress,
-    lazyImport: () => import('../../abis/OnboardingContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/OnboardingContract.json'),
     web3Instance,
   });
 }
@@ -224,7 +227,7 @@ export function initContractBankExtension(
     adapterOrExtensionName: ContractExtensionNames.bank,
     contractAddress,
     isExtension: true,
-    lazyImport: () => import('../../abis/BankExtension.json'),
+    lazyImport: () => import('../../abis/tribute-contracts/BankExtension.json'),
     web3Instance,
   });
 }
@@ -238,7 +241,8 @@ export function initContractTribute(
     adapterNameForRedux: DaoAdapterConstants.TRIBUTE,
     adapterOrExtensionName: ContractAdapterNames.tribute,
     contractAddress,
-    lazyImport: () => import('../../abis/TributeContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/TributeContract.json'),
     web3Instance,
   });
 }
@@ -252,7 +256,8 @@ export function initContractDistribute(
     adapterNameForRedux: DaoAdapterConstants.DISTRIBUTE,
     adapterOrExtensionName: ContractAdapterNames.distribute,
     contractAddress,
-    lazyImport: () => import('../../abis/DistributeContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/DistributeContract.json'),
     web3Instance,
   });
 }
@@ -266,7 +271,8 @@ export function initContractManaging(
     adapterNameForRedux: DaoAdapterConstants.MANAGING,
     adapterOrExtensionName: ContractAdapterNames.managing,
     contractAddress,
-    lazyImport: () => import('../../abis/ManagingContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/ManagingContract.json'),
     web3Instance,
   });
 }
@@ -280,21 +286,8 @@ export function initContractBankAdapter(
     adapterNameForRedux: DaoAdapterConstants.BANK,
     adapterOrExtensionName: ContractAdapterNames.bank,
     contractAddress,
-    lazyImport: () => import('../../abis/BankAdapterContract.json'),
-    web3Instance,
-  });
-}
-
-export function initContractNFTAdapter(
-  web3Instance: Web3,
-  contractAddress?: string
-) {
-  return initContractThunkFactory({
-    actionType: CONTRACT_NFT_ADAPTER,
-    adapterNameForRedux: DaoAdapterConstants.NFT,
-    adapterOrExtensionName: ContractAdapterNames.nft,
-    contractAddress,
-    lazyImport: () => import('../../abis/NFTAdapterContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/BankAdapterContract.json'),
     web3Instance,
   });
 }
@@ -308,7 +301,8 @@ export function initContractDaoRegistryAdapter(
     adapterNameForRedux: DaoAdapterConstants.DAO_REGISTRY,
     adapterOrExtensionName: ContractAdapterNames.dao_registry,
     contractAddress,
-    lazyImport: () => import('../../abis/DaoRegistryAdapterContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/DaoRegistryAdapterContract.json'),
     web3Instance,
   });
 }
@@ -322,7 +316,8 @@ export function initContractRagequit(
     adapterNameForRedux: DaoAdapterConstants.RAGEQUIT,
     adapterOrExtensionName: ContractAdapterNames.ragequit,
     contractAddress,
-    lazyImport: () => import('../../abis/RagequitContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/RagequitContract.json'),
     web3Instance,
   });
 }
@@ -336,7 +331,8 @@ export function initContractGuildKick(
     adapterNameForRedux: DaoAdapterConstants.GUILDKICK,
     adapterOrExtensionName: ContractAdapterNames.guildkick,
     contractAddress,
-    lazyImport: () => import('../../abis/GuildKickContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/GuildKickContract.json'),
     web3Instance,
   });
 }
@@ -350,7 +346,8 @@ export function initContractFinancing(
     adapterNameForRedux: DaoAdapterConstants.FINANCING,
     adapterOrExtensionName: ContractAdapterNames.financing,
     contractAddress,
-    lazyImport: () => import('../../abis/FinancingContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/FinancingContract.json'),
     web3Instance,
   });
 }
@@ -364,7 +361,8 @@ export function initContractConfiguration(
     adapterNameForRedux: DaoAdapterConstants.CONFIGURATION,
     adapterOrExtensionName: ContractAdapterNames.configuration,
     contractAddress,
-    lazyImport: () => import('../../abis/ConfigurationContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/ConfigurationContract.json'),
     web3Instance,
   });
 }
@@ -378,7 +376,8 @@ export function initContractTributeNFT(
     adapterNameForRedux: DaoAdapterConstants.TRIBUTE_NFT,
     adapterOrExtensionName: ContractAdapterNames.tribute_nft,
     contractAddress,
-    lazyImport: () => import('../../abis/TributeNFTContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/TributeNFTContract.json'),
     web3Instance,
   });
 }
@@ -392,7 +391,23 @@ export function initContractCouponOnboarding(
     adapterNameForRedux: DaoAdapterConstants.COUPON_ONBOARDING,
     adapterOrExtensionName: ContractAdapterNames.coupon_onboarding,
     contractAddress,
-    lazyImport: () => import('../../abis/CouponOnboardingContract.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/CouponOnboardingContract.json'),
+    web3Instance,
+  });
+}
+
+export function initContractKycOnboarding(
+  web3Instance: Web3,
+  contractAddress?: string
+) {
+  return initContractThunkFactory({
+    actionType: CONTRACT_KYC_ONBOARDING,
+    adapterNameForRedux: DaoAdapterConstants.KYC_ONBOARDING,
+    adapterOrExtensionName: ContractAdapterNames.kyc_onboarding,
+    contractAddress,
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/KycOnboardingContract.json'),
     web3Instance,
   });
 }
@@ -407,7 +422,7 @@ export function initContractNFTExtension(
     adapterOrExtensionName: ContractExtensionNames.nft,
     contractAddress,
     isExtension: true,
-    lazyImport: () => import('../../abis/NFTExtension.json'),
+    lazyImport: () => import('../../abis/tribute-contracts/NFTExtension.json'),
     web3Instance,
   });
 }
@@ -422,7 +437,8 @@ export function initContractERC20Extension(
     adapterOrExtensionName: ContractExtensionNames.erc20,
     contractAddress,
     isExtension: true,
-    lazyImport: () => import('../../abis/ERC20Extension.json'),
+    lazyImport: () =>
+      import('../../abis/tribute-contracts/ERC20Extension.json'),
     web3Instance,
   });
 }

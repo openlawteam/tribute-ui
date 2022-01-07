@@ -183,7 +183,9 @@ export default function CreateTributeProposal() {
     }
 
     try {
-      const {default: lazyERC20ABI} = await import('../../abis/ERC20.json');
+      const {default: lazyERC20ABI} = await import(
+        '../../abis/external/ERC20.json'
+      );
       const erc20Contract: AbiItem[] = lazyERC20ABI as any;
       const instance = new web3Instance.eth.Contract(
         erc20Contract,

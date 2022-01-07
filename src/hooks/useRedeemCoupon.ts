@@ -52,6 +52,7 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
   );
+
   const couponOnboardingContract = useSelector(
     (s: StoreState) => s.contracts.CouponOnboardingContract
   );

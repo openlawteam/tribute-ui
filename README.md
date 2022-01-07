@@ -10,7 +10,7 @@ Related supporting repositories:
 
 ### Local `.env` File
 
-When running locally you'll need a `.env` file in the root directory with the following:
+When running locally you'll need a `.env` file in the root directory with the following environment variables:
 
 ```
 REACT_APP_ENVIRONMENT=localhost
@@ -20,7 +20,7 @@ REACT_APP_MULTICALL_CONTRACT_ADDRESS=...
 REACT_APP_SNAPSHOT_HUB_API_URL=http://localhost:8081
 REACT_APP_COUPON_API_URL=http://localhost:8080
 REACT_APP_SNAPSHOT_SPACE=tribute
-REACT_APP_GRAPH_API_URL=...
+REACT_APP_GRAPH_CORE_URL=...
 ```
 
 NOTE:
@@ -29,30 +29,64 @@ NOTE:
 - `REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS` is the address of the `DaoRegistry` smart contract deployed to your network.
 - `REACT_APP_MULTICALL_CONTRACT_ADDRESS` is the address of the `Multicall` smart contract deployed to your network.
 - `REACT_APP_SNAPSHOT_HUB_API_URL` is the url of [snaphot-hub](https://github.com/openlawteam/snapshot-hub/tree/erc-712) running locally in a container.
+- `REACT_APP_COUPON_API_URL` is the url of the [coupon-manager](https://github.com/openlawteam/coupon-manager) running locally in a container.
 - `REACT_APP_SNAPSHOT_SPACE` is the unique name registered in Snapshot Hub under which proposals, votes, etc. will be stored.
-- `REACT_APP_GRAPH_API_URL` is the url of the [subgraph](#running-the-local-graph-node) running locally in a container.
+- `REACT_APP_GRAPH_CORE_URL` is the url of the core [subgraph](#running-the-local-graph-node) running locally in a container.
 
-#### Optional env vars for local development
+#### Additional Required Environment Variables for KYC Onboarding
 
-`REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>`
+If you want to use the [KYC Onboarding adapter](https://github.com/openlawteam/tribute-contracts/blob/master/website/docs/contracts/adapters/onboarding/KycOnboarding.md), you will also need the following environment variables:
+
+```
+REACT_APP_ENABLE_KYC_ONBOARDING=true
+REACT_APP_KYC_BACKEND_URL=http://localhost:3003/kyc-certificate
+REACT_APP_KYC_FORMS_URL=...
+```
+
+NOTE:
+
+- `REACT_APP_KYC_BACKEND_URL` is the url of the [KYC backend service](https://github.com/openlawteam/lao-backends) running locally in a container.
+- `REACT_APP_KYC_FORMS_URL` is the url of the KYC forms interface.
+
+#### Optional Environment Variables for Additional adapter/extension subgraphs
+
+```
+REACT_APP_GRAPH_COUPON_ONBOARDING_URL=...
+REACT_APP_GRAPH_NFT_EXTENSION_URL=...
+```
+
+NOTE:
+
+- `REACT_APP_GRAPH_COUPON_ONBOARDING_URL` is the url of the optional coupon onboarding [subgraph](#running-the-local-graph-node) running locally in a container.
+- `REACT_APP_GRAPH_NFT_EXTENSION_URL` is the url of the optional NFT extension [subgraph](#running-the-local-graph-node) running locally in a container.
+
+#### Optional Environment Variables for Local Development
+
+```
+REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>
+```
+
+NOTE:
+
+- `REACT_APP_DEFAULT_CHAIN_NAME_LOCAL` can be set to override using the Ganache private network as the default local development chain.
 
 ### Ganache Blockchain Setup
 
 #### Using [Ganache CLI](https://github.com/trufflesuite/ganache-cli) (more stable):
 
 - `npm install -g ganache-cli` (if not already installed)
-- `ganache-cli --port 7545 --networkId 1337 --blockTime 10`
+- `ganache-cli --port 7545 --networkId 1337 --chainId 1337 --blockTime 3`
 
 #### Using [Ganache GUI app](https://www.trufflesuite.com/ganache):
 
 - Change the Network ID to `1337`. That is necessary in order to connect MetaMask to your Ganache network. The DApp is configured for Ganache to be `chainId` `1337`.
-- Turn off Automine and set the Mining Block Time (Seconds) to `10`.
+- Turn off Automine and set the Mining Block Time (Seconds) to `3`.
 
 ---
 
 **Remember**: After you deploy the `DaoRegistry` and `Multicall` smart contracts on your local Ganache network you must include the deployed contract's address in your local root `.env` file. Additionally, you will need to add the contract addresses for the deployed adapters and extensions contracts to the config in `/src/config.ts`.
 
-#### Saving Ganache data
+#### Saving Ganache Data
 
 If you want to use the same accounts (`-d`) and data (`--db`) from a previous Ganache chain, you can add the below arguments to the `ganache-cli` command. The `--db` path can be any path with any structure. Ganache creates many "loose" files, so it may be easiest to keep each chain in its own directory (e.g. `some/path/your-ganache-dbs/01-01-1999`).
 
@@ -64,11 +98,9 @@ If you want to use the same accounts (`-d`) and data (`--db`) from a previous Ga
 
 - **Invalid address, and/or nonce-related errors:** If you're developing on Ganache and the app will not start due to a vague error about an "invalid address", or you're receiving transaction errors from the app related to an incorrect nonce(s), then resetting your Ganache account(s) in MetaMask (or other wallet, if possible) should fix this. To reset your accounts in MetaMask (or other wallet) click: _Settings->Advanced->Reset Account_.
 
-## Running the local graph-node
+## Running the Local graph-node
 
-Clone the https://github.com/openlawteam/tribute-contracts repo and from the root open up a terminal, `npm ci`.
-
-Follow the instructions [here](https://github.com/openlawteam/tribute-contracts/tree/master/docker) to setup and run the local graph-node.
+Follow the instructions [here](https://github.com/openlawteam/tribute-subgraph/blob/main/docker/README.md) to set up and run the local graph-node and to deploy the mandatory core subgraph and any optional adapter/extension subgraphs.
 
 ## GitHub Pages Deployments
 
@@ -76,7 +108,7 @@ Deployments for the development environment are handled automatically with a Git
 
 - `GitHub Pages development deployment`: push to `main` branch -> https://demo.tributedao.com
 
-## Developer notes
+## Developer Notes
 
 ### Node Version
 

@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import FadeIn from '../../components/common/FadeIn';
 import {useWeb3Modal} from '../../components/web3/hooks';
@@ -19,21 +19,6 @@ type DaoTokenHolderProps = {
   customStyles?: Record<string, string>;
 };
 
-const image = `${window.location.origin}/favicon.ico`;
-
-const toDataURL = (url: string) =>
-  fetch(url)
-    .then((response) => response.blob())
-    .then(
-      (blob) =>
-        new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        })
-    );
-
 export default function DaoTokenHolder({
   customStyles,
   ...badgeStyles
@@ -52,12 +37,6 @@ export default function DaoTokenHolder({
 
   const {tokenHolderBalances} = useTokenHolderBalances();
   const {account, networkId} = useWeb3Modal();
-
-  /**
-   * Cached callbacks
-   */
-
-  const getTokenImageCallback = useCallback(getTokenImage, []);
 
   /**
    * Effects
@@ -87,23 +66,9 @@ export default function DaoTokenHolder({
           `${ETHERSCAN_URLS[networkId]}/token/${tokenAddress}?a=${account}`
         );
 
-      getTokenImageCallback();
+      setTokenImageURL(`${window.location.origin}/favicon.ico`);
     }
-  }, [account, networkId, tokenHolderBalances, getTokenImageCallback]);
-
-  /**
-   * Functions
-   */
-
-  function getTokenImage() {
-    try {
-      toDataURL(image).then((dataUrl: any) => {
-        dataUrl && setTokenImageURL(dataUrl);
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  }, [account, networkId, tokenHolderBalances]);
 
   /**
    * Render
