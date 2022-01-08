@@ -48,6 +48,18 @@ NOTE:
 - `REACT_APP_KYC_BACKEND_URL` is the url of the [KYC backend service](https://github.com/openlawteam/lao-backends) running locally in a container.
 - `REACT_APP_KYC_FORMS_URL` is the url of the KYC forms interface.
 
+#### Optional Environment Variables for ERC20 Onboarding
+
+```
+REACT_APP_ONBOARDING_TOKEN_ADDRESS=...
+```
+
+NOTE:
+
+- `REACT_APP_ONBOARDING_TOKEN_ADDRESS` is the address of the ERC20 token that will be contributed in exchange for membership units. Be default, the Onboarding and KycOnboarding interfaces are configured to handle Ether as the contribution token. If a valid ERC20 address is set for this environment variable, the Onboarding and KycOnboarding interfaces will be configured to accept that ERC20 token instead.
+
+_Note that this configuration should be consistent with how the actual Onboarding and KycOnboarding smart contracts have been configured._
+
 #### Optional Environment Variables for Additional adapter/extension subgraphs
 
 ```
