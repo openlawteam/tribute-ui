@@ -3,6 +3,7 @@ import {rest} from 'msw';
 import {COUPON_API_URL, SNAPSHOT_HUB_API_URL} from '../config';
 import {
   ethGasStationResponse,
+  getAssetTransfersFixture,
   snapshotAPIDraftResponse,
   snapshotAPIOffchainProofResponse,
   snapshotAPIProposalResponse,
@@ -74,20 +75,39 @@ const ethGasStationAPI = rest.get(
 );
 
 /**
+ * Alchemy API
+ */
+
+const alchemyAPI = rest.post(
+  'https://eth-mainnet.alchemyapi.io/v2/*',
+  (req, res, ctx) => {
+    const {body} = req;
+
+    if (typeof body === 'object') {
+      // `alchemy_getAssetTransfers`
+      if (body.method === 'alchemy_getAssetTransfers') {
+        return res(ctx.json(getAssetTransfersFixture));
+      }
+    }
+  }
+);
+
+/**
  * HANDLERS TO EXPORT
  */
 
 const handlers = [
+  alchemyAPI,
   ethGasStationAPI,
   getSnapshotAPIDraft,
   getSnapshotAPIOffchainProof,
   getSnapshotAPIProposal,
   getSnapshotAPIRoot,
   getSnapshotAPISpace,
-  postSnapshotAPIMessage,
-  postSnapshotAPIOffchainProof,
   patchRedeemedCoupon,
   postRedeemedCoupon,
+  postSnapshotAPIMessage,
+  postSnapshotAPIOffchainProof,
 ];
 
 export {handlers};

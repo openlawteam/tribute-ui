@@ -10,6 +10,7 @@ export * from './getValidationError';
 export * from './isPossibleContractWallet';
 export * from './normalizeString';
 export * from './numberRangeArray';
+export * from './numberTo0xHexString';
 export * from './stripFormatNumber';
 export * from './stripTrailingZeroes';
 export * from './truncateEthAddress';
