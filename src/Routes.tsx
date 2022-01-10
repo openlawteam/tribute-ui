@@ -1,6 +1,6 @@
 import {Route, Switch} from 'react-router-dom';
 
-import AdapterOrExtensionManager from './components/adapters-extensions/AdapterOrExtensionManager';
+// import AdapterOrExtensionManager from './components/adapters-extensions/AdapterOrExtensionManager';
 import CreateGovernanceProposal from './pages/governance/CreateGovernanceProposal';
 import CreateMembershipProposal from './pages/membership/CreateMembershipProposal';
 import CreateTransferProposal from './pages/transfers/CreateTransferProposal';
@@ -111,12 +111,14 @@ export default function Routes() {
           path="/members/:ethereumAddress"
           render={() => <MemberProfile />}
         />,
-        <Route
-          key="dao-manager"
-          exact
-          path="/dao-manager"
-          render={() => <AdapterOrExtensionManager />}
-        />,
+        // @note Disabling DAO Manager for now because we paused on maintaining
+        // it.
+        // <Route
+        //   key="dao-manager"
+        //   exact
+        //   path="/dao-manager"
+        //   render={() => <AdapterOrExtensionManager />}
+        // />,
         <Route key="redeem" exact path="/redeem" render={() => <Redeem />} />,
         // 404 component (note: does not redirect to a route to maintain original path)
         <Route key="no-match" component={NotFound} />,
