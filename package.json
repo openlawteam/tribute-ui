@@ -80,7 +80,8 @@
     "eject": "react-scripts eject",
     "generate-abi-types": "typechain --target=web3-v1 --out-dir='abi-types' 'src/abis/*.json'",
     "postinstall": "npm run generate-abi-types",
-    "release": "np",
+    "release": "np patch",
+    "release:minor": "np minor",
     "start": "npm run generate-abi-types && react-scripts start",
     "style:fix": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
     "style": "prettier --check 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
@@ -120,9 +121,10 @@
     ]
   },
   "np": {
-    "branch": "main",
+    "branch": "release-v1",
     "yolo": true,
     "yarn": false,
-    "publish": false
+    "publish": false,
+    "tag": "v1"
   }
 }
