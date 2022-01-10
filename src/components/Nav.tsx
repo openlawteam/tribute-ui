@@ -241,7 +241,7 @@ export function NavHamburger() {
                     </li>
                   )}
                   {/* The Manage DAO link is available to both connected member users and connected delegate users. */}
-                  {/* @note Hiding DAO Manager for now because we paused on maintaining it. */}
+                  {/* @note Disabling DAO Manager for now because we paused on maintaining it. */}
                   {/* {isCurrentMemberOrDelegateConnected && (
                     <li
                       onClick={() => {
