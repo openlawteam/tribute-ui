@@ -11,6 +11,7 @@ import {ConfigurationUpdated} from '../../../abis/types/DaoRegistry';
 import {normalizeString} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
 import {useAbortController} from '../../../hooks';
+import {useWeb3Modal} from '../../web3/hooks';
 
 type UseTotalAmountContributedReturn = {
   amountContributed: number;
@@ -33,13 +34,9 @@ const KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH = sha3('kyc-onboarding.chunkSize');
  *
  * This hook will only run on mainnet due to constraints from the Alchemy Transfers API.
  */
-export function useTotalAmountContributedMultisig({
-  multisigAddress,
-  mainnetWeb3Instance,
-}: {
-  multisigAddress: string;
-  mainnetWeb3Instance: Web3;
-}): UseTotalAmountContributedReturn {
+export function useTotalAmountContributedMultisig(
+  multisigAddress: string
+): UseTotalAmountContributedReturn {
   /**
    * Selectors
    */
@@ -66,6 +63,7 @@ export function useTotalAmountContributedMultisig({
    */
 
   const {abortController, isMountedRef} = useAbortController();
+  const {web3Instance} = useWeb3Modal();
 
   /**
    * Cached callbacks
@@ -82,14 +80,21 @@ export function useTotalAmountContributedMultisig({
    */
 
   useEffect(() => {
-    if (DEFAULT_CHAIN !== CHAINS.MAINNET || !daoAddress || !daoABI) return;
+    if (
+      DEFAULT_CHAIN !== CHAINS.MAINNET ||
+      !daoAddress ||
+      !daoABI ||
+      !web3Instance
+    ) {
+      return;
+    }
 
     getAmountContributedCached({
       daoABI,
       daoAddress,
-      web3Instance: mainnetWeb3Instance,
+      web3Instance,
     });
-  }, [daoABI, daoAddress, getAmountContributedCached, mainnetWeb3Instance]);
+  }, [daoABI, daoAddress, getAmountContributedCached, web3Instance]);
 
   /**
    * Functions

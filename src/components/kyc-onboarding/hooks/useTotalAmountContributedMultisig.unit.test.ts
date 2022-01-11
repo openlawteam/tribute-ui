@@ -1,12 +1,14 @@
 import {act, renderHook} from '@testing-library/react-hooks';
 
 import {AsyncStatus} from '../../../util/types';
-import {DEFAULT_ETH_ADDRESS, getWeb3Instance} from '../../../test/helpers';
+import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../../test/helpers';
+import {getAssetTransfersFixture} from '../../../test/restResponses';
 import {rest, server} from '../../../test/server';
 import {useTotalAmountContributedMultisig} from '.';
 import * as config from '../../../config';
 import Wrapper from '../../../test/Wrapper';
-import {getAssetTransfersFixture} from '../../../test/restResponses';
+
+const originalDefaultChain = config.DEFAULT_CHAIN;
 
 const {FULFILLED, PENDING, REJECTED, STANDBY} = AsyncStatus;
 
@@ -32,7 +34,6 @@ const DEFAULT_LOGS_RESULT = [
 describe('useTotalAmountContributedMultisig unit tests', () => {
   test('should return correct data', async () => {
     // Mock chain to be production so hook will run
-    const originalDefaultChain = config.DEFAULT_CHAIN;
     (config as any).DEFAULT_CHAIN = 1;
 
     const useIsDefaultChain = await import(
@@ -48,18 +49,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
         isDefaultChain: true,
       }));
 
-    const {mockWeb3Provider, web3} = getWeb3Instance();
+    let mockWeb3Provider: FakeHttpProvider;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () =>
-          useTotalAmountContributedMultisig({
-            multisigAddress: DEFAULT_ETH_ADDRESS,
-            mainnetWeb3Instance: web3,
-          }),
+        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
         {
           wrapper: Wrapper,
           initialProps: {
+            getProps(p) {
+              mockWeb3Provider = p.mockWeb3Provider;
+            },
             useInit: true,
             useWallet: true,
           },
@@ -94,7 +94,6 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
 
   test('should return correct data when non-allowed assets in transfers', async () => {
     // Mock chain to be production so hook will run
-    const originalDefaultChain = config.DEFAULT_CHAIN;
     (config as any).DEFAULT_CHAIN = 1;
 
     const useIsDefaultChain = await import(
@@ -151,18 +150,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       })
     );
 
-    const {mockWeb3Provider, web3} = getWeb3Instance();
+    let mockWeb3Provider: FakeHttpProvider;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () =>
-          useTotalAmountContributedMultisig({
-            multisigAddress: DEFAULT_ETH_ADDRESS,
-            mainnetWeb3Instance: web3,
-          }),
+        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
         {
           wrapper: Wrapper,
           initialProps: {
+            getProps(p) {
+              mockWeb3Provider = p.mockWeb3Provider;
+            },
             useInit: true,
             useWallet: true,
           },
@@ -197,7 +195,6 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
 
   test('should return correct data when non-multiple of chunk size in transfers', async () => {
     // Mock chain to be production so hook will run
-    const originalDefaultChain = config.DEFAULT_CHAIN;
     (config as any).DEFAULT_CHAIN = 1;
 
     const useIsDefaultChain = await import(
@@ -254,18 +251,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       })
     );
 
-    const {mockWeb3Provider, web3} = getWeb3Instance();
+    let mockWeb3Provider: FakeHttpProvider;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () =>
-          useTotalAmountContributedMultisig({
-            multisigAddress: DEFAULT_ETH_ADDRESS,
-            mainnetWeb3Instance: web3,
-          }),
+        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
         {
           wrapper: Wrapper,
           initialProps: {
+            getProps(p) {
+              mockWeb3Provider = p.mockWeb3Provider;
+            },
             useInit: true,
             useWallet: true,
           },
@@ -300,7 +296,6 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
 
   test('should return correct data when alchemy error', async () => {
     // Mock chain to be production so hook will run
-    const originalDefaultChain = config.DEFAULT_CHAIN;
     (config as any).DEFAULT_CHAIN = 1;
 
     const useIsDefaultChain = await import(
@@ -323,18 +318,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       )
     );
 
-    const {mockWeb3Provider, web3} = getWeb3Instance();
+    let mockWeb3Provider: FakeHttpProvider;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () =>
-          useTotalAmountContributedMultisig({
-            multisigAddress: DEFAULT_ETH_ADDRESS,
-            mainnetWeb3Instance: web3,
-          }),
+        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
         {
           wrapper: Wrapper,
           initialProps: {
+            getProps(p) {
+              mockWeb3Provider = p.mockWeb3Provider;
+            },
             useInit: true,
             useWallet: true,
           },
@@ -369,7 +363,6 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
 
   test('should return correct data when rpc error', async () => {
     // Mock chain to be production so hook will run
-    const originalDefaultChain = config.DEFAULT_CHAIN;
     (config as any).DEFAULT_CHAIN = 1;
 
     const useIsDefaultChain = await import(
@@ -385,18 +378,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
         isDefaultChain: true,
       }));
 
-    const {mockWeb3Provider, web3} = getWeb3Instance();
+    let mockWeb3Provider: FakeHttpProvider;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () =>
-          useTotalAmountContributedMultisig({
-            multisigAddress: DEFAULT_ETH_ADDRESS,
-            mainnetWeb3Instance: web3,
-          }),
+        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
         {
           wrapper: Wrapper,
           initialProps: {
+            getProps(p) {
+              mockWeb3Provider = p.mockWeb3Provider;
+            },
             useInit: true,
             useWallet: true,
           },
@@ -413,38 +405,33 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(PENDING);
 
-      // Mock web3 repsonse
-      mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
+      // Wait for the other web3 app calls to complete
+      await new Promise((r) => setTimeout(r, 0));
 
-      // Mock RPC error response
-      mockWeb3Provider.injectError({
-        code: 1234,
-        message: 'Some bad chain error',
-      });
+      mockWeb3Provider.injectError(
+        {
+          code: 1234,
+          message: 'Some bad chain error',
+        },
+        {debugName: 'ERRRRR1'}
+      );
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
-      // Assert fulfilled
+      // Assert rejected
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(REJECTED);
 
       // Cleanup
-
       spy.mockRestore();
       (config as any).DEFAULT_CHAIN = originalDefaultChain;
     });
   });
 
   test('should not run if not mainnet', async () => {
-    const {web3} = getWeb3Instance();
-
     await act(async () => {
       const {result, waitForNextUpdate} = await renderHook(
-        () =>
-          useTotalAmountContributedMultisig({
-            multisigAddress: DEFAULT_ETH_ADDRESS,
-            mainnetWeb3Instance: web3,
-          }),
+        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
         {
           wrapper: Wrapper,
           initialProps: {
