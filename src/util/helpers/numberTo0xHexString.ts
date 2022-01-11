@@ -5,8 +5,10 @@
  * @param n `number`
  * @returns `0x${string}`
  */
-export function numberTo0xHexString(n: number): `0x${string}` | undefined {
-  if (isNaN(n)) return undefined;
+export function numberTo0xHexString(
+  n: number | undefined
+): `0x${string}` | undefined {
+  if (n === undefined || isNaN(n)) return;
 
   return `0x${Math.abs(n).toString(16)}`;
 }
