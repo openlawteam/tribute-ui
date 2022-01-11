@@ -67,7 +67,8 @@ type AlchemyGetAssetTransfersResponse = {
  * @see https://docs.alchemy.com/alchemy/enhanced-apis/transfers-api
  */
 export async function alchemyFetchAssetTransfers(
-  parameters: GetAssetTransfersParameters = {fromBlock: 0}
+  parameters: GetAssetTransfersParameters = {fromBlock: 0},
+  options: {abortController?: AbortController} = {}
 ): Promise<AlchemyGetAssetTransfersResult[]> {
   const ALCHEMY_URL = getAlchemyURL(CHAINS.MAINNET);
 
@@ -98,6 +99,7 @@ export async function alchemyFetchAssetTransfers(
       'Content-Type': 'application/json',
     },
     method: 'POST',
+    signal: options?.abortController?.signal,
   });
 
   if (!response.ok) {

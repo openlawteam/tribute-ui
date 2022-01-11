@@ -10,6 +10,7 @@ import {CHAINS, DEFAULT_CHAIN} from '../../../config';
 import {ConfigurationUpdated} from '../../../abis/types/DaoRegistry';
 import {normalizeString} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
+import {useAbortController} from '../../../hooks';
 
 type UseTotalAmountContributedReturn = {
   amountContributed: number;
@@ -61,10 +62,18 @@ export function useTotalAmountContributedMultisig({
     useState<AsyncStatus>(STANDBY);
 
   /**
+   * Our hooks
+   */
+
+  const {abortController, isMountedRef} = useAbortController();
+
+  /**
    * Cached callbacks
    */
 
   const getAmountContributedCached = useCallback(getAmountContributed, [
+    abortController,
+    isMountedRef,
     multisigAddress,
   ]);
 
@@ -107,10 +116,13 @@ export function useTotalAmountContributedMultisig({
 
       setAmountContributedStatus(PENDING);
 
-      const transfers = await alchemyFetchAssetTransfers({
-        category: ['external', 'internal', 'token'],
-        toAddress: multisigAddress,
-      });
+      const transfers = await alchemyFetchAssetTransfers(
+        {
+          category: ['external', 'internal', 'token'],
+          toAddress: multisigAddress,
+        },
+        {abortController}
+      );
 
       const daoConfigUpdatedLogs = await web3Instance.eth.getPastLogs({
         fromBlock: 0,
@@ -152,9 +164,13 @@ export function useTotalAmountContributedMultisig({
         .filter((v) => v && chunkSizeValues.some((c) => v % Number(c) === 0))
         .reduce((acc: number, next) => (acc += next || 0), 0);
 
+      if (!isMountedRef.current) return;
+
       setAmountContributedStatus(FULFILLED);
       setAmountContributed(amountContributed);
     } catch (error) {
+      if (!isMountedRef.current) return;
+
       setAmountContributedStatus(REJECTED);
     }
   }
