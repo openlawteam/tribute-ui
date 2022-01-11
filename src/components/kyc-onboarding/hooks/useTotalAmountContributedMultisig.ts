@@ -7,7 +7,7 @@ import Web3 from 'web3';
 import {alchemyFetchAssetTransfers} from '../../web3/helpers';
 import {AsyncStatus} from '../../../util/types';
 import {CHAINS, DEFAULT_CHAIN} from '../../../config';
-import {ConfigurationUpdated} from '../../../../abi-types/DaoRegistry';
+import {ConfigurationUpdated} from '../../../abis/types/DaoRegistry';
 import {normalizeString} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
 
@@ -17,6 +17,8 @@ type UseTotalAmountContributedReturn = {
 };
 
 const {FULFILLED, PENDING, REJECTED, STANDBY} = AsyncStatus;
+
+const ALLOWED_ASSETS = ['eth', 'weth'];
 
 const CONFIGURATION_UPDATED_EVENT_SIGNATURE_HASH = sha3(
   'ConfigurationUpdated(bytes32,uint256)'
@@ -29,9 +31,6 @@ const KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH = sha3('kyc-onboarding.chunkSize');
  * via `KycOnboarding` transfers and direct transfers.
  *
  * This hook will only run on mainnet due to constraints from the Alchemy Transfers API.
- *
- * @todo Add `KycOnboardingContract` to Redux store for `tribute-ui` and get contract address dynamically,
- *   instead of passing as argument.
  */
 export function useTotalAmountContributedMultisig({
   multisigAddress,
@@ -141,9 +140,13 @@ export function useTotalAmountContributedMultisig({
       /**
        * Get amount contributed
        *
-       * Assumes we're working with normal `number`s and not big numbers.
+       * Assumes we're working with normal `number`s, not big numbers.
        */
       const amountContributed: number = transfers
+        // Only take transfers which have assets in `ALLOWED_ASSETS`
+        .filter((t) =>
+          ALLOWED_ASSETS.some((a) => a === normalizeString(t.asset || ''))
+        )
         .map((t) => t.value)
         // Only take values which are multiples of a chunk size config value
         .filter((v) => v && chunkSizeValues.some((c) => v % Number(c) === 0))
