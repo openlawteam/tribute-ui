@@ -1,6 +1,8 @@
 import {useCallback, useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
 import {useLocation} from 'react-router-dom';
 
+import {StoreState} from '../../store/types';
 import {AsyncStatus} from '../../util/types';
 import {COUPON_API_URL} from '../../config';
 import {useAbortController} from '../../hooks';
@@ -21,6 +23,14 @@ type RedeemCouponType = {
 };
 
 export default function RedeemCoupon() {
+  /**
+   * Selectors
+   */
+
+  const ERC20ExtensionContract = useSelector(
+    (state: StoreState) => state.contracts?.ERC20ExtensionContract
+  );
+
   /**
    * State
    */
@@ -56,7 +66,7 @@ export default function RedeemCoupon() {
   const isInProcess =
     couponStatus === AsyncStatus.STANDBY ||
     couponStatus === AsyncStatus.PENDING ||
-    daoTokenDetailsStatus === AsyncStatus.STANDBY ||
+    (ERC20ExtensionContract && daoTokenDetailsStatus === AsyncStatus.STANDBY) ||
     daoTokenDetailsStatus === AsyncStatus.PENDING;
 
   /**

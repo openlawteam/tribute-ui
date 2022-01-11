@@ -11,8 +11,8 @@ import {AsyncStatus} from '../../../util/types';
 import {ProposalVotingAdapterData, ProposalVotingAdapterTuple} from '../types';
 import {useProposalsVotes} from './useProposalsVotes';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
-import OffchainVotingABI from '../../../abis/OffchainVotingContract.json';
-import VotingABI from '../../../abis/VotingContract.json';
+import OffchainVotingABI from '../../../abis/tribute-contracts/OffchainVotingContract.json';
+import VotingABI from '../../../abis/tribute-contracts/VotingContract.json';
 import Wrapper from '../../../test/Wrapper';
 
 describe('useProposalsVotes unit tests', () => {
@@ -67,7 +67,7 @@ describe('useProposalsVotes unit tests', () => {
 
       const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
         {
-          Voting: {
+          VotingDetails: {
             snapshot: 'uint256',
             reporter: 'address',
             resultRoot: 'bytes32',
@@ -75,8 +75,9 @@ describe('useProposalsVotes unit tests', () => {
             nbNo: 'uint256',
             startingTime: 'uint256',
             gracePeriodStartingTime: 'uint256',
-            forceFailed: 'bool',
             isChallenged: 'bool',
+            stepRequested: 'uint256',
+            forceFailed: 'bool',
             fallbackVotesCount: 'uint256',
           },
         },
@@ -89,8 +90,9 @@ describe('useProposalsVotes unit tests', () => {
           nbNo: '0',
           startingTime: '1617878162',
           gracePeriodStartingTime: '1617964640',
-          forceFailed: false,
           isChallenged: false,
+          stepRequested: '0',
+          forceFailed: false,
           fallbackVotesCount: '0',
         }
       );
@@ -149,17 +151,6 @@ describe('useProposalsVotes unit tests', () => {
           DEFAULT_PROPOSAL_HASH,
           {
             OffchainVotingContract: {
-              '0': '8376297',
-              '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-              '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-              '3': '1',
-              '4': '0',
-              '5': '1617878162',
-              '6': '1617964640',
-              '7': false,
-              '8': false,
-              '9': '0',
-              __length__: 10,
               snapshot: '8376297',
               reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
               resultRoot:
@@ -168,8 +159,9 @@ describe('useProposalsVotes unit tests', () => {
               nbNo: '0',
               startingTime: '1617878162',
               gracePeriodStartingTime: '1617964640',
-              forceFailed: false,
               isChallenged: false,
+              stepRequested: '0',
+              forceFailed: false,
               fallbackVotesCount: '0',
             },
           },
@@ -178,17 +170,6 @@ describe('useProposalsVotes unit tests', () => {
           '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca76',
           {
             OffchainVotingContract: {
-              '0': '8376297',
-              '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-              '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-              '3': '1',
-              '4': '0',
-              '5': '1617878162',
-              '6': '1617964640',
-              '7': false,
-              '8': false,
-              '9': '0',
-              __length__: 10,
               snapshot: '8376297',
               reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
               resultRoot:
@@ -197,8 +178,9 @@ describe('useProposalsVotes unit tests', () => {
               nbNo: '0',
               startingTime: '1617878162',
               gracePeriodStartingTime: '1617964640',
-              forceFailed: false,
               isChallenged: false,
+              stepRequested: '0',
+              forceFailed: false,
               fallbackVotesCount: '0',
             },
           },
@@ -304,7 +286,7 @@ describe('useProposalsVotes unit tests', () => {
 
       const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
         {
-          Voting: {
+          VotingDetails: {
             snapshot: 'uint256',
             reporter: 'address',
             resultRoot: 'bytes32',
@@ -312,8 +294,9 @@ describe('useProposalsVotes unit tests', () => {
             nbNo: 'uint256',
             startingTime: 'uint256',
             gracePeriodStartingTime: 'uint256',
-            forceFailed: 'bool',
             isChallenged: 'bool',
+            stepRequested: 'uint256',
+            forceFailed: 'bool',
             fallbackVotesCount: 'uint256',
           },
         },
@@ -326,8 +309,9 @@ describe('useProposalsVotes unit tests', () => {
           nbNo: '0',
           startingTime: '1617878162',
           gracePeriodStartingTime: '1617964640',
-          forceFailed: false,
           isChallenged: false,
+          stepRequested: '0',
+          forceFailed: false,
           fallbackVotesCount: '0',
         }
       );
@@ -362,17 +346,6 @@ describe('useProposalsVotes unit tests', () => {
           '0x4662dd46b8ca7ce0852426f20bc53b02335432089bbe3a4c510b36741d81ca75',
           {
             OffchainVotingContract: {
-              '0': '8376297',
-              '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-              '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-              '3': '1',
-              '4': '0',
-              '5': '1617878162',
-              '6': '1617964640',
-              '7': false,
-              '8': false,
-              '9': '0',
-              __length__: 10,
               snapshot: '8376297',
               reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
               resultRoot:
@@ -381,8 +354,9 @@ describe('useProposalsVotes unit tests', () => {
               nbNo: '0',
               startingTime: '1617878162',
               gracePeriodStartingTime: '1617964640',
-              forceFailed: false,
               isChallenged: false,
+              stepRequested: '0',
+              forceFailed: false,
               fallbackVotesCount: '0',
             },
           },

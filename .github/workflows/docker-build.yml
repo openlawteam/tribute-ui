@@ -1,4 +1,4 @@
-name: DockerHub Build 
+name: DockerHub Build
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      
+
       - name: Build docker image and tag
         uses: docker/build-push-action@v1
         env:
@@ -32,7 +32,7 @@ jobs:
           username: ${{ secrets.PUB_REPO_DOCKERHUB_USERNAME }}
           password: ${{ secrets.PUB_REPO_DOCKERHUB_ACCESS_TOKEN }}
           repository: ${{ env.DOCKER_REPO }}
-          # Automatically tags the built image with the git short SHA 
+          # Automatically tags the built image with the git short SHA
           # prefixed with the branch name, e.g: main-xxxxxxx
           tags: ${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
           # Only push on git main branch

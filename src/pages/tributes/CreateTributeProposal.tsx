@@ -5,13 +5,13 @@ import {useForm} from 'react-hook-form';
 import {useHistory} from 'react-router-dom';
 import {Contract as Web3Contract} from 'web3-eth-contract/types';
 import {toBN, AbiItem, toChecksumAddress} from 'web3-utils';
+import {debounce} from 'debounce';
 
 import {
-  getValidationError,
-  stripFormatNumber,
   formatNumber,
-  formatDecimal,
+  getValidationError,
   normalizeString,
+  stripFormatNumber,
   truncateEthAddress,
 } from '../../util/helpers';
 import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
@@ -183,7 +183,9 @@ export default function CreateTributeProposal() {
     }
 
     try {
-      const {default: lazyERC20ABI} = await import('../../abis/ERC20.json');
+      const {default: lazyERC20ABI} = await import(
+        '../../abis/external/ERC20.json'
+      );
       const erc20Contract: AbiItem[] = lazyERC20ABI as any;
       const instance = new web3Instance.eth.Contract(
         erc20Contract,
@@ -398,10 +400,7 @@ export default function CreateTributeProposal() {
       return '---';
     }
 
-    const isBalanceInt = Number.isInteger(Number(userERC20Balance));
-    return isBalanceInt
-      ? userERC20Balance
-      : formatDecimal(Number(userERC20Balance));
+    return formatNumber(userERC20Balance);
   }
 
   function getUnauthorizedMessage() {
@@ -501,12 +500,14 @@ export default function CreateTributeProposal() {
                 aria-describedby={`error-${Fields.tributeAmount}`}
                 aria-invalid={errors.tributeAmount ? 'true' : 'false'}
                 name={Fields.tributeAmount}
-                onChange={() =>
-                  setValue(
-                    Fields.tributeAmount,
-                    formatNumber(getValues().tributeAmount)
-                  )
-                }
+                onChange={debounce(
+                  () =>
+                    setValue(
+                      Fields.tributeAmount,
+                      formatNumber(stripFormatNumber(getValues().tributeAmount))
+                    ),
+                  1000
+                )}
                 ref={register({
                   validate: (tributeAmount: string): string | boolean => {
                     const amount = Number(stripFormatNumber(tributeAmount));
@@ -558,12 +559,14 @@ export default function CreateTributeProposal() {
               aria-describedby={`error-${Fields.requestAmount}`}
               aria-invalid={errors.requestAmount ? 'true' : 'false'}
               name={Fields.requestAmount}
-              onChange={() =>
-                setValue(
-                  Fields.requestAmount,
-                  formatNumber(getValues().requestAmount)
-                )
-              }
+              onChange={debounce(
+                () =>
+                  setValue(
+                    Fields.requestAmount,
+                    formatNumber(stripFormatNumber(getValues().requestAmount))
+                  ),
+                1000
+              )}
               ref={register({
                 validate: (requestAmount: string): string | boolean => {
                   const amount = Number(stripFormatNumber(requestAmount));
@@ -574,6 +577,8 @@ export default function CreateTributeProposal() {
                     ? FormFieldErrors.INVALID_NUMBER
                     : amount < 0
                     ? 'The value must be at least 0.'
+                    : !Number.isInteger(amount)
+                    ? 'The value must be an integer.'
                     : true;
                 },
               })}

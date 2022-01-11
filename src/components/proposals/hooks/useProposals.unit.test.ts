@@ -171,7 +171,7 @@ const mockWeb3Responses: Parameters<typeof Wrapper>[0]['getProps'] = ({
    */
   const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
     {
-      Voting: {
+      VotingDetail: {
         snapshot: 'uint256',
         reporter: 'address',
         resultRoot: 'bytes32',
@@ -179,8 +179,9 @@ const mockWeb3Responses: Parameters<typeof Wrapper>[0]['getProps'] = ({
         nbNo: 'uint256',
         startingTime: 'uint256',
         gracePeriodStartingTime: 'uint256',
-        forceFailed: 'bool',
         isChallenged: 'bool',
+        stepRequested: 'uint256',
+        forceFailed: 'bool',
         fallbackVotesCount: 'uint256',
       },
     },
@@ -193,8 +194,9 @@ const mockWeb3Responses: Parameters<typeof Wrapper>[0]['getProps'] = ({
       nbNo: '0',
       startingTime: '1617878162',
       gracePeriodStartingTime: '1617964640',
-      forceFailed: false,
       isChallenged: false,
+      stepRequested: '0',
+      forceFailed: false,
       fallbackVotesCount: '0',
     }
   );
@@ -393,17 +395,6 @@ describe('useProposals unit tests', () => {
 
       expect(result.current.proposals[1].daoProposalVote).toEqual({
         OffchainVotingContract: {
-          '0': '8376297',
-          '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-          '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-          '3': '1',
-          '4': '0',
-          '5': '1617878162',
-          '6': '1617964640',
-          '7': false,
-          '8': false,
-          '9': '0',
-          __length__: 10,
           snapshot: '8376297',
           reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
           resultRoot:
@@ -412,8 +403,9 @@ describe('useProposals unit tests', () => {
           nbNo: '0',
           startingTime: '1617878162',
           gracePeriodStartingTime: '1617964640',
-          forceFailed: false,
           isChallenged: false,
+          stepRequested: '0',
+          forceFailed: false,
           fallbackVotesCount: '0',
         },
       });
@@ -697,7 +689,7 @@ describe('useProposals unit tests', () => {
        */
       const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
         {
-          Voting: {
+          VotingDetail: {
             snapshot: 'uint256',
             reporter: 'address',
             resultRoot: 'bytes32',
@@ -705,8 +697,9 @@ describe('useProposals unit tests', () => {
             nbNo: 'uint256',
             startingTime: 'uint256',
             gracePeriodStartingTime: 'uint256',
-            forceFailed: 'bool',
             isChallenged: 'bool',
+            stepRequested: 'uint256',
+            forceFailed: 'bool',
             fallbackVotesCount: 'uint256',
           },
         },
@@ -719,8 +712,9 @@ describe('useProposals unit tests', () => {
           nbNo: '0',
           startingTime: '1617878162',
           gracePeriodStartingTime: '1617964640',
-          forceFailed: false,
           isChallenged: false,
+          stepRequested: '0',
+          forceFailed: false,
           fallbackVotesCount: '0',
         }
       );
@@ -842,17 +836,6 @@ describe('useProposals unit tests', () => {
 
       expect(result.current.proposals[1].daoProposalVote).toEqual({
         OffchainVotingContract: {
-          '0': '8376297',
-          '1': '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
-          '2': '0x9298a7fccdf7655408a8106ff03c9cbf0610082cc0f00dfe4c8f73f57a60df71',
-          '3': '1',
-          '4': '0',
-          '5': '1617878162',
-          '6': '1617964640',
-          '7': false,
-          '8': false,
-          '9': '0',
-          __length__: 10,
           snapshot: '8376297',
           reporter: '0xf9731Ad60BeCA05E9FB7aE8Dd4B63BFA49675b68',
           resultRoot:
@@ -861,8 +844,9 @@ describe('useProposals unit tests', () => {
           nbNo: '0',
           startingTime: '1617878162',
           gracePeriodStartingTime: '1617964640',
-          forceFailed: false,
           isChallenged: false,
+          stepRequested: '0',
+          forceFailed: false,
           fallbackVotesCount: '0',
         },
       });

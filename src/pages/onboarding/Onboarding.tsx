@@ -6,13 +6,13 @@ import FadeIn from '../../components/common/FadeIn';
 import Proposals from '../../components/proposals/Proposals';
 import Wrap from '../../components/common/Wrap';
 
-export default function Membership() {
+export default function Onboarding() {
   /**
    * Functions
    */
 
   function proposalLinkPath(id: string) {
-    return `/membership/${id}`;
+    return `/onboarding/${id}`;
   }
 
   /**
@@ -41,9 +41,9 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
    * Functions
    */
 
-  function viewMembers(event: React.MouseEvent<HTMLButtonElement>) {
+  function goToNewProposal(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
-    history.push('/members');
+    history.push('/onboard');
   }
 
   /**
@@ -54,9 +54,9 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
     <Wrap className="section-wrapper">
       <FadeIn>
         <div className="titlebar">
-          <h2 className="titlebar__title">Membership</h2>
-          <button className="titlebar__action" onClick={viewMembers}>
-            View members
+          <h2 className="titlebar__title">Onboarding</h2>
+          <button className="titlebar__action" onClick={goToNewProposal}>
+            Onboard
           </button>
         </div>
 

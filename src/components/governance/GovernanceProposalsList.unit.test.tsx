@@ -142,7 +142,8 @@ describe('GovernanceProposalsList unit tests', () => {
         [
           0,
           [
-            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '30000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '20000000'),
             web3Instance.eth.abi.encodeParameter('uint256', '200000'),
             web3Instance.eth.abi.encodeParameter('uint256', '100000'),
           ],
@@ -157,7 +158,8 @@ describe('GovernanceProposalsList unit tests', () => {
         [
           0,
           [
-            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '30000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '20000000'),
             web3Instance.eth.abi.encodeParameter('uint256', '200000'),
             web3Instance.eth.abi.encodeParameter('uint256', '300000'),
           ],
@@ -172,7 +174,8 @@ describe('GovernanceProposalsList unit tests', () => {
         [
           0,
           [
-            web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '30000000'),
+            web3Instance.eth.abi.encodeParameter('uint256', '20000000'),
             web3Instance.eth.abi.encodeParameter('uint256', '100000'),
             web3Instance.eth.abi.encodeParameter('uint256', '100000'),
           ],

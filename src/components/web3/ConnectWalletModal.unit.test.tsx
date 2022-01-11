@@ -2,7 +2,6 @@ import {render, screen, waitFor} from '@testing-library/react';
 import {Store} from 'redux';
 import {useDispatch, useSelector} from 'react-redux';
 import userEvent from '@testing-library/user-event';
-import Web3 from 'web3';
 
 import {
   connectModalClose,
@@ -10,7 +9,7 @@ import {
   setConnectedMember,
 } from '../../store/actions';
 import {CHAINS} from '../../config';
-import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../test/helpers';
+import {DEFAULT_ETH_ADDRESS} from '../../test/helpers';
 import {REVERSE_RECORDS_ADDRESS} from './helpers';
 import {StoreState} from '../../store/types';
 import {useEffect} from 'react';
@@ -785,7 +784,9 @@ describe('ConnectWalletModal unit tests', () => {
 
   test('can remove `"injected"` provider option when device is mobile', async () => {
     // Mock @walletconnect's `isMobile: () => boolean`
-    const walletConnectUtils = await import('@walletconnect/browser-utils');
+    const walletConnectUtils = await import(
+      '@walletconnect/browser-utils/dist/cjs/browser'
+    );
 
     const isMobileMock = jest
       .spyOn(walletConnectUtils, 'isMobile')

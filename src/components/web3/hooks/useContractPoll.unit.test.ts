@@ -5,7 +5,7 @@ import {waitFor} from '@testing-library/react';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
 import {DEFAULT_ETH_ADDRESS, getWeb3Instance} from '../../../test/helpers';
 import {useContractPoll} from './useContractPoll';
-import DAORegistryABI from '../../../abis/DaoRegistry.json';
+import DAORegistryABI from '../../../abis/tribute-contracts/DaoRegistry.json';
 
 describe('useContractPoll unit tests', () => {
   test('should poll contract', async () => {

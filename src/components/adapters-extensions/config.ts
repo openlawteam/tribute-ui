@@ -11,7 +11,6 @@ import {
   FINANCING_CONTRACT_ADDRESS,
   GUILDKICK_CONTRACT_ADDRESS,
   MANAGING_CONTRACT_ADDRESS,
-  NFT_ADAPTER_CONTRACT_ADDRESS,
   // NFT_EXTENSION_CONTRACT_ADDRESS,
   OFFCHAINVOTING_CONTRACT_ADDRESS,
   ONBOARDING_CONTRACT_ADDRESS,
@@ -171,13 +170,6 @@ export const defaultAdaptersAndExtensions: AdaptersAndExtensionsType[] = [
     abiFunctionName: 'withdraw',
     description:
       'Allows the members to withdraw their funds from the DAO bank.',
-  },
-  {
-    name: DaoAdapterConstants.NFT,
-    adapterId: getAdapterOrExtensionId(DaoAdapterConstants.NFT),
-    contractAddress: NFT_ADAPTER_CONTRACT_ADDRESS[DEFAULT_CHAIN],
-    abiFunctionName: 'collect',
-    description: 'Transfers ownership of an NFT to the DAO collection.',
   },
   {
     name: DaoAdapterConstants.COUPON_ONBOARDING,

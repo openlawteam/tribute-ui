@@ -9,5 +9,7 @@ export * from './getExtensionAddress';
 export * from './getVotingAdapterName';
 export * from './hasFlag';
 export * from './isEIP1559Compatible';
+export * from './isNotReservedAddress';
+export * from './isNotZeroAddress';
 export * from './multicall';
 export * from './reverseResolveENS';

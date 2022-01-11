@@ -62,10 +62,6 @@ describe('useCheckApplicant unit tests', () => {
             [
               0,
               [
-                // For `isNotReservedAddress` call
-                web3Instance.eth.abi.encodeParameter('bool', true),
-                // For `isNotZeroAddress` call
-                web3Instance.eth.abi.encodeParameter('bool', true),
                 // For `getAddressIfDelegated` call
                 web3Instance.eth.abi.encodeParameter(
                   'address',
@@ -113,10 +109,6 @@ describe('useCheckApplicant unit tests', () => {
             [
               0,
               [
-                // For `isNotReservedAddress` call
-                web3Instance.eth.abi.encodeParameter('bool', false),
-                // For `isNotZeroAddress` call
-                web3Instance.eth.abi.encodeParameter('bool', true),
                 // For `getAddressIfDelegated` call
                 web3Instance.eth.abi.encodeParameter('address', GUILD_ADDRESS),
               ],
@@ -163,10 +155,6 @@ describe('useCheckApplicant unit tests', () => {
             [
               0,
               [
-                // For `isNotReservedAddress` call
-                web3Instance.eth.abi.encodeParameter('bool', true),
-                // For `isNotZeroAddress` call
-                web3Instance.eth.abi.encodeParameter('bool', false),
                 // For `getAddressIfDelegated` call
                 web3Instance.eth.abi.encodeParameter('address', BURN_ADDRESS),
               ],
@@ -213,10 +201,6 @@ describe('useCheckApplicant unit tests', () => {
             [
               0,
               [
-                // For `isNotReservedAddress` call
-                web3Instance.eth.abi.encodeParameter('bool', true),
-                // For `isNotZeroAddress` call
-                web3Instance.eth.abi.encodeParameter('bool', true),
                 // For `getAddressIfDelegated` call
                 web3Instance.eth.abi.encodeParameter(
                   'address',

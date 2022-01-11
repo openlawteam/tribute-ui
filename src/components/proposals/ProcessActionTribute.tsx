@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useState, useRef, useEffect, useCallback} from 'react';
 
 import {CycleEllipsis} from '../feedback';
-import {ERC20} from '../../../abi-types/ERC20';
+import {ERC20} from '../../abis/types/ERC20';
 import {getConnectedMember} from '../../store/actions';
 import {ProposalData, SnapshotProposal} from './types';
 import {ReduxDispatch, StoreState} from '../../store/types';
@@ -229,7 +229,9 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
 
       const {tokenAddress, tributeAmount} = tributeProposalDetails;
 
-      const {default: lazyERC20ABI} = await import('../../abis/ERC20.json');
+      const {default: lazyERC20ABI} = await import(
+        '../../abis/external/ERC20.json'
+      );
       const erc20Contract: AbiItem[] = lazyERC20ABI as any;
 
       const erc20Instance = new web3Instance.eth.Contract(

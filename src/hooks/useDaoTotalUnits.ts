@@ -1,23 +1,26 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useLazyQuery} from '@apollo/react-hooks';
 import {useSelector} from 'react-redux';
+import {toBN} from 'web3-utils';
 
 import {AsyncStatus} from '../util/types';
 import {StoreState} from '../store/types';
 import {SubgraphNetworkStatus} from '../store/subgraphNetworkStatus/types';
 import {GET_DAO} from '../gql';
-import {TOTAL_ADDRESS, UNITS_ADDRESS} from '../config';
+import {GUILD_ADDRESS, TOTAL_ADDRESS, UNITS_ADDRESS} from '../config';
 
 type UseDaoTotalUnitsReturn = {
   totalUnits: number | undefined;
   totalUnitsError: Error | undefined;
+  totalUnitsIssued: number | undefined;
   totalUnitsStatus: AsyncStatus;
 };
 
 /**
  * useDaoTotalUnits
  *
- * Gets DAO total units from subgraph with direct onchain fallback.
+ * Gets DAO (1) total units minted and (2) total units issued and outstanding
+ * from subgraph with direct onchain fallback.
  *
  * @returns {UseDaoTotalUnitsReturn}
  */
@@ -52,6 +55,7 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
    */
 
   const [totalUnits, setTotalUnits] = useState<number>();
+  const [totalUnitsIssued, setTotalUnitsIssued] = useState<number>();
   const [totalUnitsStatus, setTotalUnitsStatus] = useState<AsyncStatus>(
     AsyncStatus.STANDBY
   );
@@ -68,7 +72,7 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
 
   const getTotalUnitsFromSubgraphCached = useCallback(
     getTotalUnitsFromSubgraph,
-    [data, error, getTotalUnitsFromExtensionCached, loading]
+    [data, error, getTotalUnitsFromExtensionCached]
   );
 
   /**
@@ -83,7 +87,7 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
 
   useEffect(() => {
     if (subgraphNetworkStatus === SubgraphNetworkStatus.OK) {
-      if (!loading && DaoRegistryContract?.contractAddress) {
+      if (called && !loading && DaoRegistryContract?.contractAddress) {
         getTotalUnitsFromSubgraphCached();
       }
     } else {
@@ -93,6 +97,7 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
     }
   }, [
     DaoRegistryContract?.contractAddress,
+    called,
     getTotalUnitsFromExtensionCached,
     getTotalUnitsFromSubgraphCached,
     loading,
@@ -107,20 +112,32 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
     try {
       setTotalUnitsStatus(AsyncStatus.PENDING);
 
-      if (!loading && data) {
+      if (data) {
         // extract totalUnits from gql data
-        const {totalUnits} = data.tributeDaos[0] as Record<string, any>;
+        const {totalUnits, totalUnitsIssued} = data.tributeDaos[0] as Record<
+          string,
+          any
+        >;
         setTotalUnits(Number(totalUnits));
+        setTotalUnitsIssued(Number(totalUnitsIssued));
         setTotalUnitsStatus(AsyncStatus.FULFILLED);
       } else {
         if (error) {
-          throw new Error(error.message);
+          throw new Error(`subgraph query error: ${error.message}`);
+        } else if (typeof data === 'undefined') {
+          // Additional case to catch `{"errors":{"message":"No indexers found
+          // for subgraph deployment"}}` which does not get returned as an error
+          // by the graph query call.
+          throw new Error('subgraph query error: data is undefined');
         }
       }
     } catch (error) {
+      const {message} = error as Error;
+
       // If there is a subgraph query error fallback to fetching totalUnits
       // directly from smart contract
-      console.log(`subgraph query error: ${error.message}`);
+      console.log(message);
+
       getTotalUnitsFromExtensionCached();
     }
   }
@@ -133,19 +150,30 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
     try {
       setTotalUnitsStatus(AsyncStatus.PENDING);
 
-      const totalUnits = await BankExtensionContract.instance.methods
+      // total units minted for the DAO
+      const totalUnitsToSet = await BankExtensionContract.instance.methods
         .balanceOf(TOTAL_ADDRESS, UNITS_ADDRESS)
         .call();
+      // balance of units owned by the guild bank
+      const balanceOfGuildUnits = await BankExtensionContract.instance.methods
+        .balanceOf(GUILD_ADDRESS, UNITS_ADDRESS)
+        .call();
+      // total units issued and outstanding (not owned by the guild bank)
+      const totalUnitsIssuedToSet = toBN(totalUnitsToSet).sub(
+        toBN(balanceOfGuildUnits)
+      );
 
-      setTotalUnits(Number(totalUnits));
+      setTotalUnits(Number(totalUnitsToSet));
+      setTotalUnitsIssued(Number(totalUnitsIssuedToSet));
       setTotalUnitsStatus(AsyncStatus.FULFILLED);
     } catch (error) {
       console.log(error);
       setTotalUnits(undefined);
+      setTotalUnitsIssued(undefined);
       setTotalUnitsError(error);
       setTotalUnitsStatus(AsyncStatus.REJECTED);
     }
   }
 
-  return {totalUnits, totalUnitsError, totalUnitsStatus};
+  return {totalUnits, totalUnitsError, totalUnitsIssued, totalUnitsStatus};
 }

@@ -8,6 +8,7 @@ import {useForm} from 'react-hook-form';
 import {useHistory} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import {useState, useCallback, useEffect} from 'react';
+import {debounce} from 'debounce';
 
 import {
   useContractSend,
@@ -16,15 +17,14 @@ import {
   useWeb3Modal,
 } from '../../components/web3/hooks';
 import {
+  formatNumber,
   getValidationError,
   stripFormatNumber,
-  formatNumber,
-  formatDecimal,
   truncateEthAddress,
 } from '../../util/helpers';
 import {BURN_ADDRESS} from '../../util/constants';
 import {ContractAdapterNames, Web3TxStatus} from '../../components/web3/types';
-import {default as ERC20ABI} from '../../abis/ERC20.json';
+import {default as ERC20ABI} from '../../abis/external/ERC20.json';
 import {ETH_TOKEN_ADDRESS, GUILD_ADDRESS, UNITS_ADDRESS} from '../../config';
 import {FormFieldErrors} from '../../util/enums';
 import {isEthAddressValid} from '../../util/validation';
@@ -386,6 +386,7 @@ export default function CreateTransferProposal() {
       let proposalId: string = proposalData?.uniqueId || '';
       let data: SnapshotProposalData | undefined = proposalData?.data;
       let signature: string = proposalData?.signature || '';
+      let submitter: string = proposalData?.submitter || '';
 
       const bodyIntro = isTypeAllMembers
         ? 'Transfer to all members pro rata.'
@@ -411,6 +412,7 @@ export default function CreateTransferProposal() {
           uniqueId,
           data: returnData,
           signature: returnSignature,
+          submitter: returnSubmitter,
         } = await signAndSendProposal({
           partialProposalData: {
             name,
@@ -428,6 +430,7 @@ export default function CreateTransferProposal() {
         proposalId = uniqueId;
         data = returnData;
         signature = returnSignature;
+        submitter = returnSubmitter;
       }
 
       const memberAddressArg = isTypeAllMembers
@@ -450,6 +453,7 @@ export default function CreateTransferProposal() {
                 start: data.payload.start,
                 end: data.payload.end,
               },
+              submitter,
               sig: signature,
               space: data.space,
               timestamp: parseInt(data.timestamp),
@@ -532,10 +536,7 @@ export default function CreateTransferProposal() {
       return '---';
     }
 
-    const isBalanceInt = Number.isInteger(Number(selectedTokenBalance));
-    return isBalanceInt
-      ? selectedTokenBalance
-      : formatDecimal(Number(selectedTokenBalance));
+    return formatNumber(selectedTokenBalance);
   }
 
   function getUnauthorizedMessage() {
@@ -679,9 +680,14 @@ export default function CreateTransferProposal() {
                 aria-describedby={`error-${Fields.amount}`}
                 aria-invalid={errors.amount ? 'true' : 'false'}
                 name={Fields.amount}
-                onChange={() =>
-                  setValue(Fields.amount, formatNumber(getValues().amount))
-                }
+                onChange={debounce(
+                  () =>
+                    setValue(
+                      Fields.amount,
+                      formatNumber(stripFormatNumber(getValues().amount))
+                    ),
+                  1000
+                )}
                 ref={register({
                   validate: (amount: string): string | boolean => {
                     const amountToNumber = Number(stripFormatNumber(amount));

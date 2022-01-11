@@ -39,12 +39,16 @@ jobs:
         env:
           REACT_APP_ENVIRONMENT: development
           REACT_APP_INFURA_PROJECT_ID_DEV: ${{ secrets.REACT_APP_INFURA_PROJECT_ID_DEV }}
-          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0xf5af0d9c3e4091a48925902eaAB2982e44E7a4C5"
-          REACT_APP_MULTICALL_CONTRACT_ADDRESS: "0xde0Ca6340FDE1906B3c4c1A2bdEE060933e4b253"
+          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0x723631A5F2511c171d1CB07ad71526ae9dd86FdE"
+          REACT_APP_MULTICALL_CONTRACT_ADDRESS: "0x46134bDa23ac0FA458AEe79E6411816Ca395A0e8"
           REACT_APP_SNAPSHOT_HUB_API_URL: https://snapshot-hub-erc712.dev.thelao.io
           REACT_APP_COUPON_API_URL: https://coupon.dev.openlaw.io
           REACT_APP_SNAPSHOT_SPACE: tribute
-          REACT_APP_GRAPH_API_URL: https://api.thegraph.com/subgraphs/name/openlawteam/tribute-dev
+          REACT_APP_GRAPH_CORE_URL: https://api.thegraph.com/subgraphs/name/openlawteam/tribute-core-dev
+          REACT_APP_ENABLE_KYC_ONBOARDING: false
+          REACT_APP_KYC_BACKEND_URL: https://kyc-backend.dev.thelao.io/kyc-certificate
+          # @todo use generalized development Tribute KYC site (needs to be created)
+          REACT_APP_KYC_FORMS_URL: ""
         run: npm run build
 
       - name: Deploy to GitHub Pages site

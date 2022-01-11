@@ -14,7 +14,7 @@ import ErrorMessageWithDetails from '../../components/common/ErrorMessageWithDet
 import FadeIn from '../../components/common/FadeIn';
 import LoaderLarge from '../../components/feedback/LoaderLarge';
 import NotFound from '../subpages/NotFound';
-import ProcessActionMembership from '../../components/proposals/ProcessActionMembership';
+import ProcessActionOnboarding from '../../components/proposals/ProcessActionOnboarding';
 import ProposalActions from '../../components/proposals/ProposalActions';
 import SubmitAction from '../../components/proposals/SubmitAction';
 import ProposalAmount from '../../components/proposals/ProposalAmount';
@@ -23,7 +23,7 @@ import Wrap from '../../components/common/Wrap';
 
 const PLACEHOLDER = '\u2014'; /* em dash */
 
-export default function MembershipDetails() {
+export default function OnboardingDetails() {
   /**
    * @todo
    *
@@ -97,7 +97,7 @@ export default function MembershipDetails() {
       }
 
       return (
-        <ProcessActionMembership
+        <ProcessActionOnboarding
           // Show during DAO proposal grace period, but set to disabled
           disabled={status === ProposalFlowStatus.OffchainVotingGracePeriod}
           proposal={proposal}
@@ -202,7 +202,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
   function goToAll(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
 
-    history.push('/membership');
+    history.push('/onboarding');
   }
 
   /**
@@ -213,7 +213,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
     <Wrap className="section-wrapper">
       <FadeIn>
         <div className="titlebar">
-          <h2 className="titlebar__title">Membership</h2>
+          <h2 className="titlebar__title">Onboarding</h2>
           <button className="titlebar__action" onClick={goToAll}>
             View all
           </button>

@@ -131,7 +131,7 @@ export function useProposalsVotingAdapter(
       });
 
       const {default: lazyIVotingABI} = await import(
-        '../../../abis/IVoting.json'
+        '../../../abis/tribute-contracts/IVoting.json'
       );
 
       const getAdapterNameABI = (lazyIVotingABI as typeof registryABI).find(

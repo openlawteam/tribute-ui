@@ -1,9 +1,9 @@
 import {rest} from 'msw';
 
-import {COUPON_API_URL, SNAPSHOT_HUB_API_URL} from '../config';
 import {
   ethGasStationResponse,
   getAssetTransfersFixture,
+  kycCertificateCheckResponse,
   snapshotAPIDraftResponse,
   snapshotAPIOffchainProofResponse,
   snapshotAPIProposalResponse,
@@ -11,6 +11,7 @@ import {
   snapshotAPISpaceResponse,
   snapshotAPISubmitMessage,
 } from './restResponses';
+import {COUPON_API_URL, KYC_BACKEND_URL, SNAPSHOT_HUB_API_URL} from '../config';
 
 /**
  * Snapshot
@@ -71,7 +72,16 @@ const postRedeemedCoupon = rest.post(
 
 const ethGasStationAPI = rest.get(
   'https://ethgasstation.info/json/ethgasAPI.json',
-  (_req, res, ctx) => res(ctx.json(ethGasStationResponse))
+  async (_req, res, ctx) => res(ctx.json(ethGasStationResponse))
+);
+
+/**
+ * KYC Certificate
+ */
+
+const kycCertificateCheckVerification = rest.get(
+  `${KYC_BACKEND_URL}/:daoAddress/:ethAddressToCheck`,
+  async (_req, res, ctx) => res(ctx.json(kycCertificateCheckResponse))
 );
 
 /**
@@ -104,6 +114,7 @@ const handlers = [
   getSnapshotAPIProposal,
   getSnapshotAPIRoot,
   getSnapshotAPISpace,
+  kycCertificateCheckVerification,
   patchRedeemedCoupon,
   postRedeemedCoupon,
   postSnapshotAPIMessage,

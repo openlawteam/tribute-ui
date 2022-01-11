@@ -9,11 +9,13 @@ import {
   InMemoryCache,
   NormalizedCacheObject,
   HttpLink,
+  split,
 } from '@apollo/client';
 import {QueryClient, QueryClientProvider} from 'react-query';
 
 import {
   ENVIRONMENT,
+  GRAPH_API_SERVICE_NAME,
   GRAPH_API_URL,
   WALLETCONNECT_PROVIDER_OPTIONS,
 } from './config';
@@ -40,17 +42,39 @@ window.ethereum &&
   window.ethereum.autoRefreshOnNetworkChange &&
   (window.ethereum.autoRefreshOnNetworkChange = false);
 
+// Set graphql endpoints for `ApolloClient`
+const defaultGraphqlEndpoint = new HttpLink({
+  uri: ({operationName}) => `${GRAPH_API_URL.CORE}?${operationName}`,
+});
+const couponOnboardingGraphqlEndpoint = new HttpLink({
+  uri: ({operationName}) =>
+    `${GRAPH_API_URL.COUPON_ONBOARDING}?${operationName}`,
+});
+const nftExtensionGraphqlEndpoint = new HttpLink({
+  uri: ({operationName}) => `${GRAPH_API_URL.NFT_EXTENSION}?${operationName}`,
+});
+
+// Apollo link directional composition (https://www.apollographql.com/docs/react/api/link/introduction/#directional-composition) can be chained to allow for more than two endpoints.
+const graphqlEndpoints = split(
+  (operation) =>
+    operation.getContext().serviceName ===
+    GRAPH_API_SERVICE_NAME.COUPON_ONBOARDING,
+  couponOnboardingGraphqlEndpoint,
+  split(
+    (operation) =>
+      operation.getContext().serviceName ===
+      GRAPH_API_SERVICE_NAME.NFT_EXTENSION,
+    nftExtensionGraphqlEndpoint,
+    defaultGraphqlEndpoint
+  )
+);
+
 // Create `ApolloClient`
 export const getApolloClient = (
   store: Store
 ): ApolloClient<NormalizedCacheObject> =>
   new ApolloClient({
-    link: concat(
-      handleSubgraphError(store),
-      new HttpLink({
-        uri: ({operationName}) => `${GRAPH_API_URL}?${operationName}`,
-      })
-    ),
+    link: concat(handleSubgraphError(store), graphqlEndpoints),
     cache: new InMemoryCache({
       // Cache data may be lost when replacing the `adapters|extensions`
       // field of a Query object. To address this problem

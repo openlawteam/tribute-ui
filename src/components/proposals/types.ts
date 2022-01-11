@@ -23,8 +23,8 @@ import {VotingState} from './voting/types';
  * the results of checking the proposal's state via flag will be wrong.
  *
  * @see `ProposalFlag` `DaoRegistry.sol`
- * @see `getFlag` `DaoConstants.sol`
- * @see `setFlag` `DaoConstants.sol`
+ * @see `getFlag` `DaoHelper.sol`
+ * @see `setFlag` `DaoHelper.sol`
  */
 export enum ProposalFlag {
   EXISTS,
@@ -188,7 +188,6 @@ export type OffchainVotingAdapterVote = {
   fallbackVotesCount: string;
   forceFailed: boolean;
   gracePeriodStartingTime: string;
-  index: string;
   isChallenged: boolean;
   nbNo: string;
   nbYes: string;
@@ -196,6 +195,7 @@ export type OffchainVotingAdapterVote = {
   resultRoot: string;
   snapshot: string;
   startingTime: string;
+  stepRequested: string;
 };
 
 /**

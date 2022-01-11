@@ -10,8 +10,8 @@ import {
   initContractERC20Extension,
   initContractFinancing,
   initContractGuildKick,
+  initContractKycOnboarding,
   initContractManaging,
-  initContractNFTAdapter,
   initContractNFTExtension,
   initContractOnboarding,
   initContractRagequit,
@@ -55,6 +55,9 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
       case DaoAdapterConstants.GUILDKICK:
         await dispatch(initContractGuildKick(web3Instance));
         break;
+      case DaoAdapterConstants.KYC_ONBOARDING:
+        await dispatch(initContractKycOnboarding(web3Instance));
+        break;
       case DaoAdapterConstants.MANAGING:
         await dispatch(initContractManaging(web3Instance));
         break;
@@ -84,9 +87,6 @@ export function useInitAdapterExtensionContracts(): UseInitAdapterExtensionContr
         break;
       case DaoAdapterConstants.TRIBUTE_NFT:
         await dispatch(initContractTributeNFT(web3Instance));
-        break;
-      case DaoAdapterConstants.NFT:
-        await dispatch(initContractNFTAdapter(web3Instance));
         break;
       case DaoAdapterConstants.DAO_REGISTRY:
         await dispatch(initContractDaoRegistryAdapter(web3Instance));

@@ -122,8 +122,10 @@ describe('GovernanceActions unit tests', () => {
           [
             0,
             [
-              // Total units
-              web3Instance.eth.abi.encodeParameter('uint256', '10000000'),
+              // Total units minted
+              web3Instance.eth.abi.encodeParameter('uint256', '30000000'),
+              // Balance of units owned by the guild bank
+              web3Instance.eth.abi.encodeParameter('uint256', '20000000'),
               // Units for "yes" voter
               web3Instance.eth.abi.encodeParameter('uint256', '200000'),
               // Units for "no" voter

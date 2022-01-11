@@ -1,7 +1,7 @@
 import {AbiItem} from 'web3-utils/types';
 import Web3 from 'web3';
 
-import {IVoting} from '../../../../abi-types/IVoting';
+import {IVoting} from '../../../abis/types/IVoting';
 import {VotingAdapterName} from '../../adapters-extensions/enums';
 
 export async function getVotingAdapterName(
@@ -10,7 +10,7 @@ export async function getVotingAdapterName(
 ): Promise<VotingAdapterName> {
   try {
     const {default: lazyIVotingABI} = await import(
-      '../../../abis/IVoting.json'
+      '../../../abis/tribute-contracts/IVoting.json'
     );
 
     const votingAdapterName: string = await (
