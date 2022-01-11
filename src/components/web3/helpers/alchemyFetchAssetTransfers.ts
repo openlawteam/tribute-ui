@@ -22,7 +22,7 @@ type GetAssetTransfersParameters = {
   fromAddress?: string;
   toAddress?: string;
   contractAddresses?: string[];
-  category?: AlchemyGetAssetTransfersCategories;
+  category?: AlchemyGetAssetTransfersCategories[];
   excludeZeroValue?: boolean;
   /**
    * Will be converted to hex string
@@ -67,13 +67,16 @@ type AlchemyGetAssetTransfersResponse = {
  * @see https://docs.alchemy.com/alchemy/enhanced-apis/transfers-api
  */
 export async function alchemyFetchAssetTransfers(
-  parameters: GetAssetTransfersParameters
+  parameters: GetAssetTransfersParameters = {fromBlock: 0}
 ): Promise<AlchemyGetAssetTransfersResult[]> {
   const ALCHEMY_URL = getAlchemyURL(CHAINS.MAINNET);
 
   if (!ALCHEMY_URL) {
     throw new Error('No Alchemy URL was found.');
   }
+
+  const {fromBlock = 0, maxCount = 1000} = parameters;
+  const toBlock = numberTo0xHexString(parameters.toBlock) || 'latest';
 
   const requestOptions = {
     id: 0,
@@ -82,15 +85,9 @@ export async function alchemyFetchAssetTransfers(
     params: [
       {
         ...parameters,
-        fromBlock: parameters.fromBlock
-          ? numberTo0xHexString(parameters.fromBlock)
-          : undefined,
-        maxCount: parameters.maxCount
-          ? numberTo0xHexString(parameters.maxCount)
-          : undefined,
-        toBlock: parameters.toBlock
-          ? numberTo0xHexString(parameters.toBlock)
-          : undefined,
+        fromBlock: numberTo0xHexString(fromBlock),
+        maxCount: numberTo0xHexString(maxCount),
+        toBlock,
       },
     ],
   };
