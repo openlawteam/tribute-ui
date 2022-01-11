@@ -99,6 +99,8 @@ export const CHAIN_NAME = {
   [CHAINS.GANACHE]: 'ganache',
   [CHAINS.HARMONY_TEST]: 'harmony-testnet',
   [CHAINS.HARMONY_MAIN]: 'harmony-mainnet',
+  [CHAINS.POLYGON]: 'polygon-mainnet',
+  [CHAINS.POLYGON_TEST]: 'polygon-testnet',
 } as const;
 
 // Network names verbose

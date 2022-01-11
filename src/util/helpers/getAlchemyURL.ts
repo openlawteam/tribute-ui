@@ -24,11 +24,14 @@ export function getAlchemyURL(
     return;
   }
 
-  // Alchemy does not support the following networks
   if (
+    // Alchemy does not support the following networks
     networkID === CHAINS.GANACHE ||
     networkID === CHAINS.HARMONY_MAIN ||
-    networkID === CHAINS.HARMONY_TEST
+    networkID === CHAINS.HARMONY_TEST ||
+    // @todo Separate handling for Polyon URL as it's a bit different.
+    networkID === CHAINS.POLYGON ||
+    networkID === CHAINS.POLYGON_TEST
   ) {
     return;
   }
