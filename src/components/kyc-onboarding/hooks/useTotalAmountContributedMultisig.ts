@@ -1,8 +1,7 @@
-import {AbiItem} from 'web3-utils/types';
 import {fromWei, sha3} from 'web3-utils';
 import {useCallback, useEffect, useState} from 'react';
+import {useQuery} from 'react-query';
 import {useSelector} from 'react-redux';
-import Web3 from 'web3';
 
 import {alchemyFetchAssetTransfers} from '../../web3/helpers';
 import {AsyncStatus} from '../../../util/types';
@@ -36,6 +35,7 @@ const KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH = sha3('kyc-onboarding.chunkSize');
  *
  * @todo Get multisig addresses from the DAO config dynamically
  * @todo Allow Alchemy parameters to be passed in
+ * @todo Allow `ALLOWED_ASSETS` to be passed in
  */
 export function useTotalAmountContributedMultisig(
   multisigAddress: string
@@ -56,8 +56,6 @@ export function useTotalAmountContributedMultisig(
    * State
    */
 
-  const [amountContributed, setAmountContributed] = useState<number>(0);
-
   const [amountContributedStatus, setAmountContributedStatus] =
     useState<AsyncStatus>(STANDBY);
 
@@ -74,47 +72,56 @@ export function useTotalAmountContributedMultisig(
 
   const getAmountContributedCached = useCallback(getAmountContributed, [
     abortController,
+    daoABI,
+    daoAddress,
     isMountedRef,
     multisigAddress,
+    web3Instance,
   ]);
+
+  /**
+   * React Query
+   */
+
+  const {data: amountContributed = 0, refetch} = useQuery(
+    'totalAmountContributedMultisig',
+    getAmountContributedCached,
+    /**
+     * Will manually `refetch` as the `web3Instance` dependency makes this
+     * a bit trickier as it cannot be stringified due to a circular dependency
+     */
+    {enabled: false}
+  );
 
   /**
    * Effects
    */
 
+  /**
+   * Manually fetches the `useQuery`, if data has not already been fetched.
+   */
   useEffect(() => {
-    if (
-      DEFAULT_CHAIN !== CHAINS.MAINNET ||
-      !daoAddress ||
-      !daoABI ||
-      !web3Instance
-    ) {
-      return;
-    }
+    if (amountContributed) return;
 
-    getAmountContributedCached({
-      daoABI,
-      daoAddress,
-      web3Instance,
-    });
-  }, [daoABI, daoAddress, getAmountContributedCached, web3Instance]);
+    refetch();
+  }, [amountContributed, getAmountContributedCached, refetch]);
 
   /**
    * Functions
    */
 
-  async function getAmountContributed({
-    daoABI,
-    daoAddress,
-    web3Instance,
-  }: {
-    daoAddress: string;
-    daoABI: AbiItem[];
-    web3Instance: Web3;
-  }) {
+  async function getAmountContributed() {
     try {
-      if (!CONFIGURATION_UPDATED_EVENT_SIGNATURE_HASH) return;
-      if (!KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH) return;
+      if (
+        DEFAULT_CHAIN !== CHAINS.MAINNET ||
+        !daoAddress ||
+        !daoABI ||
+        !web3Instance ||
+        !CONFIGURATION_UPDATED_EVENT_SIGNATURE_HASH ||
+        !KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH
+      ) {
+        return;
+      }
 
       const configurationUpdatedEventInputs = daoABI.find(
         ({name, type}) => type === 'event' && name === 'ConfigurationUpdated'
@@ -181,7 +188,8 @@ export function useTotalAmountContributedMultisig(
       if (!isMountedRef.current) return;
 
       setAmountContributedStatus(FULFILLED);
-      setAmountContributed(amountContributed);
+
+      return amountContributed;
     } catch (error) {
       if (!isMountedRef.current) return;
 
