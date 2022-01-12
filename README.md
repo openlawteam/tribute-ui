@@ -26,7 +26,7 @@ REACT_APP_GRAPH_CORE_URL=...
 
 NOTE:
 
-- `REACT_APP_INFURA_PROJECT_ID_LOCAL` can be the same value you use for LAO local development.
+- `REACT_APP_INFURA_PROJECT_ID_LOCAL` is the value of your Infura PROJECT ID key.
 - `REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS` is the address of the `DaoRegistry` smart contract deployed to your network.
 - `REACT_APP_MULTICALL_CONTRACT_ADDRESS` is the address of the `Multicall` smart contract deployed to your network.
 - `REACT_APP_SNAPSHOT_HUB_API_URL` is the url of [snaphot-hub](https://github.com/openlawteam/snapshot-hub/tree/erc-712) running locally in a container.
