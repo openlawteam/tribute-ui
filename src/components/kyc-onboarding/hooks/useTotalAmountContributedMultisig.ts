@@ -5,9 +5,8 @@ import {useSelector} from 'react-redux';
 
 import {alchemyFetchAssetTransfers} from '../../web3/helpers';
 import {AsyncStatus} from '../../../util/types';
-import {CHAINS, DEFAULT_CHAIN, ONBOARDING_TOKEN_ADDRESS} from '../../../config';
-import {ConfigurationUpdated} from '../../../abis/types/DaoRegistry';
-import {ContractDAOConfigKeys} from '../../web3/types';
+import {CHAINS, DEFAULT_CHAIN} from '../../../config';
+import {ConfigurationUpdated} from '../../../../abi-types/DaoRegistry';
 import {normalizeString} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
 import {useAbortController} from '../../../hooks';
@@ -26,9 +25,7 @@ const CONFIGURATION_UPDATED_EVENT_SIGNATURE_HASH = sha3(
   'ConfigurationUpdated(bytes32,uint256)'
 );
 
-const KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH = sha3(
-  ContractDAOConfigKeys.kycOnboardingChunkSize
-);
+const KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH = sha3('kyc-onboarding.chunkSize');
 
 /**
  * Returns the total amount of ETH, WETH contributed to the DAO's multi-sig
@@ -126,19 +123,6 @@ export function useTotalAmountContributedMultisig(
         return;
       }
 
-      /**
-       * Get the concatenated hash used in the `KycOnboarding` contract
-       * for storing `kyc-onboarding.chunkSize` key
-       */
-      const KYC_ONBOARDING_CHUNK_SIZE_CONFIG_KEY_HASH = sha3(
-        web3Instance.eth.abi.encodeParameters(
-          ['address', 'bytes32'],
-          [ONBOARDING_TOKEN_ADDRESS, KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH]
-        )
-      );
-
-      if (!KYC_ONBOARDING_CHUNK_SIZE_CONFIG_KEY_HASH) return;
-
       const configurationUpdatedEventInputs = daoABI.find(
         ({name, type}) => type === 'event' && name === 'ConfigurationUpdated'
       )?.inputs;
@@ -177,11 +161,11 @@ export function useTotalAmountContributedMultisig(
               [CONFIGURATION_UPDATED_EVENT_SIGNATURE_HASH]
             ) as any as ConfigurationUpdated['returnValues']
         )
-        // Only take `key`s matching `KYC_ONBOARDING_CHUNK_SIZE_CONFIG_KEY_HASH`
+        // Only take `key`s matching `KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH`
         .filter(
           (d) =>
             normalizeString(d.key) ===
-            normalizeString(KYC_ONBOARDING_CHUNK_SIZE_CONFIG_KEY_HASH)
+            normalizeString(KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH)
         )
         // Only take the config `value`s, converted to ETH
         .map((c) => fromWei(c.value, 'ether'));
