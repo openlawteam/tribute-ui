@@ -12,7 +12,7 @@ Related supporting repositories:
 
 When running locally you'll need a `.env` file in the root directory with the following:
 
-```
+```sh
 REACT_APP_ENVIRONMENT=localhost
 REACT_APP_INFURA_PROJECT_ID_LOCAL=...
 REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS=...

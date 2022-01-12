@@ -61,7 +61,21 @@ export const CHAINS = {
   POLYGON: 137,
 } as const;
 
-// Network names for modal messaging
+// Network names
+export const CHAIN_NAME = {
+  [CHAINS.MAINNET]: 'mainnet',
+  [CHAINS.ROPSTEN]: 'ropsten',
+  [CHAINS.RINKEBY]: 'rinkeby',
+  [CHAINS.GOERLI]: 'goerli',
+  [CHAINS.KOVAN]: 'kovan',
+  [CHAINS.GANACHE]: 'ganache',
+  [CHAINS.HARMONY_TEST]: 'harmony-testnet',
+  [CHAINS.HARMONY_MAIN]: 'harmony-mainnet',
+  [CHAINS.POLYGON]: 'polygon-mainnet',
+  [CHAINS.POLYGON_TEST]: 'polygon-testnet',
+} as const;
+
+// Network names verbose
 export const CHAIN_NAME_FULL = {
   [CHAINS.MAINNET]: 'Main Ethereum Network',
   [CHAINS.ROPSTEN]: 'Ropsten Test Network',
@@ -75,7 +89,7 @@ export const CHAIN_NAME_FULL = {
   [CHAINS.POLYGON]: 'Polygon Main Network',
 };
 
-export const DEFAULT_CHAIN =
+export const DEFAULT_CHAIN: typeof CHAINS[keyof typeof CHAINS] =
   REACT_APP_ENVIRONMENT === 'production'
     ? CHAINS.MAINNET
     : REACT_APP_ENVIRONMENT === 'development'
