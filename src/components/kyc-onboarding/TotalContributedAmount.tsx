@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {formatNumber} from '../../util/helpers';
 import {useTotalAmountContributedMultisig} from '.';
 import FadeIn from '../common/FadeIn';
@@ -9,15 +11,17 @@ type TotalContributedAmountProps = {
       formatted: string;
     }
   ) => JSX.Element | null;
+  rootElementProps?: React.HTMLAttributes<HTMLDivElement>;
 };
 
 export function TotalContributedAmount(
   props: TotalContributedAmountProps
 ): JSX.Element | null {
-  const {multisigAddress, render} = props;
+  const {multisigAddress, render, rootElementProps} = props;
 
   const result = useTotalAmountContributedMultisig(multisigAddress);
 
+  // Custom render
   if (render) {
     return render({
       ...result,
@@ -25,16 +29,18 @@ export function TotalContributedAmount(
     });
   }
 
-  // @todo add same wrapping styles as below so the text doesn't "jump" on DOM insert.
-  if (!result.amountContributed) {
-    return <div></div>;
+  const {amountContributed} = result;
+
+  // Don't render text until there is a value
+  if (!amountContributed) {
+    // By assigning any of the same props (e.g. styles) it helps the text not unexpectedly "jump".
+    return <div aria-hidden {...rootElementProps} />;
   }
 
   return (
     <FadeIn>
-      {/* @todo add same wrapping styles as above so the text doesn't "jump" on DOM insert. */}
-      <div>
-        {formatNumber(Math.floor(result.amountContributed))} ETH contributed
+      <div {...rootElementProps}>
+        {formatNumber(Math.floor(amountContributed))} ETH Contributed
       </div>
     </FadeIn>
   );

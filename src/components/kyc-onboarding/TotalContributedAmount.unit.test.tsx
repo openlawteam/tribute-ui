@@ -55,6 +55,11 @@ describe('TotalContributedAmount unit tests', () => {
       </Wrapper>
     );
 
+    // Assert initial
+    await waitFor(() => {
+      expect(() => getByText(/eth contributed$/i)).toThrow();
+    });
+
     // Mock web3 repsonse
     await waitFor(() => {
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
@@ -101,6 +106,11 @@ describe('TotalContributedAmount unit tests', () => {
         />
       </Wrapper>
     );
+
+    // Assert initial
+    await waitFor(() => {
+      expect(() => getByText(/eth contributed$/i)).toThrow();
+    });
 
     // Mock web3 repsonse
     await waitFor(() => {
@@ -184,6 +194,11 @@ describe('TotalContributedAmount unit tests', () => {
       </Wrapper>
     );
 
+    // Assert initial
+    await waitFor(() => {
+      expect(() => getByText(/eth contributed$/i)).toThrow();
+    });
+
     // Mock web3 repsonse
     await waitFor(() => {
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
@@ -265,6 +280,11 @@ describe('TotalContributedAmount unit tests', () => {
         <TotalContributedAmount multisigAddress={DEFAULT_ETH_ADDRESS} />
       </Wrapper>
     );
+
+    // Assert initial
+    await waitFor(() => {
+      expect(() => getByText(/eth contributed$/i)).toThrow();
+    });
 
     // Mock web3 repsonse
     await waitFor(() => {
