@@ -3,6 +3,7 @@
 Related supporting repositories:
 
 - [openlawteam/tribute-contracts](https://github.com/openlawteam/tribute-contracts)
+- [openlawteam/tribute-subgraph](https://github.com/openlawteam/tribute-subgraph)
 - [openlawteam/snapshot-hub (erc-712 branch)](https://github.com/openlawteam/snapshot-hub/tree/erc-712)
 - [openlawteam/snapshot-js-erc712](https://github.com/openlawteam/snapshot-js-erc712)
 
