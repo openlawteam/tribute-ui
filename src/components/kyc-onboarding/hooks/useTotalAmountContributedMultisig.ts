@@ -35,6 +35,7 @@ const KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH = sha3('kyc-onboarding.chunkSize');
  * This hook will only run on mainnet due to constraints from the Alchemy Transfers API.
  *
  * @todo Get multisig addresses from the DAO config dynamically
+ * @todo Allow Alchemy parameters to be passed in
  */
 export function useTotalAmountContributedMultisig(
   multisigAddress: string
@@ -125,6 +126,12 @@ export function useTotalAmountContributedMultisig(
 
       const transfers = await alchemyFetchAssetTransfers(
         {
+          /**
+           * Leave a generous block filter where no tribute-contracts would've been deployed to mainnet.
+           *
+           * 2021-01-01 00:00:00
+           */
+          fromBlock: 11565019,
           category: ['external', 'internal', 'token'],
           toAddress: multisigAddress,
         },
