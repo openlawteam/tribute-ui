@@ -38,7 +38,7 @@ NOTE:
 
 If you want to use the [KYC Onboarding adapter](https://github.com/openlawteam/tribute-contracts/blob/master/website/docs/contracts/adapters/onboarding/KycOnboarding.md), you will also need the following environment variables:
 
-```
+```sh
 REACT_APP_ENABLE_KYC_ONBOARDING=true
 REACT_APP_KYC_BACKEND_URL=http://localhost:3003/kyc-certificate
 REACT_APP_KYC_FORMS_URL=...
@@ -51,7 +51,7 @@ NOTE:
 
 #### Optional Environment Variables for ERC20 Onboarding
 
-```
+```sh
 REACT_APP_ONBOARDING_TOKEN_ADDRESS=...
 ```
 
@@ -63,7 +63,7 @@ _Note that this configuration should be consistent with how the actual Onboardin
 
 #### Optional Environment Variables for Additional adapter/extension subgraphs
 
-```
+```sh
 REACT_APP_GRAPH_COUPON_ONBOARDING_URL=...
 REACT_APP_GRAPH_NFT_EXTENSION_URL=...
 ```
