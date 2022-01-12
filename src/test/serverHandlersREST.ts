@@ -2,6 +2,7 @@ import {rest} from 'msw';
 
 import {
   ethGasStationResponse,
+  getAssetTransfersFixture,
   kycCertificateCheckResponse,
   snapshotAPIDraftResponse,
   snapshotAPIOffchainProofResponse,
@@ -84,10 +85,29 @@ const kycCertificateCheckVerification = rest.get(
 );
 
 /**
+ * Alchemy API
+ */
+
+const alchemyAPI = rest.post(
+  'https://eth-mainnet.alchemyapi.io/v2/*',
+  (req, res, ctx) => {
+    const {body} = req;
+
+    if (typeof body === 'object') {
+      // `alchemy_getAssetTransfers`
+      if (body.method === 'alchemy_getAssetTransfers') {
+        return res(ctx.json(getAssetTransfersFixture));
+      }
+    }
+  }
+);
+
+/**
  * HANDLERS TO EXPORT
  */
 
 const handlers = [
+  alchemyAPI,
   ethGasStationAPI,
   getSnapshotAPIDraft,
   getSnapshotAPIOffchainProof,

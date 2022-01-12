@@ -1,3 +1,4 @@
+export * from './alchemyFetchAssetTransfers';
 export * from './contractSend';
 export * from './getAdapterAddress';
 export * from './getAdapterAddressFromContracts';

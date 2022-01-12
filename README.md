@@ -12,7 +12,7 @@ Related supporting repositories:
 
 When running locally you'll need a `.env` file in the root directory with the following environment variables:
 
-```
+```sh
 REACT_APP_ENVIRONMENT=localhost
 REACT_APP_INFURA_PROJECT_ID_LOCAL=...
 REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS=...
@@ -74,13 +74,17 @@ NOTE:
 
 #### Optional Environment Variables for Local Development
 
-```
+```sh
+##
+# Alchemy API key
+#
+# i.e. Transfers API for getting total ETH amount contributed to DAO multi-sig.
+##
+REACT_APP_ALCHEMY_API_KEY=...
+
+# Can be set to override using the Ganache private network as the default local development chain.
 REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>
 ```
-
-NOTE:
-
-- `REACT_APP_DEFAULT_CHAIN_NAME_LOCAL` can be set to override using the Ganache private network as the default local development chain.
 
 ### Ganache Blockchain Setup
 
