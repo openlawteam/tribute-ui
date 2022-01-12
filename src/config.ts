@@ -5,6 +5,7 @@ import {resolve} from 'path';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 
 import {EnvironmentName} from './util/types';
+import {isEthAddressValid} from './util/validation';
 
 dotenvConfig({path: resolve(__dirname, '../.env')});
 
@@ -27,6 +28,7 @@ const {
   REACT_APP_KYC_BACKEND_URL,
   REACT_APP_KYC_FORMS_URL,
   REACT_APP_MULTICALL_CONTRACT_ADDRESS,
+  REACT_APP_ONBOARDING_TOKEN_ADDRESS,
   REACT_APP_SNAPSHOT_HUB_API_URL,
   REACT_APP_SNAPSHOT_SPACE,
 } = process.env;
@@ -486,7 +488,8 @@ export const KYC_ONBOARDING_CONTRACT_ADDRESS = {
   [CHAINS.GANACHE]: '',
 };
 
-// If developing locally, include your Multicall contract address in your `.env` file.
+// If developing locally, include your Multicall contract address in your `.env`
+// file.
 export const MULTICALL_CONTRACT_ADDRESS: string | undefined =
   REACT_APP_MULTICALL_CONTRACT_ADDRESS;
 
@@ -527,3 +530,15 @@ export const SPACE: string | undefined = REACT_APP_SNAPSHOT_SPACE;
  */
 export const GQL_QUERY_POLLING_INTERVAL: number =
   REACT_APP_ENVIRONMENT === 'production' ? 10000 : 5000;
+
+/**
+ * The address of the token that will be contributed to onboard. If optional
+ * ERC20 token address has not been set or if that address is invalid, ETH will
+ * be used as default.
+ *
+ */
+export const ONBOARDING_TOKEN_ADDRESS: string =
+  REACT_APP_ONBOARDING_TOKEN_ADDRESS &&
+  isEthAddressValid(REACT_APP_ONBOARDING_TOKEN_ADDRESS)
+    ? REACT_APP_ONBOARDING_TOKEN_ADDRESS
+    : ETH_TOKEN_ADDRESS;
