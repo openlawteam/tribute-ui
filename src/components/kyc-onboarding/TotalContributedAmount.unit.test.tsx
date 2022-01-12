@@ -13,10 +13,17 @@ const DEFAULT_LOGS_RESULT = [
     blockHash:
       '0xc71df7ee20cb6f91c1b4f78912e8436d57c93f7646f08e19492f47fca331d5d9',
     blockNumber: 13290895,
-    data: '0xb024dc66daa5f76b3a0f3ca4879dc87b33f90cea509e863f3e0955b6222a3a1e000000000000000000000000000000000000000000000002b5e3af16b1880000',
+    /**
+     * web3Instance.eth.abi.encodeParameters(
+     *  ['bytes32', 'uint256'],
+     *  [KYC_ONBOARDING_CHUNK_SIZE_CONFIG_KEY_HASH, '50000000000000000000']
+     * );
+     */
+    data: '0x7096823768c7b22c230a00de80487025954817802186dbc0550561c089cceb3f000000000000000000000000000000000000000000000002b5e3af16b1880000',
     logIndex: 54,
     removed: false,
     topics: [
+      // sha3('ConfigurationUpdated(bytes32,uint256)');
       '0x50bc2a45e7693135e6950fb78733dccb013ce4c6b62f17dbbda5131d8d0fac29',
     ],
     transactionHash:
