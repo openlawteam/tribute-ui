@@ -53,7 +53,7 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
 
   const [
     getTokenHolderBalancesFromSubgraphResult,
-    {called, loading, data, error, startPolling, stopPolling},
+    {called, loading, data, error},
   ] = useLazyQuery(GET_TOKEN_HOLDER_BALANCES, {
     variables: {
       tokenAddress: erc20ExtensionContract?.contractAddress.toLowerCase(),
@@ -129,20 +129,12 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
   // default, the `useEffect` hook uses a strict equality comparison which will
   // consider the new object a changed value (even if the individual fields are
   // the same from the previous `connectedMember` store state). This change is
-  // used to trigger a refresh of the `GET_TOKEN_HOLDER_BALANCES` query result
-  // so any change to the connected token holder's balance can be shown in the
-  // nav badge without having to do a page reload.
+  // used to refetch the token holder balances so any change to the connected
+  // token holder's balance can be shown in the nav badge without having to do a
+  // page reload.
   useEffect(() => {
-    // a single refetch may not be enough to catch any token balance change so
-    // we poll but only for a short time period
-    connectedMember && startPolling && startPolling(2000);
-
-    const pollingTimeoutId = stopPolling && setTimeout(stopPolling, 8000);
-
-    return function cleanup() {
-      pollingTimeoutId && clearTimeout(pollingTimeoutId);
-    };
-  }, [connectedMember, startPolling, stopPolling]);
+    connectedMember && getTokenHolderBalancesFromExtensionCached();
+  }, [connectedMember, getTokenHolderBalancesFromExtensionCached]);
 
   /**
    * Functions
