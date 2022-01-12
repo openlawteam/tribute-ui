@@ -535,7 +535,6 @@ export const GQL_QUERY_POLLING_INTERVAL: number =
  * The address of the token that will be contributed to onboard. If optional
  * ERC20 token address has not been set or if that address is invalid, ETH will
  * be used as default.
- *
  */
 export const ONBOARDING_TOKEN_ADDRESS: string =
   REACT_APP_ONBOARDING_TOKEN_ADDRESS &&
