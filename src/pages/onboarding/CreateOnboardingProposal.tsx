@@ -567,7 +567,7 @@ export default function CreateOnboardingProposal() {
       // rely on getting this data from onchain because the proposal may not
       // exist there yet.)
       const proposalAmountValues = {
-        tributeAmount: amount,
+        tributeAmount: formatNumber(amount),
         tributeAmountUnit: amountUnit,
       };
 
