@@ -1,7 +1,8 @@
 import {useState, useCallback, useEffect} from 'react';
 import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 import {useForm, Controller} from 'react-hook-form';
-import {fromWei, toBN, toWei, toChecksumAddress} from 'web3-utils';
+import {AbiItem, fromWei, toBN, toWei, toChecksumAddress} from 'web3-utils';
+import {Contract as Web3Contract} from 'web3-eth-contract/types';
 import {useHistory} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 
@@ -9,7 +10,6 @@ import {
   formatNumber,
   getValidationError,
   normalizeString,
-  stripFormatNumber,
   truncateEthAddress,
 } from '../../util/helpers';
 import {useIsDefaultChain, useWeb3Modal} from '../../components/web3/hooks';
@@ -22,7 +22,11 @@ import {FormFieldErrors} from '../../util/enums';
 import {getDAOConfigEntry} from '../../components/web3/helpers';
 import {isEthAddressValid} from '../../util/validation';
 import {AsyncStatus} from '../../util/types';
-import {UNITS_ADDRESS} from '../../config';
+import {
+  ETH_TOKEN_ADDRESS,
+  ONBOARDING_TOKEN_ADDRESS,
+  UNITS_ADDRESS,
+} from '../../config';
 import {CycleEllipsis} from '../../components/feedback';
 import {
   useCheckApplicant,
@@ -38,12 +42,12 @@ import Wrap from '../../components/common/Wrap';
 
 enum Fields {
   ethAddress = 'ethAddress',
-  ethAmount = 'ethAmount',
+  amount = 'amount',
 }
 
 type FormInputs = {
   ethAddress: string;
-  ethAmount: string;
+  amount: string;
 };
 
 type SubmitActionArguments = [
@@ -58,7 +62,14 @@ type OnboardingConfigs = {
   unitsPerChunk: string;
 };
 
+type ERC20Details = {
+  symbol: string;
+  decimals: number;
+};
+
 const PLACEHOLDER = '\u2014'; /* em dash */
+
+const isERC20Onboarding = ONBOARDING_TOKEN_ADDRESS !== ETH_TOKEN_ADDRESS;
 
 function renderUserAccountBalance(userAccountBalance: string | undefined) {
   if (!userAccountBalance) {
@@ -163,6 +174,10 @@ export default function CreateOnboardingProposal() {
   const [onboardingConfigs, setOnboardingConfigs] =
     useState<OnboardingConfigs>();
 
+  const [erc20Contract, setERC20Contract] = useState<Web3Contract>();
+
+  const [erc20Details, setERC20Details] = useState<ERC20Details>();
+
   /**
    * Variables
    */
@@ -180,7 +195,7 @@ export default function CreateOnboardingProposal() {
 
   const ethAddressValue = watch(Fields.ethAddress);
 
-  const ethAmountValue = watch(Fields.ethAmount);
+  const amountValue = watch(Fields.amount);
 
   const createOnboardError = submitError || proposalSignAndSendError;
 
@@ -205,9 +220,7 @@ export default function CreateOnboardingProposal() {
     ? formatNumber(onboardingConfigs.unitsPerChunk)
     : PLACEHOLDER;
 
-  const minEthAmountText = onboardingConfigs
-    ? formatNumber(fromWei(toBN(onboardingConfigs.chunkSize), 'ether'))
-    : PLACEHOLDER;
+  const minAmountText = sliderMin ? formatNumber(sliderMin) : PLACEHOLDER;
 
   const maxUnitsText = onboardingConfigs
     ? formatNumber(
@@ -219,16 +232,9 @@ export default function CreateOnboardingProposal() {
       )
     : PLACEHOLDER;
 
-  const maxEthAmountText = onboardingConfigs
-    ? formatNumber(
-        fromWei(
-          toBN(onboardingConfigs.chunkSize).mul(
-            toBN(onboardingConfigs.maximumChunks)
-          ),
-          'ether'
-        )
-      )
-    : PLACEHOLDER;
+  const maxAmountText = sliderMax ? formatNumber(sliderMax) : PLACEHOLDER;
+
+  const amountUnit = isERC20Onboarding ? erc20Details?.symbol : 'ETH';
 
   /**
    * Cached callbacks
@@ -236,11 +242,15 @@ export default function CreateOnboardingProposal() {
 
   const getUserAccountBalanceCached = useCallback(getUserAccountBalance, [
     account,
+    defaultChainError,
+    erc20Contract,
     web3Instance,
   ]);
 
   const setSliderConfigsCached = useCallback(setSliderConfigs, [
     daoRegistryContract,
+    defaultChainError,
+    erc20Details,
     onboardingConfigs,
     setValue,
   ]);
@@ -248,6 +258,16 @@ export default function CreateOnboardingProposal() {
   const getOnboardingConfigsCached = useCallback(getOnboardingConfigs, [
     daoRegistryContract,
     defaultChainError,
+  ]);
+
+  const getERC20ContractCached = useCallback(getERC20Contract, [
+    defaultChainError,
+    web3Instance,
+  ]);
+
+  const getERC20DetailsCached = useCallback(getERC20Details, [
+    defaultChainError,
+    erc20Contract,
   ]);
 
   /**
@@ -278,42 +298,126 @@ export default function CreateOnboardingProposal() {
     getOnboardingConfigsCached();
   }, [getOnboardingConfigsCached]);
 
+  useEffect(() => {
+    if (isERC20Onboarding) {
+      getERC20ContractCached();
+    }
+  }, [getERC20ContractCached]);
+
+  useEffect(() => {
+    if (isERC20Onboarding) {
+      getERC20DetailsCached();
+    }
+  }, [getERC20DetailsCached]);
+
   /**
    * Functions
    */
 
+  async function getERC20Contract() {
+    if (!web3Instance || defaultChainError) {
+      setERC20Contract(undefined);
+      return;
+    }
+
+    try {
+      if (!ONBOARDING_TOKEN_ADDRESS) {
+        throw new Error(
+          'No Onboarding ERC20 address was found. Are you sure it is set?'
+        );
+      }
+
+      const {default: lazyERC20ABI} = await import(
+        '../../abis/external/ERC20.json'
+      );
+      const erc20Contract: AbiItem[] = lazyERC20ABI as any;
+      const instance = new web3Instance.eth.Contract(
+        erc20Contract,
+        ONBOARDING_TOKEN_ADDRESS
+      );
+
+      setERC20Contract(instance);
+    } catch (error) {
+      console.error(error);
+      setERC20Contract(undefined);
+    }
+  }
+
+  async function getERC20Details() {
+    if (!erc20Contract || defaultChainError) {
+      setERC20Details(undefined);
+      return;
+    }
+
+    try {
+      const symbol = await erc20Contract.methods.symbol().call();
+      const decimals = await erc20Contract.methods.decimals().call();
+      setERC20Details({symbol, decimals: Number(decimals)});
+    } catch (error) {
+      console.error(error);
+      setERC20Details(undefined);
+    }
+  }
+
   function setSliderConfigs() {
     try {
-      if (!daoRegistryContract || !onboardingConfigs) {
+      if (!daoRegistryContract || defaultChainError || !onboardingConfigs) {
         setSliderStep(undefined);
         setSliderMin(undefined);
         setSliderMax(undefined);
-        setValue(Fields.ethAmount, PLACEHOLDER);
+        setValue(Fields.amount, PLACEHOLDER);
 
         return;
       }
 
-      setSliderStep(Number(fromWei(onboardingConfigs.chunkSize, 'ether')));
+      if (isERC20Onboarding) {
+        // ERC20 onboarding
+        if (!erc20Details) {
+          setSliderStep(undefined);
+          setSliderMin(undefined);
+          setSliderMax(undefined);
+          setValue(Fields.amount, PLACEHOLDER);
 
-      setSliderMax(
-        Number(
-          fromWei(
-            toBN(onboardingConfigs.chunkSize).mul(
-              toBN(onboardingConfigs.maximumChunks)
-            ),
-            'ether'
+          return;
+        }
+
+        const divisor = toBN(10).pow(toBN(erc20Details.decimals));
+        const beforeDecimal = toBN(onboardingConfigs.chunkSize).div(divisor);
+        const afterDecimal = toBN(onboardingConfigs.chunkSize).mod(divisor);
+        const stepAmount: number = afterDecimal.eq(toBN(0))
+          ? Number(String(beforeDecimal))
+          : Number(`${String(beforeDecimal)}.${String(afterDecimal)}`);
+        setSliderStep(stepAmount);
+
+        setSliderMax(stepAmount * Number(onboardingConfigs.maximumChunks));
+
+        setSliderMin(stepAmount);
+
+        setValue(Fields.amount, String(stepAmount));
+      } else {
+        // ETH onboarding
+        setSliderStep(Number(fromWei(onboardingConfigs.chunkSize, 'ether')));
+
+        setSliderMax(
+          Number(
+            fromWei(
+              toBN(onboardingConfigs.chunkSize).mul(
+                toBN(onboardingConfigs.maximumChunks)
+              ),
+              'ether'
+            )
           )
-        )
-      );
+        );
 
-      setSliderMin(Number(fromWei(onboardingConfigs.chunkSize, 'ether')));
+        setSliderMin(Number(fromWei(onboardingConfigs.chunkSize, 'ether')));
 
-      setValue(Fields.ethAmount, fromWei(onboardingConfigs.chunkSize, 'ether'));
+        setValue(Fields.amount, fromWei(onboardingConfigs.chunkSize, 'ether'));
+      }
     } catch (error) {
       setSliderStep(undefined);
       setSliderMin(undefined);
       setSliderMax(undefined);
-      setValue(Fields.ethAmount, PLACEHOLDER);
+      setValue(Fields.amount, PLACEHOLDER);
 
       console.error(error);
     }
@@ -323,30 +427,21 @@ export default function CreateOnboardingProposal() {
     try {
       if (!daoRegistryContract || defaultChainError) return;
 
-      const chunkSize = String(
-        await getDAOConfigEntry(
-          daoRegistryContract.instance,
-          ContractDAOConfigKeys.onboardingChunkSize,
-          UNITS_ADDRESS
-        )
+      const chunkSize = await getDAOConfigEntry(
+        daoRegistryContract.instance,
+        ContractDAOConfigKeys.onboardingChunkSize,
+        UNITS_ADDRESS
       );
-
-      const maximumChunks = String(
-        await getDAOConfigEntry(
-          daoRegistryContract.instance,
-          ContractDAOConfigKeys.onboardingMaximumChunks,
-          UNITS_ADDRESS
-        )
+      const maximumChunks = await getDAOConfigEntry(
+        daoRegistryContract.instance,
+        ContractDAOConfigKeys.onboardingMaximumChunks,
+        UNITS_ADDRESS
       );
-
-      const unitsPerChunk = String(
-        await getDAOConfigEntry(
-          daoRegistryContract.instance,
-          ContractDAOConfigKeys.onboardingUnitsPerChunk,
-          UNITS_ADDRESS
-        )
+      const unitsPerChunk = await getDAOConfigEntry(
+        daoRegistryContract.instance,
+        ContractDAOConfigKeys.onboardingUnitsPerChunk,
+        UNITS_ADDRESS
       );
-
       setOnboardingConfigs({
         chunkSize,
         maximumChunks,
@@ -360,20 +455,50 @@ export default function CreateOnboardingProposal() {
   }
 
   async function getUserAccountBalance() {
-    if (!web3Instance || !account) {
-      setUserAccountBalance(undefined);
-      return;
-    }
-
     try {
-      // Ether wallet balance
-      setUserAccountBalance(
-        web3Instance.utils.fromWei(
-          await web3Instance.eth.getBalance(account),
-          'ether'
-        )
-      );
+      if (!account || defaultChainError) {
+        setUserAccountBalance(undefined);
+
+        return;
+      }
+
+      if (isERC20Onboarding) {
+        // ERC20 onboarding
+        if (!erc20Contract) {
+          setUserAccountBalance(undefined);
+
+          return;
+        }
+
+        const balance = await erc20Contract.methods.balanceOf(account).call();
+        const balanceBN = toBN(balance);
+        const decimals = await erc20Contract.methods.decimals().call();
+        const divisor = toBN(10).pow(toBN(decimals));
+        const beforeDecimal = balanceBN.div(divisor);
+        const afterDecimal = balanceBN.mod(divisor);
+        const balanceReadable = afterDecimal.eq(toBN(0))
+          ? String(beforeDecimal)
+          : `${String(beforeDecimal)}.${String(afterDecimal)}`;
+
+        setUserAccountBalance(balanceReadable);
+      } else {
+        // ETH onboarding
+        if (!web3Instance) {
+          setUserAccountBalance(undefined);
+
+          return;
+        }
+
+        // Ether wallet balance
+        setUserAccountBalance(
+          web3Instance.utils.fromWei(
+            await web3Instance.eth.getBalance(account),
+            'ether'
+          )
+        );
+      }
     } catch (error) {
+      console.error(error);
       setUserAccountBalance(undefined);
     }
   }
@@ -410,18 +535,40 @@ export default function CreateOnboardingProposal() {
       // Maybe set proposal ID from previous attempt
       let proposalId: string = proposalData?.uniqueId || '';
 
-      const {ethAddress, ethAmount} = values;
+      const {ethAddress, amount} = values;
       const ethAddressToChecksum = toChecksumAddress(ethAddress);
-      const ethAmountInWei = toWei(stripFormatNumber(ethAmount), 'ether');
       const proposerAddressToChecksum = toChecksumAddress(account);
+
+      let amountArg = '';
+
+      if (isERC20Onboarding) {
+        // ERC20 onboarding
+        if (!erc20Details) {
+          throw new Error('No ERC20 details found.');
+        }
+
+        if (!Number.isInteger(Number(amount))) {
+          throw new Error('The amount must be an integer for an ERC20 token.');
+        }
+
+        const multiplier = toBN(10).pow(toBN(erc20Details.decimals));
+        const erc20AmountWithDecimals = toBN(amount).mul(multiplier);
+
+        amountArg = String(erc20AmountWithDecimals);
+      } else {
+        // ETH onboarding
+        const ethAmountInWei = toWei(amount, 'ether');
+
+        amountArg = ethAmountInWei;
+      }
 
       // Values needed to display relevant proposal amounts in the proposal
       // details page are set in the snapshot draft metadata. (We can no longer
       // rely on getting this data from onchain because the proposal may not
       // exist there yet.)
       const proposalAmountValues = {
-        tributeAmount: ethAmount,
-        tributeAmountUnit: 'ETH',
+        tributeAmount: formatNumber(amount),
+        tributeAmountUnit: amountUnit,
       };
 
       // Arguments needed to submit the proposal onchain are set in the snapshot
@@ -429,7 +576,7 @@ export default function CreateOnboardingProposal() {
       const submitActionArgs: SubmitActionArguments = [
         ethAddressToChecksum,
         UNITS_ADDRESS,
-        ethAmountInWei,
+        amountArg,
       ];
 
       // Only submit to snapshot if there is not already a proposal ID returned from a previous attempt.
@@ -489,15 +636,16 @@ export default function CreateOnboardingProposal() {
       <div className="form__description">
         <p>
           Submit a proposal to join Tribute DAO. Each member can purchase{' '}
-          {minUnitsText} units for {minEthAmountText} ETH (up to {maxUnitsText}{' '}
-          units for {maxEthAmountText} ETH). Please put your preferred ETH
-          address below and the amount of ETH you&apos;d like to contribute.
+          {minUnitsText} units for {minAmountText} {amountUnit} (up to{' '}
+          {maxUnitsText} units for {maxAmountText} {amountUnit}). Please put
+          your preferred ETH address below and the amount of {amountUnit}{' '}
+          you&apos;d like to contribute.
         </p>
         <p>
           Following your submission, existing members will consider your
           proposal. If approved by vote, your proposal will be processed and you
-          will finalize the transfer of your allocated ETH in exchange for
-          membership units.
+          will finalize the transfer of your allocated {amountUnit} in exchange
+          for membership units.
         </p>
       </div>
 
@@ -534,12 +682,12 @@ export default function CreateOnboardingProposal() {
           </div>
         </div>
 
-        {/* ETH AMOUNT SLIDER */}
+        {/* AMOUNT SLIDER */}
         <div className="form__input-row">
           <label
             className="form__input-row-label"
-            htmlFor={Fields.ethAmount}
-            id={`${Fields.ethAmount}-label`}>
+            htmlFor={Fields.amount}
+            id={`${Fields.amount}-label`}>
             Amount
           </label>
           <div className="form__input-row-fieldwrap--narrow">
@@ -547,9 +695,9 @@ export default function CreateOnboardingProposal() {
               render={({onChange}) => (
                 <Slider
                   data-testid="onboarding-slider"
-                  aria-labelledby={`${Fields.ethAmount}-label`}
+                  aria-labelledby={`${Fields.amount}-label`}
                   defaultValue={sliderMin || 0}
-                  id={Fields.ethAmount}
+                  id={Fields.amount}
                   max={sliderMax || 0}
                   min={sliderMin || 0}
                   step={sliderStep || 0}
@@ -559,26 +707,28 @@ export default function CreateOnboardingProposal() {
               )}
               defaultValue={sliderMin || 0}
               control={control}
-              name={Fields.ethAmount}
+              name={Fields.amount}
               rules={{
                 validate: (value: string): string | boolean => {
-                  const amount = Number(stripFormatNumber(value));
+                  const amount = Number(value);
 
-                  return amount >= Number(userAccountBalance)
+                  return amount > Number(userAccountBalance)
                     ? `Insufficient funds. ${renderUserAccountBalance(
                         userAccountBalance
-                      )} ETH available.`
+                      )} ${amountUnit} available.`
                     : true;
                 },
               }}
             />
 
             <InputError
-              error={getValidationError(Fields.ethAmount, errors)}
-              id={`error-${Fields.ethAmount}`}
+              error={getValidationError(Fields.amount, errors)}
+              id={`error-${Fields.amount}`}
             />
           </div>
-          <div className="form__input-addon">{ethAmountValue} ETH</div>
+          <div className="form__input-addon">
+            {formatNumber(amountValue)} {amountUnit}
+          </div>
         </div>
 
         {/* SUBMIT */}
@@ -614,6 +764,7 @@ export default function CreateOnboardingProposal() {
             <ErrorMessageWithDetails
               renderText="Something went wrong while submitting the proposal."
               error={createOnboardError}
+              detailsProps={{open: true}}
             />
           </div>
         )}

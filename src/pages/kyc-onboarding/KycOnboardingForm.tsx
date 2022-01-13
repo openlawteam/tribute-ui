@@ -9,7 +9,6 @@ import {
   formatNumber,
   getValidationError,
   normalizeString,
-  stripFormatNumber,
 } from '../../util/helpers';
 import {featureFlags} from '../../util/features';
 import {
@@ -487,6 +486,7 @@ export default function KycOnboardingForm() {
       }
 
       if (isERC20Onboarding) {
+        // ERC20 onboarding
         if (!erc20Details) {
           setSliderStep(undefined);
           setSliderMin(undefined);
@@ -510,6 +510,7 @@ export default function KycOnboardingForm() {
 
         setValue(Fields.amount, String(stepAmount));
       } else {
+        // ETH onboarding
         setSliderStep(Number(fromWei(kycOnboardingConfigs.chunkSize, 'ether')));
 
         setSliderMax(
@@ -544,38 +545,26 @@ export default function KycOnboardingForm() {
     try {
       if (!daoRegistryContract || defaultChainError) return;
 
-      const chunkSize = String(
-        await getDAOConfigEntry(
-          daoRegistryContract.instance,
-          ContractDAOConfigKeys.kycOnboardingChunkSize,
-          ONBOARDING_TOKEN_ADDRESS
-        )
+      const chunkSize = await getDAOConfigEntry(
+        daoRegistryContract.instance,
+        ContractDAOConfigKeys.kycOnboardingChunkSize,
+        ONBOARDING_TOKEN_ADDRESS
       );
-
-      const maximumChunks = String(
-        await getDAOConfigEntry(
-          daoRegistryContract.instance,
-          ContractDAOConfigKeys.kycOnboardingMaximumChunks,
-          ONBOARDING_TOKEN_ADDRESS
-        )
+      const maximumChunks = await getDAOConfigEntry(
+        daoRegistryContract.instance,
+        ContractDAOConfigKeys.kycOnboardingMaximumChunks,
+        ONBOARDING_TOKEN_ADDRESS
       );
-
-      const maxMembers = String(
-        await getDAOConfigEntry(
-          daoRegistryContract.instance,
-          ContractDAOConfigKeys.kycOnboardingMaxMembers,
-          ONBOARDING_TOKEN_ADDRESS
-        )
+      const maxMembers = await getDAOConfigEntry(
+        daoRegistryContract.instance,
+        ContractDAOConfigKeys.kycOnboardingMaxMembers,
+        ONBOARDING_TOKEN_ADDRESS
       );
-
-      const unitsPerChunk = String(
-        await getDAOConfigEntry(
-          daoRegistryContract.instance,
-          ContractDAOConfigKeys.kycOnboardingUnitsPerChunk,
-          ONBOARDING_TOKEN_ADDRESS
-        )
+      const unitsPerChunk = await getDAOConfigEntry(
+        daoRegistryContract.instance,
+        ContractDAOConfigKeys.kycOnboardingUnitsPerChunk,
+        ONBOARDING_TOKEN_ADDRESS
       );
-
       setKycOnboardingConfigs({
         chunkSize,
         maximumChunks,
@@ -598,6 +587,7 @@ export default function KycOnboardingForm() {
       }
 
       if (isERC20Onboarding) {
+        // ERC20 onboarding
         if (!erc20Contract) {
           setUserAccountBalance(undefined);
 
@@ -616,6 +606,7 @@ export default function KycOnboardingForm() {
 
         setUserAccountBalance(balanceReadable);
       } else {
+        // ETH onboarding
         if (!web3Instance) {
           setUserAccountBalance(undefined);
 
@@ -669,7 +660,7 @@ export default function KycOnboardingForm() {
         const approveAmount = allowanceBN.add(difference);
         const tokenApproveArguments: TokenApproveArguments = [
           kycOnboardingContract.contractAddress,
-          approveAmount.toString(),
+          String(approveAmount),
         ];
         const txArguments = {
           from: account || '',
@@ -755,6 +746,7 @@ export default function KycOnboardingForm() {
       let txReceipt;
 
       if (isERC20Onboarding) {
+        // ERC20 onboarding
         if (!erc20Details) {
           throw new Error('No ERC20 details found.');
         }
@@ -764,9 +756,7 @@ export default function KycOnboardingForm() {
         }
 
         const multiplier = toBN(10).pow(toBN(erc20Details.decimals));
-        const erc20AmountWithDecimals = toBN(stripFormatNumber(amount)).mul(
-          multiplier
-        );
+        const erc20AmountWithDecimals = toBN(amount).mul(multiplier);
 
         await handleSubmitTokenApprove(erc20AmountWithDecimals);
 
@@ -790,7 +780,8 @@ export default function KycOnboardingForm() {
           txArguments
         );
       } else {
-        const ethAmountInWei = toWei(stripFormatNumber(amount), 'ether');
+        // ETH onboarding
+        const ethAmountInWei = toWei(amount, 'ether');
 
         const onboardEthArguments: OnboardEthArguments = [
           daoRegistryContract.contractAddress,
@@ -970,7 +961,7 @@ export default function KycOnboardingForm() {
               name={Fields.amount}
               rules={{
                 validate: (value: string): string | boolean => {
-                  const amount = Number(stripFormatNumber(value));
+                  const amount = Number(value);
 
                   return amount > Number(userAccountBalance)
                     ? `Insufficient funds. ${renderUserAccountBalance(
@@ -987,7 +978,7 @@ export default function KycOnboardingForm() {
             />
           </div>
           <div className="form__input-addon">
-            {amountValue} {amountUnit}
+            {formatNumber(amountValue)} {amountUnit}
           </div>
         </div>
 

@@ -1,10 +1,10 @@
 import DiscordSVG from '../../assets/svg/DiscordSVG';
 import GitHubSVG from '../../assets/svg/GitHubSVG';
-import MediumSVG from '../../assets/svg/MediumSVG';
+// import MediumSVG from '../../assets/svg/MediumSVG';
 
 // @todo Add missing URLs when available
 enum SocialMediaLinks {
-  DISCORD = '#',
+  DISCORD = 'https://discord.gg/tEfP68xnTd',
   /*
    * query params search sepcifically for:
    * openlawteam/tribute-ui
@@ -13,18 +13,18 @@ enum SocialMediaLinks {
    * openlawteam/tribute-subgraph
    */
   GITHUB = 'https://github.com/search?q=org%3Aopenlawteam+tribute-ui+OR+tribute-contracts+OR+tribute-subgraph+in%3Aname&type=repositories',
-  MEDIUM = '#',
+  // MEDIUM = '#',
 }
 
 export default function SocialMedia() {
   return (
     <div className="socialmedia">
-      <a
+      {/* <a
         href={SocialMediaLinks.MEDIUM}
         target="_blank"
         rel="noopener noreferrer">
         <MediumSVG />
-      </a>
+      </a> */}
       <a
         href={SocialMediaLinks.DISCORD}
         target="_blank"

@@ -3,6 +3,7 @@
 Related supporting repositories:
 
 - [openlawteam/tribute-contracts](https://github.com/openlawteam/tribute-contracts)
+- [openlawteam/tribute-subgraph](https://github.com/openlawteam/tribute-subgraph)
 - [openlawteam/snapshot-hub (erc-712 branch)](https://github.com/openlawteam/snapshot-hub/tree/erc-712)
 - [openlawteam/snapshot-js-erc712](https://github.com/openlawteam/snapshot-js-erc712)
 
@@ -25,7 +26,7 @@ REACT_APP_GRAPH_CORE_URL=...
 
 NOTE:
 
-- `REACT_APP_INFURA_PROJECT_ID_LOCAL` can be the same value you use for LAO local development.
+- `REACT_APP_INFURA_PROJECT_ID_LOCAL` is the value of your Infura PROJECT ID key.
 - `REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS` is the address of the `DaoRegistry` smart contract deployed to your network.
 - `REACT_APP_MULTICALL_CONTRACT_ADDRESS` is the address of the `Multicall` smart contract deployed to your network.
 - `REACT_APP_SNAPSHOT_HUB_API_URL` is the url of [snaphot-hub](https://github.com/openlawteam/snapshot-hub/tree/erc-712) running locally in a container.
@@ -37,7 +38,7 @@ NOTE:
 
 If you want to use the [KYC Onboarding adapter](https://github.com/openlawteam/tribute-contracts/blob/master/website/docs/contracts/adapters/onboarding/KycOnboarding.md), you will also need the following environment variables:
 
-```
+```sh
 REACT_APP_ENABLE_KYC_ONBOARDING=true
 REACT_APP_KYC_BACKEND_URL=http://localhost:3003/kyc-certificate
 REACT_APP_KYC_FORMS_URL=...
@@ -50,7 +51,7 @@ NOTE:
 
 #### Optional Environment Variables for ERC20 Onboarding
 
-```
+```sh
 REACT_APP_ONBOARDING_TOKEN_ADDRESS=...
 ```
 
@@ -62,7 +63,7 @@ _Note that this configuration should be consistent with how the actual Onboardin
 
 #### Optional Environment Variables for Additional adapter/extension subgraphs
 
-```
+```sh
 REACT_APP_GRAPH_COUPON_ONBOARDING_URL=...
 REACT_APP_GRAPH_NFT_EXTENSION_URL=...
 ```

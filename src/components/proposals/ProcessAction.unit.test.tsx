@@ -97,7 +97,7 @@ describe('ProcessAction unit tests', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('button', {name: /^done/i})).toBeInTheDocument();
-      expect(screen.getByText(/proposal submitted!/i)).toBeInTheDocument();
+      expect(screen.getByText(/proposal processed!/i)).toBeInTheDocument();
       // Etherscan link
       expect(screen.getByText(/view transaction/i)).toBeInTheDocument();
     });
@@ -177,7 +177,7 @@ describe('ProcessAction unit tests', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('button', {name: /^done/i})).toBeInTheDocument();
-      expect(screen.getByText(/proposal submitted!/i)).toBeInTheDocument();
+      expect(screen.getByText(/proposal processed!/i)).toBeInTheDocument();
       // Etherscan link
       expect(screen.getByText(/view transaction/i)).toBeInTheDocument();
     });
