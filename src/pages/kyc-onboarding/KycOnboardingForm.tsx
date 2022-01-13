@@ -660,7 +660,7 @@ export default function KycOnboardingForm() {
         const approveAmount = allowanceBN.add(difference);
         const tokenApproveArguments: TokenApproveArguments = [
           kycOnboardingContract.contractAddress,
-          approveAmount.toString(),
+          String(approveAmount),
         ];
         const txArguments = {
           from: account || '',

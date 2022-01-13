@@ -1,7 +1,9 @@
 import {useState, useRef, useEffect, useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {AbiItem, toBN} from 'web3-utils';
 
 import {CycleEllipsis} from '../feedback';
+import {ETH_TOKEN_ADDRESS, ONBOARDING_TOKEN_ADDRESS} from '../../config';
 import {getConnectedMember} from '../../store/actions';
 import {ProposalData, SnapshotProposal} from './types';
 import {ReduxDispatch, StoreState} from '../../store/types';
@@ -17,14 +19,21 @@ import FadeIn from '../common/FadeIn';
 import Loader from '../feedback/Loader';
 
 type ProcessArguments = [
-  string, // `dao`
-  string // `proposalId`
+  dao: string, // `dao`
+  proposalId: string // `proposalId`
+];
+
+type TokenApproveArguments = [
+  spender: string, // `spender`
+  amount: string // `amount`
 ];
 
 type ProcessActionOnboardingProps = {
   disabled?: boolean;
   proposal: ProposalData;
 };
+
+type BN = ReturnType<typeof toBN>;
 
 type ActionDisabledReasons = {
   notProposerMessage: string;
@@ -41,6 +50,79 @@ const useMemberActionDisabledProps = {
   skipIsActiveMemberCheck: true,
 };
 
+const isERC20Onboarding = ONBOARDING_TOKEN_ADDRESS !== ETH_TOKEN_ADDRESS;
+
+function renderSubmitStatus({
+  txEtherscanURL,
+  txStatus,
+  txEtherscanURLTokenApprove,
+  txStatusTokenApprove,
+}: {
+  txEtherscanURL: string;
+  txStatus: Web3TxStatus;
+  txEtherscanURLTokenApprove: string;
+  txStatusTokenApprove: string;
+}): React.ReactNode {
+  // token approve transaction statuses
+  if (txStatusTokenApprove === Web3TxStatus.AWAITING_CONFIRM) {
+    return (
+      <>
+        Confirm to transfer your tokens
+        <CycleEllipsis intervalMs={500} />
+      </>
+    );
+  }
+
+  if (txStatusTokenApprove === Web3TxStatus.PENDING) {
+    return (
+      <>
+        <div>
+          Approving your tokens for transfer
+          <CycleEllipsis intervalMs={500} />
+        </div>
+
+        <EtherscanURL url={txEtherscanURLTokenApprove} isPending />
+      </>
+    );
+  }
+
+  // process proposal transaction statuses
+  switch (txStatus) {
+    case Web3TxStatus.AWAITING_CONFIRM:
+      return (
+        <>
+          Confirm to process the proposal
+          <CycleEllipsis intervalMs={500} />
+        </>
+      );
+    case Web3TxStatus.PENDING:
+      return (
+        <>
+          <CycleMessage
+            intervalMs={2000}
+            messages={TX_CYCLE_MESSAGES}
+            useFirstItemStart
+            render={(message) => {
+              return <FadeIn key={message}>{message}</FadeIn>;
+            }}
+          />
+
+          <EtherscanURL url={txEtherscanURL} isPending />
+        </>
+      );
+    case Web3TxStatus.FULFILLED:
+      return (
+        <>
+          <div>Proposal processed!</div>
+
+          <EtherscanURL url={txEtherscanURL} />
+        </>
+      );
+    default:
+      return null;
+  }
+}
+
 export default function ProcessActionOnboarding(
   props: ProcessActionOnboardingProps
 ) {
@@ -54,6 +136,7 @@ export default function ProcessActionOnboarding(
    */
 
   const [submitError, setSubmitError] = useState<Error>();
+
   const [onboardingProposalAmount, setOnboardingProposalAmount] =
     useState<string>();
 
@@ -72,6 +155,7 @@ export default function ProcessActionOnboarding(
   const OnboardingContract = useSelector(
     (s: StoreState) => s.contracts?.OnboardingContract
   );
+
   const daoRegistryContract = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract
   );
@@ -81,8 +165,17 @@ export default function ProcessActionOnboarding(
    */
 
   const {account, web3Instance} = useWeb3Modal();
+
   const {txEtherscanURL, txIsPromptOpen, txSend, txStatus} = useContractSend();
+
   const {average: gasPrice} = useETHGasPrice();
+
+  const {
+    txEtherscanURL: txEtherscanURLTokenApprove,
+    txIsPromptOpen: txIsPromptOpenTokenApprove,
+    txSend: txSendTokenApprove,
+    txStatus: txStatusTokenApprove,
+  } = useContractSend();
 
   const {
     isDisabled,
@@ -105,9 +198,15 @@ export default function ProcessActionOnboarding(
 
   const isInProcess =
     txStatus === Web3TxStatus.AWAITING_CONFIRM ||
-    txStatus === Web3TxStatus.PENDING;
+    txStatus === Web3TxStatus.PENDING ||
+    txStatusTokenApprove === Web3TxStatus.AWAITING_CONFIRM ||
+    txStatusTokenApprove === Web3TxStatus.PENDING;
+
   const isDone = txStatus === Web3TxStatus.FULFILLED;
-  const isInProcessOrDone = isInProcess || isDone || txIsPromptOpen;
+
+  const isInProcessOrDone =
+    isInProcess || isDone || txIsPromptOpen || txIsPromptOpenTokenApprove;
+
   const areSomeDisabled = isDisabled || isInProcessOrDone || propsDisabled;
 
   /**
@@ -183,6 +282,71 @@ export default function ProcessActionOnboarding(
     }
   }
 
+  async function handleSubmitTokenApprove(erc20AmountBN: BN) {
+    try {
+      if (!ONBOARDING_TOKEN_ADDRESS) {
+        throw new Error(
+          'No Onboarding ERC20 address was found. Are you sure it is set?'
+        );
+      }
+
+      if (!OnboardingContract) {
+        throw new Error('No OnboardingContract found.');
+      }
+
+      if (!account) {
+        throw new Error('No account found.');
+      }
+
+      if (!web3Instance) {
+        throw new Error('No Web3 instance was found.');
+      }
+
+      const {default: lazyERC20ABI} = await import(
+        '../../abis/external/ERC20.json'
+      );
+      const erc20Contract: AbiItem[] = lazyERC20ABI as any;
+
+      const erc20Instance = new web3Instance.eth.Contract(
+        erc20Contract,
+        ONBOARDING_TOKEN_ADDRESS
+      );
+
+      // Value to check if adapter is allowed to spend amount of tribute tokens
+      // on behalf of owner. If allowance is not sufficient, the owner will
+      // approve the adapter to spend the amount of tokens needed for the owner
+      // to provide the full tribute amount.
+      const allowance = await erc20Instance.methods
+        .allowance(account, OnboardingContract.contractAddress)
+        .call();
+
+      const allowanceBN = toBN(allowance);
+
+      if (erc20AmountBN.gt(allowanceBN)) {
+        const difference = erc20AmountBN.sub(allowanceBN);
+        const approveAmount = allowanceBN.add(difference);
+        const tokenApproveArguments: TokenApproveArguments = [
+          OnboardingContract.contractAddress,
+          String(approveAmount),
+        ];
+        const txArguments = {
+          from: account || '',
+          ...(gasPrice ? {gasPrice} : null),
+        };
+
+        // Execute contract call for `approve`
+        await txSendTokenApprove(
+          'approve',
+          erc20Instance.methods,
+          tokenApproveArguments,
+          txArguments
+        );
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async function handleSubmit() {
     try {
       if (!daoRegistryContract) {
@@ -205,6 +369,16 @@ export default function ProcessActionOnboarding(
         throw new Error('No Web3 instance was found.');
       }
 
+      if (!onboardingProposalAmount) {
+        throw new Error('No proposal amount found.');
+      }
+
+      if (isERC20Onboarding) {
+        // ERC20 onboarding
+        const erc20AmountBN = toBN(onboardingProposalAmount);
+        await handleSubmitTokenApprove(erc20AmountBN);
+      }
+
       const processArguments: ProcessArguments = [
         daoRegistryContract.contractAddress,
         snapshotProposal.idInDAO,
@@ -212,18 +386,18 @@ export default function ProcessActionOnboarding(
 
       const txArguments = {
         from: account || '',
-        value: onboardingProposalAmount,
         ...(gasPrice ? {gasPrice} : null),
+        ...(isERC20Onboarding ? null : {value: onboardingProposalAmount}),
       };
 
-      const tx = await txSend(
+      const txReceipt = await txSend(
         'processProposal',
         OnboardingContract.instance.methods,
         processArguments,
         txArguments
       );
 
-      if (tx) {
+      if (txReceipt) {
         // re-fetch member
         await dispatch(
           getConnectedMember({
@@ -243,7 +417,10 @@ export default function ProcessActionOnboarding(
         }
       }
     } catch (error) {
-      setSubmitError(error);
+      // Set any errors from Web3 utils or explicitly set above.
+      const e = error as Error;
+
+      setSubmitError(e);
     }
   }
 
@@ -267,44 +444,6 @@ export default function ProcessActionOnboarding(
    * Render
    */
 
-  function renderSubmitStatus(): React.ReactNode {
-    // process proposal transaction statuses
-    switch (txStatus) {
-      case Web3TxStatus.AWAITING_CONFIRM:
-        return (
-          <>
-            Confirm to process the proposal
-            <CycleEllipsis />
-          </>
-        );
-      case Web3TxStatus.PENDING:
-        return (
-          <>
-            <CycleMessage
-              intervalMs={2000}
-              messages={TX_CYCLE_MESSAGES}
-              useFirstItemStart
-              render={(message) => {
-                return <FadeIn key={message}>{message}</FadeIn>;
-              }}
-            />
-
-            <EtherscanURL url={txEtherscanURL} isPending />
-          </>
-        );
-      case Web3TxStatus.FULFILLED:
-        return (
-          <>
-            <div>Proposal submitted!</div>
-
-            <EtherscanURL url={txEtherscanURL} />
-          </>
-        );
-      default:
-        return null;
-    }
-  }
-
   return (
     <>
       <div>
@@ -324,7 +463,12 @@ export default function ProcessActionOnboarding(
 
         {isInProcessOrDone && (
           <div className="form__submit-status-container">
-            {renderSubmitStatus()}
+            {renderSubmitStatus({
+              txEtherscanURL,
+              txStatus,
+              txEtherscanURLTokenApprove,
+              txStatusTokenApprove,
+            })}
           </div>
         )}
 
