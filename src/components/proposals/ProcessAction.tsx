@@ -178,7 +178,7 @@ export default function ProcessAction(props: ProcessActionProps) {
       case Web3TxStatus.FULFILLED:
         return (
           <>
-            <div>Proposal submitted!</div>
+            <div>Proposal processed!</div>
 
             <EtherscanURL url={txEtherscanURL} />
           </>
