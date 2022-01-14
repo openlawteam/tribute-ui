@@ -101,6 +101,21 @@ describe('useInitContracts unit tests', () => {
       ).toBeTruthy();
     });
 
+    // KYC Onboarding
+    await waitFor(() => {
+      expect(
+        reduxStore.getState().contracts.KycOnboardingContract?.abi
+      ).toBeTruthy();
+
+      expect(
+        reduxStore.getState().contracts.KycOnboardingContract?.contractAddress
+      ).toBeTruthy();
+
+      expect(
+        reduxStore.getState().contracts.KycOnboardingContract?.instance
+      ).toBeTruthy();
+    });
+
     // Tribute
     await waitFor(() => {
       expect(reduxStore.getState().contracts.TributeContract?.abi).toBeTruthy();

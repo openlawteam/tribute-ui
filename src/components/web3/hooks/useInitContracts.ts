@@ -15,6 +15,7 @@ import {
   initContractERC20Extension,
   initContractFinancing,
   initContractGuildKick,
+  initContractKycOnboarding,
   initContractManaging,
   initContractNFTAdapter,
   initContractNFTExtension,
@@ -61,6 +62,7 @@ export function useInitContracts(): (data: {
       await dispatch(initContractConfiguration(web3Instance));
       await dispatch(initContractFinancing(web3Instance));
       await dispatch(initContractGuildKick(web3Instance));
+      await dispatch(initContractKycOnboarding(web3Instance));
       await dispatch(initContractManaging(web3Instance));
       await dispatch(initContractRagequit(web3Instance));
       await dispatch(initContractBankAdapter(web3Instance));
