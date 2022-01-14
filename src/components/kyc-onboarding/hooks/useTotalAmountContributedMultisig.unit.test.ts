@@ -92,7 +92,7 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(PENDING);
 
-      // Mock web3 repsonse
+      // Mock web3 response
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
@@ -200,7 +200,7 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(PENDING);
 
-      // Mock web3 repsonse
+      // Mock web3 response
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
@@ -308,7 +308,7 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(PENDING);
 
-      // Mock web3 repsonse
+      // Mock web3 response
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
@@ -382,7 +382,7 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(PENDING);
 
-      // Mock web3 repsonse
+      // Mock web3 response
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
 
       await waitForValueToChange(() => result.current.amountContributedStatus);

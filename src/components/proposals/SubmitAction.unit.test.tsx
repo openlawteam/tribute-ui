@@ -501,7 +501,7 @@ describe('SubmitAction unit tests', () => {
   });
 
   test('can display error message if Snapshot Hub error', async () => {
-    // Mock Snapshot Hub error repsonse
+    // Mock Snapshot Hub error response
     server.use(
       rest.post(`${SNAPSHOT_HUB_API_URL}/api/message`, async (_req, res, ctx) =>
         res(ctx.status(500))

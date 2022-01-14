@@ -39,7 +39,7 @@ describe('alchemyFetchAssetTransfers unit tests', () => {
       })
     );
 
-    // Assert repsonse
+    // Assert response
     expect(
       await alchemyFetchAssetTransfers({
         toAddress: DEFAULT_ETH_ADDRESS,
