@@ -67,7 +67,7 @@ describe('TotalContributedAmount unit tests', () => {
       expect(() => getByText(/eth contributed$/i)).toThrow();
     });
 
-    // Mock web3 repsonse
+    // Mock web3 response
     await waitFor(() => {
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
     });
@@ -119,7 +119,7 @@ describe('TotalContributedAmount unit tests', () => {
       expect(() => getByText(/eth contributed$/i)).toThrow();
     });
 
-    // Mock web3 repsonse
+    // Mock web3 response
     await waitFor(() => {
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
     });
@@ -206,7 +206,7 @@ describe('TotalContributedAmount unit tests', () => {
       expect(() => getByText(/eth contributed$/i)).toThrow();
     });
 
-    // Mock web3 repsonse
+    // Mock web3 response
     await waitFor(() => {
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
     });
@@ -293,7 +293,7 @@ describe('TotalContributedAmount unit tests', () => {
       expect(() => getByText(/eth contributed$/i)).toThrow();
     });
 
-    // Mock web3 repsonse
+    // Mock web3 response
     await waitFor(() => {
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
     });
