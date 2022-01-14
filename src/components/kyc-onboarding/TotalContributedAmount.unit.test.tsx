@@ -1,4 +1,5 @@
 import {render, waitFor} from '@testing-library/react';
+import Web3 from 'web3';
 
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../test/helpers';
 import {getAssetTransfersFixture} from '../../test/restResponses';
@@ -57,8 +58,16 @@ describe('TotalContributedAmount unit tests', () => {
         useWallet
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
+
+          // Mock Web3 result for `getAddressConfiguration.call()`
+          mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            )
+          );
         }}>
-        <TotalContributedAmount multisigAddress={DEFAULT_ETH_ADDRESS} />
+        <TotalContributedAmount />
       </Wrapper>
     );
 
@@ -104,9 +113,16 @@ describe('TotalContributedAmount unit tests', () => {
         useWallet
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
+
+          // Mock Web3 result for `getAddressConfiguration.call()`
+          mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            )
+          );
         }}>
         <TotalContributedAmount
-          multisigAddress={DEFAULT_ETH_ADDRESS}
           render={({amountContributed}) => {
             return <div>{amountContributed} ETH is in the DAO</div>;
           }}
@@ -196,8 +212,16 @@ describe('TotalContributedAmount unit tests', () => {
         useWallet
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
+
+          // Mock Web3 result for `getAddressConfiguration.call()`
+          mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            )
+          );
         }}>
-        <TotalContributedAmount multisigAddress={DEFAULT_ETH_ADDRESS} />
+        <TotalContributedAmount />
       </Wrapper>
     );
 
@@ -283,8 +307,16 @@ describe('TotalContributedAmount unit tests', () => {
         useWallet
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
+
+          // Mock Web3 result for `getAddressConfiguration.call()`
+          mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            )
+          );
         }}>
-        <TotalContributedAmount multisigAddress={DEFAULT_ETH_ADDRESS} />
+        <TotalContributedAmount />
       </Wrapper>
     );
 
