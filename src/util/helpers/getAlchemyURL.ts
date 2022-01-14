@@ -29,7 +29,7 @@ export function getAlchemyURL(
     networkID === CHAINS.GANACHE ||
     networkID === CHAINS.HARMONY_MAIN ||
     networkID === CHAINS.HARMONY_TEST ||
-    // @todo Separate handling for Polyon URL as it's a bit different.
+    // @todo Separate handling for Polygon URL as it's a bit different.
     networkID === CHAINS.POLYGON ||
     networkID === CHAINS.POLYGON_TEST
   ) {
