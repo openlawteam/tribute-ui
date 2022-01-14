@@ -7,6 +7,7 @@ import {alchemyFetchAssetTransfers} from '../../web3/helpers';
 import {AsyncStatus} from '../../../util/types';
 import {CHAINS, DEFAULT_CHAIN} from '../../../config';
 import {ConfigurationUpdated} from '../../../../abi-types/DaoRegistry';
+import {ContractDAOConfigKeys} from '../../web3/types';
 import {normalizeString} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
 import {useAbortController} from '../../../hooks';
@@ -25,7 +26,9 @@ const CONFIGURATION_UPDATED_EVENT_SIGNATURE_HASH = sha3(
   'ConfigurationUpdated(bytes32,uint256)'
 );
 
-const KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH = sha3('kyc-onboarding.chunkSize');
+const KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH = sha3(
+  ContractDAOConfigKeys.kycOnboardingChunkSize
+);
 
 /**
  * Returns the total amount of ETH, WETH contributed to the DAO's multi-sig
