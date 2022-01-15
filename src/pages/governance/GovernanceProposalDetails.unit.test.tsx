@@ -76,7 +76,7 @@ describe('GovernanceProposalDetails unit tests', () => {
     /**
      * Vote actions
      *
-     * @note is an ended vote as per default mocked repsonse in our test suite.
+     * @note is an ended vote as per default mocked response in our test suite.
      */
 
     await waitFor(() => {

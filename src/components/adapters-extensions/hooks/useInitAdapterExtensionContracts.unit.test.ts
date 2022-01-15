@@ -9,6 +9,7 @@ import {
   CONTRACT_DISTRIBUTE,
   CONTRACT_FINANCING,
   CONTRACT_GUILDKICK,
+  CONTRACT_KYC_ONBOARDING,
   CONTRACT_MANAGING,
   CONTRACT_NFT_ADAPTER,
   CONTRACT_ONBOARDING,
@@ -70,6 +71,9 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
         expect(reduxStore.getState().contracts.DistributeContract).toBeNull();
         expect(reduxStore.getState().contracts.FinancingContract).toBeNull();
         expect(reduxStore.getState().contracts.GuildKickContract).toBeNull();
+        expect(
+          reduxStore.getState().contracts.KycOnboardingContract
+        ).toBeNull();
         expect(reduxStore.getState().contracts.ManagingContract).toBeNull();
         expect(reduxStore.getState().contracts.OnboardingContract).toBeNull();
         expect(reduxStore.getState().contracts.RagequitContract).toBeNull();
@@ -96,6 +100,9 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
       });
       reduxStore.dispatch({
         type: CONTRACT_GUILDKICK,
+      });
+      reduxStore.dispatch({
+        type: CONTRACT_KYC_ONBOARDING,
       });
       reduxStore.dispatch({
         type: CONTRACT_MANAGING,
@@ -131,6 +138,9 @@ describe('useInitAdapterExtensionContracts unit tests', () => {
       expect(reduxStore.getState().contracts.DistributeContract).not.toBeNull();
       expect(reduxStore.getState().contracts.FinancingContract).not.toBeNull();
       expect(reduxStore.getState().contracts.GuildKickContract).not.toBeNull();
+      expect(
+        reduxStore.getState().contracts.KycOnboardingContract
+      ).not.toBeNull();
       expect(reduxStore.getState().contracts.ManagingContract).not.toBeNull();
       expect(reduxStore.getState().contracts.OnboardingContract).not.toBeNull();
       expect(reduxStore.getState().contracts.RagequitContract).not.toBeNull();

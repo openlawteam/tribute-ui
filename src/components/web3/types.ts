@@ -34,6 +34,7 @@ export enum ContractAdapterNames {
   distribute = 'distribute',
   financing = 'financing',
   guildkick = 'guildkick',
+  kyc_onboarding = 'kyc-onboarding',
   managing = 'managing',
   nft = 'nft',
   onboarding = 'onboarding',
@@ -60,13 +61,19 @@ export enum ContractExtensionNames {
  * @todo Add other extensions as needs arise
  */
 export enum ContractDAOConfigKeys {
+  kycOnboardingChunkSize = 'kyc-onboarding.chunkSize',
+  kycOnboardingFundTargetAddress = 'kyc-onboarding.fundTargetAddress',
+  kycOnboardingMaximumChunks = 'kyc-onboarding.maximumChunks',
+  kycOnboardingMaxMembers = 'kyc-onboarding.maxMembers',
+  kycOnboardingSignerAddress = 'kyc-onboarding.signerAddress',
+  kycOnboardingUnitsPerChunk = 'kyc-onboarding.unitsPerChunk',
   offchainVotingGracePeriod = 'offchainvoting.gracePeriod',
   offchainVotingStakingAmount = 'offchainvoting.stakingAmount',
   offchainVotingVotingPeriod = 'offchainvoting.votingPeriod',
   onboardingChunkSize = 'onboarding.chunkSize',
   onboardingMaximumChunks = 'onboarding.maximumChunks',
-  onboardingUnitsPerChunk = 'onboarding.unitsPerChunk',
   onboardingTokenAddr = 'onboarding.tokenAddr',
+  onboardingUnitsPerChunk = 'onboarding.unitsPerChunk',
   votingGracePeriod = 'voting.gracePeriod',
   votingStakingAmount = 'voting.stakingAmount',
   votingVotingPeriod = 'voting.votingPeriod',

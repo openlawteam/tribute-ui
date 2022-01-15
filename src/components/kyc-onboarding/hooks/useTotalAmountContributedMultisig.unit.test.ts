@@ -1,4 +1,5 @@
 import {act, renderHook} from '@testing-library/react-hooks';
+import Web3 from 'web3';
 
 import {AsyncStatus} from '../../../util/types';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../../test/helpers';
@@ -36,6 +37,29 @@ const DEFAULT_LOGS_RESULT = [
     transactionIndex: 29,
     id: 'log_79e8ecdf',
   },
+  {
+    address: '0x1D96d039d384d3ECCaD6f07aAB27A49408A1Cf2B',
+    blockHash:
+      '0xc71df7ee20cb6f91c1b4f78912e8436d57c93f7646f08e19492f47fca331d5d9',
+    blockNumber: 13290895,
+    /**
+     * web3Instance.eth.abi.encodeParameters(
+     *  ['bytes32', 'uint256'],
+     *  [KYC_ONBOARDING_MAXIMUM_CHUNKS_KEY_HASH, 3]
+     * );
+     */
+    data: '0x30671f20b402b0209c539f216c8370ad5c14d6756f759a0bb3e1c2b4869e9f2f0000000000000000000000000000000000000000000000000000000000000003',
+    logIndex: 55,
+    removed: false,
+    topics: [
+      // sha3('ConfigurationUpdated(bytes32,uint256)');
+      '0x50bc2a45e7693135e6950fb78733dccb013ce4c6b62f17dbbda5131d8d0fac29',
+    ],
+    transactionHash:
+      '0xae49dbd78d15dd8ce91c4927b93736cbf9e2f129ab1c9a17180702cb1908651b',
+    transactionIndex: 29,
+    id: 'log_5118158c',
+  },
 ];
 
 describe('useTotalAmountContributedMultisig unit tests', () => {
@@ -57,15 +81,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       }));
 
     let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
+        () => useTotalAmountContributedMultisig(),
         {
           wrapper: Wrapper,
           initialProps: {
             getProps(p) {
               mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
             useInit: true,
             useWallet: true,
@@ -77,19 +103,159 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(STANDBY);
 
+      // Mock Web3 result for `getAddressConfiguration.call()`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+      );
+
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
       // Assert pending
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(PENDING);
 
-      // Mock web3 repsonse
+      // Mock web3 response
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
       // Assert fulfilled
       expect(result.current.amountContributed).toBe(200);
+      expect(result.current.amountContributedStatus).toBe(FULFILLED);
+
+      // Cleanup
+
+      spy.mockRestore();
+      (config as any).DEFAULT_CHAIN = originalDefaultChain;
+    });
+  });
+
+  test('should return correct data when different chunk size configs have been set', async () => {
+    const MODIFIED_LOGS_RESULT = [
+      ...DEFAULT_LOGS_RESULT,
+      {
+        address: '0x1D96d039d384d3ECCaD6f07aAB27A49408A1Cf2B',
+        blockHash:
+          '0xc71df7ee20cb6f91c1b4f78912e8436d57c93f7646f08e19492f47fca331d5d9',
+        blockNumber: 13290895,
+        /**
+         * web3Instance.eth.abi.encodeParameters(
+         *  ['bytes32', 'uint256'],
+         *  [KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH, '30000000000000000000']
+         * );
+         */
+        data: '0xb024dc66daa5f76b3a0f3ca4879dc87b33f90cea509e863f3e0955b6222a3a1e000000000000000000000000000000000000000000000001a055690d9db80000',
+        logIndex: 56,
+        removed: false,
+        topics: [
+          // sha3('ConfigurationUpdated(bytes32,uint256)');
+          '0x50bc2a45e7693135e6950fb78733dccb013ce4c6b62f17dbbda5131d8d0fac29',
+        ],
+        transactionHash:
+          '0xae49dbd78d15dd8ce91c4927b93736cbf9e2f129ab1c9a17180702cb1908651b',
+        transactionIndex: 29,
+        id: 'log_292c238f',
+      },
+    ];
+
+    // Mock chain to be production so hook will run
+    (config as any).DEFAULT_CHAIN = 1;
+
+    const useIsDefaultChain = await import(
+      '../../web3/hooks/useIsDefaultChain'
+    );
+
+    // Mock `useDefaultChain` for `Init`; `isDefaultChain` should be `true`
+    const spy = jest
+      .spyOn(useIsDefaultChain, 'useIsDefaultChain')
+      .mockImplementation(() => ({
+        defaultChain: 1,
+        defaultChainError: undefined,
+        isDefaultChain: true,
+      }));
+
+    // Mock Alchemy response with assets that are multiple of second chunk size config ('30000000000000000000')
+    server.use(
+      rest.post('https://eth-mainnet.alchemyapi.io/v2/*', (req, res, ctx) => {
+        const {body} = req;
+
+        if (typeof body === 'object') {
+          // `alchemy_getAssetTransfers`
+          if (body.method === 'alchemy_getAssetTransfers') {
+            return res(
+              ctx.json({
+                ...getAssetTransfersFixture,
+                result: {
+                  ...getAssetTransfersFixture.result,
+                  transfers: [
+                    ...getAssetTransfersFixture.result.transfers,
+                    {
+                      blockNum: '0xcace2e',
+                      hash: '0x13d460778ee6fe4595bc83c2b31fc742601e59ff9fe4025a1a42025b3bf79328',
+                      from: '0x3e9425919e7f806ff0d4c29869f59e55970385fa',
+                      to: '0xa9a70e66830bcf9776c23fb1df708d7ad498e6e6',
+                      // multiple of chunk size '30000000000000000000'
+                      value: 60, // to wei '60000000000000000000'
+                      erc721TokenId: null,
+                      erc1155Metadata: null,
+                      asset: 'ETH',
+                      category: 'token',
+                      rawContract: {
+                        value: '0x02b5e3af16b1880000',
+                        address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                        decimal: '0x12',
+                      },
+                    },
+                  ],
+                },
+              })
+            );
+          }
+        }
+      })
+    );
+
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    await act(async () => {
+      const {result, waitForValueToChange} = await renderHook(
+        () => useTotalAmountContributedMultisig(),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            getProps(p) {
+              mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
+            },
+            useInit: true,
+            useWallet: true,
+          },
+        }
+      );
+
+      // Assert initial
+      expect(result.current.amountContributed).toBe(0);
+      expect(result.current.amountContributedStatus).toBe(STANDBY);
+
+      // Mock Web3 result for `getAddressConfiguration.call()`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+      );
+
+      await waitForValueToChange(() => result.current.amountContributedStatus);
+
+      // Assert pending
+      expect(result.current.amountContributed).toBe(0);
+      expect(result.current.amountContributedStatus).toBe(PENDING);
+
+      // Mock web3 response
+      mockWeb3Provider.injectResult(MODIFIED_LOGS_RESULT);
+
+      await waitForValueToChange(() => result.current.amountContributedStatus);
+
+      // Assert fulfilled
+      expect(result.current.amountContributed).toBe(260);
       expect(result.current.amountContributedStatus).toBe(FULFILLED);
 
       // Cleanup
@@ -158,15 +324,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
     );
 
     let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
+        () => useTotalAmountContributedMultisig(),
         {
           wrapper: Wrapper,
           initialProps: {
             getProps(p) {
               mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
             useInit: true,
             useWallet: true,
@@ -178,13 +346,18 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(STANDBY);
 
+      // Mock Web3 result for `getAddressConfiguration.call()`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+      );
+
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
       // Assert pending
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(PENDING);
 
-      // Mock web3 repsonse
+      // Mock web3 response
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
@@ -259,15 +432,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
     );
 
     let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
+        () => useTotalAmountContributedMultisig(),
         {
           wrapper: Wrapper,
           initialProps: {
             getProps(p) {
               mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
             useInit: true,
             useWallet: true,
@@ -279,19 +454,203 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(STANDBY);
 
+      // Mock Web3 result for `getAddressConfiguration.call()`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+      );
+
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
       // Assert pending
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(PENDING);
 
-      // Mock web3 repsonse
+      // Mock web3 response
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
       // Assert fulfilled
       expect(result.current.amountContributed).toBe(200);
+      expect(result.current.amountContributedStatus).toBe(FULFILLED);
+
+      // Cleanup
+
+      spy.mockRestore();
+      (config as any).DEFAULT_CHAIN = originalDefaultChain;
+    });
+  });
+
+  test('should return correct data when multiple of chunk size, but greater than expected max amount in transfers', async () => {
+    const MODIFIED_LOGS_RESULT = [
+      ...DEFAULT_LOGS_RESULT,
+      {
+        address: '0x1D96d039d384d3ECCaD6f07aAB27A49408A1Cf2B',
+        blockHash:
+          '0xc71df7ee20cb6f91c1b4f78912e8436d57c93f7646f08e19492f47fca331d5d9',
+        blockNumber: 13290895,
+        /**
+         * web3Instance.eth.abi.encodeParameters(
+         *  ['bytes32', 'uint256'],
+         *  [KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH, '30000000000000000000']
+         * );
+         */
+        data: '0xb024dc66daa5f76b3a0f3ca4879dc87b33f90cea509e863f3e0955b6222a3a1e000000000000000000000000000000000000000000000001a055690d9db80000',
+        logIndex: 56,
+        removed: false,
+        topics: [
+          // sha3('ConfigurationUpdated(bytes32,uint256)');
+          '0x50bc2a45e7693135e6950fb78733dccb013ce4c6b62f17dbbda5131d8d0fac29',
+        ],
+        transactionHash:
+          '0xae49dbd78d15dd8ce91c4927b93736cbf9e2f129ab1c9a17180702cb1908651b',
+        transactionIndex: 29,
+        id: 'log_292c238f',
+      },
+      {
+        address: '0x1D96d039d384d3ECCaD6f07aAB27A49408A1Cf2B',
+        blockHash:
+          '0xc71df7ee20cb6f91c1b4f78912e8436d57c93f7646f08e19492f47fca331d5d9',
+        blockNumber: 13290895,
+        /**
+         * web3Instance.eth.abi.encodeParameters(
+         *  ['bytes32', 'uint256'],
+         *  [KYC_ONBOARDING_MAXIMUM_CHUNKS_KEY_HASH, 2]
+         * );
+         */
+        data: '0x30671f20b402b0209c539f216c8370ad5c14d6756f759a0bb3e1c2b4869e9f2f0000000000000000000000000000000000000000000000000000000000000002',
+        logIndex: 57,
+        removed: false,
+        topics: [
+          // sha3('ConfigurationUpdated(bytes32,uint256)');
+          '0x50bc2a45e7693135e6950fb78733dccb013ce4c6b62f17dbbda5131d8d0fac29',
+        ],
+        transactionHash:
+          '0xae49dbd78d15dd8ce91c4927b93736cbf9e2f129ab1c9a17180702cb1908651b',
+        transactionIndex: 29,
+        id: 'log_c9710de2',
+      },
+    ];
+
+    // Mock chain to be production so hook will run
+    (config as any).DEFAULT_CHAIN = 1;
+
+    const useIsDefaultChain = await import(
+      '../../web3/hooks/useIsDefaultChain'
+    );
+
+    // Mock `useDefaultChain` for `Init`; `isDefaultChain` should be `true`
+    const spy = jest
+      .spyOn(useIsDefaultChain, 'useIsDefaultChain')
+      .mockImplementation(() => ({
+        defaultChain: 1,
+        defaultChainError: undefined,
+        isDefaultChain: true,
+      }));
+
+    // Mock Alchemy response with assets that are greater than expected max
+    // contribution amount
+    server.use(
+      rest.post('https://eth-mainnet.alchemyapi.io/v2/*', (req, res, ctx) => {
+        const {body} = req;
+
+        if (typeof body === 'object') {
+          // `alchemy_getAssetTransfers`
+          if (body.method === 'alchemy_getAssetTransfers') {
+            return res(
+              ctx.json({
+                ...getAssetTransfersFixture,
+                result: {
+                  ...getAssetTransfersFixture.result,
+                  transfers: [
+                    ...getAssetTransfersFixture.result.transfers,
+                    {
+                      blockNum: '0xcace2e',
+                      hash: '0x13d460778ee6fe4595bc83c2b31fc742601e59ff9fe4025a1a42025b3bf79328',
+                      from: '0x3e9425919e7f806ff0d4c29869f59e55970385fa',
+                      to: '0xa9a70e66830bcf9776c23fb1df708d7ad498e6e6',
+                      // multiple of chunk size '30000000000000000000'
+                      value: 60, // to wei '60000000000000000000'
+                      erc721TokenId: null,
+                      erc1155Metadata: null,
+                      asset: 'ETH',
+                      category: 'token',
+                      rawContract: {
+                        value: '0x02b5e3af16b1880000',
+                        address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                        decimal: '0x12',
+                      },
+                    },
+                    // this large transfer value should be filtered out
+                    {
+                      blockNum: '0xcace2e',
+                      hash: '0x13d460778ee6fe4595bc83c2b31fc742601e59ff9fe4025a1a42025b3bf79328',
+                      from: '0x3e9425919e7f806ff0d4c29869f59e55970385fa',
+                      to: '0xa9a70e66830bcf9776c23fb1df708d7ad498e6e6',
+                      // greater than (greatest chunk size value
+                      // '50000000000000000000') * (greatest maximum chunks
+                      // value '3') =  '150000000000000000000'
+                      value: 200, // to wei '200000000000000000000'
+                      erc721TokenId: null,
+                      erc1155Metadata: null,
+                      asset: 'ETH',
+                      category: 'token',
+                      rawContract: {
+                        value: '0x02b5e3af16b1880000',
+                        address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                        decimal: '0x12',
+                      },
+                    },
+                  ],
+                },
+              })
+            );
+          }
+        }
+      })
+    );
+
+    let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
+
+    await act(async () => {
+      const {result, waitForValueToChange} = await renderHook(
+        () => useTotalAmountContributedMultisig(),
+        {
+          wrapper: Wrapper,
+          initialProps: {
+            getProps(p) {
+              mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
+            },
+            useInit: true,
+            useWallet: true,
+          },
+        }
+      );
+
+      // Assert initial
+      expect(result.current.amountContributed).toBe(0);
+      expect(result.current.amountContributedStatus).toBe(STANDBY);
+
+      // Mock Web3 result for `getAddressConfiguration.call()`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+      );
+
+      await waitForValueToChange(() => result.current.amountContributedStatus);
+
+      // Assert pending
+      expect(result.current.amountContributed).toBe(0);
+      expect(result.current.amountContributedStatus).toBe(PENDING);
+
+      // Mock web3 response
+      mockWeb3Provider.injectResult(MODIFIED_LOGS_RESULT);
+
+      await waitForValueToChange(() => result.current.amountContributedStatus);
+
+      // Assert fulfilled
+      expect(result.current.amountContributed).toBe(260);
       expect(result.current.amountContributedStatus).toBe(FULFILLED);
 
       // Cleanup
@@ -326,15 +685,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
     );
 
     let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
+        () => useTotalAmountContributedMultisig(),
         {
           wrapper: Wrapper,
           initialProps: {
             getProps(p) {
               mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
             useInit: true,
             useWallet: true,
@@ -346,13 +707,18 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(STANDBY);
 
+      // Mock Web3 result for `getAddressConfiguration.call()`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+      );
+
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
       // Assert pending
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(PENDING);
 
-      // Mock web3 repsonse
+      // Mock web3 response
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
@@ -386,15 +752,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       }));
 
     let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
+        () => useTotalAmountContributedMultisig(),
         {
           wrapper: Wrapper,
           initialProps: {
             getProps(p) {
               mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
             useInit: true,
             useWallet: true,
@@ -405,6 +773,11 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       // Assert initial
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(STANDBY);
+
+      // Mock Web3 result for `getAddressConfiguration.call()`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+      );
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
@@ -438,7 +811,7 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
   test('should not run if not mainnet', async () => {
     await act(async () => {
       const {result, waitForNextUpdate} = await renderHook(
-        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
+        () => useTotalAmountContributedMultisig(),
         {
           wrapper: Wrapper,
           initialProps: {

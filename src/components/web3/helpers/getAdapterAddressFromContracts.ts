@@ -40,6 +40,8 @@ export function getAdapterAddressFromContracts(
         return '';
       case ContractAdapterNames.guildkick:
         return '';
+      case ContractAdapterNames.kyc_onboarding:
+        return getContractAddressOrThrow(contracts.KycOnboardingContract);
       case ContractAdapterNames.managing:
         return getContractAddressOrThrow(contracts.ManagingContract);
       case ContractAdapterNames.onboarding:
