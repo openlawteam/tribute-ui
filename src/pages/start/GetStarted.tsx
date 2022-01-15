@@ -5,7 +5,6 @@ import '../../../node_modules/aos/dist/aos.css';
 
 import {CenterLogo} from '../../components/logo';
 import {NavHamburger} from '../../components/Nav';
-import {TotalContributedAmount} from '../../components/kyc-onboarding';
 import FadeIn from '../../components/common/FadeIn';
 import SocialMedia from '../../components/common/SocialMedia';
 import Wrap from '../../components/common/Wrap';
@@ -73,8 +72,6 @@ export default function GetStarted() {
             <div className="landing__img">
               <TributeCube />
             </div>
-
-            <TotalContributedAmount multisigAddress="0x9ddbdcD3C5123E673E4B96992101F8CEafCd95A0" />
 
             <div className="landing__button">
               <button
