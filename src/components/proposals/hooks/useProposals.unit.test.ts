@@ -167,7 +167,7 @@ const mockWeb3Responses: Parameters<typeof Wrapper>[0]['getProps'] = ({
    * Mock results for `useProposalsVotes`
    *
    * @note Maintain the same order as the contract's struct.
-   * @note We use the same, single result for any off-chain votes repsonses for testing only.
+   * @note We use the same, single result for any off-chain votes responses for testing only.
    */
   const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
     {
@@ -685,7 +685,7 @@ describe('useProposals unit tests', () => {
        * Mock results for `useProposalsVotes`
        *
        * @note Maintain the same order as the contract's struct.
-       * @note We use the same, single result for any off-chain votes repsonses for testing only.
+       * @note We use the same, single result for any off-chain votes responses for testing only.
        */
       const offchainVotesDataResponse = web3Instance.eth.abi.encodeParameter(
         {
