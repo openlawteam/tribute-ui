@@ -45,10 +45,10 @@ const DEFAULT_LOGS_RESULT = [
     /**
      * web3Instance.eth.abi.encodeParameters(
      *  ['bytes32', 'uint256'],
-     *  [KYC_ONBOARDING_MAXIMUM_CHUNKS_KEY_HASH, 3]
+     *  [KYC_ONBOARDING_MAXIMUM_CHUNKS_CONFIG_KEY_HASH, 3]
      * );
      */
-    data: '0x30671f20b402b0209c539f216c8370ad5c14d6756f759a0bb3e1c2b4869e9f2f0000000000000000000000000000000000000000000000000000000000000003',
+    data: '0x69fca5d139dbd5583b465b34fb3ac5287b00e6ae381ca8d5f3029486f60db9c20000000000000000000000000000000000000000000000000000000000000003',
     logIndex: 55,
     removed: false,
     topics: [
@@ -141,10 +141,10 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
         /**
          * web3Instance.eth.abi.encodeParameters(
          *  ['bytes32', 'uint256'],
-         *  [KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH, '30000000000000000000']
+         *  [KYC_ONBOARDING_CHUNK_SIZE_CONFIG_KEY_HASH, '30000000000000000000']
          * );
          */
-        data: '0xb024dc66daa5f76b3a0f3ca4879dc87b33f90cea509e863f3e0955b6222a3a1e000000000000000000000000000000000000000000000001a055690d9db80000',
+        data: '0x7096823768c7b22c230a00de80487025954817802186dbc0550561c089cceb3f000000000000000000000000000000000000000000000001a055690d9db80000',
         logIndex: 56,
         removed: false,
         topics: [
@@ -493,10 +493,10 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
         /**
          * web3Instance.eth.abi.encodeParameters(
          *  ['bytes32', 'uint256'],
-         *  [KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH, '30000000000000000000']
+         *  [KYC_ONBOARDING_CHUNK_SIZE_CONFIG_KEY_HASH, '30000000000000000000']
          * );
          */
-        data: '0xb024dc66daa5f76b3a0f3ca4879dc87b33f90cea509e863f3e0955b6222a3a1e000000000000000000000000000000000000000000000001a055690d9db80000',
+        data: '0x7096823768c7b22c230a00de80487025954817802186dbc0550561c089cceb3f000000000000000000000000000000000000000000000001a055690d9db80000',
         logIndex: 56,
         removed: false,
         topics: [
@@ -516,10 +516,10 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
         /**
          * web3Instance.eth.abi.encodeParameters(
          *  ['bytes32', 'uint256'],
-         *  [KYC_ONBOARDING_MAXIMUM_CHUNKS_KEY_HASH, 2]
+         *  [KYC_ONBOARDING_MAXIMUM_CHUNKS_CONFIG_KEY_HASH, 2]
          * );
          */
-        data: '0x30671f20b402b0209c539f216c8370ad5c14d6756f759a0bb3e1c2b4869e9f2f0000000000000000000000000000000000000000000000000000000000000002',
+        data: '0x69fca5d139dbd5583b465b34fb3ac5287b00e6ae381ca8d5f3029486f60db9c20000000000000000000000000000000000000000000000000000000000000002',
         logIndex: 57,
         removed: false,
         topics: [
