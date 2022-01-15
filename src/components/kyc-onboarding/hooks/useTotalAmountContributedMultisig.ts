@@ -3,8 +3,12 @@ import {useCallback, useEffect, useState} from 'react';
 import {useQuery} from 'react-query';
 import {useSelector} from 'react-redux';
 
-import {alchemyFetchAssetTransfers} from '../../web3/helpers';
+import {
+  alchemyFetchAssetTransfers,
+  getDAOAddressConfigEntry,
+} from '../../web3/helpers';
 import {AsyncStatus} from '../../../util/types';
+import {BURN_ADDRESS} from '../../../util/constants';
 import {CHAINS, DEFAULT_CHAIN, ONBOARDING_TOKEN_ADDRESS} from '../../../config';
 import {ConfigurationUpdated} from '../../../abis/types/DaoRegistry';
 import {ContractDAOConfigKeys} from '../../web3/types';
@@ -36,13 +40,10 @@ const KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH = sha3(
  *
  * This hook will only run on mainnet due to constraints from the Alchemy Transfers API.
  *
- * @todo Get multisig addresses from the DAO config dynamically
  * @todo Allow Alchemy parameters to be passed in
  * @todo Allow `ALLOWED_ASSETS` to be passed in
  */
-export function useTotalAmountContributedMultisig(
-  multisigAddress: string
-): UseTotalAmountContributedReturn {
+export function useTotalAmountContributedMultisig(): UseTotalAmountContributedReturn {
   /**
    * Selectors
    */
@@ -53,6 +54,10 @@ export function useTotalAmountContributedMultisig(
 
   const daoABI = useSelector(
     (s: StoreState) => s.contracts.DaoRegistryContract?.abi
+  );
+
+  const daoInstance = useSelector(
+    (s: StoreState) => s.contracts.DaoRegistryContract?.instance
   );
 
   /**
@@ -77,8 +82,8 @@ export function useTotalAmountContributedMultisig(
     abortController,
     daoABI,
     daoAddress,
+    daoInstance,
     isMountedRef,
-    multisigAddress,
     web3Instance,
   ]);
 
@@ -119,6 +124,7 @@ export function useTotalAmountContributedMultisig(
         DEFAULT_CHAIN !== CHAINS.MAINNET ||
         !daoAddress ||
         !daoABI ||
+        !daoInstance ||
         !web3Instance ||
         !CONFIGURATION_UPDATED_EVENT_SIGNATURE_HASH ||
         !KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH
@@ -145,6 +151,20 @@ export function useTotalAmountContributedMultisig(
 
       if (!configurationUpdatedEventInputs) return;
 
+      /**
+       * Get KycOnboarding fundTargetAddress from the DAO address config
+       *
+       * Assumes we care about only the latest fundTargetAddress value to
+       * calculate the total contribution amount
+       * */
+      const fundTargetAddress = await getDAOAddressConfigEntry(
+        daoInstance,
+        ContractDAOConfigKeys.kycOnboardingFundTargetAddress,
+        ONBOARDING_TOKEN_ADDRESS
+      );
+
+      if (!fundTargetAddress || fundTargetAddress === BURN_ADDRESS) return;
+
       setAmountContributedStatus(PENDING);
 
       const transfers = await alchemyFetchAssetTransfers(
@@ -156,7 +176,7 @@ export function useTotalAmountContributedMultisig(
            */
           fromBlock: 11565019,
           category: ['external', 'internal', 'token'],
-          toAddress: multisigAddress,
+          toAddress: fundTargetAddress,
         },
         {abortController}
       );

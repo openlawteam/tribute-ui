@@ -1,4 +1,5 @@
 import {act, renderHook} from '@testing-library/react-hooks';
+import Web3 from 'web3';
 
 import {AsyncStatus} from '../../../util/types';
 import {DEFAULT_ETH_ADDRESS, FakeHttpProvider} from '../../../test/helpers';
@@ -57,15 +58,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       }));
 
     let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
+        () => useTotalAmountContributedMultisig(),
         {
           wrapper: Wrapper,
           initialProps: {
             getProps(p) {
               mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
             useInit: true,
             useWallet: true,
@@ -76,6 +79,11 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       // Assert initial
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(STANDBY);
+
+      // Mock Web3 result for `getAddressConfiguration.call()`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+      );
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
@@ -158,15 +166,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
     );
 
     let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
+        () => useTotalAmountContributedMultisig(),
         {
           wrapper: Wrapper,
           initialProps: {
             getProps(p) {
               mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
             useInit: true,
             useWallet: true,
@@ -177,6 +187,11 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       // Assert initial
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(STANDBY);
+
+      // Mock Web3 result for `getAddressConfiguration.call()`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+      );
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
@@ -259,15 +274,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
     );
 
     let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
+        () => useTotalAmountContributedMultisig(),
         {
           wrapper: Wrapper,
           initialProps: {
             getProps(p) {
               mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
             useInit: true,
             useWallet: true,
@@ -278,6 +295,11 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       // Assert initial
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(STANDBY);
+
+      // Mock Web3 result for `getAddressConfiguration.call()`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+      );
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
@@ -326,15 +348,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
     );
 
     let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
+        () => useTotalAmountContributedMultisig(),
         {
           wrapper: Wrapper,
           initialProps: {
             getProps(p) {
               mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
             useInit: true,
             useWallet: true,
@@ -345,6 +369,11 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       // Assert initial
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(STANDBY);
+
+      // Mock Web3 result for `getAddressConfiguration.call()`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+      );
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
@@ -386,15 +415,17 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       }));
 
     let mockWeb3Provider: FakeHttpProvider;
+    let web3Instance: Web3;
 
     await act(async () => {
       const {result, waitForValueToChange} = await renderHook(
-        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
+        () => useTotalAmountContributedMultisig(),
         {
           wrapper: Wrapper,
           initialProps: {
             getProps(p) {
               mockWeb3Provider = p.mockWeb3Provider;
+              web3Instance = p.web3Instance;
             },
             useInit: true,
             useWallet: true,
@@ -405,6 +436,11 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
       // Assert initial
       expect(result.current.amountContributed).toBe(0);
       expect(result.current.amountContributedStatus).toBe(STANDBY);
+
+      // Mock Web3 result for `getAddressConfiguration.call()`
+      mockWeb3Provider.injectResult(
+        web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
+      );
 
       await waitForValueToChange(() => result.current.amountContributedStatus);
 
@@ -438,7 +474,7 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
   test('should not run if not mainnet', async () => {
     await act(async () => {
       const {result, waitForNextUpdate} = await renderHook(
-        () => useTotalAmountContributedMultisig(DEFAULT_ETH_ADDRESS),
+        () => useTotalAmountContributedMultisig(),
         {
           wrapper: Wrapper,
           initialProps: {

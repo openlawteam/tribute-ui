@@ -5,7 +5,6 @@ import {useTotalAmountContributedMultisig} from '.';
 import FadeIn from '../common/FadeIn';
 
 type TotalContributedAmountProps = {
-  multisigAddress: string;
   render?: (
     v: ReturnType<typeof useTotalAmountContributedMultisig> & {
       formatted: string;
@@ -17,9 +16,9 @@ type TotalContributedAmountProps = {
 export function TotalContributedAmount(
   props: TotalContributedAmountProps
 ): JSX.Element | null {
-  const {multisigAddress, render, rootElementProps} = props;
+  const {render, rootElementProps} = props;
 
-  const result = useTotalAmountContributedMultisig(multisigAddress);
+  const result = useTotalAmountContributedMultisig();
 
   // Custom render
   if (render) {

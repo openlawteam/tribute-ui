@@ -57,8 +57,16 @@ describe('TotalContributedAmount unit tests', () => {
         useWallet
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
+
+          // Mock Web3 result for `getAddressConfiguration.call()`
+          mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            )
+          );
         }}>
-        <TotalContributedAmount multisigAddress={DEFAULT_ETH_ADDRESS} />
+        <TotalContributedAmount />
       </Wrapper>
     );
 
@@ -104,9 +112,16 @@ describe('TotalContributedAmount unit tests', () => {
         useWallet
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
+
+          // Mock Web3 result for `getAddressConfiguration.call()`
+          mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            )
+          );
         }}>
         <TotalContributedAmount
-          multisigAddress={DEFAULT_ETH_ADDRESS}
           render={({amountContributed}) => {
             return <div>{amountContributed} ETH is in the DAO</div>;
           }}
@@ -196,8 +211,16 @@ describe('TotalContributedAmount unit tests', () => {
         useWallet
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
+
+          // Mock Web3 result for `getAddressConfiguration.call()`
+          mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            )
+          );
         }}>
-        <TotalContributedAmount multisigAddress={DEFAULT_ETH_ADDRESS} />
+        <TotalContributedAmount />
       </Wrapper>
     );
 
@@ -283,8 +306,16 @@ describe('TotalContributedAmount unit tests', () => {
         useWallet
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
+
+          // Mock Web3 result for `getAddressConfiguration.call()`
+          mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            )
+          );
         }}>
-        <TotalContributedAmount multisigAddress={DEFAULT_ETH_ADDRESS} />
+        <TotalContributedAmount />
       </Wrapper>
     );
 
