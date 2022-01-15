@@ -34,6 +34,10 @@ const KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH = sha3(
   ContractDAOConfigKeys.kycOnboardingChunkSize
 );
 
+const KYC_ONBOARDING_MAXIMUM_CHUNKS_KEY_HASH = sha3(
+  ContractDAOConfigKeys.kycOnboardingMaximumChunks
+);
+
 /**
  * Returns the total amount of ETH, WETH contributed to the DAO's fund target
  * address (which is typically a multi-sig wallet on mainnet) via
@@ -128,7 +132,8 @@ export function useTotalAmountContributedMultisig(): UseTotalAmountContributedRe
         !daoInstance ||
         !web3Instance ||
         !CONFIGURATION_UPDATED_EVENT_SIGNATURE_HASH ||
-        !KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH
+        !KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH ||
+        !KYC_ONBOARDING_MAXIMUM_CHUNKS_KEY_HASH
       ) {
         return;
       }
@@ -139,23 +144,27 @@ export function useTotalAmountContributedMultisig(): UseTotalAmountContributedRe
 
       if (!configurationUpdatedEventInputs) return;
 
-      // Get KycOnboarding fundTargetAddress from the DAO address config dynamically
+      /**
+       * Get KycOnboarding fundTargetAddress from the DAO address config
+       *
+       *
+       * Assumes we care about only the latest fundTargetAddress value to
+       * calculate the total contribution amount
+       * */
       const fundTargetAddress = await getDAOAddressConfigEntry(
         ContractDAOConfigKeys.kycOnboardingFundTargetAddress,
         daoInstance
       );
 
-      if (!fundTargetAddress || fundTargetAddress === BURN_ADDRESS) {
-        console.log('No kyc-onboarding.fundTargetAddress config found.');
-        return;
-      }
+      if (!fundTargetAddress || fundTargetAddress === BURN_ADDRESS) return;
 
       setAmountContributedStatus(PENDING);
 
       const transfers = await alchemyFetchAssetTransfers(
         {
           /**
-           * Leave a generous block filter where no tribute-contracts would've been deployed to mainnet.
+           * Leave a generous block filter where no tribute-contracts would've
+           * been deployed to mainnet.
            *
            * 2021-01-01 00:00:00
            */
@@ -191,8 +200,40 @@ export function useTotalAmountContributedMultisig(): UseTotalAmountContributedRe
         // Only take the config `value`s, converted to ETH
         .map((c) => fromWei(c.value, 'ether'));
 
+      const maximumChunksValues = daoConfigUpdatedLogs
+        // Decode each log
+        .map(
+          (c) =>
+            web3Instance.eth.abi.decodeLog(
+              configurationUpdatedEventInputs,
+              c.data,
+              [CONFIGURATION_UPDATED_EVENT_SIGNATURE_HASH]
+            ) as any as ConfigurationUpdated['returnValues']
+        )
+        // Only take `key`s matching `KYC_ONBOARDING_MAXIMUM_CHUNKS_KEY_HASH`
+        .filter(
+          (d) =>
+            normalizeString(d.key) ===
+            normalizeString(KYC_ONBOARDING_MAXIMUM_CHUNKS_KEY_HASH)
+        )
+        // Only take the config `value`s
+        .map((c) => c.value);
+
       /**
-       * Get amount contributed
+       * Get expected maximum amount that could have been contributed by each
+       * member.
+       *
+       * Assumes we care about only the greatest chunkSize and maximumChunks
+       * values to calculate the amount.
+       *
+       * Assumes we're working with normal `number`s, not big numbers.
+       */
+      const expectedMaxAmount: number =
+        Math.max(...chunkSizeValues.map(Number)) *
+        Math.max(...maximumChunksValues.map(Number));
+
+      /**
+       * Get total amount contributed
        *
        * Assumes we're working with normal `number`s, not big numbers.
        */
@@ -204,6 +245,9 @@ export function useTotalAmountContributedMultisig(): UseTotalAmountContributedRe
         .map((t) => t.value)
         // Only take values which are multiples of a chunk size config value
         .filter((v) => v && chunkSizeValues.some((c) => v % Number(c) === 0))
+        // Only take values which are less than or equal to the
+        // expectedMaxAmount
+        .filter((mv) => mv && mv <= expectedMaxAmount)
         .reduce((acc: number, next) => (acc += next || 0), 0);
 
       if (!isMountedRef.current) return;
