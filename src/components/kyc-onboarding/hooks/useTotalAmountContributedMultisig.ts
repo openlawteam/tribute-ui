@@ -35,10 +35,12 @@ const KYC_ONBOARDING_CHUNK_SIZE_KEY_HASH = sha3(
 );
 
 /**
- * Returns the total amount of ETH, WETH contributed to the DAO's multi-sig
- * via `KycOnboarding` transfers and direct transfers.
+ * Returns the total amount of ETH, WETH contributed to the DAO's fund target
+ * address (which is typically a multi-sig wallet on mainnet) via
+ * `KycOnboarding` transfers and direct transfers.
  *
- * This hook will only run on mainnet due to constraints from the Alchemy Transfers API.
+ * This hook will only run on mainnet due to constraints from the Alchemy
+ * Transfers API.
  *
  * @todo Allow Alchemy parameters to be passed in
  * @todo Allow `ALLOWED_ASSETS` to be passed in
