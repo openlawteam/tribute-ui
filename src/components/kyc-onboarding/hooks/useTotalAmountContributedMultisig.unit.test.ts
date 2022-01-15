@@ -549,7 +549,8 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
         isDefaultChain: true,
       }));
 
-    // Mock Alchemy response with assets that are multiple of second chunk size config ('30000000000000000000')
+    // Mock Alchemy response with assets that are greater than expected max
+    // contribution amount
     server.use(
       rest.post('https://eth-mainnet.alchemyapi.io/v2/*', (req, res, ctx) => {
         const {body} = req;
@@ -587,7 +588,9 @@ describe('useTotalAmountContributedMultisig unit tests', () => {
                       hash: '0x13d460778ee6fe4595bc83c2b31fc742601e59ff9fe4025a1a42025b3bf79328',
                       from: '0x3e9425919e7f806ff0d4c29869f59e55970385fa',
                       to: '0xa9a70e66830bcf9776c23fb1df708d7ad498e6e6',
-                      // greater than (greatest chunk size value '50000000000000000000') * (greatest maximum chunks value '3') =  '150000000000000000000'
+                      // greater than (greatest chunk size value
+                      // '50000000000000000000') * (greatest maximum chunks
+                      // value '3') =  '150000000000000000000'
                       value: 200, // to wei '200000000000000000000'
                       erc721TokenId: null,
                       erc1155Metadata: null,
