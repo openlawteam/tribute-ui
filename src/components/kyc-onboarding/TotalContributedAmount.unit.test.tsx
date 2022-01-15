@@ -31,6 +31,29 @@ const DEFAULT_LOGS_RESULT = [
     transactionIndex: 29,
     id: 'log_79e8ecdf',
   },
+  {
+    address: '0x1D96d039d384d3ECCaD6f07aAB27A49408A1Cf2B',
+    blockHash:
+      '0xc71df7ee20cb6f91c1b4f78912e8436d57c93f7646f08e19492f47fca331d5d9',
+    blockNumber: 13290895,
+    /**
+     * web3Instance.eth.abi.encodeParameters(
+     *  ['bytes32', 'uint256'],
+     *  [KYC_ONBOARDING_MAXIMUM_CHUNKS_CONFIG_KEY_HASH, 100]
+     * );
+     */
+    data: '0x69fca5d139dbd5583b465b34fb3ac5287b00e6ae381ca8d5f3029486f60db9c20000000000000000000000000000000000000000000000000000000000000064',
+    logIndex: 55,
+    removed: false,
+    topics: [
+      // sha3('ConfigurationUpdated(bytes32,uint256)');
+      '0x50bc2a45e7693135e6950fb78733dccb013ce4c6b62f17dbbda5131d8d0fac29',
+    ],
+    transactionHash:
+      '0xae49dbd78d15dd8ce91c4927b93736cbf9e2f129ab1c9a17180702cb1908651b',
+    transactionIndex: 29,
+    id: 'log_5118158c',
+  },
 ];
 
 describe('TotalContributedAmount unit tests', () => {
@@ -57,8 +80,16 @@ describe('TotalContributedAmount unit tests', () => {
         useWallet
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
+
+          // Mock Web3 result for `getAddressConfiguration.call()`
+          mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            )
+          );
         }}>
-        <TotalContributedAmount multisigAddress={DEFAULT_ETH_ADDRESS} />
+        <TotalContributedAmount />
       </Wrapper>
     );
 
@@ -67,7 +98,7 @@ describe('TotalContributedAmount unit tests', () => {
       expect(() => getByText(/eth contributed$/i)).toThrow();
     });
 
-    // Mock web3 repsonse
+    // Mock web3 response
     await waitFor(() => {
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
     });
@@ -104,9 +135,16 @@ describe('TotalContributedAmount unit tests', () => {
         useWallet
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
+
+          // Mock Web3 result for `getAddressConfiguration.call()`
+          mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            )
+          );
         }}>
         <TotalContributedAmount
-          multisigAddress={DEFAULT_ETH_ADDRESS}
           render={({amountContributed}) => {
             return <div>{amountContributed} ETH is in the DAO</div>;
           }}
@@ -119,7 +157,7 @@ describe('TotalContributedAmount unit tests', () => {
       expect(() => getByText(/eth contributed$/i)).toThrow();
     });
 
-    // Mock web3 repsonse
+    // Mock web3 response
     await waitFor(() => {
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
     });
@@ -196,8 +234,16 @@ describe('TotalContributedAmount unit tests', () => {
         useWallet
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
+
+          // Mock Web3 result for `getAddressConfiguration.call()`
+          mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            )
+          );
         }}>
-        <TotalContributedAmount multisigAddress={DEFAULT_ETH_ADDRESS} />
+        <TotalContributedAmount />
       </Wrapper>
     );
 
@@ -206,7 +252,7 @@ describe('TotalContributedAmount unit tests', () => {
       expect(() => getByText(/eth contributed$/i)).toThrow();
     });
 
-    // Mock web3 repsonse
+    // Mock web3 response
     await waitFor(() => {
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
     });
@@ -255,7 +301,7 @@ describe('TotalContributedAmount unit tests', () => {
                       from: '0x3e9425919e7f806ff0d4c29869f59e55970385fa',
                       to: '0xa9a70e66830bcf9776c23fb1df708d7ad498e6e6',
                       // Value to format
-                      value: 500000,
+                      value: 5000,
                       erc721TokenId: null,
                       erc1155Metadata: null,
                       asset: 'ETH',
@@ -283,8 +329,16 @@ describe('TotalContributedAmount unit tests', () => {
         useWallet
         getProps={(p) => {
           mockWeb3Provider = p.mockWeb3Provider;
+
+          // Mock Web3 result for `getAddressConfiguration.call()`
+          mockWeb3Provider.injectResult(
+            p.web3Instance.eth.abi.encodeParameter(
+              'address',
+              DEFAULT_ETH_ADDRESS
+            )
+          );
         }}>
-        <TotalContributedAmount multisigAddress={DEFAULT_ETH_ADDRESS} />
+        <TotalContributedAmount />
       </Wrapper>
     );
 
@@ -293,13 +347,13 @@ describe('TotalContributedAmount unit tests', () => {
       expect(() => getByText(/eth contributed$/i)).toThrow();
     });
 
-    // Mock web3 repsonse
+    // Mock web3 response
     await waitFor(() => {
       mockWeb3Provider.injectResult(DEFAULT_LOGS_RESULT);
     });
 
     await waitFor(() => {
-      expect(getByText(/^500,000 eth contributed/i)).toBeInTheDocument();
+      expect(getByText(/^5,000 eth contributed/i)).toBeInTheDocument();
     });
 
     // Cleanup

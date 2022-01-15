@@ -3,7 +3,7 @@ import Web3 from 'web3';
 import {ContractDAOConfigKeys} from '../types';
 import {DaoRegistry} from '../../../abis/types/DaoRegistry';
 
-export async function getDAOConfigEntry(
+export async function getDAOAddressConfigEntry(
   daoContractInstance: DaoRegistry | undefined,
   configKey: ContractDAOConfigKeys,
   address?: string // additional argument to get concatenated hash used in some tribute contracts
@@ -31,7 +31,7 @@ export async function getDAOConfigEntry(
     }
 
     return await daoContractInstance.methods
-      .getConfiguration(configKeySha3)
+      .getAddressConfiguration(configKeySha3)
       .call();
   } catch (error) {
     throw error;

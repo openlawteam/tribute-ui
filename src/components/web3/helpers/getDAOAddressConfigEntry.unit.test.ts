@@ -3,12 +3,12 @@ import {AbiItem} from 'web3-utils/types';
 import {ContractDAOConfigKeys} from '../types';
 import {DAO_REGISTRY_CONTRACT_ADDRESS} from '../../../config';
 import {DaoRegistry} from '../../../abis/types/DaoRegistry';
-import {getDAOConfigEntry} from '.';
+import {getDAOAddressConfigEntry} from '.';
 import {DEFAULT_ETH_ADDRESS, getWeb3Instance} from '../../../test/helpers';
 import DaoRegistryABI from '../../../abis/tribute-contracts/DaoRegistry.json';
 
-describe('getDAOConfigEntry unit tests', () => {
-  test('should return correct config value', async () => {
+describe('getDAOAddressConfigEntry unit tests', () => {
+  test('should return correct address config value', async () => {
     const {web3, mockWeb3Provider} = getWeb3Instance();
     const contractAddress = DAO_REGISTRY_CONTRACT_ADDRESS;
     const instance = new web3.eth.Contract(
@@ -16,17 +16,19 @@ describe('getDAOConfigEntry unit tests', () => {
       contractAddress
     ) as any as DaoRegistry;
 
-    const result: [string] = [web3.eth.abi.encodeParameter('uint256', 1000)];
+    const result: [string] = [
+      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
+    ];
 
-    // Inject Web3 result for `getConfiguration.call()`
+    // Inject Web3 result for `getAddressConfiguration.call()`
     mockWeb3Provider.injectResult(...result);
 
-    const configEntry = await getDAOConfigEntry(
+    const configEntry = await getDAOAddressConfigEntry(
       instance,
-      ContractDAOConfigKeys.offchainVotingVotingPeriod
+      ContractDAOConfigKeys.kycOnboardingFundTargetAddress
     );
 
-    expect(configEntry).toBe('1000');
+    expect(configEntry).toBe(DEFAULT_ETH_ADDRESS);
   });
 
   test('should return correct config value if optional third argument provided', async () => {
@@ -37,27 +39,29 @@ describe('getDAOConfigEntry unit tests', () => {
       contractAddress
     ) as any as DaoRegistry;
 
-    const result: [string] = [web3.eth.abi.encodeParameter('uint256', 1000)];
+    const result: [string] = [
+      web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
+    ];
 
-    // Inject Web3 result for `getConfiguration.call()`
+    // Inject Web3 result for `getAddressConfiguration.call()`
     mockWeb3Provider.injectResult(...result);
 
-    const configEntry = await getDAOConfigEntry(
+    const configEntry = await getDAOAddressConfigEntry(
       instance,
-      ContractDAOConfigKeys.offchainVotingVotingPeriod,
+      ContractDAOConfigKeys.kycOnboardingFundTargetAddress,
       DEFAULT_ETH_ADDRESS
     );
 
-    expect(configEntry).toBe('1000');
+    expect(configEntry).toBe(DEFAULT_ETH_ADDRESS);
   });
 
   test('should throw if no contract instance provided', async () => {
     let capturedError: string = '';
 
     try {
-      await getDAOConfigEntry(
+      await getDAOAddressConfigEntry(
         undefined,
-        ContractDAOConfigKeys.offchainVotingVotingPeriod
+        ContractDAOConfigKeys.kycOnboardingFundTargetAddress
       );
     } catch (error) {
       capturedError = error.message;
