@@ -252,7 +252,7 @@ export default function useMembers(): UseMembersReturn {
 
         const balanceOfABI = bankABI.find((item) => item.name === 'balanceOf');
 
-        const unitsBalanceOfCalls = memberAddressesByDelegatedKey.map(
+        const unitsBalanceOfCalls = memberAddresses.map(
           (address): MulticallTuple => [
             bankAddress,
             balanceOfABI as AbiItem,
