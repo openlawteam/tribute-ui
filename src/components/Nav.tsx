@@ -98,14 +98,11 @@ export function NavHamburger() {
    */
 
   // const isCurrentMemberOrDelegateConnected: boolean =
-  //   account &&
-  //   (connectedMember?.isActiveMember || connectedMember?.isAddressDelegated)
-  //     ? true
-  //     : false;
+  //   account && connectedMember?.isActiveMember ? true : false;
 
   const isCurrentMemberConnected: boolean =
     account &&
-    (connectedMember?.isActiveMember || connectedMember?.isAddressDelegated) &&
+    connectedMember?.isActiveMember &&
     account.toLowerCase() === connectedMember?.memberAddress.toLowerCase()
       ? true
       : false;
