@@ -204,6 +204,10 @@ export default function KycOnboardingForm() {
     (s: StoreState) => s.connectedMember?.isActiveMember
   );
 
+  const isAddressDelegated = useSelector(
+    (s: StoreState) => s.connectedMember?.isAddressDelegated
+  );
+
   /**
    * Our hooks
    */
@@ -736,7 +740,7 @@ export default function KycOnboardingForm() {
         );
       }
 
-      if (isActiveMember) {
+      if (isActiveMember || isAddressDelegated) {
         throw new Error('The applicant address is already a member.');
       }
 

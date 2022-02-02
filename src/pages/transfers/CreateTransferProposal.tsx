@@ -76,6 +76,12 @@ type TokenDetails = InitialTokenDetails & {
   decimals: number;
 };
 
+const getDelegatedAddressMessage = (a: string) =>
+  `Your member address is delegated to ${truncateEthAddress(
+    a,
+    7
+  )}. You must use that address.`;
+
 export default function CreateTransferProposal() {
   /**
    * Selectors
@@ -89,6 +95,12 @@ export default function CreateTransferProposal() {
   );
   const BankExtensionContract = useSelector(
     (state: StoreState) => state.contracts?.BankExtensionContract
+  );
+  const delegateAddress = useSelector(
+    (s: StoreState) => s.connectedMember?.delegateKey
+  );
+  const isAddressDelegated = useSelector(
+    (s: StoreState) => s.connectedMember?.isAddressDelegated
   );
   const isActiveMember = useSelector(
     (s: StoreState) => s.connectedMember?.isActiveMember
@@ -551,8 +563,13 @@ export default function CreateTransferProposal() {
     }
 
     // user is not an active member
-    if (!isActiveMember) {
+    if (!isActiveMember && !isAddressDelegated) {
       return 'Either you are not a member, or your membership is not active.';
+    }
+
+    // member has delegated to another address
+    if (delegateAddress && isAddressDelegated) {
+      return getDelegatedAddressMessage(delegateAddress);
     }
   }
 

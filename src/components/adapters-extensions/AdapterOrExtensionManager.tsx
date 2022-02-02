@@ -42,6 +42,12 @@ enum WhyDisableModalTitles {
   CONFIGURATION_REASON = 'Why are configurations disabled?',
 }
 
+const getDelegatedAddressMessage = (a: string) =>
+  `Your member address is delegated to ${truncateEthAddress(
+    a,
+    7
+  )}. You must use that address.`;
+
 /**
  * AdapterOrExtensionManager()
  *
@@ -60,6 +66,15 @@ export default function AdapterOrExtensionManager() {
   const {DaoRegistryContract, DaoFactoryContract} = useSelector(
     (s: StoreState) => s.contracts
   );
+
+  const delegateAddress = useSelector(
+    (s: StoreState) => s.connectedMember?.delegateKey
+  );
+
+  const isAddressDelegated = useSelector(
+    (s: StoreState) => s.connectedMember?.isAddressDelegated
+  );
+
   const isActiveMember = useSelector(
     (s: StoreState) => s.connectedMember?.isActiveMember
   );
@@ -614,8 +629,13 @@ export default function AdapterOrExtensionManager() {
     }
 
     // user is not an active member
-    if (!isActiveMember) {
+    if (!isActiveMember && !isAddressDelegated) {
       return 'Either you are not a member, or your membership is not active.';
+    }
+
+    // member has delegated to another address
+    if (delegateAddress && isAddressDelegated) {
+      return getDelegatedAddressMessage(delegateAddress);
     }
   }
 

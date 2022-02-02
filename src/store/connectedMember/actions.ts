@@ -35,14 +35,13 @@ export function getConnectedMember({
   return async function (dispatch: Dispatch<any>) {
     const daoRegistryAddress = daoRegistryContract?.contractAddress;
 
+    const daoRegistryInstance = daoRegistryContract?.instance;
+
     const getAddressIfDelegatedABI = daoRegistryContract?.abi.find(
       (ai) => ai.name === 'getAddressIfDelegated'
     );
     const membersABI = daoRegistryContract?.abi.find(
       (ai) => ai.name === 'members'
-    );
-    const isActiveMemberABI = daoRegistryContract?.abi.find(
-      (ai) => ai.name === 'isActiveMember'
     );
     const getCurrentDelegateKeyABI = daoRegistryContract?.abi.find(
       (ai) => ai.name === 'getCurrentDelegateKey'
@@ -51,9 +50,9 @@ export function getConnectedMember({
     if (
       !account ||
       !daoRegistryAddress ||
+      !daoRegistryInstance ||
       !getAddressIfDelegatedABI ||
       !getCurrentDelegateKeyABI ||
-      !isActiveMemberABI ||
       !membersABI
     ) {
       dispatch(clearConnectedMember());
@@ -66,24 +65,31 @@ export function getConnectedMember({
        * @link https://github.com/openlawteam/tribute-contracts/blob/master/docs/core/DaoRegistry.md
        */
 
-      const [
-        addressIfDelegated,
-        memberFlag,
-        isActiveMember,
-        currentDelegateKey,
-      ] = await multicall({
-        calls: [
-          [daoRegistryAddress, getAddressIfDelegatedABI, [account]],
-          [daoRegistryAddress, membersABI, [account]],
-          [
-            daoRegistryAddress,
-            isActiveMemberABI,
-            [daoRegistryAddress, account],
+      const [addressIfDelegated, memberFlag, currentDelegateKey] =
+        await multicall({
+          calls: [
+            [daoRegistryAddress, getAddressIfDelegatedABI, [account]],
+            [daoRegistryAddress, membersABI, [account]],
+            [daoRegistryAddress, getCurrentDelegateKeyABI, [account]],
           ],
-          [daoRegistryAddress, getCurrentDelegateKeyABI, [account]],
-        ],
-        web3Instance,
-      });
+          web3Instance,
+        });
+
+      let isActiveMember = false;
+      try {
+        isActiveMember = await daoRegistryInstance.methods
+          .isActiveMember(daoRegistryAddress, account)
+          .call();
+      } catch (error) {
+        // Error message indicates that the member has set a delegate address.
+        // In this situation, the "active member" is considered to be the
+        // delegate address (and not the original member address).
+        if (error.message.includes('call with your delegate key')) {
+          isActiveMember = false;
+        } else {
+          throw error;
+        }
+      }
 
       // A member can exist in the DAO, yet not be an active member (has units > 0)
       const doesMemberExist: boolean = hasFlag(MemberFlag.EXISTS, memberFlag);

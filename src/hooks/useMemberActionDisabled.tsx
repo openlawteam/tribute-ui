@@ -2,6 +2,7 @@ import React, {useCallback, useState} from 'react';
 import ReactModal from 'react-modal';
 
 import {StoreState} from '../store/types';
+import {truncateEthAddress} from '../util/helpers';
 import {useSelector} from 'react-redux';
 import {useWeb3Modal} from '../components/web3/hooks';
 import FadeIn from '../components/common/FadeIn';
@@ -32,6 +33,12 @@ type WhyDisabledModalProps = {
   title?: string;
 };
 
+const getDelegatedAddressMessage = (a: string) =>
+  `Your member address is delegated to ${truncateEthAddress(
+    a,
+    7
+  )}. You must use that address.`;
+
 /**
  * useMemberActionDisabled
  *
@@ -58,6 +65,14 @@ export function useMemberActionDisabled(
   /**
    * Selectors
    */
+
+  const delegateAddress = useSelector(
+    (s: StoreState) => s.connectedMember?.delegateKey
+  );
+
+  const isAddressDelegated = useSelector(
+    (s: StoreState) => s.connectedMember?.isAddressDelegated
+  );
 
   const isActiveMember = useSelector(
     (s: StoreState) => s.connectedMember?.isActiveMember
@@ -109,8 +124,12 @@ export function useMemberActionDisabled(
       return 'Your wallet is not connected.';
     }
 
-    if (!isActiveMember && !skipIsActiveMemberCheck) {
+    if (!isActiveMember && !isAddressDelegated && !skipIsActiveMemberCheck) {
       return 'Either you are not a member, or your membership is not active.';
+    }
+
+    if (delegateAddress && isAddressDelegated && !skipIsActiveMemberCheck) {
+      return getDelegatedAddressMessage(delegateAddress);
     }
 
     return otherReasonNext || '';

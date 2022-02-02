@@ -6,7 +6,7 @@ import {SnapshotType} from '@openlaw/snapshot-js-erc712';
 
 import {CycleEllipsis} from '../../components/feedback';
 import {FormFieldErrors} from '../../util/enums';
-import {getValidationError} from '../../util/helpers';
+import {getValidationError, truncateEthAddress} from '../../util/helpers';
 import {SnapshotMetadataType} from '../../components/proposals/types';
 import {StoreState} from '../../store/types';
 import {useSignAndSubmitProposal} from '../../components/proposals/hooks';
@@ -29,10 +29,24 @@ type FormInputs = {
   description: string;
 };
 
+const getDelegatedAddressMessage = (a: string) =>
+  `Your member address is delegated to ${truncateEthAddress(
+    a,
+    7
+  )}. You must use that address.`;
+
 export default function CreateGovernanceProposal() {
   /**
    * Selectors
    */
+
+  const delegateAddress = useSelector(
+    (s: StoreState) => s.connectedMember?.delegateKey
+  );
+
+  const isAddressDelegated = useSelector(
+    (s: StoreState) => s.connectedMember?.isAddressDelegated
+  );
 
   const isActiveMember = useSelector(
     (s: StoreState) => s.connectedMember?.isActiveMember
@@ -92,8 +106,13 @@ export default function CreateGovernanceProposal() {
     }
 
     // user is not an active member
-    if (!isActiveMember) {
+    if (!isActiveMember && !isAddressDelegated) {
       return 'Either you are not a member, or your membership is not active.';
+    }
+
+    // member has delegated to another address
+    if (delegateAddress && isAddressDelegated) {
+      return getDelegatedAddressMessage(delegateAddress);
     }
   }
 

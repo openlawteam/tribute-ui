@@ -97,12 +97,12 @@ export function NavHamburger() {
    * Variables
    */
 
-  // const isCurrentMemberOrDelegateConnected: boolean =
+  // const isActiveMemberConnected: boolean =
   //   account && connectedMember?.isActiveMember ? true : false;
 
   const isCurrentMemberConnected: boolean =
     account &&
-    connectedMember?.isActiveMember &&
+    (connectedMember?.isActiveMember || connectedMember?.isAddressDelegated) &&
     account.toLowerCase() === connectedMember?.memberAddress.toLowerCase()
       ? true
       : false;
@@ -241,9 +241,8 @@ export function NavHamburger() {
                       </NavLink>
                     </li>
                   )}
-                  {/* The Manage DAO link is available to both connected member users and connected delegate users. */}
                   {/* @note Disabling DAO Manager for now because we paused on maintaining it. */}
-                  {/* {isCurrentMemberOrDelegateConnected && (
+                  {/* {isActiveMemberConnected && (
                     <li
                       onClick={() => {
                         handleMenuModalClose(false);
