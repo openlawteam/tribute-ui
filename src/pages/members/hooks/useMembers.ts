@@ -43,7 +43,9 @@ export default function useMembers(): UseMembersReturn {
     (state: StoreState) => state.subgraphNetworkStatus.status
   );
 
-  const connectedMember = useSelector((s: StoreState) => s.connectedMember);
+  const connectedMember = useSelector(
+    (state: StoreState) => state.connectedMember
+  );
 
   /**
    * Our hooks
@@ -249,7 +251,7 @@ export default function useMembers(): UseMembersReturn {
           ]
         );
 
-        const getCurrentDelegateKey: string[] = await multicall({
+        const delegateKeys: string[] = await multicall({
           calls: getCurrentDelegateKeyCalls,
           web3Instance,
         });
@@ -274,10 +276,9 @@ export default function useMembers(): UseMembersReturn {
 
         const membersWithDetails = memberAddresses.map((address, index) => ({
           address,
-          delegateKey: getCurrentDelegateKey[index],
+          delegateKey: delegateKeys[index],
           isDelegated:
-            normalizeString(address) !==
-            normalizeString(getCurrentDelegateKey[index]),
+            normalizeString(address) !== normalizeString(delegateKeys[index]),
           units: unitsBalances[index],
         }));
 
