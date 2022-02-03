@@ -568,7 +568,7 @@ export default function CreateTransferProposal() {
     }
 
     // member has delegated to another address
-    if (delegateAddress && isAddressDelegated) {
+    if (!isActiveMember && delegateAddress && isAddressDelegated) {
       return getDelegatedAddressMessage(delegateAddress);
     }
   }

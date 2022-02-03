@@ -7,7 +7,11 @@ import {BURN_ADDRESS} from '../../util/constants';
 import {CheckboxSize} from '../../components/common/Checkbox';
 import {FormFieldErrors} from '../../util/enums';
 import {getConnectedMember} from '../../store/actions';
-import {getValidationError, truncateEthAddress} from '../../util/helpers';
+import {
+  getValidationError,
+  normalizeString,
+  truncateEthAddress,
+} from '../../util/helpers';
 import {isEthAddressValid} from '../../util/validation';
 import {ReduxDispatch, StoreState} from '../../store/types';
 import {TX_CYCLE_MESSAGES} from '../../components/web3/config';
@@ -28,13 +32,15 @@ import TimesSVG from '../../assets/svg/TimesSVG';
 import UserSVG from '../../assets/svg/UserSVG';
 
 enum DelegationStatus {
-  DELEGATE_VOTES = 'Delegate Votes',
+  DELEGATE = 'Delegate',
   REVOKE_DELEGATION = 'Revoke Delegation',
+  UPDATE_DELEGATE = 'Update Delegate',
 }
 
 enum DelegationStep {
   SET_DELEGATION = 'setDelegation',
   REVOKE_DELEGATION = 'revokeDelegation',
+  UPDATE_DELEGATION = 'updateDelegation',
 }
 
 enum Fields {
@@ -42,7 +48,7 @@ enum Fields {
   confirmDelegation = 'confirmDelegation',
 }
 
-type Steps = 'setDelegation' | 'revokeDelegation';
+type Steps = 'setDelegation' | 'revokeDelegation' | 'updateDelegation';
 
 type StepsType = {[S in Steps]: () => JSX.Element};
 
@@ -52,8 +58,8 @@ type FormInputs = {
 };
 
 type UpdateDelegateKeyArguments = [
-  string, // `dao`
-  string // `delegateKey`
+  dao: string, // `dao`
+  delegateKey: string // `delegateKey`
 ];
 
 type DelegationModalProps = {
@@ -123,6 +129,7 @@ function DelegationModal({
   const steps: StepsType = {
     setDelegation: renderSetDelegation,
     revokeDelegation: renderRevokeDelegation,
+    updateDelegation: renderUpdateDelegation,
   };
 
   /**
@@ -139,7 +146,7 @@ function DelegationModal({
         {/* TITLE */}
         <div className="modal__title">Delegate</div>
 
-        <p>Transfer your voting rights</p>
+        <p>Transfer your member rights</p>
         <div className="delegation-modal__arrow-down">&darr;</div>
         <form className="form" onSubmit={(e) => e.preventDefault()}>
           {/* DELEGATE ADDRESS */}
@@ -256,8 +263,8 @@ function DelegationModal({
             Back to you
           </p>
           <div className="delegation-modal__text">
-            You&apos;ll be able to resume voting from your account. You can
-            delegate again at any time from your profile.
+            You&apos;ll be able to resume member actions from your account. You
+            can delegate again at any time from your profile.
           </div>
 
           {/* SUBMIT */}
@@ -290,6 +297,115 @@ function DelegationModal({
     }
 
     return <></>;
+  }
+
+  function renderUpdateDelegation() {
+    return (
+      <>
+        {/* TITLE */}
+        <div className="modal__title">Update Delegate</div>
+
+        <p>Transfer your member rights</p>
+        <div className="delegation-modal__arrow-down">&darr;</div>
+        <form className="form" onSubmit={(e) => e.preventDefault()}>
+          {/* DELEGATE ADDRESS */}
+          <div className="form__input-row">
+            <div className="form__input-row-fieldwrap">
+              <input
+                aria-describedby={`error-${Fields.delegateAddress}`}
+                aria-invalid={errors.delegateAddress ? 'true' : 'false'}
+                name={Fields.delegateAddress}
+                ref={register({
+                  validate: (delegateAddress: string): string | boolean => {
+                    return !delegateAddress
+                      ? FormFieldErrors.REQUIRED
+                      : !isEthAddressValid(delegateAddress) ||
+                        delegateAddress === BURN_ADDRESS
+                      ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
+                      : true;
+                  },
+                })}
+                type="text"
+                disabled={isInProcessOrDone}
+                placeholder="Enter delegate address"
+              />
+
+              {getValidationError(Fields.delegateAddress, errors).includes(
+                'invalid'
+              ) && (
+                <InputError
+                  error={getValidationError(Fields.delegateAddress, errors)}
+                  id={`error-${Fields.delegateAddress}`}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* CONFIRM DELEGATION */}
+          <div className="form__input-row" style={{marginTop: 0}}>
+            <div className="form__input-row-fieldwrap">
+              <input
+                className="checkbox-input"
+                aria-describedby={`error-${Fields.confirmDelegation}`}
+                aria-invalid={errors.confirmDelegation ? 'true' : 'false'}
+                id={Fields.confirmDelegation}
+                name={Fields.confirmDelegation}
+                ref={register({
+                  required: FormFieldErrors.REQUIRED,
+                })}
+                type="checkbox"
+                disabled={isInProcessOrDone}
+              />
+
+              <label
+                className="checkbox-label"
+                htmlFor={Fields.confirmDelegation}>
+                <span className={`checkbox-box ${CheckboxSize.SMALL}`}></span>
+                <span className="checkbox-text">
+                  Confirm delegation to the above address. You will no longer be
+                  a delegate with member rights.
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* SUBMIT */}
+          <button
+            aria-label={isInProcess ? 'Updating the delegate key...' : ''}
+            className="button"
+            disabled={isInProcessOrDone || isFormFieldEmpty}
+            onClick={async () => {
+              if (isInProcessOrDone) return;
+
+              if (!(await trigger())) {
+                return;
+              }
+
+              handleConfirmDelegation(getValues());
+            }}
+            type="submit">
+            {isInProcess ? <Loader /> : isDone ? 'Done' : 'Confirm'}
+          </button>
+
+          {/* SUBMIT STATUS */}
+          {isInProcessOrDone && (
+            <div className="form__submit-status-container">
+              {renderSubmitStatus()}
+            </div>
+          )}
+
+          {/* SUBMIT ERROR */}
+          {delegateError && (
+            <div className="form__submit-error-container">
+              <ErrorMessageWithDetails
+                renderText="Something went wrong with updating the delegate."
+                error={delegateError}
+              />
+            </div>
+          )}
+        </form>
+      </>
+    );
   }
 
   async function handleConfirmDelegation(values: FormInputs) {
@@ -483,6 +599,12 @@ export default function Delegation() {
   const connectedMember = useSelector((s: StoreState) => s.connectedMember);
 
   /**
+   * Our hooks
+   */
+
+  const {account} = useWeb3Modal();
+
+  /**
    * State
    */
 
@@ -498,6 +620,7 @@ export default function Delegation() {
    */
 
   const fetchDelegationInfoCached = useCallback(fetchDelegationInfo, [
+    account,
     connectedMember,
   ]);
 
@@ -513,23 +636,75 @@ export default function Delegation() {
    * Functions
    */
 
-  async function fetchDelegationInfo() {
-    try {
-      if (!connectedMember) {
-        throw new Error('No connected account found.');
-      }
+  function fetchDelegationInfo() {
+    if (!connectedMember || !account) return;
 
-      const currentStep = connectedMember.isAddressDelegated
-        ? DelegationStep.REVOKE_DELEGATION
-        : DelegationStep.SET_DELEGATION;
-      setCurrentStep(currentStep);
+    const {delegateKey, isAddressDelegated, isActiveMember, memberAddress} =
+      connectedMember;
 
-      const delegationStatus = connectedMember.isAddressDelegated
-        ? DelegationStatus.REVOKE_DELEGATION
-        : DelegationStatus.DELEGATE_VOTES;
-      setDelegationStatus(delegationStatus);
-    } catch (error) {
-      console.log(error);
+    if (
+      // NO CURRENT DELEGATION VIEWED BY MEMBER
+      isActiveMember &&
+      !isAddressDelegated &&
+      normalizeString(account) === normalizeString(memberAddress)
+    ) {
+      setCurrentStep(DelegationStep.SET_DELEGATION);
+      setDelegationStatus(DelegationStatus.DELEGATE);
+    } else if (
+      // CURRENT DELEGATION VIEWED BY MEMBER
+      !isActiveMember &&
+      isAddressDelegated &&
+      normalizeString(account) === normalizeString(memberAddress)
+    ) {
+      setCurrentStep(DelegationStep.REVOKE_DELEGATION);
+      setDelegationStatus(DelegationStatus.REVOKE_DELEGATION);
+    } else if (
+      // CURRENT DELEGATION VIEWED BY DELEGATE
+      isActiveMember &&
+      !isAddressDelegated &&
+      normalizeString(account) === normalizeString(delegateKey)
+    ) {
+      setCurrentStep(DelegationStep.UPDATE_DELEGATION);
+      setDelegationStatus(DelegationStatus.UPDATE_DELEGATE);
+    }
+  }
+
+  function renderDelegationStatus(): JSX.Element {
+    if (!connectedMember) return <></>;
+
+    switch (delegationStatus) {
+      case DelegationStatus.DELEGATE:
+        // NO CURRENT DELEGATION VIEWED BY MEMBER
+        return (
+          <>
+            You can delegate your member rights to a different ETH address. The
+            address cannot be another member or already in use as a delegate.
+          </>
+        );
+      case DelegationStatus.REVOKE_DELEGATION:
+        // CURRENT DELEGATION VIEWED BY MEMBER
+        return (
+          <>
+            Your member rights have been delegated to{' '}
+            <span className="delegation__delegate-address-text">
+              {truncateEthAddress(connectedMember.delegateKey, 7)}
+            </span>
+            . You can revoke this at any time.
+          </>
+        );
+      case DelegationStatus.UPDATE_DELEGATE:
+        // CURRENT DELEGATION VIEWED BY DELEGATE
+        return (
+          <>
+            The member rights have been delegated to you{' '}
+            <span className="delegation__delegate-address-text">
+              {truncateEthAddress(connectedMember.delegateKey, 7)}
+            </span>
+            . You can update this at any time.
+          </>
+        );
+      default:
+        return <></>;
     }
   }
 
@@ -543,22 +718,7 @@ export default function Delegation() {
         {delegationStatus !== '' && (
           <>
             <div className="memberprofile__action-description">
-              {connectedMember.isAddressDelegated ? (
-                // CURRENT DELEGATION
-                <>
-                  Your voting rights have been delegated to{' '}
-                  <span className="delegation__delegate-address-text">
-                    {truncateEthAddress(connectedMember.delegateKey, 7)}
-                  </span>
-                  . You can revoke this at any time.
-                </>
-              ) : (
-                <>
-                  You can delegate your voting rights to a different ETH
-                  address. The address cannot be another member or already in
-                  use as a delegate.
-                </>
-              )}
+              {renderDelegationStatus()}
             </div>
 
             {/* OPEN DELEGATION MODAL BUTTON */}

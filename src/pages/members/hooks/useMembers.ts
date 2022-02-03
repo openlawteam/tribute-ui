@@ -34,12 +34,16 @@ export default function useMembers(): UseMembersReturn {
   const DaoRegistryContract = useSelector(
     (state: StoreState) => state.contracts.DaoRegistryContract
   );
+
   const BankExtensionContract = useSelector(
     (state: StoreState) => state.contracts.BankExtensionContract
   );
+
   const subgraphNetworkStatus = useSelector(
     (state: StoreState) => state.subgraphNetworkStatus.status
   );
+
+  const connectedMember = useSelector((s: StoreState) => s.connectedMember);
 
   /**
    * Our hooks
@@ -118,6 +122,10 @@ export default function useMembers(): UseMembersReturn {
     loading,
     subgraphNetworkStatus,
   ]);
+
+  useEffect(() => {
+    connectedMember && getMembersFromRegistryCached();
+  }, [connectedMember, getMembersFromRegistryCached]);
 
   /**
    * Set `Member.addressENS`
@@ -228,21 +236,21 @@ export default function useMembers(): UseMembersReturn {
           web3Instance,
         });
 
-        // Build calls to get list of member addresses by delegated key
-        const memberAddressesByDelegatedKeyABI = daoRegistryABI.find(
-          (item) => item.name === 'memberAddressesByDelegatedKey'
+        // Build calls to get list of delegate addresses by member addresses
+        const getCurrentDelegateKeyABI = daoRegistryABI.find(
+          (item) => item.name === 'getCurrentDelegateKey'
         );
 
-        const memberAddressesByDelegatedKeyCalls = memberAddresses.map(
+        const getCurrentDelegateKeyCalls = memberAddresses.map(
           (address): MulticallTuple => [
             daoRegistryAddress,
-            memberAddressesByDelegatedKeyABI as AbiItem,
+            getCurrentDelegateKeyABI as AbiItem,
             [address],
           ]
         );
 
-        const memberAddressesByDelegatedKey: string[] = await multicall({
-          calls: memberAddressesByDelegatedKeyCalls,
+        const getCurrentDelegateKey: string[] = await multicall({
+          calls: getCurrentDelegateKeyCalls,
           web3Instance,
         });
 
@@ -266,10 +274,10 @@ export default function useMembers(): UseMembersReturn {
 
         const membersWithDetails = memberAddresses.map((address, index) => ({
           address,
-          delegateKey: memberAddressesByDelegatedKey[index],
+          delegateKey: getCurrentDelegateKey[index],
           isDelegated:
             normalizeString(address) !==
-            normalizeString(memberAddressesByDelegatedKey[index]),
+            normalizeString(getCurrentDelegateKey[index]),
           units: unitsBalances[index],
         }));
 
