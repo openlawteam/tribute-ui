@@ -32,15 +32,14 @@ describe('connectedMember actions unit tests', () => {
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
             // For `members` call
             web3.eth.abi.encodeParameter('uint8', '1'),
+            // For `isActiveMember` call
+            web3.eth.abi.encodeParameter('bool', true),
             // For `getCurrentDelegateKey` call
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
           ],
         ]
       )
     );
-
-    // For `isActiveMember` call
-    mockWeb3Provider.injectResult(web3.eth.abi.encodeParameter('bool', true));
 
     // Dispatch `getConnectedMember`
     store.dispatch(
@@ -72,10 +71,10 @@ describe('connectedMember actions unit tests', () => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
     });
 
-    // Setup for `getConnectedMember`
+    // Setup for `getConnectedMember` multicall
     const delegateAddress: string =
       '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1';
-    // For multicall
+
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -86,6 +85,8 @@ describe('connectedMember actions unit tests', () => {
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
             // For `members` call
             web3.eth.abi.encodeParameter('uint8', '1'),
+            // For `isActiveMember` call
+            web3.eth.abi.encodeParameter('bool', false),
             // For `getCurrentDelegateKey` call
             web3.eth.abi.encodeParameter('address', delegateAddress),
           ],
@@ -93,14 +94,15 @@ describe('connectedMember actions unit tests', () => {
       )
     );
 
-    // // Inject error response for `isActiveMember` call
-    // mockWeb3Provider.injectError({
-    //   code: 1234,
-    //   message: 'call with your delegate key',
-    // });
+    /**
+     * @todo Fix test to use injected error response for `isActiveMember` call.
 
-    // For `isActiveMember` call
-    mockWeb3Provider.injectResult(web3.eth.abi.encodeParameter('bool', false));
+    // Inject error response for `isActiveMember` call
+    mockWeb3Provider.injectError({
+      code: 1234,
+      message: 'call with your delegate key',
+    });
+    */
 
     // Dispatch `getConnectedMember`
     store.dispatch(
@@ -143,15 +145,14 @@ describe('connectedMember actions unit tests', () => {
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
             // For `members` call
             web3.eth.abi.encodeParameter('uint8', '1'),
+            // For `isActiveMember` call
+            web3.eth.abi.encodeParameter('bool', false),
             // For `getCurrentDelegateKey` call
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
           ],
         ]
       )
     );
-
-    // For `isActiveMember` call
-    mockWeb3Provider.injectResult(web3.eth.abi.encodeParameter('bool', false));
 
     // Dispatch `getConnectedMember`
     store.dispatch(
@@ -194,15 +195,14 @@ describe('connectedMember actions unit tests', () => {
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
             // For `members` call
             web3.eth.abi.encodeParameter('uint8', '0'),
+            // For `isActiveMember` call
+            web3.eth.abi.encodeParameter('bool', false),
             // For `getCurrentDelegateKey` call
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
           ],
         ]
       )
     );
-
-    // For `isActiveMember` call
-    mockWeb3Provider.injectResult(web3.eth.abi.encodeParameter('bool', false));
 
     // Dispatch `getConnectedMember`
     store.dispatch(
@@ -234,7 +234,13 @@ describe('connectedMember actions unit tests', () => {
       expect(store.getState().contracts.DaoRegistryContract).not.toBe(null);
     });
 
-    // Setup for `getConnectedMember` multicall
+    // Inject first error response for first `getConnectedMember` multicall
+    mockWeb3Provider.injectError({
+      code: 1234,
+      message: 'Some error',
+    });
+
+    // Setup for second `getConnectedMember` multicall
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['uint256', 'bytes[]'],
@@ -250,7 +256,7 @@ describe('connectedMember actions unit tests', () => {
       )
     );
 
-    // Inject error response
+    // Inject second error response
     mockWeb3Provider.injectError({
       code: 1234,
       message: 'Some error',
@@ -299,15 +305,14 @@ describe('connectedMember actions unit tests', () => {
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
             // For `members` call
             web3.eth.abi.encodeParameter('uint8', '1'),
+            // For `isActiveMember` call
+            web3.eth.abi.encodeParameter('bool', true),
             // For `getCurrentDelegateKey` call
             web3.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS),
           ],
         ]
       )
     );
-
-    // For `isActiveMember` call
-    mockWeb3Provider.injectResult(web3.eth.abi.encodeParameter('bool', true));
 
     await waitFor(() => {
       expect(store.getState().connectedMember).toBe(null);

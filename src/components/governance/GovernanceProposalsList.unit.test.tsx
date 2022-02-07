@@ -367,7 +367,17 @@ describe('GovernanceProposalsList unit tests', () => {
       </Wrapper>
     );
 
+    /**
+     * @note Think we need two errors for this to work properly, because of
+     * mocked calls in the Wrapper. `useOffchainVotingResults` unmounts too soon
+     * if only one `injectError` is used, because it causes a failure higher in
+     * the component tree, presumably?
+     */
     await waitFor(() => {
+      mockWeb3Provider.injectError({
+        code: 1234,
+        message: 'Some contract error',
+      });
       mockWeb3Provider.injectError({
         code: 1234,
         message: 'Some contract error',

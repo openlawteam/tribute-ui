@@ -307,7 +307,6 @@ describe('useDaoProposals unit tests', () => {
        *
        * @todo Fix needing `injectResult` to make test work.
        */
-
       mockWeb3Provider.injectResult(null);
       mockWeb3Provider.injectError({code: 1234, message: 'Some RPC error!'});
 
