@@ -69,7 +69,8 @@ export default function MemberCard(props: MemberCardProps): JSX.Element {
       <div
         className={`membercard ${
           account &&
-          normalizeString(account) === normalizeString(member.address)
+          (normalizeString(account) === normalizeString(member.address) ||
+            normalizeString(account) === normalizeString(member.delegateKey))
             ? `membercard--connected-account`
             : ''
         }`}>
