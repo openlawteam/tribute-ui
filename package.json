@@ -21,7 +21,7 @@
     "@walletconnect/web3-provider": "^1.7.0",
     "aos": "^2.3.4",
     "debounce": "^1.2.1",
-    "ethers": "^5.5.2",
+    "ethers": "^5.5.4",
     "markdown-to-jsx": "^7.1.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.2",
