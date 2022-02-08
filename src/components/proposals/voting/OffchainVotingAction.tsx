@@ -11,7 +11,6 @@ import {ContractAdapterNames, Web3TxStatus} from '../../web3/types';
 import {getVoteChosen} from '../helpers';
 import {ProposalData} from '../types';
 import {StoreState} from '../../../store/types';
-import {truncateEthAddress} from '../../../util/helpers';
 import {useSignAndSendVote} from '../hooks';
 import {useWeb3Modal} from '../../web3/hooks';
 import {VotingActionButtons} from '.';
@@ -23,7 +22,6 @@ type OffchainVotingActionProps = {
 };
 
 type VotingDisabledReasons = {
-  addressIsDelegatedMessage: string;
   alreadyVotedMessage: string;
   fetchingMembershipAtSnapshotMessage: string;
   noMembershipAtSnapshotMessage: string;
@@ -31,12 +29,6 @@ type VotingDisabledReasons = {
 };
 
 const {FULFILLED, PENDING, REJECTED} = AsyncStatus;
-
-const getDelegatedAddressMessage = (a: string) =>
-  `Your member address is delegated to ${truncateEthAddress(
-    a,
-    7
-  )}. You must use that address to vote.`;
 
 /**
  * OffchainVotingAction
@@ -65,7 +57,6 @@ export function OffchainVotingAction(
    */
 
   const votingDisabledReasonsRef = useRef<VotingDisabledReasons>({
-    addressIsDelegatedMessage: '',
     alreadyVotedMessage: '',
     fetchingMembershipAtSnapshotMessage: '',
     noMembershipAtSnapshotMessage: '',
@@ -75,14 +66,6 @@ export function OffchainVotingAction(
   /**
    * Selectors
    */
-
-  const delegateAddress = useSelector(
-    (s: StoreState) => s.connectedMember?.delegateKey
-  );
-
-  const isAddressDelegated = useSelector(
-    (s: StoreState) => s.connectedMember?.isAddressDelegated
-  );
 
   const memberAddress = useSelector(
     (s: StoreState) => s.connectedMember?.memberAddress
@@ -143,14 +126,6 @@ export function OffchainVotingAction(
   useEffect(() => {
     // 1. Determine and set local reasons why voting would be disabled
 
-    // Reason: address is delegated
-    if (delegateAddress) {
-      setDisabledReasonHelper(
-        'addressIsDelegatedMessage',
-        isAddressDelegated ? getDelegatedAddressMessage(delegateAddress) : ''
-      );
-    }
-
     // Reason: already voted
     setDisabledReasonHelper(
       'alreadyVotedMessage',
@@ -184,9 +159,7 @@ export function OffchainVotingAction(
     // 2. Set reasons
     setOtherDisabledReasons(Object.values(votingDisabledReasonsRef.current));
   }, [
-    delegateAddress,
     hasMembershipAtSnapshot,
-    isAddressDelegated,
     memberUnitsAtSnapshotStatus,
     setOtherDisabledReasons,
     snapshot,

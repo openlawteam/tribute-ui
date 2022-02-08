@@ -236,7 +236,7 @@ export default function Wrapper(
         {debugName: '<Wrapper /> multicall for `getConnectedMember`'}
       );
     }
-  }, [mockWeb3Provider, useInit, useWallet, web3Instance]);
+  }, [mockWeb3Provider, useWallet, web3Instance]);
 
   /**
    * Functions

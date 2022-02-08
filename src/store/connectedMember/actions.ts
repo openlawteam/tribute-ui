@@ -15,13 +15,12 @@ export const CLEAR_CONNECTED_MEMBER = 'CLEAR_CONNECTED_MEMBER';
 /**
  * getConnectedMember
  *
- * Gets information about a connected address from the DAO's `members`.
- * If the user is not a member, the defaults for a non-existent member of the DAO are returned (e.g. "0x000000...")
- * and `isActiveMember` will be `false`.
+ * Gets information about a connected address from the DAO's `members`. If the
+ * user is not a member, the defaults for a non-existent member of the DAO are
+ * returned (e.g. "0x000000...") and `isActiveMember` will be `false`.
  *
- * The reason state is set for both a member and a non-member
- * is to ensure we're not too restrictive in our Dapp logic and
- * letting the contract do its job.
+ * The reason state is set for both a member and a non-member is to ensure we're
+ * not too restrictive in our Dapp logic and letting the contract do its job.
  */
 export function getConnectedMember({
   account,
@@ -34,6 +33,8 @@ export function getConnectedMember({
 }) {
   return async function (dispatch: Dispatch<any>) {
     const daoRegistryAddress = daoRegistryContract?.contractAddress;
+
+    const daoRegistryInstance = daoRegistryContract?.instance;
 
     const getAddressIfDelegatedABI = daoRegistryContract?.abi.find(
       (ai) => ai.name === 'getAddressIfDelegated'
@@ -51,6 +52,7 @@ export function getConnectedMember({
     if (
       !account ||
       !daoRegistryAddress ||
+      !daoRegistryInstance ||
       !getAddressIfDelegatedABI ||
       !getCurrentDelegateKeyABI ||
       !isActiveMemberABI ||
@@ -109,9 +111,69 @@ export function getConnectedMember({
         })
       );
     } catch (error) {
-      dispatch(clearConnectedMember());
+      /**
+       * Handle error thrown from multicall caused by `isActiveMember` call,
+       * which is expected if connected user is a member that has set a
+       * delegated address. In this situation, we remove the `isActiveMember`
+       * call from the multicall and handle its thrown error independently.
+       */
+      try {
+        const [addressIfDelegated, memberFlag, currentDelegateKey] =
+          await multicall({
+            calls: [
+              [daoRegistryAddress, getAddressIfDelegatedABI, [account]],
+              [daoRegistryAddress, membersABI, [account]],
+              [daoRegistryAddress, getCurrentDelegateKeyABI, [account]],
+            ],
+            web3Instance,
+          });
 
-      throw error;
+        let isActiveMember = false;
+        try {
+          isActiveMember = await daoRegistryInstance.methods
+            .isActiveMember(daoRegistryAddress, account)
+            .call();
+        } catch (error) {
+          /**
+           * Error message indicates that the member has set a delegate address.
+           * In this situation, the "active member" is considered to be the
+           * delegate address (and not the original member address).
+           */
+          if (error.message.includes('call with your delegate key')) {
+            isActiveMember = false;
+          } else {
+            throw error;
+          }
+        }
+
+        // A member can exist in the DAO, yet not be an active member (has units > 0)
+        const doesMemberExist: boolean = hasFlag(MemberFlag.EXISTS, memberFlag);
+
+        // Is this address known to the DAO?
+        const delegateKey: string =
+          isActiveMember || doesMemberExist ? currentDelegateKey : BURN_ADDRESS;
+
+        // Is this address known to the DAO?
+        const memberAddress: string =
+          isActiveMember || doesMemberExist ? addressIfDelegated : BURN_ADDRESS;
+
+        const isAddressDelegated: boolean =
+          normalizeString(account) === normalizeString(memberAddress) &&
+          normalizeString(account) !== normalizeString(delegateKey);
+
+        dispatch(
+          setConnectedMember({
+            delegateKey,
+            isAddressDelegated,
+            isActiveMember,
+            memberAddress,
+          })
+        );
+      } catch (error) {
+        dispatch(clearConnectedMember());
+
+        throw error;
+      }
     }
   };
 }

@@ -98,9 +98,9 @@ describe('useDaoConfigurations unit tests', () => {
 
       /**
        * @note Think we need two errors for this to work properly, because of
-       *   mocked calls in the Wrapper. `useDaoConfigurations` unmounts too soon
-       *   if only one `injectError` is used, because it causes a failure higher in the
-       *   component tree, presumably?
+       * mocked calls in the Wrapper. `useDaoConfigurations` unmounts too soon
+       * if only one `injectError` is used, because it causes a failure higher
+       * in the component tree, presumably?
        */
       mockWeb3Provider.injectError({code: 1234, message: 'Some bad error!'});
       mockWeb3Provider.injectError({code: 1234, message: 'Some bad error!'});

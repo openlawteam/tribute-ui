@@ -1,4 +1,3 @@
-import {AbiItem} from 'web3-utils';
 import {useSelector} from 'react-redux';
 import {useState, useEffect, useCallback} from 'react';
 import usePreviousDistinct from 'react-use/lib/usePreviousDistinct';
@@ -7,8 +6,6 @@ import {AsyncStatus} from '../../../util/types';
 import {
   isNotReservedAddress,
   isNotZeroAddress,
-  multicall,
-  MulticallTuple,
 } from '../../../components/web3/helpers';
 import {normalizeString, truncateEthAddress} from '../../../util/helpers';
 import {StoreState} from '../../../store/types';
@@ -35,8 +32,8 @@ export function useCheckApplicant(address?: string): UseCheckApplicantReturn {
    * Selectors
    */
 
-  const DaoRegistryContract = useSelector(
-    (state: StoreState) => state.contracts.DaoRegistryContract
+  const daoRegistryInstance = useSelector(
+    (state: StoreState) => state.contracts.DaoRegistryContract?.instance
   );
 
   /**
@@ -71,8 +68,8 @@ export function useCheckApplicant(address?: string): UseCheckApplicantReturn {
    */
 
   const checkApplicantValidityCached = useCallback(checkApplicantValidity, [
-    DaoRegistryContract,
     address,
+    daoRegistryInstance,
     web3Instance,
   ]);
 
@@ -99,32 +96,16 @@ export function useCheckApplicant(address?: string): UseCheckApplicantReturn {
    */
 
   async function checkApplicantValidity() {
-    if (!address || !DaoRegistryContract || !web3Instance) return;
+    if (!address || !daoRegistryInstance || !web3Instance) return;
 
     try {
       setCheckApplicantStatus(AsyncStatus.PENDING);
 
       const truncatedAddress = truncateEthAddress(address, 7);
 
-      const {abi: daoRegistryABI, contractAddress: daoRegistryAddress} =
-        DaoRegistryContract;
-
-      // Build call to DaoRegistry contract
-      const getGetAddressIfDelegatedABI = daoRegistryABI.find(
-        (item) => item.name === 'getAddressIfDelegated'
-      );
-      const getAddressIfDelegatedCall: MulticallTuple = [
-        daoRegistryAddress,
-        getGetAddressIfDelegatedABI as AbiItem,
-        [address],
-      ];
-
-      const calls = [getAddressIfDelegatedCall];
-
-      const [getAddressIfDelegatedResult] = await multicall<[string]>({
-        calls,
-        web3Instance,
-      });
+      const getAddressIfDelegatedResult = await daoRegistryInstance.methods
+        .getAddressIfDelegated(address)
+        .call();
 
       if (!isNotReservedAddress(address)) {
         // Applicant address cannot be a reserved address.

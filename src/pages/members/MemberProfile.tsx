@@ -100,6 +100,14 @@ export default function MemberProfile() {
       ? true
       : false;
 
+  const isCurrentMemberOrDelegateConnected: boolean =
+    account &&
+    memberDetails &&
+    (normalizeString(account) === normalizeString(memberDetails.address) ||
+      normalizeString(account) === normalizeString(memberDetails.delegateKey))
+      ? true
+      : false;
+
   const votingWeight =
     memberDetails && typeof totalUnitsIssued === 'number'
       ? ((Number(memberDetails.units) / totalUnitsIssued) * 100).toFixed(2)
@@ -143,7 +151,7 @@ export default function MemberProfile() {
   }
 
   function renderMemberActions() {
-    if (isCurrentMemberConnected) {
+    if (isCurrentMemberOrDelegateConnected) {
       return (
         <div>
           <div className="memberprofile__action">
@@ -155,8 +163,8 @@ export default function MemberProfile() {
     } else {
       return (
         <div className="memberprofile__actions-unavailable">
-          Connect your wallet with this member address to view available
-          actions.
+          Connect your wallet with this member address (or its delegate) to view
+          available actions.
         </div>
       );
     }

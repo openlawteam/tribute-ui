@@ -40,7 +40,7 @@
     "react-use-clipboard": "^1.0.7",
     "redux": "^4.1.0",
     "redux-thunk": "^2.4.1",
-    "tribute-contracts": "^2.3.3",
+    "tribute-contracts": "^2.3.5",
     "uuid": "^8.3.2",
     "web-vitals": "^2.1.0",
     "web3": "1.5.3",

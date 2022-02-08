@@ -56,20 +56,9 @@ describe('useCheckApplicant unit tests', () => {
       });
 
       await waitFor(() => {
+        // For `getAddressIfDelegated` call
         mockWeb3Provider.injectResult(
-          web3Instance.eth.abi.encodeParameters(
-            ['uint256', 'bytes[]'],
-            [
-              0,
-              [
-                // For `getAddressIfDelegated` call
-                web3Instance.eth.abi.encodeParameter(
-                  'address',
-                  DEFAULT_ETH_ADDRESS
-                ),
-              ],
-            ]
-          )
+          web3Instance.eth.abi.encodeParameter('address', DEFAULT_ETH_ADDRESS)
         );
       });
 
@@ -103,17 +92,9 @@ describe('useCheckApplicant unit tests', () => {
       });
 
       await waitFor(() => {
+        // For `getAddressIfDelegated` call
         mockWeb3Provider.injectResult(
-          web3Instance.eth.abi.encodeParameters(
-            ['uint256', 'bytes[]'],
-            [
-              0,
-              [
-                // For `getAddressIfDelegated` call
-                web3Instance.eth.abi.encodeParameter('address', GUILD_ADDRESS),
-              ],
-            ]
-          )
+          web3Instance.eth.abi.encodeParameter('address', GUILD_ADDRESS)
         );
       });
 
@@ -149,17 +130,9 @@ describe('useCheckApplicant unit tests', () => {
       });
 
       await waitFor(() => {
+        // For `getAddressIfDelegated` call
         mockWeb3Provider.injectResult(
-          web3Instance.eth.abi.encodeParameters(
-            ['uint256', 'bytes[]'],
-            [
-              0,
-              [
-                // For `getAddressIfDelegated` call
-                web3Instance.eth.abi.encodeParameter('address', BURN_ADDRESS),
-              ],
-            ]
-          )
+          web3Instance.eth.abi.encodeParameter('address', BURN_ADDRESS)
         );
       });
 
@@ -195,19 +168,11 @@ describe('useCheckApplicant unit tests', () => {
       });
 
       await waitFor(() => {
+        // For `getAddressIfDelegated` call
         mockWeb3Provider.injectResult(
-          web3Instance.eth.abi.encodeParameters(
-            ['uint256', 'bytes[]'],
-            [
-              0,
-              [
-                // For `getAddressIfDelegated` call
-                web3Instance.eth.abi.encodeParameter(
-                  'address',
-                  DEFAULT_DELEGATED_ADDRESS
-                ),
-              ],
-            ]
+          web3Instance.eth.abi.encodeParameter(
+            'address',
+            DEFAULT_DELEGATED_ADDRESS
           )
         );
       });

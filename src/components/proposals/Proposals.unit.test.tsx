@@ -243,7 +243,8 @@ describe('ProposalCard unit tests', () => {
             ),
           ],
         ]
-      )
+      ),
+      {debugName: '`useProposals` proposals response'}
     );
 
     /**
@@ -277,7 +278,8 @@ describe('ProposalCard unit tests', () => {
             offchainVotingAdapterAddressResponse,
           ],
         ]
-      )
+      ),
+      {debugName: ' `dao.votingAdapter` responses'}
     );
 
     // Mock `IVoting.getAdapterName` responses
@@ -292,7 +294,8 @@ describe('ProposalCard unit tests', () => {
             offchainVotingAdapterNameResponse,
           ],
         ]
-      )
+      ),
+      {debugName: '`IVoting.getAdapterName` responses'}
     );
 
     /**
@@ -312,7 +315,8 @@ describe('ProposalCard unit tests', () => {
             web3Instance.eth.abi.encodeParameter('uint8', '4'),
           ],
         ]
-      )
+      ),
+      {debugName: 'results for `useProposalsVotingState`'}
     );
 
     /**
@@ -361,7 +365,8 @@ describe('ProposalCard unit tests', () => {
             offchainVotesDataResponse,
           ],
         ]
-      )
+      ),
+      {debugName: 'results for `useProposalsVotes`'}
     );
 
     injectDefaultVotingWeightResults({web3Instance, mockWeb3Provider});
@@ -390,7 +395,8 @@ describe('ProposalCard unit tests', () => {
             web3Instance.eth.abi.encodeParameter('uint256', '100000'),
           ],
         ]
-      )
+      ),
+      {debugName: 'offchain voting configuration values'}
     );
   }
 
@@ -422,7 +428,8 @@ describe('ProposalCard unit tests', () => {
             web3Instance.eth.abi.encodeParameter('uint256', '100000'),
           ],
         ]
-      )
+      ),
+      {debugName: 'voting passed result'}
     );
 
     // Inject failed result
@@ -442,7 +449,8 @@ describe('ProposalCard unit tests', () => {
             web3Instance.eth.abi.encodeParameter('uint256', '300000'),
           ],
         ]
-      )
+      ),
+      {debugName: 'voting failed result'}
     );
 
     // Inject voting result
@@ -462,7 +470,8 @@ describe('ProposalCard unit tests', () => {
             web3Instance.eth.abi.encodeParameter('uint256', '100000'),
           ],
         ]
-      )
+      ),
+      {debugName: 'voting tied result'}
     );
   }
 

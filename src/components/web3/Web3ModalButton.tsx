@@ -1,5 +1,6 @@
 import {isMobile} from '@walletconnect/browser-utils';
 import {useDispatch} from 'react-redux';
+import {toChecksumAddress} from 'web3-utils';
 
 import {connectModalOpen} from '../../store/actions';
 import {truncateEthAddress} from '../../util/helpers';
@@ -54,7 +55,7 @@ export default function ConnectWalletButton({
     }
 
     if (account) {
-      return accountENS || truncateEthAddress(account);
+      return accountENS || truncateEthAddress(toChecksumAddress(account));
     }
 
     return 'Connect';

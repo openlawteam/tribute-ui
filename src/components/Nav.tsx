@@ -5,14 +5,15 @@ import {useState, useEffect, useRef} from 'react';
 import Media from 'react-media';
 import ReactModal from 'react-modal';
 
+import {ENABLE_KYC_ONBOARDING} from '../config';
 import {ModalLogo} from './logo';
+import {normalizeString} from '../util/helpers';
 import {StoreState} from '../store/types';
 import {useWeb3Modal} from './web3/hooks';
+import DaoTokenHolder from './dao-token/DaoTokenHolder';
 import HamburgerSVG from '../assets/svg/HamburgerSVG';
 import TimesSVG from '../assets/svg/TimesSVG';
 import Web3ModalButton from './web3/Web3ModalButton';
-import DaoTokenHolder from './dao-token/DaoTokenHolder';
-import {ENABLE_KYC_ONBOARDING} from '../config';
 
 // see: http://reactcommunity.org/react-transition-group/transition
 const duration = 200;
@@ -97,12 +98,16 @@ export function NavHamburger() {
    * Variables
    */
 
-  // const isCurrentMemberOrDelegateConnected: boolean =
+  // const isActiveMemberConnected: boolean =
   //   account && connectedMember?.isActiveMember ? true : false;
-  const isCurrentMemberConnected: boolean =
+
+  const isCurrentMemberOrDelegateConnected: boolean =
     account &&
-    connectedMember?.isActiveMember &&
-    account.toLowerCase() === connectedMember?.memberAddress.toLowerCase()
+    connectedMember &&
+    (connectedMember.isActiveMember || connectedMember.isAddressDelegated) &&
+    (normalizeString(account) ===
+      normalizeString(connectedMember.memberAddress) ||
+      normalizeString(account) === normalizeString(connectedMember.delegateKey))
       ? true
       : false;
 
@@ -229,20 +234,20 @@ export function NavHamburger() {
                       <span>Members</span>
                     </NavLink>
                   </li>
-                  {/* The Profile link is available to only the connected member user (not any delegate) because the profile exists for the member account. */}
-                  {isCurrentMemberConnected && (
+                  {/* The Profile link for the member account is available to both the connected member address and its delegate address. */}
+                  {isCurrentMemberOrDelegateConnected && (
                     <li
                       onClick={() => {
                         handleMenuModalClose(false);
                       }}>
-                      <NavLink to={`/members/${account}`}>
+                      <NavLink
+                        to={`/members/${connectedMember?.memberAddress}`}>
                         <span>Profile</span>
                       </NavLink>
                     </li>
                   )}
-                  {/* The Manage DAO link is available to both connected member users and connected delegate users. */}
                   {/* @note Disabling DAO Manager for now because we paused on maintaining it. */}
-                  {/* {isCurrentMemberOrDelegateConnected && (
+                  {/* {isActiveMemberConnected && (
                     <li
                       onClick={() => {
                         handleMenuModalClose(false);

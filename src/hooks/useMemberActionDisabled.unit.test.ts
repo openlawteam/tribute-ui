@@ -69,6 +69,55 @@ describe('useMemberActionDisabled unit tests', () => {
     });
   });
 
+  test('should return correct data when user is member who has delegated', async () => {
+    await act(async () => {
+      let reduxStore: any;
+
+      const {result} = await renderHook(() => useMemberActionDisabled(), {
+        initialProps: {
+          getProps: ({store}) => {
+            reduxStore = store;
+          },
+          useInit: true,
+          useWallet: true,
+        },
+        wrapper: Wrapper,
+      });
+
+      // Assert initial state
+      expect(result.current.isDisabled).toBe(true);
+      expect(result.current.disabledReason).toMatch(
+        /either you are not a member, or your membership is not active\./i
+      );
+      expect(result.current.openWhyDisabledModal).toBeInstanceOf(Function);
+      expect(result.current.WhyDisabledModal).toBeInstanceOf(Function);
+      expect(result.current.setOtherDisabledReasons).toBeInstanceOf(Function);
+
+      await waitFor(() => {
+        expect(reduxStore.getState().connectedMember).not.toBeNull();
+      });
+
+      const delegateKey: string = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1';
+
+      reduxStore.dispatch({
+        type: SET_CONNECTED_MEMBER,
+        ...reduxStore.getState().connectedMember,
+        isActiveMember: false,
+        isAddressDelegated: true,
+        delegateKey,
+      });
+
+      // Assert post-init state
+      expect(result.current.isDisabled).toBe(true);
+      expect(result.current.disabledReason).toMatch(
+        /your member address is delegated to 0x90f8b\.\.\.c9c1\. you must use that address\./i
+      );
+      expect(result.current.openWhyDisabledModal).toBeInstanceOf(Function);
+      expect(result.current.WhyDisabledModal).toBeInstanceOf(Function);
+      expect(result.current.setOtherDisabledReasons).toBeInstanceOf(Function);
+    });
+  });
+
   test('should return correct data when user is member', async () => {
     // @note By default <Wrapper /> set the member to active when using `useWallet`
     const {result, waitForNextUpdate} = renderHook(
