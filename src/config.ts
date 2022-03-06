@@ -158,8 +158,8 @@ export const INFURA_WS_URLS: {[chainId: number]: string} = {
   [CHAINS.HARMONY_MAIN]: `wss://ws.s0.t.hmny.io`,
   [CHAINS.POLYGON_TEST]: `wss://ws-matic-mumbai.chainstacklabs.com`,
   [CHAINS.POLYGON]: `wss://ws-matic-mainnet.chainstacklabs.com`,
-  [CHAINS.AVALANCHE_TEST]: `wss://x.elmurci.com/ext/bc/C/ws`,
-  [CHAINS.AVALANCHE_MAIN]: `wss://x.elmurci.com/ext/bc/C/ws`,
+  [CHAINS.AVALANCHE_TEST]: `wss://api.avax-test.network:9650/ext/bc/C/ws`,
+  [CHAINS.AVALANCHE_MAIN]: `wss://api.avax.network:9650/ext/bc/C/ws`,
 };
 
 // Infura Project Id
