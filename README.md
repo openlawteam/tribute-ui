@@ -84,7 +84,7 @@ NOTE:
 REACT_APP_ALCHEMY_API_KEY=...
 
 # Can be set to override using the Ganache private network as the default local development chain.
-REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE>
+REACT_APP_DEFAULT_CHAIN_NAME_LOCAL=<MAINNET | ROPSTEN | RINKEBY | GOERLI | KOVAN | GANACHE | AVALANCHE_TEST | AVALANCHE_MAIN>
 ```
 
 ### Ganache Blockchain Setup
