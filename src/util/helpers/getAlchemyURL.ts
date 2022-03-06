@@ -19,8 +19,6 @@ export function getAlchemyURL(
   networkID: typeof CHAINS[keyof typeof CHAINS] = DEFAULT_CHAIN
 ): AlchemyAPIURL | undefined {
   if (!process.env.REACT_APP_ALCHEMY_API_KEY) {
-    console.warn('No Alchemy API key was found.');
-
     return;
   }
 
@@ -31,7 +29,9 @@ export function getAlchemyURL(
     networkID === CHAINS.HARMONY_TEST ||
     // @todo Separate handling for Polygon URL as it's a bit different.
     networkID === CHAINS.POLYGON ||
-    networkID === CHAINS.POLYGON_TEST
+    networkID === CHAINS.POLYGON_TEST ||
+    networkID === CHAINS.AVALANCHE_TEST ||
+    networkID === CHAINS.AVALANCHE_MAIN
   ) {
     return;
   }

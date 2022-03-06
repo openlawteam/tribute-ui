@@ -89,6 +89,8 @@ export const CHAINS = {
   HARMONY_MAIN: 1666600000,
   POLYGON_TEST: 80001,
   POLYGON: 137,
+  AVALANCHE_TEST: 43113,
+  AVALANCHE_MAIN: 43114,
 } as const;
 
 // Network names
@@ -103,6 +105,8 @@ export const CHAIN_NAME = {
   [CHAINS.HARMONY_MAIN]: 'harmony-mainnet',
   [CHAINS.POLYGON]: 'polygon-mainnet',
   [CHAINS.POLYGON_TEST]: 'polygon-testnet',
+  [CHAINS.AVALANCHE_TEST]: 'avalanche-fuji',
+  [CHAINS.AVALANCHE_MAIN]: 'avalanche-mainnet',
 } as const;
 
 // Network names verbose
@@ -117,6 +121,8 @@ export const CHAIN_NAME_FULL = {
   [CHAINS.HARMONY_MAIN]: 'Harmony Main Network',
   [CHAINS.POLYGON_TEST]: 'Polygon Test Network',
   [CHAINS.POLYGON]: 'Polygon Main Network',
+  [CHAINS.AVALANCHE_TEST]: 'Avalanche Fuji Test Network',
+  [CHAINS.AVALANCHE_MAIN]: 'Avalanche Main Network',
 };
 
 export const DEFAULT_CHAIN: typeof CHAINS[keyof typeof CHAINS] =
@@ -138,6 +144,8 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = {
   [CHAINS.HARMONY_MAIN]: `https://explorer.harmony.one`,
   [CHAINS.POLYGON_TEST]: `https://mumbai.polygonscan.com`,
   [CHAINS.POLYGON]: `https://polygonscan.com`,
+  [CHAINS.AVALANCHE_TEST]: `https://testnet.snowtrace.io`,
+  [CHAINS.AVALANCHE_MAIN]: `https://snowtrace.io`,
 };
 
 export const INFURA_WS_URLS: {[chainId: number]: string} = {
@@ -150,6 +158,8 @@ export const INFURA_WS_URLS: {[chainId: number]: string} = {
   [CHAINS.HARMONY_MAIN]: `wss://ws.s0.t.hmny.io`,
   [CHAINS.POLYGON_TEST]: `wss://ws-matic-mumbai.chainstacklabs.com`,
   [CHAINS.POLYGON]: `wss://ws-matic-mainnet.chainstacklabs.com`,
+  [CHAINS.AVALANCHE_TEST]: `wss://x.elmurci.com/ext/bc/C/ws`,
+  [CHAINS.AVALANCHE_MAIN]: `wss://x.elmurci.com/ext/bc/C/ws`,
 };
 
 // Infura Project Id
@@ -162,7 +172,9 @@ export const INFURA_PROJECT_ID =
 
 // Ethereum Provider URL
 export const ETHEREUM_PROVIDER_URL: string = INFURA_WS_URLS[DEFAULT_CHAIN]
+  ? INFURA_PROJECT_ID
   ? `${INFURA_WS_URLS[DEFAULT_CHAIN]}/${INFURA_PROJECT_ID}`
+  : INFURA_WS_URLS[DEFAULT_CHAIN]
   : DEFAULT_CHAIN === CHAINS.GANACHE
   ? /**
      * Ganache over WebSocket should work. @note Is not tested, yet.
@@ -233,6 +245,8 @@ export const DAO_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const BANK_FACTORY_CONTRACT_ADDRESS = {
@@ -246,6 +260,8 @@ export const BANK_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 // @todo
@@ -260,6 +276,8 @@ export const NFT_COLLECTION_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 // @todo
@@ -274,6 +292,8 @@ export const ERC20_TOKEN_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 /**
@@ -308,6 +328,8 @@ export const VOTING_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const CONFIGURATION_CONTRACT_ADDRESS = {
@@ -321,6 +343,8 @@ export const CONFIGURATION_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const RAGEQUIT_CONTRACT_ADDRESS = {
@@ -334,6 +358,8 @@ export const RAGEQUIT_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const MANAGING_CONTRACT_ADDRESS = {
@@ -347,6 +373,8 @@ export const MANAGING_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const FINANCING_CONTRACT_ADDRESS = {
@@ -360,6 +388,8 @@ export const FINANCING_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const ONBOARDING_CONTRACT_ADDRESS = {
@@ -373,6 +403,8 @@ export const ONBOARDING_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const GUILDKICK_CONTRACT_ADDRESS = {
@@ -386,6 +418,8 @@ export const GUILDKICK_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const DAO_REGISTRY_ADAPTER_CONTRACT_ADDRESS = {
@@ -399,6 +433,8 @@ export const DAO_REGISTRY_ADAPTER_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const BANK_ADAPTER_CONTRACT_ADDRESS = {
@@ -412,6 +448,8 @@ export const BANK_ADAPTER_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const COUPONONBOARDING_CONTRACT_ADDRESS = {
@@ -425,6 +463,8 @@ export const COUPONONBOARDING_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const TRIBUTE_CONTRACT_ADDRESS = {
@@ -438,6 +478,8 @@ export const TRIBUTE_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const DISTRIBUTE_CONTRACT_ADDRESS = {
@@ -451,6 +493,8 @@ export const DISTRIBUTE_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const TRIBUTE_NFT_CONTRACT_ADDRESS = {
@@ -464,6 +508,8 @@ export const TRIBUTE_NFT_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const OFFCHAINVOTING_CONTRACT_ADDRESS = {
@@ -477,6 +523,8 @@ export const OFFCHAINVOTING_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 export const KYC_ONBOARDING_CONTRACT_ADDRESS = {
@@ -490,6 +538,8 @@ export const KYC_ONBOARDING_CONTRACT_ADDRESS = {
   [CHAINS.HARMONY_MAIN]: '',
   [CHAINS.POLYGON_TEST]: '',
   [CHAINS.POLYGON]: '',
+  [CHAINS.AVALANCHE_TEST]: '',
+  [CHAINS.AVALANCHE_MAIN]: '',
 };
 
 // If developing locally, include your Multicall contract address in your `.env`
