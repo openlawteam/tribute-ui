@@ -173,8 +173,8 @@ export const INFURA_PROJECT_ID =
 // Ethereum Provider URL
 export const ETHEREUM_PROVIDER_URL: string = INFURA_WS_URLS[DEFAULT_CHAIN]
   ? INFURA_PROJECT_ID
-  ? `${INFURA_WS_URLS[DEFAULT_CHAIN]}/${INFURA_PROJECT_ID}`
-  : INFURA_WS_URLS[DEFAULT_CHAIN]
+    ? `${INFURA_WS_URLS[DEFAULT_CHAIN]}/${INFURA_PROJECT_ID}`
+    : INFURA_WS_URLS[DEFAULT_CHAIN]
   : DEFAULT_CHAIN === CHAINS.GANACHE
   ? /**
      * Ganache over WebSocket should work. @note Is not tested, yet.
