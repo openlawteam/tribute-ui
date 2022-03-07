@@ -133,7 +133,6 @@ export default function Init(props: InitProps) {
       if (!SNAPSHOT_HUB_API_URL) {
         throw new Error('No Snapshot Hub API URL was found.');
       }
-
       const {data} = await getSnapshotAPIStatus(SNAPSHOT_HUB_API_URL);
 
       // Choosing a slice of the data to make sure we have a response, not just 200 OK.
