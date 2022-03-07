@@ -149,9 +149,11 @@ export function useGovernanceProposals({
     } catch (error) {
       if (!isMountedRef.current) return;
 
+      const e = error as Error;
+
       setGovernanceProposalsStatus(AsyncStatus.REJECTED);
       setGovernanceProposals([]);
-      setGovernanceProposalsError(error);
+      setGovernanceProposalsError(e);
     }
   }
 

@@ -167,10 +167,12 @@ export function useDaoTotalUnits(): UseDaoTotalUnitsReturn {
       setTotalUnitsIssued(Number(totalUnitsIssuedToSet));
       setTotalUnitsStatus(AsyncStatus.FULFILLED);
     } catch (error) {
-      console.log(error);
+      const e = error as Error;
+
+      console.log(e);
       setTotalUnits(undefined);
       setTotalUnitsIssued(undefined);
-      setTotalUnitsError(error);
+      setTotalUnitsError(e);
       setTotalUnitsStatus(AsyncStatus.REJECTED);
     }
   }

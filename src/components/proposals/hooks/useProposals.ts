@@ -512,9 +512,11 @@ export function useProposals({
         setSnapshotDraftAndProposalsStatus(AsyncStatus.FULFILLED);
       }
     } catch (error) {
+      const e = error as Error;
+
       setSnapshotDraftAndProposalsStatus(AsyncStatus.REJECTED);
       setSnapshotDraftAndProposals(INITIAL_ARRAY);
-      setSnapshotDraftAndProposalsError(error);
+      setSnapshotDraftAndProposalsError(e);
     }
   }
 

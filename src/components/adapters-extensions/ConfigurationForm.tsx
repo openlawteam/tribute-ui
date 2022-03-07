@@ -179,7 +179,9 @@ export default function ConfigurationForm({
           // @todo Display closing modal message
         }, 3000);
     } catch (error) {
-      setSubmitError(error);
+      const e = error as Error;
+
+      setSubmitError(e);
       setRemoveStatus(Web3TxStatus.REJECTED);
     }
   }
@@ -242,8 +244,10 @@ export default function ConfigurationForm({
 
       setConfigureAdapterStatus(Web3TxStatus.FULFILLED);
     } catch (error) {
+      const e = error as Error;
+
       // Set any errors from Web3 utils or explicitly set above.
-      setSubmitError(error);
+      setSubmitError(e);
       setConfigureAdapterStatus(Web3TxStatus.REJECTED);
     }
   }

@@ -26,7 +26,9 @@ describe('getVotingAdapterABI unit tests', () => {
     try {
       await getVotingAdapterABI('ew' as VotingAdapterName);
     } catch (error) {
-      errorToTest = error;
+      const e = error as Error;
+
+      errorToTest = e;
     }
 
     await waitFor(() => {

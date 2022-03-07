@@ -190,7 +190,9 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
         }
       }
     } catch (error) {
-      setSubmitError(error);
+      const e = error as Error;
+
+      setSubmitError(e);
       setSubmitStatus(FetchStatus.REJECTED);
     }
   }

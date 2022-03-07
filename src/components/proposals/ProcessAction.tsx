@@ -142,7 +142,9 @@ export default function ProcessAction(props: ProcessActionProps) {
         );
       }
     } catch (error) {
-      setSubmitError(error);
+      const e = error as Error;
+
+      setSubmitError(e);
     }
   }
 

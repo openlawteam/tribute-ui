@@ -171,8 +171,10 @@ export function useDaoProposals(proposalIds: string[]): UseDaoProposalsReturn {
         setDaoProposalsStatus(AsyncStatus.FULFILLED);
       }
     } catch (error) {
+      const e = error as Error;
+
       setDaoProposals(INITIAL_DAO_PROPOSAL_ENTRIES);
-      setDaoProposalsError(error);
+      setDaoProposalsError(e);
       setDaoProposalsStatus(AsyncStatus.REJECTED);
     }
   }

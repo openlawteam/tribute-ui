@@ -243,9 +243,11 @@ export function useProposalWithOffchainVoteStatus({
 
         await getStatusFromContractCached();
       } catch (error) {
+        const e = error as Error;
+
         handleStopPollingForStatus();
 
-        setProposalFlowStatusError(error);
+        setProposalFlowStatusError(e);
       }
     }, pollInterval);
 

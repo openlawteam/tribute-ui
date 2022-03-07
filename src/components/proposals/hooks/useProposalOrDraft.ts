@@ -317,8 +317,10 @@ export function useProposalOrDraft(
     } catch (error) {
       if (!isMountedRef.current) return;
 
+      const e = error as Error;
+
       setProposalStatus(AsyncStatus.REJECTED);
-      setProposalError(error);
+      setProposalError(e);
     }
   }
 
@@ -383,8 +385,10 @@ export function useProposalOrDraft(
     } catch (error) {
       if (!isMountedRef.current) return;
 
+      const e = error as Error;
+
       setProposalStatus(AsyncStatus.REJECTED);
-      setProposalError(error);
+      setProposalError(e);
     }
   }
 

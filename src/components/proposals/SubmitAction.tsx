@@ -321,7 +321,9 @@ export default function SubmitAction(props: SubmitActionProps) {
       // Update the proposal
       refetchProposalOrDraft();
     } catch (error) {
-      setSubmitError(error);
+      const e = error as Error;
+
+      setSubmitError(e);
     }
   }
 

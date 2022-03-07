@@ -272,8 +272,10 @@ export function useSignAndSubmitProposal<
 
       return dataToReturn;
     } catch (error) {
+      const e = error as Error;
+
       setProposalSignAndSendStatus(Web3TxStatus.REJECTED);
-      setProposalSignAndSendError(error);
+      setProposalSignAndSendError(e);
 
       throw error;
     }

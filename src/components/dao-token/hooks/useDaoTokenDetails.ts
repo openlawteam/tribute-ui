@@ -79,9 +79,11 @@ export function useDaoTokenDetails(): UseDaoTokenDetailsReturn {
 
       setDaoTokenDetailsStatus(AsyncStatus.FULFILLED);
     } catch (error) {
-      console.log(error);
+      const e = error as Error;
+
+      console.log(e);
       setDaoTokenDetails(undefined);
-      setDaoTokenDetailsError(error);
+      setDaoTokenDetailsError(e);
       setDaoTokenDetailsStatus(AsyncStatus.REJECTED);
     }
   }

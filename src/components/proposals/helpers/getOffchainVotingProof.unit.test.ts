@@ -17,7 +17,9 @@ describe('getOffchainVotingProof unit tests', () => {
     try {
       testResponse = await getOffchainVotingProof(DEFAULT_MERKLE_ROOT_HEX);
     } catch (error) {
-      testError = error;
+      const e = error as Error;
+
+      testError = e;
     }
 
     await waitFor(async () => {
@@ -40,7 +42,9 @@ describe('getOffchainVotingProof unit tests', () => {
     try {
       testResponse = await getOffchainVotingProof(DEFAULT_MERKLE_ROOT_HEX);
     } catch (error) {
-      testError = error;
+      const e = error as Error;
+
+      testError = e;
     }
 
     await waitFor(async () => {

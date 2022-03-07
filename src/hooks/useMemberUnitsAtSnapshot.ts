@@ -240,9 +240,11 @@ export function useMemberUnitsAtSnapshot(
     } catch (error) {
       if (!isMountedRef.current) return;
 
+      const e = error as Error;
+
       setHasMembershipAtSnapshot(false);
       setMemberUnitsAtSnapshot(undefined);
-      setMemberUnitsAtSnapshotError(error);
+      setMemberUnitsAtSnapshotError(e);
       setMemberUnitsAtSnapshotStatus(REJECTED);
     }
   }

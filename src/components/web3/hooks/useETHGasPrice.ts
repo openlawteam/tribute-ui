@@ -186,7 +186,9 @@ export function useETHGasPrice(props?: {
     } catch (error) {
       if (!isMountedRef.current) return;
 
-      setGasPriceError(error);
+      const e = error as Error;
+
+      setGasPriceError(e);
       setGasPrices(INITIAL_GAS_PRICES);
       setGasPriceStatus(AsyncStatus.REJECTED);
     }

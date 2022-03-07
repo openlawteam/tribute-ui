@@ -113,7 +113,9 @@ export function useContractPoll<T>(
 
       intervalIdRef.current = intervalIdToSet;
     } catch (error) {
-      setPollContractError(error);
+      const e = error as Error;
+
+      setPollContractError(e);
     }
   }
 

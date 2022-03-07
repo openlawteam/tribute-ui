@@ -120,9 +120,11 @@ export function useDaoConfigurations(
 
       setDaoConfigurationsStatus(AsyncStatus.FULFILLED);
     } catch (error) {
+      const e = error as Error;
+
       setDaoConfigurations(INITIAL_CONFIG_ENTRIES);
       setDaoConfigurationsStatus(AsyncStatus.REJECTED);
-      setDaoConfigurationsError(error);
+      setDaoConfigurationsError(e);
     }
   }
 

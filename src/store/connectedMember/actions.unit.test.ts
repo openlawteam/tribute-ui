@@ -274,7 +274,7 @@ describe('connectedMember actions unit tests', () => {
         })
       );
     } catch (error) {
-      thrownError = error;
+      thrownError = error as Error;
     }
 
     await waitFor(() => {

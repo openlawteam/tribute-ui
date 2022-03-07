@@ -250,8 +250,10 @@ export function useTokenHolderBalances(): UseTokenHolderBalancesReturn {
         });
       }
     } catch (error) {
+      const e = error as Error;
+
       setTokenHolderBalances(undefined);
-      setTokenHolderBalancesError(error);
+      setTokenHolderBalancesError(e);
     }
   }
 

@@ -612,7 +612,9 @@ export default function CreateOnboardingProposal() {
       history.push(`/onboarding/${proposalId}`);
     } catch (error) {
       // Set any errors from Web3 utils or explicitly set above.
-      setSubmitError(error);
+      const e = error as Error;
+
+      setSubmitError(e);
     }
   }
 

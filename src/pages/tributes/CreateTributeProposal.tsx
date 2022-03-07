@@ -368,7 +368,9 @@ export default function CreateTributeProposal() {
       history.push(`/tributes/${proposalId}`);
     } catch (error) {
       // Set any errors from Web3 utils or explicitly set above.
-      setSubmitError(error);
+      const e = error as Error;
+
+      setSubmitError(e);
     }
   }
 

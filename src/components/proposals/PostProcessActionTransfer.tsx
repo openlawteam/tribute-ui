@@ -216,7 +216,9 @@ export default function PostProcessActionTransfer(
         );
       }
     } catch (error) {
-      setSubmitError(error);
+      const e = error as Error;
+
+      setSubmitError(e);
     }
   }
 

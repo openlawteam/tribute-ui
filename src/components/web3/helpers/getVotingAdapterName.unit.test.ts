@@ -37,7 +37,7 @@ describe('getVotingAdapterName unit tests', () => {
     try {
       await getVotingAdapterName(DEFAULT_ETH_ADDRESS, web3);
     } catch (error) {
-      thrownError = error;
+      thrownError = error as Error;
     }
 
     await waitFor(() => {
@@ -63,7 +63,7 @@ describe('getVotingAdapterName unit tests', () => {
     try {
       await getVotingAdapterName('abc123', web3);
     } catch (error) {
-      thrownError = error;
+      thrownError = error as Error;
     }
 
     await waitFor(() => {

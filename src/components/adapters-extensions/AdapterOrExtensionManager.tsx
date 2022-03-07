@@ -385,14 +385,16 @@ export default function AdapterOrExtensionManager() {
       // init adapter/extension contracts
       initAdapterExtensionContract(adapterOrExtensionName, web3Instance);
     } catch (error) {
+      const e = error as Error & {code: number};
+
       setIsInProcess((prevState) => ({
         ...prevState,
         [adapterOrExtensionName]: false,
       }));
 
       const errorMessage = new Error(
-        error && error?.code === 4001
-          ? error.message
+        e && e?.code === 4001
+          ? e.message
           : `Unable to add ${adapterOrExtensionName} ${adapterOrExtensionType}; ${error}`
       );
       setSubmitError(errorMessage);
@@ -487,10 +489,10 @@ export default function AdapterOrExtensionManager() {
         }
       }
     } catch (error) {
+      const e = error as Error & {code: number};
+
       const errorMessage = new Error(
-        error && error?.code === 4001
-          ? error.message
-          : `Unable to add adapters; ${error}`
+        e && e?.code === 4001 ? e.message : `Unable to add adapters; ${error}`
       );
       setSubmitError(errorMessage);
 
@@ -535,9 +537,11 @@ export default function AdapterOrExtensionManager() {
       setInputParameters(inputs);
       setOpenConfigureModal(true);
     } catch (error) {
+      const e = error as Error & {code: number};
+
       const errorMessage = new Error(
-        error && error?.code === 4001
-          ? error.message
+        e && e?.code === 4001
+          ? e.message
           : `${adapterOrExtension.name} contract not found`
       );
       setSubmitError(errorMessage);

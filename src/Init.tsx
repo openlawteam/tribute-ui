@@ -161,7 +161,9 @@ export default function Init(props: InitProps) {
 
       await initContracts({web3Instance});
     } catch (error) {
-      setError(error);
+      const e = error as Error;
+
+      setError(e);
     }
   }
 
@@ -184,7 +186,9 @@ export default function Init(props: InitProps) {
         })
       );
     } catch (error) {
-      setError(error);
+      const e = error as Error;
+
+      setError(e);
     }
   }
 

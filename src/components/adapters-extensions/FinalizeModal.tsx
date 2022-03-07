@@ -150,7 +150,9 @@ export default function FinalizeModal({
           closeHandler();
         }, TIMEOUT_INTERVAL);
     } catch (error) {
-      setSubmitError(error);
+      const e = error as Error;
+
+      setSubmitError(e);
     }
   }
 

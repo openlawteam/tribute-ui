@@ -74,7 +74,9 @@ export function useDao(): UseDaoReturn {
         }
       }
     } catch (error) {
-      setDaoError(error);
+      const e = error as Error;
+
+      setDaoError(e);
     }
   }
 
