@@ -19,6 +19,8 @@ export function getAlchemyURL(
   networkID: typeof CHAINS[keyof typeof CHAINS] = DEFAULT_CHAIN
 ): AlchemyAPIURL | undefined {
   if (!process.env.REACT_APP_ALCHEMY_API_KEY) {
+    console.warn('No Alchemy API key was found.');
+
     return;
   }
 
