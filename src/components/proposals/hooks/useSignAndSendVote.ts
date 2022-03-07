@@ -244,8 +244,10 @@ export function useSignAndSendVote(): UseSignAndSendVoteReturn {
 
       return dataToReturn;
     } catch (error) {
+      const e = error as Error;
+
       setVoteDataStatus(Web3TxStatus.REJECTED);
-      setVoteDataError(error);
+      setVoteDataError(e);
 
       throw error;
     }

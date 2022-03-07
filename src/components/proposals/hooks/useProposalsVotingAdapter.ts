@@ -210,9 +210,11 @@ export function useProposalsVotingAdapter(
       setProposalsVotingAdapters(votingAdaptersToSet);
       setProposalsVotingAdaptersStatus(AsyncStatus.FULFILLED);
     } catch (error) {
+      const e = error as Error;
+
       setProposalsVotingAdaptersStatus(AsyncStatus.REJECTED);
       setProposalsVotingAdapters([]);
-      setProposalsVotingAdaptersError(error);
+      setProposalsVotingAdaptersError(e);
     }
   }
 

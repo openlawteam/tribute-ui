@@ -500,7 +500,9 @@ export default function CreateTransferProposal() {
       history.push(`/transfers/${proposalId}`);
     } catch (error) {
       // Set any errors from Web3 utils or explicitly set above.
-      setSubmitError(error);
+      const e = error as Error;
+
+      setSubmitError(e);
     }
   }
 

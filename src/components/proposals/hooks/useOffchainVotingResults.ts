@@ -222,9 +222,11 @@ export function useOffchainVotingResults(
     } catch (error) {
       if (!isMountedRef.current) return;
 
+      const e = error as Error;
+
       setOffchainVotingResultsStatus(AsyncStatus.REJECTED);
       setVotingResults([]);
-      setOffchainVotingResultsError(error);
+      setOffchainVotingResultsError(e);
     }
   }
 

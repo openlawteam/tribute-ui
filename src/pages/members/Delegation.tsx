@@ -461,12 +461,14 @@ function DelegationModal({
         }, 2000);
       }
     } catch (error) {
-      console.log(error);
-      let parsedError = error;
+      const e = error as Error;
+
+      console.log(e);
+      let parsedError = e;
 
       if (
-        error.message.includes('cannot overwrite existing delegated keys') ||
-        error.message.includes('address already taken as delegated key')
+        e.message.includes('cannot overwrite existing delegated keys') ||
+        e.message.includes('address already taken as delegated key')
       ) {
         parsedError = new Error(
           'The provided address cannot be another member or already in use as a delegate.'
@@ -528,9 +530,11 @@ function DelegationModal({
         }, 2000);
       }
     } catch (error) {
-      console.log(error);
+      const e = error as Error;
 
-      setSubmitError(error);
+      console.log(e);
+
+      setSubmitError(e);
     }
   }
 

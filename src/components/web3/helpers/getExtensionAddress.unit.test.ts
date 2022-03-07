@@ -37,7 +37,9 @@ describe('getExtensionAddress unit tests', () => {
     try {
       await getExtensionAddress(ContractExtensionNames.bank, undefined);
     } catch (error) {
-      capturedError = error.message;
+      const {message} = error as Error;
+
+      capturedError = message;
     }
 
     expect(capturedError).toBe('No DaoRegistry contract instance provided.');

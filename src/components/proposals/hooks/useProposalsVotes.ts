@@ -208,9 +208,11 @@ export function useProposalsVotes(
         }
       }
     } catch (error) {
+      const e = error as Error;
+
       setProposalsVotes([]);
       setProposalsVotesStatus(AsyncStatus.REJECTED);
-      setProposalsVotesError(error);
+      setProposalsVotesError(e);
     }
   }
 

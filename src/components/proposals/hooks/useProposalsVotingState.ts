@@ -203,9 +203,11 @@ export function useProposalsVotingState(
         );
       }
     } catch (error) {
+      const e = error as Error;
+
       setProposalsVotingStateStatus(AsyncStatus.REJECTED);
       setProposaslsVotingState([]);
-      setProposalsVotingStateError(error);
+      setProposalsVotingStateError(e);
     }
   }
 

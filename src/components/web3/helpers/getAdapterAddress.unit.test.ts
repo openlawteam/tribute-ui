@@ -37,7 +37,9 @@ describe('getAdapterAddress unit tests', () => {
     try {
       await getAdapterAddress(ContractAdapterNames.onboarding, undefined);
     } catch (error) {
-      capturedError = error.message;
+      const e = error as Error;
+
+      capturedError = e.message;
     }
 
     expect(capturedError).toBe('No DaoRegistry contract instance provided.');

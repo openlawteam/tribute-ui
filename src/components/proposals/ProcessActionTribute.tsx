@@ -339,7 +339,9 @@ export default function ProcessActionTribute(props: ProcessActionTributeProps) {
         }
       }
     } catch (error) {
-      setSubmitError(error);
+      const e = error as Error;
+
+      setSubmitError(e);
     }
   }
 

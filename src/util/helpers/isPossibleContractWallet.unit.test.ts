@@ -83,7 +83,7 @@ describe('isPossibleContractWallet unit tests', () => {
     try {
       await isPossibleContractWallet(DEFAULT_ETH_ADDRESS, provider);
     } catch (error) {
-      resultError = error;
+      resultError = error as Error;
     }
 
     await waitFor(() => {
@@ -113,7 +113,7 @@ describe('isPossibleContractWallet unit tests', () => {
     try {
       await isPossibleContractWallet('', provider);
     } catch (error) {
-      resultError = error;
+      resultError = error as Error;
     }
 
     await waitFor(() => {
@@ -143,7 +143,7 @@ describe('isPossibleContractWallet unit tests', () => {
     try {
       await isPossibleContractWallet('0x0', provider);
     } catch (error) {
-      resultError = error;
+      resultError = error as Error;
     }
 
     await waitFor(() => {

@@ -134,12 +134,14 @@ export function getConnectedMember({
             .isActiveMember(daoRegistryAddress, account)
             .call();
         } catch (error) {
+          const e = error as Error;
+
           /**
            * Error message indicates that the member has set a delegate address.
            * In this situation, the "active member" is considered to be the
            * delegate address (and not the original member address).
            */
-          if (error.message.includes('call with your delegate key')) {
+          if (e.message.includes('call with your delegate key')) {
             isActiveMember = false;
           } else {
             throw error;

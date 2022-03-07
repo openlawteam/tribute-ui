@@ -133,7 +133,9 @@ export default function CreateGovernanceProposal() {
       // Go to newly creatd governance proposal's page
       history.push(`/governance/${uniqueId}`);
     } catch (error) {
-      setSubmitError(error);
+      const e = error as Error;
+
+      setSubmitError(e);
     }
   }
 

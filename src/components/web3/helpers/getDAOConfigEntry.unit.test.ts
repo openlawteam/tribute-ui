@@ -60,7 +60,9 @@ describe('getDAOConfigEntry unit tests', () => {
         ContractDAOConfigKeys.offchainVotingVotingPeriod
       );
     } catch (error) {
-      capturedError = error.message;
+      const {message} = error as Error;
+
+      capturedError = message;
     }
 
     expect(capturedError).toBe('No DaoRegistry contract instance provided.');

@@ -82,7 +82,9 @@ export function useContractSend(): UseContractSendReturn {
 
       return receipt;
     } catch (error) {
-      setTxError(error);
+      const e = error as Error;
+
+      setTxError(e);
       setTxStatus(Web3TxStatus.REJECTED);
       setTxIsPromptOpen(false);
 

@@ -347,7 +347,9 @@ export function OffchainOpRollupVotingSubmitResultAction(
         txArguments
       );
     } catch (error) {
-      setSubmitError(error);
+      const e = error as Error;
+
+      setSubmitError(e);
       setSignatureStatus(Web3TxStatus.REJECTED);
     }
   }
