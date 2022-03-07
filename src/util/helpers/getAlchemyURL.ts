@@ -18,12 +18,6 @@ type AlchemyAPIURL = `https://eth-${
 export function getAlchemyURL(
   networkID: typeof CHAINS[keyof typeof CHAINS] = DEFAULT_CHAIN
 ): AlchemyAPIURL | undefined {
-  if (!process.env.REACT_APP_ALCHEMY_API_KEY) {
-    console.warn('No Alchemy API key was found.');
-
-    return;
-  }
-
   if (
     // Alchemy does not support the following networks
     networkID === CHAINS.GANACHE ||
@@ -35,6 +29,12 @@ export function getAlchemyURL(
     networkID === CHAINS.AVALANCHE_TEST ||
     networkID === CHAINS.AVALANCHE_MAIN
   ) {
+    return;
+  }
+
+  if (!process.env.REACT_APP_ALCHEMY_API_KEY) {
+    console.warn('No Alchemy API key was found.');
+
     return;
   }
 
