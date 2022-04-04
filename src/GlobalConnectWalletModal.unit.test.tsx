@@ -212,7 +212,9 @@ describe('GlobalConnectWalletModal unit tests', () => {
     // Assert modal open
     await waitFor(() => {
       expect(
-        screen.getByText(/smart contract wallets are not currently supported/i)
+        screen.getByText(
+          /smart contract wallets are not generally supported for features like off-chain voting/i
+        )
       ).toBeInTheDocument();
 
       expect(screen.getByText(/^connect wallet$/i)).toBeInTheDocument();
@@ -260,7 +262,9 @@ describe('GlobalConnectWalletModal unit tests', () => {
     // Assert modal open
     await waitFor(() => {
       expect(
-        screen.getByText(/smart contract wallets are not currently supported/i)
+        screen.getByText(
+          /smart contract wallets are not generally supported for features like off-chain voting/i
+        )
       ).toBeInTheDocument();
 
       expect(screen.getByText(/^connect wallet$/i)).toBeInTheDocument();
@@ -278,7 +282,9 @@ describe('GlobalConnectWalletModal unit tests', () => {
     // Assert modal closed
     await waitFor(() => {
       expect(() =>
-        screen.getByText(/smart contract wallets are not currently supported/i)
+        screen.getByText(
+          /smart contract wallets are not generally supported for features like off-chain voting/i
+        )
       ).toThrow();
     });
 
@@ -290,7 +296,9 @@ describe('GlobalConnectWalletModal unit tests', () => {
     // Assert modal open
     await waitFor(() => {
       expect(
-        screen.getByText(/smart contract wallets are not currently supported/i)
+        screen.getByText(
+          /smart contract wallets are not generally supported for features like off-chain voting/i
+        )
       ).toBeInTheDocument();
     });
   });

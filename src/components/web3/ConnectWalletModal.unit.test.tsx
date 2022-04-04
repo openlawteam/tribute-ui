@@ -572,7 +572,9 @@ describe('ConnectWalletModal unit tests', () => {
     // Assert modal open
     await waitFor(() => {
       expect(
-        screen.getByText(/smart contract wallets are not currently supported/i)
+        screen.getByText(
+          /smart contract wallets are not generally supported for features like off-chain voting/i
+        )
       ).toBeInTheDocument();
 
       expect(screen.getByText(/^connect wallet$/i)).toBeInTheDocument();
@@ -633,7 +635,7 @@ describe('ConnectWalletModal unit tests', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          /smart contract wallets are not currently supported\. as a member, you can/i
+          /smart contract wallets are not generally supported for features like off-chain voting\. as a member, you can/i
         )
       ).toBeInTheDocument();
 
