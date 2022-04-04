@@ -147,9 +147,10 @@ export default function ConnectWalletModal(
     ) : null;
 
     return (
-      <p className="error-message">
+      <p>
         <small>
-          Smart contract wallets are not currently supported. {maybeMemberText}
+          Smart contract wallets are not generally supported for features like
+          off-chain voting. {maybeMemberText}
         </small>
       </p>
     );
