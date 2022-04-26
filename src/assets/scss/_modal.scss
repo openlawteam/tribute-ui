@@ -55,6 +55,7 @@
   ); /* min font-size 1.125rem, max 1.5rem */
   letter-spacing: 1px;
   font-weight: 500;
+  color: #ff6f6f;
 }
 
 .modal__subtitle {
@@ -66,6 +67,7 @@
     18px
   ); /* min font-size 1rem, max 1.125rem */
   margin-bottom: 1.5rem;
+  color: $color-deepsmoke;
 }
 
 .modal__close-button {

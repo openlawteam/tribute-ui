@@ -202,14 +202,14 @@ export function NavHamburger() {
                       <span>Projects</span>
                     </NavLink>
                   </li>
-                  <li
+                  {/*<li
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
                     <NavLink to="/tributes">
                       <span>Tribute</span>
                     </NavLink>
-                  </li>
+                  </li> */}
                   <li
                     onClick={() => {
                       handleMenuModalClose(false);

@@ -187,7 +187,7 @@ export default function ConnectWalletModal(
 
         {/* SUBTITLE */}
         {(!connected || !isWrongNetwork) && (
-          <div className="modal__subtitle">Choose your wallet</div>
+          <div className="modal__subtitle">Choose your wallet 😎</div>
         )}
 
         {/* POSSIBLE CONTRACT WALLET WARNING TEXT */}

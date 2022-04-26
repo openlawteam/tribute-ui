@@ -556,9 +556,13 @@ export default function CreateTransferProposal() {
   function getUnauthorizedMessage() {
     // user is not connected
     if (!isConnected) {
-      return 'Connect your wallet to submit a transfer proposal.';
+      return (
+        <>
+          <p style={{color:"#ff6f6f"}}>Connect your wallet to submit a transfer proposal</p>
+          </>
+      )
     }
-
+      
     // user is on wrong network
     if (defaultChainError) {
       return defaultChainError.message;

@@ -88,7 +88,24 @@ function renderUnauthorizedMessage({
 }) {
   // user is not connected
   if (!isConnected) {
-    return 'Connect your wallet to submit an onboarding proposal.';
+    return (
+      <div className="proposalcard">
+        <div className="proposalcard__content">
+          <p>
+            ProdCapsule DAO aims to bring together members who are interested
+            in supporting the growing digital gaming ecosystem. Ready Player DAO
+            will have up to — initial members, who will pool their capital to
+            make investments. Each member can purchase — Ready Player DAO units
+            for — ETH (up to — units for — ETH). Please put your preferred ETH
+            address below and the amount of ETH you'd like to contribute to
+            Ready Player DAO. Once you fill this out, you will be fully
+            onboarded and sent information on the Ready Player DAO weekly call
+            and Discord community.
+          </p>
+          <p style={{color:"#ff6f6f"}}>Connect your wallet to get started.</p>
+        </div>
+      </div>
+    );
   }
 
   // user is on wrong network

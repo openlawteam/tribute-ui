@@ -54,6 +54,11 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
       <FadeIn>
         <div className="titlebar">
           <h2 className="titlebar__title">Governance</h2>
+          <p>
+            ProdCapsule is run entirely by its members. Below are all the
+            governance votes and proposals.
+          </p>
+
           <button className="titlebar__action" onClick={goToNewProposal}>
             New Proposal
           </button>

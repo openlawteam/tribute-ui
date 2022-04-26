@@ -1,10 +1,12 @@
-import DiscordSVG from '../../assets/svg/DiscordSVG';
+// import DiscordSVG from '../../assets/svg/DiscordSVG';
 import GitHubSVG from '../../assets/svg/GitHubSVG';
+import TwitterSVG from '../../assets/svg/TwitterSVG';
 // import MediumSVG from '../../assets/svg/MediumSVG';
 
 // @todo Add missing URLs when available
 enum SocialMediaLinks {
-  DISCORD = 'https://discord.gg/tEfP68xnTd',
+  TWITTER = 'https://twitter.com/cine_capsule',
+  //DISCORD = '',
   /*
    * query params search sepcifically for:
    * openlawteam/tribute-ui
@@ -12,7 +14,7 @@ enum SocialMediaLinks {
    * openlawteam/tribute-contracts-cli
    * openlawteam/tribute-subgraph
    */
-  GITHUB = 'https://github.com/search?q=org%3Aopenlawteam+tribute-ui+OR+tribute-contracts+OR+tribute-subgraph+in%3Aname&type=repositories',
+  GITHUB = 'https://github.com/CineCapsule',
   // MEDIUM = '#',
 }
 
@@ -25,11 +27,17 @@ export default function SocialMedia() {
         rel="noopener noreferrer">
         <MediumSVG />
       </a> */}
-      <a
+      {/*<a
         href={SocialMediaLinks.DISCORD}
         target="_blank"
         rel="noopener noreferrer">
         <DiscordSVG />
+      </a> */}
+      <a
+        href={SocialMediaLinks.TWITTER}
+        target="_blank"
+        rel="noopener noreferrer">
+        <TwitterSVG />
       </a>
       <a
         href={SocialMediaLinks.GITHUB}

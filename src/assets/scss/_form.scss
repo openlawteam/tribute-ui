@@ -33,7 +33,7 @@
   @extend .form__description;
 
   text-align: center;
-  color: $color-brightsalmon;
+  color:$color-background-primary;
 }
 
 .form__header {
@@ -43,6 +43,7 @@
 
   p:last-child {
     margin-bottom: 0;
+  
   }
 }
 
