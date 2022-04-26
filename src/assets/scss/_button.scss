@@ -34,12 +34,17 @@
   font-family: $font-accent;
   text-transform: lowercase;
   font-size: 1.25rem;
+  color: $color-darkblue;
+}
+
+.button.hover{
+  background-color:$color-brightsalmon;
 }
 
 .button--secondary {
   @extend %button;
 
-  background-color: $color-background-secondary;
+background-color: $color-litesmoke;
   border: none;
   border-radius: 12px;
   font-family: $font-body;

@@ -66,9 +66,7 @@ export default function GetStarted() {
           <CenterLogo />
 
           <div className="landing">
-            <div className="landing__subtitle">
-              A next generation DAO framework
-            </div>
+            <div className="landing__subtitle">A DAO for Cinema lovers ❤️</div>
 
             <div className="landing__img">
               <TributeCube />
@@ -80,8 +78,18 @@ export default function GetStarted() {
                 onClick={() => {
                   history.push(ENABLE_KYC_ONBOARDING ? '/join' : '/onboard');
                 }}>
-                Join
+                BECOME A MEMBER
               </button>
+            </div>
+            <br></br>
+            <div>
+              <a
+                className="landing__link"
+                href="https://medium.com/"
+                target="_blank"
+                rel="noopener noreferrer">
+                LEARN MORE
+              </a>
             </div>
           </div>
         </FadeIn>

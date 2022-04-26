@@ -199,7 +199,7 @@ export function NavHamburger() {
                       handleMenuModalClose(false);
                     }}>
                     <NavLink to="/onboarding">
-                      <span>Onboarding</span>
+                      <span>Projects</span>
                     </NavLink>
                   </li>
                   <li

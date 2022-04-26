@@ -190,6 +190,9 @@ main {
 .pulse {
   animation: pulse 0.9s infinite ease-in-out alternate;
 }
+hr{
+  max-width: 100px;
+}
 @keyframes pulse {
   from {
     transform: scale(0.8);
