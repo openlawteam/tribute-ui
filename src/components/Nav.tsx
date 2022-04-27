@@ -198,34 +198,49 @@ export function NavHamburger() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
+                    <NavLink to="/onboard">
+                      <span>Become a member</span>
+                    </NavLink>
+                  </li>
+                  <li
+                    onClick={() => {
+                      handleMenuModalClose(false);
+                    }}>
                     <NavLink to="/onboarding">
                       <span>Projects</span>
                     </NavLink>
                   </li>
-                  {/*<li
-                    onClick={() => {
-                      handleMenuModalClose(false);
-                    }}>
-                    <NavLink to="/tributes">
-                      <span>Tribute</span>
-                    </NavLink>
-                  </li> */}
-                  <li
-                    onClick={() => {
-                      handleMenuModalClose(false);
-                    }}>
-                    <NavLink to="/transfers">
-                      <span>Transfer</span>
-                    </NavLink>
-                  </li>
-                  <li
-                    onClick={() => {
-                      handleMenuModalClose(false);
-                    }}>
-                    <NavLink to="/governance">
-                      <span>Governance</span>
-                    </NavLink>
-                  </li>
+                  {isCurrentMemberOrDelegateConnected && (
+                    <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to="/governance">
+                        <span>Governance</span>
+                      </NavLink>
+                    </li>
+                  )}
+
+                  {isCurrentMemberOrDelegateConnected && (
+                    <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to="/tributes">
+                        <span>Tribute</span>
+                      </NavLink>
+                    </li>
+                  )}
+                  {isCurrentMemberOrDelegateConnected && (
+                    <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to="/transfers">
+                        <span>Transfer</span>
+                      </NavLink>
+                    </li>
+                  )}
                   <li
                     onClick={() => {
                       handleMenuModalClose(false);
@@ -246,6 +261,7 @@ export function NavHamburger() {
                       </NavLink>
                     </li>
                   )}
+
                   {/* @note Disabling DAO Manager for now because we paused on maintaining it. */}
                   {/* {isActiveMemberConnected && (
                     <li
