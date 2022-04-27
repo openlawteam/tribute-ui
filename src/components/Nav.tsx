@@ -199,7 +199,7 @@ export function NavHamburger() {
                       handleMenuModalClose(false);
                     }}>
                     <NavLink to="/onboard">
-                      <span>Become a member</span>
+                      <span>📽 Become a member</span>
                     </NavLink>
                   </li>
                   <li
@@ -207,7 +207,7 @@ export function NavHamburger() {
                       handleMenuModalClose(false);
                     }}>
                     <NavLink to="/onboarding">
-                      <span>Projects</span>
+                      <span>📽 Projects</span>
                     </NavLink>
                   </li>
                   {isCurrentMemberOrDelegateConnected && (
@@ -216,7 +216,7 @@ export function NavHamburger() {
                         handleMenuModalClose(false);
                       }}>
                       <NavLink to="/governance">
-                        <span>Governance</span>
+                        <span>📽 Governance</span>
                       </NavLink>
                     </li>
                   )}
@@ -227,7 +227,7 @@ export function NavHamburger() {
                         handleMenuModalClose(false);
                       }}>
                       <NavLink to="/tributes">
-                        <span>Tribute</span>
+                        <span>📽 Tribute</span>
                       </NavLink>
                     </li>
                   )}
@@ -237,7 +237,7 @@ export function NavHamburger() {
                         handleMenuModalClose(false);
                       }}>
                       <NavLink to="/transfers">
-                        <span>Transfer</span>
+                        <span>📽 Transfer</span>
                       </NavLink>
                     </li>
                   )}
@@ -246,7 +246,7 @@ export function NavHamburger() {
                       handleMenuModalClose(false);
                     }}>
                     <NavLink to="/members">
-                      <span>Members</span>
+                      <span>📽 Members</span>
                     </NavLink>
                   </li>
                   {/* The Profile link for the member account is available to both the connected member address and its delegate address. */}
@@ -257,7 +257,7 @@ export function NavHamburger() {
                       }}>
                       <NavLink
                         to={`/members/${connectedMember?.memberAddress}`}>
-                        <span>Profile</span>
+                        <span>📽 Profile</span>
                       </NavLink>
                     </li>
                   )}
