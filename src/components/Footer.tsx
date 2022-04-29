@@ -33,7 +33,7 @@ export default function Footer() {
           </a>
           <a
             className="footer_item__PztHD org-footer-item"
-            href=""
+            href="mailto:hello@cinecapsule.com"
             target="_blank"
             rel="noopener noreferrer">
             Contact Us

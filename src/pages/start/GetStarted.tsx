@@ -6,7 +6,7 @@ import '../../../node_modules/aos/dist/aos.css';
 import {CenterLogo} from '../../components/logo';
 import {NavHamburger} from '../../components/Nav';
 import FadeIn from '../../components/common/FadeIn';
-import SocialMedia from '../../components/common/SocialMedia';
+// import SocialMedia from '../../components/common/SocialMedia';
 import Wrap from '../../components/common/Wrap';
 import {ENABLE_KYC_ONBOARDING} from '../../config';
 import Footer from '../../components/Footer';
