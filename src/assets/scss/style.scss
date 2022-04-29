@@ -93,7 +93,11 @@ p {
 }
 
 a {
-  color: $color-primary;
+  color: #ffffff;
+}
+a.landing__link{
+  
+  color: #6df4fa;
 }
 
 /* react mount point */

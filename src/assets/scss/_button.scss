@@ -28,14 +28,28 @@
 .button {
   @extend %button;
 
-  background-color: $color-background-primary;
+  
   border-radius: 15px;
   border: 1px solid $color-border-primary;
   font-family: $font-accent;
   text-transform: lowercase;
   font-size: 1.25rem;
   color: $color-darkblue;
+  text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    border-color: #70d85f;
+    color: #70d85f;
+    border-radius: 1.5em;
+    background-color: transparent;
+    border: 3px solid;
+    border-radius: 3em;
+    font-size: 1.125rem;
+    padding: 1em 1.75em;
 }
+
+
+
+
 
 .button.hover{
   background-color:$color-brightsalmon;

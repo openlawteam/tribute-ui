@@ -9,6 +9,7 @@ import FadeIn from '../../components/common/FadeIn';
 import SocialMedia from '../../components/common/SocialMedia';
 import Wrap from '../../components/common/Wrap';
 import {ENABLE_KYC_ONBOARDING} from '../../config';
+import Footer from '../../components/Footer';
 
 const TributeCube = memo(() => {
   return (
@@ -27,7 +28,7 @@ const TributeCube = memo(() => {
 function GetStartedHeader() {
   return (
     <div data-testid="get-started-header" className="landing__header">
-      <SocialMedia />
+      {/*<SocialMedia ></SocialMedia>*/}
       <NavHamburger />
     </div>
   );
@@ -92,8 +93,36 @@ export default function GetStarted() {
               </a>
             </div>
           </div>
+          <br></br>
+          <div className="interest_submit-container">
+            <div className="interest_submit-proposal__1cudS">
+              <span
+                className="interest_submit-proposal__image__1JcQq"
+                aria-label="Unicorn emoji"
+                role="img">
+                📽
+              </span>
+              <div className="interest_submit-proposal__title__dZrRm">
+                Looking for funding?
+              </div>
+              <div>
+                The ProdCapsule is a global group of Fuse enthusiasts and experts
+                supporting the work of Fuse builders.
+              </div>
+              <button className="button_submit_proposal"
+              onClick={() => {
+                history.push(ENABLE_KYC_ONBOARDING ? '/join' : '/onboarding');
+              }}>
+              
+                Submit a proposal
+              </button>
+            </div>
+          </div>
         </FadeIn>
       </Wrap>
+      <Footer />
     </>
   );
 }
+
+  
