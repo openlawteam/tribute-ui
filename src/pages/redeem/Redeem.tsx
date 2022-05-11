@@ -101,7 +101,7 @@ export default function RedeemCoupon() {
       setCouponStatus(AsyncStatus.PENDING);
 
       // handle adding new authorized user to thee `auth` tbl
-      const response = await fetch(`${COUPON_API_URL}/api/coupon/redeem`, {
+      const response = await fetch(`${COUPON_API_URL}/api/coupon/redeem/`, {
         method: 'POST',
         body: JSON.stringify({
           signature: coupon,

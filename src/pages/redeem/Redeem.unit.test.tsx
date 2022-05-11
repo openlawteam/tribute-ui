@@ -67,7 +67,7 @@ describe('RedeemManager unit tests', () => {
 
   test('should render error message when signature provided, but incorrect', async () => {
     server.use(
-      rest.post(`${COUPON_API_URL}/api/coupon/redeem`, (_, res, ctx) => {
+      rest.post(`${COUPON_API_URL}/api/coupon/redeem/`, (_, res, ctx) => {
         return res(ctx.status(500));
       })
     );
@@ -92,7 +92,7 @@ describe('RedeemManager unit tests', () => {
 
   test('should redeem coupon', async () => {
     server.use(
-      rest.post(`${COUPON_API_URL}/api/coupon/redeem`, (_, res, ctx) => {
+      rest.post(`${COUPON_API_URL}/api/coupon/redeem/`, (_, res, ctx) => {
         return res(ctx.json(redeemables));
       })
     );

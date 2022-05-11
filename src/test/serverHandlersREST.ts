@@ -57,12 +57,12 @@ const getSnapshotAPIOffchainProof = rest.get(
  */
 
 const patchRedeemedCoupon = rest.patch(
-  `${COUPON_API_URL}/api/coupon/redeem`,
+  `${COUPON_API_URL}/api/coupon/redeem/`,
   async (_req, res, ctx) => res(ctx.status(200))
 );
 
 const postRedeemedCoupon = rest.post(
-  `${COUPON_API_URL}/api/coupon/redeem`,
+  `${COUPON_API_URL}/api/coupon/redeem/`,
   async (_req, res, ctx) => res(ctx.status(200))
 );
 

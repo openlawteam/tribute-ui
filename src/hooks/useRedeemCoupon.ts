@@ -154,7 +154,7 @@ export function useRedeemCoupon(): ReturnUseRedeemCoupon {
 
       if (txReceipt) {
         // update the db and send email
-        const response = await fetch(`${COUPON_API_URL}/api/coupon/redeem`, {
+        const response = await fetch(`${COUPON_API_URL}/api/coupon/redeem/`, {
           method: 'PATCH',
           body: JSON.stringify({
             // search by signature
