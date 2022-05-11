@@ -258,7 +258,7 @@ describe('useRedeemCoupon unit tests', () => {
     // Mock HTTP error
     server.use(
       rest.patch(
-        `${COUPON_API_URL}/api/coupon/redeem`,
+        `${COUPON_API_URL}/api/coupon/redeem/`,
         async (_req, res, ctx) => res(ctx.status(500))
       )
     );
