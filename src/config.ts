@@ -156,7 +156,7 @@ export const INFURA_WS_URLS: {[chainId: number]: string} = {
   [CHAINS.KOVAN]: `wss://kovan.infura.io/ws/v3`,
   [CHAINS.HARMONY_TEST]: `wss://ws.s0.pops.one`,
   [CHAINS.HARMONY_MAIN]: `wss://ws.s0.t.hmny.io`,
-  [CHAINS.POLYGON_TEST]: `wss://ws-matic-mumbai.chainstacklabs.com`,
+  [CHAINS.POLYGON_TEST]: `wss://polygon-mumbai.g.alchemy.com/v2`,
   [CHAINS.POLYGON]: `wss://ws-matic-mainnet.chainstacklabs.com`,
   [CHAINS.AVALANCHE_TEST]: `wss://api.avax-test.network:9650/ext/bc/C/ws`,
   [CHAINS.AVALANCHE_MAIN]: `wss://api.avax.network:9650/ext/bc/C/ws`,
@@ -171,6 +171,7 @@ export const INFURA_PROJECT_ID =
     : REACT_APP_INFURA_PROJECT_ID_LOCAL;
 
 // Ethereum Provider URL
+// export const ETHEREUM_PROVIDER_URL: string = REACT_APP_ETH_NODE_URL ?
 export const ETHEREUM_PROVIDER_URL: string = INFURA_WS_URLS[DEFAULT_CHAIN]
   ? INFURA_PROJECT_ID
     ? `${INFURA_WS_URLS[DEFAULT_CHAIN]}/${INFURA_PROJECT_ID}`
