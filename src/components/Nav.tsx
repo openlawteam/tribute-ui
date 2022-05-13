@@ -207,7 +207,7 @@ export function NavHamburger() {
                       handleMenuModalClose(false);
                     }}>
                     <NavLink to="/onboarding">
-                      <span>📽 Projects</span>
+                      <span>📽 Onbording</span>
                     </NavLink>
                   </li>
                   {isCurrentMemberOrDelegateConnected && (

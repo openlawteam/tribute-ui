@@ -17,9 +17,7 @@
   font-family: $font-body;
   margin: 0 2rem;
 }
-a.landing__link:hover{
-  background-color:$color-brightsalmon;
-}
+
 .landing__subtitle {
   font-size: 1.2rem;
   font-family: "Lexend Exa",-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
@@ -33,7 +31,9 @@ a.landing__link:hover{
     margin: 2rem 0;
     text-align: center;
     text-transform: uppercase;
-    text-shadow: 2px 2px 1px #6df4fa;
+    text-shadow: 2px 2px 1px rgba(0,0,0,0.1);
+    margin-right: 60%;
+    color:$color-brightsalmon;
 
 
   @include size-medium-down {
@@ -43,6 +43,7 @@ a.landing__link:hover{
 
 .landing__img {
   margin-top: 2rem;
+  margin-left: 100%;
 }
 
 .landing__button {
@@ -50,10 +51,15 @@ a.landing__link:hover{
     font-size: 1.5rem;
     padding: 1rem 4rem;
     margin: 2.5rem 0 1rem;
+    margin-right: 48rem
+;
   }
 }
 .interest_submit-container{
   padding: 0 1rem;
+  margin-top: 100px;
+  width: 60rem;
+;
 
 }
 .interest_submit-proposal__1cudS{
@@ -63,9 +69,11 @@ a.landing__link:hover{
     max-width: 56em;
     text-align: center;
     margin: 0 auto 4rem;
+    border-color: #6df4fa;
     box-sizing: border-box;
+    margin-right: 10rem;
+;
 }
-
 
 .interest_submit-proposal__image__1JcQq{
   display: inline-block;
@@ -74,9 +82,8 @@ a.landing__link:hover{
 }
 .interest_submit-proposal__title__dZrRm{
   text-align: center;
-
   margin-bottom: 2rem;
-  font-size: 1.2rem;
+  font-size: 1.7rem;
 
 }
 .button_submit_proposal{
@@ -88,7 +95,42 @@ a.landing__link:hover{
     font-size: .8rem;
     padding: 1rem 4rem;
     margin: 2.5rem 0 1rem;
+   
 }
+.button_submit_proposal:hover{
+  background: rgba(112,216,95,.15);
+box-shadow: 0 0 1.5rem #6ef4fa;
+}
+
+.row{
+  display: flex;
+}
+.interest_submit_flower{
+  border: 3px solid rgba(32, 32, 32, 0.5);
+  border-radius: 2.5em;
+  padding: 1.5rem 5rem 2rem;
+  max-width: 56em;
+  text-align: center;
+  margin: 0 auto 4rem;
+  border-color: #6df4fa;
+  box-sizing: border-box;
+  margin-right: 10rem;
+}
+.interest_submit-proposal_xyz{
+  border: 3px solid rgba(32, 32, 32, 0.5);
+  border-radius: 2.5em;
+  padding: 1.5rem 5rem 2rem;
+  max-width: 56em;
+  text-align: center;
+  margin: 0 auto 4rem;
+  border-color: #8a8a8a09;
+  box-sizing: border-box;
+  margin-top:15rem;
+  
+}
+
+
+
 
 
 

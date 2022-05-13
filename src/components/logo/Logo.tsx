@@ -5,7 +5,10 @@ interface LogoProps {
 export default function Logo(props: LogoProps) {
   return (
     <div className={`logo ${props.size ? `logo--${props.size}` : ''}`}>
-       ProdCapsule
+       Invest in the films of tomorrow
+       
     </div>
+   
   );
+  
 }

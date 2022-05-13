@@ -19,9 +19,9 @@
   display: flex;
   flex: 1 100%;
   margin: 1rem 0;
-  border: 1px solid $color-brightsalmon;
+  border: 1px solid $color-babyblue;
   border-radius: 15px;
-  box-shadow: 0 2px 2px 0 $color-brightsalmon;
+  box-shadow: 0 2px 2px 0 $color-babyblue;
 
   @include size-medium-down {
     flex-direction: column;

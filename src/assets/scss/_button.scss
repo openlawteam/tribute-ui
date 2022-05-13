@@ -38,13 +38,17 @@
   text-transform: uppercase;
     margin-bottom: 1.5rem;
     border-color: #70d85f;
-    color: #70d85f;
+    color: #ffc039;
     border-radius: 1.5em;
     background-color: transparent;
     border: 3px solid;
     border-radius: 3em;
     font-size: 1.125rem;
     padding: 1em 1.75em;
+}
+.button:hover{
+  background: rgba(112,216,95,.15);
+  box-shadow: 0 0 1.5rem #ffc039;
 }
 
 

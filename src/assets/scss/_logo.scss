@@ -30,6 +30,9 @@
   font-size: 6em;
   font-weight: bold;
   letter-spacing: 6px;
+  text-align: left;
+  margin-top: 100px;
+  margin-left: 20px;
 
   &--small {
     @include fluid-type(

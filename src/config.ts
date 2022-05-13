@@ -126,15 +126,15 @@ export const CHAIN_NAME_FULL = {
 };
 
 export const DEFAULT_CHAIN: typeof CHAINS[keyof typeof CHAINS] =
-  REACT_APP_ENVIRONMENT === 'production'
+  REACT_APP_ENVIRONMENT === 'production' // si on est en prod, on utilise le mainnet
     ? CHAINS.MAINNET
-    : REACT_APP_ENVIRONMENT === 'development'
+    : REACT_APP_ENVIRONMENT === 'development' // si on est en dev, on utilise Rinkeby ...
     ? CHAINS.RINKEBY
-    : REACT_APP_DEFAULT_CHAIN_NAME_LOCAL // Set this to change local development chain
-    ? CHAINS[REACT_APP_DEFAULT_CHAIN_NAME_LOCAL]
-    : CHAINS.GANACHE; // Defaults to a Ganache private network (1337)
+    : REACT_APP_DEFAULT_CHAIN_NAME_LOCAL // ... sinon on utilise le local
+    ? CHAINS[REACT_APP_DEFAULT_CHAIN_NAME_LOCAL] // ... et on le définit comme chain par défaut
+    : CHAINS.GANACHE; // Defaults to a Ganache private network (1337) // ganache est le chain par défaut
 
-export const ETHERSCAN_URLS: {[chainId: number]: string} = {
+export const ETHERSCAN_URLS: {[chainId: number]: string} = { // c'est leur url pour chaque chain id 
   [CHAINS.MAINNET]: `https://etherscan.io`,
   [CHAINS.ROPSTEN]: `https://ropsten.etherscan.io`,
   [CHAINS.RINKEBY]: `https://rinkeby.etherscan.io`,
@@ -164,10 +164,10 @@ export const INFURA_WS_URLS: {[chainId: number]: string} = {
 
 // Infura Project Id
 export const INFURA_PROJECT_ID =
-  REACT_APP_ENVIRONMENT === 'production'
-    ? REACT_APP_INFURA_PROJECT_ID_PROD
-    : REACT_APP_ENVIRONMENT === 'development'
-    ? REACT_APP_INFURA_PROJECT_ID_DEV
+  REACT_APP_ENVIRONMENT === 'production'// si on est en prod, on utilise le mainnet
+    ? REACT_APP_INFURA_PROJECT_ID_PROD // si on est en prod, on utilise le mainnet
+    : REACT_APP_ENVIRONMENT === 'development'// si on est en dev
+    ? REACT_APP_INFURA_PROJECT_ID_DEV 
     : REACT_APP_INFURA_PROJECT_ID_LOCAL;
 
 // Ethereum Provider URL
@@ -243,7 +243,7 @@ export const DAO_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.GANACHE]: '0x6d92a8E4aB80adcBbFDA44ef69fe847f82def641',
   [CHAINS.HARMONY_TEST]: '',
   [CHAINS.HARMONY_MAIN]: '',
-  [CHAINS.POLYGON_TEST]: '',
+  [CHAINS.POLYGON_TEST]: '0x083e3b23E4168c6864f9e6A3AdbA838950dCA576',
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',

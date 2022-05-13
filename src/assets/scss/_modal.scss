@@ -31,9 +31,9 @@
   max-height: calc(
     100vh - 10rem
   ); /* dynamic height, minus any surrounding margin + padding */
-  background-color: $color-background-primary;
+  background-color: $color-deepsmoke;
   border-radius: 15px;
-  border: 2px solid $color-border-primary;
+  border: 5px solid $color-babyblue;
   padding: 2rem 1rem;
   overflow-y: scroll;
 
@@ -56,6 +56,9 @@
   letter-spacing: 1px;
   font-weight: 500;
   color: #ff6f6f;
+}
+p.card {
+color:black;
 }
 
 .modal__subtitle {

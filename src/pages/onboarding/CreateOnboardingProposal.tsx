@@ -652,6 +652,7 @@ export default function CreateOnboardingProposal() {
 
   return (
     <RenderWrapper>
+      <div className="section-wrapper1">
       <div className="proposalcard">
         <div className="form__description">
           <p>
@@ -792,6 +793,8 @@ export default function CreateOnboardingProposal() {
           )}
         </form>
       </div>
+      </div>
+    
     </RenderWrapper>
   );
 }
