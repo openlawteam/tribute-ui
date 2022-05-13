@@ -101,10 +101,9 @@ export default function GetStarted() {
         </Wrap>
         <div className="interest_submit-container">
           <div className="interest_submit_flower">
-            <img 
-              src="././assets/images/space.png"
+            <img className="submit-space"
+              src="https://i.ibb.co/CKmB0MR/Films-on-Mars.png"
               alt="flower" 
-              className="interest_submit-proposal__image__1JcQq"
               aria-label="Unicorn emoji"
               role="img"
             />
@@ -124,7 +123,7 @@ export default function GetStarted() {
           <div className="interest_submit-proposal__title__dZrRm">
             Looking for funding?
           </div>
-          <div>
+          <div className="interest_submit-proposal-slogan">
             CapsuleProd is a global group of Fuse enthusiasts and experts
             supporting the work of Fuse builders.
           </div>

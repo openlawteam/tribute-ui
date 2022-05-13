@@ -58,7 +58,7 @@
 .interest_submit-container{
   padding: 0 1rem;
   margin-top: 100px;
-  width: 60rem;
+  //width: 60rem;
 ;
 
 }
@@ -83,16 +83,20 @@
 .interest_submit-proposal__title__dZrRm{
   text-align: center;
   margin-bottom: 2rem;
-  font-size: 1.7rem;
+  font-size: 2rem;
+
+}
+.interest_submit-proposal-slogan{
+  font-size: 1.3rem;
 
 }
 .button_submit_proposal{
   text-transform: uppercase;
     background-color: #242424;
     border-color: #242424;
-    color: #70d85f;
+    color: #6df4fa;
     border-radius: 1.5em;
-    font-size: .8rem;
+    font-size: 1.5rem;
     padding: 1rem 4rem;
     margin: 2.5rem 0 1rem;
    
@@ -128,6 +132,7 @@ box-shadow: 0 0 1.5rem #6ef4fa;
   margin-top:15rem;
   
 }
+
 
 
 
