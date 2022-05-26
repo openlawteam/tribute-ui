@@ -91,6 +91,8 @@ export const CHAINS = {
   POLYGON: 137,
   AVALANCHE_TEST: 43113,
   AVALANCHE_MAIN: 43114,
+  FUSE_TEST: 123,
+  FUSE: 122,
 } as const;
 
 // Network names
@@ -107,6 +109,8 @@ export const CHAIN_NAME = {
   [CHAINS.POLYGON_TEST]: 'polygon-testnet',
   [CHAINS.AVALANCHE_TEST]: 'avalanche-fuji',
   [CHAINS.AVALANCHE_MAIN]: 'avalanche-mainnet',
+  [CHAINS.FUSE_TEST]: 'fuse-testnet',
+  [CHAINS.FUSE]: 'fuse-mainnet',
 } as const;
 
 // Network names verbose
@@ -123,6 +127,8 @@ export const CHAIN_NAME_FULL = {
   [CHAINS.POLYGON]: 'Polygon Main Network',
   [CHAINS.AVALANCHE_TEST]: 'Avalanche Fuji Test Network',
   [CHAINS.AVALANCHE_MAIN]: 'Avalanche Main Network',
+  [CHAINS.FUSE_TEST]: 'Fuse Test Network',
+  [CHAINS.FUSE]: 'Fuse Main Network',
 };
 
 export const DEFAULT_CHAIN: typeof CHAINS[keyof typeof CHAINS] =
@@ -146,6 +152,8 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = { // c'est leur url p
   [CHAINS.POLYGON]: `https://polygonscan.com`,
   [CHAINS.AVALANCHE_TEST]: `https://testnet.snowtrace.io`,
   [CHAINS.AVALANCHE_MAIN]: `https://snowtrace.io`,
+  [CHAINS.FUSE_TEST]: `https://explorer.fusespark.io/`,
+  [CHAINS.FUSE]: `https://explorer.fusespark.io/`,
 };
 
 export const INFURA_WS_URLS: {[chainId: number]: string} = {
@@ -160,6 +168,7 @@ export const INFURA_WS_URLS: {[chainId: number]: string} = {
   [CHAINS.POLYGON]: `wss://ws-matic-mainnet.chainstacklabs.com`,
   [CHAINS.AVALANCHE_TEST]: `wss://api.avax-test.network:9650/ext/bc/C/ws`,
   [CHAINS.AVALANCHE_MAIN]: `wss://api.avax.network:9650/ext/bc/C/ws`,
+  [CHAINS.FUSE_TEST]: ``,
 };
 
 // Infura Project Id
@@ -248,6 +257,8 @@ export const DAO_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const BANK_FACTORY_CONTRACT_ADDRESS = {
@@ -263,6 +274,8 @@ export const BANK_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 // @todo
@@ -279,6 +292,8 @@ export const NFT_COLLECTION_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 // @todo
@@ -295,6 +310,8 @@ export const ERC20_TOKEN_FACTORY_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 /**
@@ -331,6 +348,8 @@ export const VOTING_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const CONFIGURATION_CONTRACT_ADDRESS = {
@@ -346,6 +365,8 @@ export const CONFIGURATION_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const RAGEQUIT_CONTRACT_ADDRESS = {
@@ -361,6 +382,8 @@ export const RAGEQUIT_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const MANAGING_CONTRACT_ADDRESS = {
@@ -376,6 +399,8 @@ export const MANAGING_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const FINANCING_CONTRACT_ADDRESS = {
@@ -391,6 +416,8 @@ export const FINANCING_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const ONBOARDING_CONTRACT_ADDRESS = {
@@ -406,6 +433,8 @@ export const ONBOARDING_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const GUILDKICK_CONTRACT_ADDRESS = {
@@ -421,6 +450,8 @@ export const GUILDKICK_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const DAO_REGISTRY_ADAPTER_CONTRACT_ADDRESS = {
@@ -436,6 +467,7 @@ export const DAO_REGISTRY_ADAPTER_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
 };
 
 export const BANK_ADAPTER_CONTRACT_ADDRESS = {
@@ -451,6 +483,8 @@ export const BANK_ADAPTER_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const COUPONONBOARDING_CONTRACT_ADDRESS = {
@@ -466,6 +500,8 @@ export const COUPONONBOARDING_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const TRIBUTE_CONTRACT_ADDRESS = {
@@ -481,6 +517,8 @@ export const TRIBUTE_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const DISTRIBUTE_CONTRACT_ADDRESS = {
@@ -496,6 +534,8 @@ export const DISTRIBUTE_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const TRIBUTE_NFT_CONTRACT_ADDRESS = {
@@ -511,6 +551,8 @@ export const TRIBUTE_NFT_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const OFFCHAINVOTING_CONTRACT_ADDRESS = {
@@ -526,6 +568,8 @@ export const OFFCHAINVOTING_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 export const KYC_ONBOARDING_CONTRACT_ADDRESS = {
@@ -541,6 +585,8 @@ export const KYC_ONBOARDING_CONTRACT_ADDRESS = {
   [CHAINS.POLYGON]: '',
   [CHAINS.AVALANCHE_TEST]: '',
   [CHAINS.AVALANCHE_MAIN]: '',
+  [CHAINS.FUSE_TEST]: '',
+  [CHAINS.FUSE]: '',
 };
 
 // If developing locally, include your Multicall contract address in your `.env`

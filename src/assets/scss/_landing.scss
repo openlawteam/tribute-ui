@@ -32,15 +32,14 @@
     text-align: center;
     text-transform: uppercase;
     text-shadow: 2px 2px 1px rgba(0,0,0,0.1);
-    margin-right: 60%;
     color:$color-brightsalmon;
-
-
-  @include size-medium-down {
-    font-size: 1.15rem;
+    animation: noise-anim 2s linear infinite alternate-reverse;
+    
   }
-}
 
+// @include size-medium-down {
+//   font-size: 1.15rem;
+// }
 .landing__img {
   margin-top: 2rem;
   margin-left: 100%;
@@ -51,7 +50,6 @@
     font-size: 1.5rem;
     padding: 1rem 4rem;
     margin: 2.5rem 0 1rem;
-    margin-right: 48rem
 ;
   }
 }
@@ -112,13 +110,12 @@ box-shadow: 0 0 1.5rem #6ef4fa;
 .interest_submit_flower{
   border: 3px solid rgba(32, 32, 32, 0.5);
   border-radius: 2.5em;
-  padding: 1.5rem 5rem 2rem;
+  padding: 1.5rem 2rem 2rem;
   max-width: 56em;
   text-align: center;
   margin: 0 auto 4rem;
   border-color: #6df4fa;
   box-sizing: border-box;
-  margin-right: 10rem;
 }
 .interest_submit-proposal_xyz{
   border: 3px solid rgba(32, 32, 32, 0.5);
@@ -131,8 +128,8 @@ box-shadow: 0 0 1.5rem #6ef4fa;
   box-sizing: border-box;
   margin-top:15rem;
   
+  
 }
-
 
 
 

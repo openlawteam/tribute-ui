@@ -7,7 +7,7 @@ export default function Footer() {
         <div>
           <span className="footer_item__PztHD org-footer-item">
             <span className="undefined org-copyright-symbol">
-              2022 @ProdCapsule DAO
+              2022 @CapsuleProd DAO
             </span>
           </span>
           <a
@@ -15,22 +15,30 @@ export default function Footer() {
             href=""
             target="_blank"
             rel="noopener noreferrer">
-            DOC
+            Doc
           </a>
-          <a
+          {/* <a
             className="footer_item__PztHD org-footer-item"
-            href=""
+            href="/privacy"
             target="_blank"
             rel="noopener noreferrer">
             Privacy
-          </a>
+          </a> */}
           <a
+            className="footer_item__PztHD org-footer-item"
+            href="https://www.cinecapsule.com/"
+            target="_blank"
+            rel="noopener noreferrer">
+            CineCapsule
+          </a>
+         
+          {/* <a
             className="footer_item__PztHD org-footer-item"
             href=""
             target="_blank"
             rel="noopener noreferrer">
             Our Team
-          </a>
+          </a> */}
           <a
             className="footer_item__PztHD org-footer-item"
             href="mailto:hello@cinecapsule.com"

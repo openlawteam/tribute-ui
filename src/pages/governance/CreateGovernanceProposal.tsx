@@ -288,7 +288,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
           <div className="form__description">
             <p>
               As a member, you can make proposals related to the governance of
-              ProdCapsule. Describe the proposal in full so that others can make an
+             CapsuleProd. Describe the proposal in full so that others can make an
               informed decision. Include links to any additional supporting
               materials in the description to better explain your proposal.
             </p>

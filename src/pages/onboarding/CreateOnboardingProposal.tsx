@@ -656,7 +656,7 @@ export default function CreateOnboardingProposal() {
       <div className="proposalcard">
         <div className="form__description">
           <p>
-            To become a member of ProdCapsule, each member can purchase{' '}
+            To become a member of CapsuleProd, each member can purchase{' '}
             {minUnitsText} units for {minAmountText} {amountUnit} (up to{' '}
             {maxUnitsText} units for {maxAmountText} {amountUnit}). Please put
             your preferred ETH address below and the amount of {amountUnit}{' '}
