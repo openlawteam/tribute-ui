@@ -558,11 +558,13 @@ export default function CreateTransferProposal() {
     if (!isConnected) {
       return (
         <>
-          <p style={{color:"#ff6f6f"}}>Connect your wallet to submit a transfer proposal</p>
-          </>
-      )
+          <p style={{color: '#ff6f6f'}}>
+            Connect your wallet to submit a transfer proposal
+          </p>
+        </>
+      );
     }
-      
+
     // user is on wrong network
     if (defaultChainError) {
       return defaultChainError.message;
@@ -828,9 +830,9 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
         <div className="form-wrapper">
           <div className="form__description">
             <p>
-              Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
-              consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut
-              lacus dictum fermentum vel tincidunt neque. Sed sed lacinia...
+              You can propose a transfer of DAO tokens to a member. The DAO will
+              vote on the proposal, and if it passes, the tokens will be
+              transferred to the member's internal account.
             </p>
           </div>
 

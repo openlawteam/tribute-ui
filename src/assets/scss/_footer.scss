@@ -1,13 +1,12 @@
-.footer {
-  z-index: 9;
-  position: relative;
+.footer_wrap__1La5y {
   align-items: center;
-  display: flex;
   background-color: #131313;
-  justify-content: flex-end;
-  padding: 1rem 0;
-
-  height:5rem;
+  color: #bbb;
+  display: flex;
+  min-height: 3rem;
+  padding: 2rem 1.5rem;
+  position: relative;
+  font-size: .8rem;
 }
 .grid__row{
   display: flex;
@@ -25,22 +24,20 @@
   margin-left: 1rem;
 }
 //  RESPONSIVE
-//   @media screen and (max-width: 812px) {
-//     .footer {
-//       align-items: center;
-//       background-color: #131313;
-//       color: #bbb;
-//       display: flex;
-//       min-height: 3rem;
-//       padding: 2rem 1.5rem;
-//       position: relative;
-//       font-size: .8rem;
-//       margin-top: 65rem;
-     
-//     }
-//     .footer_item__PztHD.org-footer-item{
-//       color: #bbb;
-//       font-size: .8rem;
-//     }
+@media only screen and (max-width: 915px) {
+  .logo--medium {
+    font-size: 1rem;
+}
+a.footer_left__6CGtF {
+    flex-direction: row;
+   text-align: center;
     
-//   }
+}
+.footer_item__PztHD.org-footer-item {
+  margin: 0 2rem 0 0;
+  color: #6ef4fa;
+  text-align: center;
+}
+}
+
+

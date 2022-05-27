@@ -11,19 +11,22 @@ import Wrap from '../../components/common/Wrap';
 import {ENABLE_KYC_ONBOARDING} from '../../config';
 import Footer from '../../components/Footer';
 
-// const TributeCube = memo(() => {
-//   return (
-//     <div
-//       className="cube"
-//       data-testid="cube"
-//       data-aos="fade-up"
-//       data-aos-delay="150">
-//       {/* <div className="cube__segment--top"></div>
-//       <div className="cube__segment--left"></div>
-//       <div className="cube__segment--right"></div> */}
-//     </div>
-//   );
-// });
+const TributeSpace = memo(() => {
+  return (
+    <div className="interest_submit-container">
+      <div className="interest_submit_flower">
+        <img
+          className="submit-space"
+          src="https://res.cloudinary.com/cinecapsule/image/upload/v1653638127/Films-on-Mars_wfxgzm.png"
+          alt="astronaut"
+          aria-label="Space background"
+          role="presentation"
+        />
+        <br></br>
+      </div>
+    </div>
+  );
+});
 
 function GetStartedHeader() {
   return (
@@ -71,22 +74,9 @@ export default function GetStarted() {
               <div className="landing__subtitle">
                 A DAO SUPPORTING INDEPENDENT CINEMA
               </div>
-              {/* <div className="landing__img">
-                <TributeCube />
-                <div className="interest_submit_flower"> */}
-              <div className="interest_submit-container">
-                <div className="interest_submit_flower">
-                  <img
-                    className="submit-space"
-                    src="https://i.ibb.co/CKmB0MR/Films-on-Mars.png"
-                    alt="astronaut"
-                    aria-label="Space background"
-                    role="img"
-                  />
-                  <br></br>
-                </div>
+              <div className="landing__img">
+                <TributeSpace />
               </div>
-
               <div className="landing__button">
                 <button
                   className="button"
@@ -96,7 +86,6 @@ export default function GetStarted() {
                   BECOME A MEMBER
                 </button>
               </div>
-              <br></br>
               <br></br>
               <div className="landing__link">
                 <a href="" target="_blank" rel="noopener noreferrer">
@@ -110,14 +99,14 @@ export default function GetStarted() {
                 className="interest_submit-proposal__image__1JcQq"
                 aria-label="Unicorn emoji"
                 role="img">
-                📽
+                🎥
               </span>
               <br></br>
               <div className="interest_submit-proposal__title__dZrRm">
                 Looking for funding?
               </div>
               <div className="interest_submit-proposal-slogan">
-                CapsuleProd is a global group of Fuse enthusiasts and experts
+                ProdCapsule is a global group of Fuse enthusiasts and experts
                 supporting the work of Fuse builders.
               </div>
               <button

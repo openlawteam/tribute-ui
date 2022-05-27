@@ -100,6 +100,21 @@ a.landing__link{
   color: #6df4fa;
   margin-right: 60rem;
 }
+ul {
+  list-style: none;
+  list-style-type: circle;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+  
+  
+
+}
+li{
+  margin-bottom: 1rem;
+  
+}
+
 
 /* react mount point */
 
@@ -211,8 +226,20 @@ hr{
     transform: scale(1.2);
   }
 }
+//IMAGE HOME
 img.submit-space{
   width: 30rem;
   border-radius: 1.5em;
   
 }
+//RESPONSIVE
+@media only screen and (max-width: 915px) {
+  .logo--large {
+    font-size:2.5rem;
+  }
+img.submit-space {
+  width:15rem;
+}
+}
+
+

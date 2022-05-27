@@ -26,14 +26,13 @@
   line-height: 1.5;
   margin-top: 1.5rem;
   font-size: 1.2rem;
-    letter-spacing: .05em;
+    letter-spacing: 0.2em;
     line-height: 1.25;
     margin: 2rem 0;
     text-align: center;
     text-transform: uppercase;
     text-shadow: 2px 2px 1px rgba(0,0,0,0.1);
     color:$color-brightsalmon;
-    animation: noise-anim 2s linear infinite alternate-reverse;
     
   }
 
@@ -42,7 +41,7 @@
 // }
 .landing__img {
   margin-top: 2rem;
-  margin-left: 100%;
+  
 }
 
 .landing__button {
@@ -55,7 +54,6 @@
 }
 .interest_submit-container{
   padding: 0 1rem;
-  margin-top: 100px;
   //width: 60rem;
 ;
 
@@ -82,6 +80,7 @@
   text-align: center;
   margin-bottom: 2rem;
   font-size: 2rem;
+  margin-top: 1rem;
 
 }
 .interest_submit-proposal-slogan{
@@ -126,9 +125,28 @@ box-shadow: 0 0 1.5rem #6ef4fa;
   margin: 0 auto 4rem;
   border-color: #8a8a8a09;
   box-sizing: border-box;
-  margin-top:15rem;
+  margin-top:5rem;
+}
+
+//RESPONSIVE//
+@media screen and (max-width: 915px) {
+  .row{
+    flex-direction: column;
+  }
   
-  
+  .landing__button > button {
+    font-size:1rem;
+  }
+  .button_submit_proposal {
+    font-size:small;
+    padding:1rem;
+  }
+  .footer_left__6CGtF {
+    display: flex;
+    flex-direction: column;
+}
+
+
 }
 
 

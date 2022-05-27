@@ -2,12 +2,12 @@ import SocialMedia from './common/SocialMedia';
 
 export default function Footer() {
   return (
-    <div className="footer">
+    <div className="footer_wrap__1La5y org-footer-wrap grid--fluid">
       <div className="grid__row">
-        <div>
+        <div className="footer_left__6CGtF grid__col-lg-6 grid__col-12">
           <span className="footer_item__PztHD org-footer-item">
             <span className="undefined org-copyright-symbol">
-              2022 @CapsuleProd DAO
+              2022 @ProdCapsule DAO
             </span>
           </span>
           <a
@@ -17,13 +17,6 @@ export default function Footer() {
             rel="noopener noreferrer">
             Doc
           </a>
-          {/* <a
-            className="footer_item__PztHD org-footer-item"
-            href="/privacy"
-            target="_blank"
-            rel="noopener noreferrer">
-            Privacy
-          </a> */}
           <a
             className="footer_item__PztHD org-footer-item"
             href="https://www.cinecapsule.com/"
@@ -31,7 +24,14 @@ export default function Footer() {
             rel="noopener noreferrer">
             CineCapsule
           </a>
-         
+          <a
+            className="footer_item__PztHD org-footer-item"
+            href="/privacy"
+            target="_blank"
+            rel="noopener noreferrer">
+            Privacy
+          </a>
+
           {/* <a
             className="footer_item__PztHD org-footer-item"
             href=""

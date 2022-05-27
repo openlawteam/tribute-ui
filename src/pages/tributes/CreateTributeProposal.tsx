@@ -666,9 +666,11 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
         <div className="form-wrapper">
           <div className="form__description">
             <p>
-              Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
-              consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut
-              lacus dictum fermentum vel tincidunt neque. Sed sed lacinia...
+              A tribute proposal is a proposal to send a certain amount of DAO
+              membership tokens to an applicant address. The proposal will be
+              held in escrow until a member votes on it. If the proposal passes,
+              the funds will automatically be sent to the DAO. If the proposal
+              fails, the funds will be refunded to you.
             </p>
           </div>
 
