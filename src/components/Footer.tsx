@@ -15,7 +15,7 @@ export default function Footer() {
             href=""
             target="_blank"
             rel="noopener noreferrer">
-            Doc
+            Docs
           </a>
           <a
             className="footer_item__PztHD org-footer-item"
