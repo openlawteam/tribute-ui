@@ -10,8 +10,8 @@
   "license": "Apache-2.0",
   "description": "A modular DAO framework developed and coordinated by its members",
   "engines": {
-    "node": "^14.0.0",
-    "npm": "^7.0.0"
+    "node": "^16.14.2",
+    "npm": "^8.5.0"
   },
   "dependencies": {
     "@apollo/client": "3.4.17",
