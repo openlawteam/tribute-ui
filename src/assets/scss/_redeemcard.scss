@@ -13,9 +13,9 @@
 }
 
 .redeemcard__content {
-  padding: 2rem;
-  word-break: break-word;
-  width: 32rem;
+  margin-top: 2em;
+  // Similar width to form pages
+  max-width: 51em;
 
   p {
     @include fluid-type(
