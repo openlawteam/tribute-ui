@@ -132,12 +132,12 @@ export const CHAIN_NAME_FULL = {
 };
 
 export const DEFAULT_CHAIN: typeof CHAINS[keyof typeof CHAINS] =
-  REACT_APP_ENVIRONMENT === 'production' // si on est en prod, on utilise le mainnet
-    ? CHAINS.MAINNET
-    : REACT_APP_ENVIRONMENT === 'development' // si on est en dev, on utilise Rinkeby ...
+  REACT_APP_ENVIRONMENT === 'production' //production default chain name for all environments except localhost
+    ? CHAINS.MAINNET //mainnet for production environment only (not localhost)
+    : REACT_APP_ENVIRONMENT === 'development' //development default chain name for localhost
     ? CHAINS.RINKEBY
-    : REACT_APP_DEFAULT_CHAIN_NAME_LOCAL // ... sinon on utilise le local
-    ? CHAINS[REACT_APP_DEFAULT_CHAIN_NAME_LOCAL] // ... et on le définit comme chain par défaut
+    : REACT_APP_DEFAULT_CHAIN_NAME_LOCAL // localhost default chain name for localhost
+    ? CHAINS[REACT_APP_DEFAULT_CHAIN_NAME_LOCAL] 
     : CHAINS.GANACHE; // Defaults to a Ganache private network (1337) // ganache est le chain par défaut
 
 export const ETHERSCAN_URLS: {[chainId: number]: string} = { // c'est leur url pour chaque chain id 
@@ -168,7 +168,8 @@ export const INFURA_WS_URLS: {[chainId: number]: string} = {
   [CHAINS.POLYGON]: `wss://ws-matic-mainnet.chainstacklabs.com`,
   [CHAINS.AVALANCHE_TEST]: `wss://api.avax-test.network:9650/ext/bc/C/ws`,
   [CHAINS.AVALANCHE_MAIN]: `wss://api.avax.network:9650/ext/bc/C/ws`,
-  [CHAINS.FUSE_TEST]: ``,
+  [CHAINS.FUSE_TEST]: `https://rpc.fuse.io`,
+  [CHAINS.FUSE]: `https://rpc.fuse.io`,
 };
 
 // Infura Project Id
