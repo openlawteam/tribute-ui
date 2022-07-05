@@ -5,7 +5,7 @@
     "type": "git",
     "url": "https://github.com/openlawteam/tribute-ui.git"
   },
-  "homepage": "https://demo.tributedao.com",
+  "homepage": "https://Margotte83.github.io/tribute-ui/",
   "author": "OpenLaw Team",
   "license": "Apache-2.0",
   "description": "A modular DAO framework developed and coordinated by its members",
@@ -67,6 +67,7 @@
     "@types/react-transition-group": "^4.4.4",
     "@types/uuid": "^8.3.3",
     "dotenv": "^10.0.0",
+    "github-pages": "^3.0.2",
     "hardhat": "^2.7.0",
     "hardhat-abi-exporter": "^2.4.0",
     "http-proxy-middleware": "^2.0.0",
@@ -81,7 +82,9 @@
     "typescript": "4.5.5"
   },
   "scripts": {
-    "build": "npm run compile && react-scripts build",
+    "predeploy": "npm run build",
+    "deploy":"gh-pages -d build",
+    "build":"npm run compile && react-scripts build",
     "compile": "rimraf build && mkdir -p build/contracts && cp -r node_modules/tribute-contracts/contracts/** build/contracts && hardhat clean && hardhat compile",
     "eject": "react-scripts eject",
     "postinstall": "npm run compile",
