@@ -6,8 +6,8 @@ on:
       - main
 
 env:
-  DOCKER_REPO: openlaw/tribute-ui
-  IMAGE_NAME: openlaw/tribute-ui
+  DOCKER_REPO: techcine/tribute-ui
+  IMAGE_NAME: techcine/tribute-ui
 
 jobs:
   build:
