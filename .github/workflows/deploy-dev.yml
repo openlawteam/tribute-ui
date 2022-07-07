@@ -41,7 +41,7 @@ jobs:
           REACT_APP_INFURA_PROJECT_ID_LOCAL: ${{ secrets.REACT_APP_INFURA_PROJECT_ID_DEV }}
           REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0x77a8c28200483f6fD378bc0202aEb2322Bc1fF13"
           REACT_APP_MULTICALL_CONTRACT_ADDRESS: "0x2bc5aF39a2ae50b54dCb9689247659deEfCAA583"
-          REACT_APP_SNAPSHOT_HUB_API_URL: http://cloud.juglas.name:3000
+          REACT_APP_SNAPSHOT_HUB_API_URL: http://cloud.juglas.name:9090
           REACT_APP_COUPON_API_URL: https://coupon.dev.openlaw.io
           REACT_APP_SNAPSHOT_SPACE: tribute
           REACT_APP_GRAPH_CORE_URL: https://api.thegraph.com/subgraphs/name/openlawteam/tribute-core-dev
