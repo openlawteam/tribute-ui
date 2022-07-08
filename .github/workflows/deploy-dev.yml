@@ -29,12 +29,6 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
         
-      - name: Setup SSH to install dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        uses: webfactory/ssh-agent@v0.5.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }} 
-
       - name: Create production build
         env:
           REACT_APP_ENVIRONMENT: local
@@ -54,7 +48,7 @@ jobs:
       - name: Deploy to GitHub Pages site
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.ACCESS_GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
           commit_message: ${{ github.event.head_commit.message }}
           cname: cinecapsule.github.io/tribute-ui/
