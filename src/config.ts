@@ -135,9 +135,9 @@ export const DEFAULT_CHAIN: typeof CHAINS[keyof typeof CHAINS] =
   REACT_APP_ENVIRONMENT === 'production' //production default chain name for all environments except localhost
     ? CHAINS.MAINNET //mainnet for production environment only (not localhost)
     : REACT_APP_ENVIRONMENT === 'development' //development default chain name for localhost
-    ? CHAINS.RINKEBY
-    : REACT_APP_DEFAULT_CHAIN_NAME_LOCAL // localhost default chain name for localhost
-    ? CHAINS[REACT_APP_DEFAULT_CHAIN_NAME_LOCAL] 
+    ? CHAINS.RINKEBY //si on est en localhost, on utilise le rinkeby pour les tests   (pas de mainnet pour les tests)
+    : REACT_APP_DEFAULT_CHAIN_NAME_LOCAL // sinon on utilise le chain name local (pour les tests) (pas de mainnet pour les tests)
+    ? CHAINS[REACT_APP_DEFAULT_CHAIN_NAME_LOCAL] // si l'utilisateur a choisi une chaine locale (ex: rinkeby) on l'utilise
     : CHAINS.GANACHE; // Defaults to a Ganache private network (1337) // ganache est le chain par défaut
 
 export const ETHERSCAN_URLS: {[chainId: number]: string} = { // c'est leur url pour chaque chain id 
