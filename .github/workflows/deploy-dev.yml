@@ -1,10 +1,8 @@
 name: GitHub Pages development deployment
-
 on:
   push:
     branches:
       - css
-
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
@@ -24,10 +22,6 @@ jobs:
         with:
           path: node_modules
           key: node-modules_deploy-dev-${{ hashFiles('package-lock.json') }}
-
-      - name: Install dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: npm ci
         
       - name: Create production build
         env:
