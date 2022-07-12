@@ -241,5 +241,20 @@ img.submit-space {
   width:15rem;
 }
 }
+.card-group{
+  justify-content: center;
+    grid-template-columns: repeat(auto-fill,minmax(300px,1fr));
+    grid-column-gap: 2em;
+    -webkit-column-gap: 2em;
+    column-gap: 2em;
+    grid-row-gap: 2em;
+    row-gap: 2em;
+    margin-bottom: 2.75rem;
+}
+.card-body {
+  flex: 1 1 auto;
+  padding: 1rem 1rem;
+  text-align: center;
+}
 
 
