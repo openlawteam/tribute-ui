@@ -88,7 +88,7 @@ export default function GetStarted() {
               </div>
               <br></br>
               <div className="landing__link">
-                <a href="" target="_blank" rel="noopener noreferrer">
+                <a href="https://medium.com/" target="_blank" rel="noopener noreferrer">
                   LEARN MORE
                 </a>
               </div>
@@ -106,13 +106,14 @@ export default function GetStarted() {
                 Looking for funding?
               </div>
               <div className="interest_submit-proposal-slogan">
-                ProdCapsule is a global group of Fuse enthusiasts and experts
-                supporting the work of Fuse builders.
-              </div>
+                ProdCapsule is a group of  enthusiasts and experts
+                supporting the work of independent Film Festivals.
+                <br></br><strong>If you are a film producer or director, join the DAO and make a proposal
+                </strong></div>
               <button
                 className="button_submit_proposal"
                 onClick={() => {
-                  history.push(ENABLE_KYC_ONBOARDING ? '/join' : '/onboarding');
+                  history.push(ENABLE_KYC_ONBOARDING ? '/onboard' : '/governance-proposal');
                 }}>
                 Submit a proposal
               </button>

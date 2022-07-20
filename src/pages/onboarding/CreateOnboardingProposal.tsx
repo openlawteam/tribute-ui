@@ -92,8 +92,8 @@ function renderUnauthorizedMessage({
       <div className="proposalcard">
         <div className="proposalcard__content">
           <p>
-            ProdCapsule DAO aims to bring together members who are interested
-            in supporting the growing digital gaming ecosystem. Ready Player DAO
+            ProdCapsule DAO aims to bring together members who are interested in
+            supporting the growing digital gaming ecosystem. Ready Player DAO
             will have up to — initial members, who will pool their capital to
             make investments. Each member can purchase — Ready Player DAO units
             for — ETH (up to — units for — ETH). Please put your preferred ETH
@@ -102,7 +102,7 @@ function renderUnauthorizedMessage({
             onboarded and sent information on the Ready Player DAO weekly call
             and Discord community.
           </p>
-          <p style={{color:"#ff6f6f"}}>Connect your wallet to get started.</p>
+          <p style={{color: '#ff6f6f'}}>Connect your wallet to get started.</p>
         </div>
       </div>
     );
@@ -653,148 +653,147 @@ export default function CreateOnboardingProposal() {
   return (
     <RenderWrapper>
       <div className="section-wrapper1">
-      <div className="proposalcard">
-        <div className="form__description">
-          <p>
-            To become a member of ProdCapsule, each member can purchase{' '}
-            {minUnitsText} units for {minAmountText} {amountUnit} (up to{' '}
-            {maxUnitsText} units for {maxAmountText} {amountUnit}). Please put
-            your preferred ETH address below and the amount of {amountUnit}{' '}
-            you&apos;d like to contribute.
-          </p>
-          <p>
-            Following your submission, existing members will consider your
-            proposal. If approved by vote, your proposal will be processed and
-            you will finalize the transfer of your allocated {amountUnit} in
-            exchange for membership units.
-          </p>
-        </div>
-
-        <form className="form" onSubmit={(e) => e.preventDefault()}>
-          {/* ETH ADDRESS */}
-          <div className="form__input-row">
-            <label
-              className="form__input-row-label"
-              htmlFor={Fields.ethAddress}>
-              Applicant Address
-            </label>
-            <div className="form__input-row-fieldwrap">
-              {/* @note We don't need the default value as it's handled in the useEffect above. */}
-              <input
-                aria-describedby={`error-${Fields.ethAddress}`}
-                aria-invalid={errors.ethAddress ? 'true' : 'false'}
-                id={Fields.ethAddress}
-                name={Fields.ethAddress}
-                ref={register({
-                  validate: (ethAddress: string): string | boolean => {
-                    return !ethAddress
-                      ? FormFieldErrors.REQUIRED
-                      : !isEthAddressValid(ethAddress)
-                      ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
-                      : true;
-                  },
-                })}
-                type="text"
-                disabled={isInProcessOrDone}
-              />
-
-              <InputError
-                error={getValidationError(Fields.ethAddress, errors)}
-                id={`error-${Fields.ethAddress}`}
-              />
-            </div>
+        <div className="proposalcard">
+          <div className="form__description">
+            <p>
+              To become a member of ProdCapsule, each member can purchase{' '}
+              {minUnitsText} units for {minAmountText} {amountUnit} (up to{' '}
+              {maxUnitsText} units for {maxAmountText} {amountUnit}). Please put
+              your preferred ETH address below and the amount of {amountUnit}{' '}
+              you&apos;d like to contribute.
+            </p>
+            <p>
+              Following your submission, existing members will consider your
+              proposal. If approved by vote, your proposal will be processed and
+              you will finalize the transfer of your allocated {amountUnit} in
+              exchange for membership units.
+            </p>
           </div>
 
-          {/* AMOUNT SLIDER */}
-          <div className="form__input-row">
-            <label
-              className="form__input-row-label"
-              htmlFor={Fields.amount}
-              id={`${Fields.amount}-label`}>
-              Amount
-            </label>
-            <div className="form__input-row-fieldwrap--narrow">
-              <Controller
-                render={({onChange}) => (
-                  <Slider
-                    data-testid="onboarding-slider"
-                    aria-labelledby={`${Fields.amount}-label`}
-                    defaultValue={sliderMin || 0}
-                    id={Fields.amount}
-                    max={sliderMax || 0}
-                    min={sliderMin || 0}
-                    step={sliderStep || 0}
-                    onChange={onChange}
-                    disabled={isInProcessOrDone}
-                  />
-                )}
-                defaultValue={sliderMin || 0}
-                control={control}
-                name={Fields.amount}
-                rules={{
-                  validate: (value: string): string | boolean => {
-                    const amount = Number(value);
+          <form className="form" onSubmit={(e) => e.preventDefault()}>
+            {/* ETH ADDRESS */}
+            <div className="form__input-row">
+              <label
+                className="form__input-row-label"
+                htmlFor={Fields.ethAddress}>
+                Applicant Address
+              </label>
+              <div className="form__input-row-fieldwrap">
+                {/* @note We don't need the default value as it's handled in the useEffect above. */}
+                <input
+                  aria-describedby={`error-${Fields.ethAddress}`}
+                  aria-invalid={errors.ethAddress ? 'true' : 'false'}
+                  id={Fields.ethAddress}
+                  name={Fields.ethAddress}
+                  ref={register({
+                    validate: (ethAddress: string): string | boolean => {
+                      return !ethAddress
+                        ? FormFieldErrors.REQUIRED
+                        : !isEthAddressValid(ethAddress)
+                        ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
+                        : true;
+                    },
+                  })}
+                  type="text"
+                  disabled={isInProcessOrDone}
+                />
 
-                    return amount > Number(userAccountBalance)
-                      ? `Insufficient funds. ${renderUserAccountBalance(
-                          userAccountBalance
-                        )} ${amountUnit} available.`
-                      : true;
-                  },
-                }}
-              />
-
-              <InputError
-                error={getValidationError(Fields.amount, errors)}
-                id={`error-${Fields.amount}`}
-              />
+                <InputError
+                  error={getValidationError(Fields.ethAddress, errors)}
+                  id={`error-${Fields.ethAddress}`}
+                />
+              </div>
             </div>
-            <div className="form__input-addon">
-              {formatNumber(amountValue)} {amountUnit}
-            </div>
-          </div>
 
-          {/* SUBMIT */}
-          <button
-            aria-label={isInProcess ? 'Submitting your proposal.' : ''}
-            className="button"
-            disabled={isInProcessOrDone}
-            onClick={
-              isInProcessOrDone
-                ? () => {}
-                : async () => {
-                    if (!(await trigger())) {
-                      return;
+            {/* AMOUNT SLIDER */}
+            <div className="form__input-row">
+              <label
+                className="form__input-row-label"
+                htmlFor={Fields.amount}
+                id={`${Fields.amount}-label`}>
+                Amount
+              </label>
+              <div className="form__input-row-fieldwrap--narrow">
+                <Controller
+                  render={({onChange}) => (
+                    <Slider
+                      data-testid="onboarding-slider"
+                      aria-labelledby={`${Fields.amount}-label`}
+                      defaultValue={sliderMin || 0}
+                      id={Fields.amount}
+                      max={sliderMax || 0}
+                      min={sliderMin || 0}
+                      step={sliderStep || 0}
+                      onChange={onChange}
+                      disabled={isInProcessOrDone}
+                    />
+                  )}
+                  defaultValue={sliderMin || 0}
+                  control={control}
+                  name={Fields.amount}
+                  rules={{
+                    validate: (value: string): string | boolean => {
+                      const amount = Number(value);
+
+                      return amount > Number(userAccountBalance)
+                        ? `Insufficient funds. ${renderUserAccountBalance(
+                            userAccountBalance
+                          )} ${amountUnit} available.`
+                        : true;
+                    },
+                  }}
+                />
+
+                <InputError
+                  error={getValidationError(Fields.amount, errors)}
+                  id={`error-${Fields.amount}`}
+                />
+              </div>
+              <div className="form__input-addon">
+                {formatNumber(amountValue)} {amountUnit}
+              </div>
+            </div>
+
+            {/* SUBMIT */}
+            <button
+              aria-label={isInProcess ? 'Submitting your proposal.' : ''}
+              className="button"
+              disabled={isInProcessOrDone}
+              onClick={
+                isInProcessOrDone
+                  ? () => {}
+                  : async () => {
+                      if (!(await trigger())) {
+                        return;
+                      }
+
+                      handleSubmit(getValues());
                     }
+              }
+              type="submit">
+              {isInProcess ? <Loader /> : isDone ? 'Done' : 'Submit'}
+            </button>
 
-                    handleSubmit(getValues());
-                  }
-            }
-            type="submit">
-            {isInProcess ? <Loader /> : isDone ? 'Done' : 'Submit'}
-          </button>
+            {/* SUBMIT STATUS */}
+            {isInProcessOrDone && (
+              <div className="form__submit-status-container">
+                {renderSubmitStatus(proposalSignAndSendStatus)}
+              </div>
+            )}
 
-          {/* SUBMIT STATUS */}
-          {isInProcessOrDone && (
-            <div className="form__submit-status-container">
-              {renderSubmitStatus(proposalSignAndSendStatus)}
-            </div>
-          )}
-
-          {/* SUBMIT ERROR */}
-          {createOnboardError && (
-            <div className="form__submit-error-container">
-              <ErrorMessageWithDetails
-                renderText="Something went wrong while submitting the proposal."
-                error={createOnboardError}
-                detailsProps={{open: true}}
-              />
-            </div>
-          )}
-        </form>
+            {/* SUBMIT ERROR */}
+            {createOnboardError && (
+              <div className="form__submit-error-container">
+                <ErrorMessageWithDetails
+                  renderText="Something went wrong while submitting the proposal."
+                  error={createOnboardError}
+                  detailsProps={{open: true}}
+                />
+              </div>
+            )}
+          </form>
+        </div>
       </div>
-      </div>
-    
     </RenderWrapper>
   );
 }
@@ -810,7 +809,6 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
         <div className="titlebar">
           <h2 className="titlebar__title">BECOME A MEMBER</h2>
         </div>
-        <hr></hr>
         <br></br>
 
         <div className="form-wrapper">
