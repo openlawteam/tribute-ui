@@ -58,6 +58,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
             ProdCapsule  is run entirely by its members.<br></br> 
             Below are all the governance votes and proposals.
           </p>
+          <p>Otherwise, you can submit a new proposal</p>
 
           <button className="titlebar__action" onClick={goToNewProposal}>
             New Proposal

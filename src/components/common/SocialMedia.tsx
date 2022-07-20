@@ -2,6 +2,7 @@
 import GitHubSVG from '../../assets/svg/GitHubSVG';
 import TwitterSVG from '../../assets/svg/TwitterSVG';
 import MediumSVG from '../../assets/svg/MediumSVG';
+import DiscordSVG from '../../assets/svg/DiscordSVG';
 
 // @todo Add missing URLs when available
 enum SocialMediaLinks {
@@ -15,7 +16,8 @@ enum SocialMediaLinks {
    * openlawteam/tribute-subgraph
    */
   GITHUB = 'https://github.com/CineCapsule',
-  MEDIUM = '#',
+  MEDIUM = 'https://medium.com/',
+  DISCORD= 'https://medium.com/'
 }
 
 export default function SocialMedia() {
@@ -44,6 +46,11 @@ export default function SocialMedia() {
         target="_blank"
         rel="noopener noreferrer">
         <GitHubSVG />
+      </a>
+      <a href={SocialMediaLinks.DISCORD}
+        target="_blank"
+        rel="noopener noreferrer">
+        <DiscordSVG />
       </a>
     </div>
   );
