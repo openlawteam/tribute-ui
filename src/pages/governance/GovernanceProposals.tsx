@@ -55,8 +55,8 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
         <div className="titlebar">
           <h2 className="titlebar__title">Governance</h2>
           <p>
-            CapsuleProd is run entirely by its members. Below are all the
-            governance votes and proposals.
+            ProdCapsule  is run entirely by its members.<br></br> 
+            Below are all the governance votes and proposals.
           </p>
 
           <button className="titlebar__action" onClick={goToNewProposal}>
