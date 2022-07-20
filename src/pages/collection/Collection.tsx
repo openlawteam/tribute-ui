@@ -17,64 +17,76 @@ export default function Collection() {
     <div className="container">
       <div className="row">
         <h1>Collection</h1>
-      <p>
-        Below are works selected by members for ProdCapsule's permanent
-        collection.
-      </p>
+        <p>
+          Below are works selected by members for ProdCapsule's permanent
+          collection.
+        </p>
       </div>
       <CardGroup>
         <Card>
           <CardImg
             alt="Card image cap"
-            src="https://picsum.photos/318/180"
+            src="https://res.cloudinary.com/cinecapsule/image/upload/v1658306891/1_s8nxnb.png"
             top
             width="100%"
           />
           <CardBody>
             <CardTitle tag="h5">Card title</CardTitle>
             <CardSubtitle className="mb-2 text-muted" tag="h6">
-              NFT Title
+              Cameras Cinecapsule #1
             </CardSubtitle>
-            <CardText  className="mb-2 text-muted">
-              Art Blocks
-            </CardText>
-            <Button>View details</Button>
+            <CardText className="mb-2 text-muted">Art Blocks</CardText>
+            <Button
+              type="button"
+              class="btn btn-info"
+              href="https://testnets.opensea.io/assets/mumbai/0x8d5383b1fd33a1e78c4dfb23c4846bc7d038a246/1"
+              target="_blank">
+              View details
+            </Button>
           </CardBody>
         </Card>
         <Card>
           <CardImg
             alt="Card image cap"
-            src="https://picsum.photos/318/180"
+            src="https://res.cloudinary.com/cinecapsule/image/upload/v1658306987/2_k8fwyf.png"
             top
             width="100%"
           />
           <CardBody>
             <CardTitle tag="h5">Card title</CardTitle>
             <CardSubtitle className="mb-2 text-muted" tag="h6">
-              NFT Title
+              Cameras Cinecapsule #2
             </CardSubtitle>
-            <CardText  className="mb-2 text-muted">
-            Art Blocks
-            </CardText>
-            <Button>View details</Button>
+            <CardText className="mb-2 text-muted">Art Blocks</CardText>
+            <Button
+              type="button"
+              class="btn btn-info"
+              href="https://testnets.opensea.io/assets/mumbai/0x8d5383b1fd33a1e78c4dfb23c4846bc7d038a246/2"
+              target="_blank">
+              View details
+            </Button>
           </CardBody>
         </Card>
         <Card>
           <CardImg
             alt="Card image cap"
-            src="https://picsum.photos/318/180"
+            src="https://res.cloudinary.com/cinecapsule/image/upload/v1658307072/3_lewwgm.png"
             top
             width="100%"
           />
           <CardBody>
             <CardTitle tag="h5">Card title</CardTitle>
             <CardSubtitle className="mb-2 text-muted" tag="h6">
-              NFT Title
+              Cameras Cinecapsule #3
             </CardSubtitle>
-            <CardText  className="mb-2 text-muted">
-            Art Blocks
-            </CardText>
-            <Button>View details</Button>
+            <CardText className="mb-2 text-muted">Art Blocks</CardText>
+            <Button
+              type="button"
+              class="btn btn-info"
+              href="https://testnets.opensea.io/assets/mumbai/0x8d5383b1fd33a1e78c4dfb23c4846bc7d038a246/3"
+              target="_blank">
+              View details
+            </Button>
           </CardBody>
         </Card>
       </CardGroup>
@@ -82,76 +94,70 @@ export default function Collection() {
         <Card>
           <CardImg
             alt="Card image cap"
-            src="https://picsum.photos/318/180"
+            src="https://res.cloudinary.com/cinecapsule/image/upload/v1658307155/4_ctypau.png"
             top
             width="100%"
           />
           <CardBody>
             <CardTitle tag="h5">Card title</CardTitle>
             <CardSubtitle className="mb-2 text-muted" tag="h6">
-              NFT Title
+              Cameras Cinecapsule #4
             </CardSubtitle>
-            <CardText  className="mb-2 text-muted">
-              Art Blocks
-            </CardText>
-            <Button>View details</Button>
+            <CardText className="mb-2 text-muted">Art Blocks</CardText>
+            <Button
+              type="button"
+              class="btn btn-info"
+              href="https://testnets.opensea.io/assets/mumbai/0x8d5383b1fd33a1e78c4dfb23c4846bc7d038a246/4"
+              target="_blank">
+              View details
+            </Button>
           </CardBody>
         </Card>
         <Card>
           <CardImg
             alt="Card image cap"
-            src="https://picsum.photos/318/180"
+            src="https://res.cloudinary.com/cinecapsule/image/upload/v1658307204/5_pgmith.png"
             top
             width="100%"
           />
           <CardBody>
             <CardTitle tag="h5">Card title</CardTitle>
             <CardSubtitle className="mb-2 text-muted" tag="h6">
-              NFT Title
+              Cameras Cinecapsule #5
             </CardSubtitle>
-            <CardText  className="mb-2 text-muted">
-            Art Blocks
-            </CardText>
-            <Button>View details</Button>
+            <CardText className="mb-2 text-muted">Art Blocks</CardText>
+            <Button
+              type="button"
+              class="btn btn-info"
+              href="https://testnets.opensea.io/assets/mumbai/0x8d5383b1fd33a1e78c4dfb23c4846bc7d038a246/5"
+              target="_blank">
+              View details
+            </Button>
           </CardBody>
         </Card>
         <Card>
           <CardImg
             alt="Card image cap"
-            src="https://picsum.photos/318/180"
+            src="https://res.cloudinary.com/cinecapsule/image/upload/v1658307268/6_jdrusl.png"
             top
             width="100%"
           />
           <CardBody>
             <CardTitle tag="h5">Card title</CardTitle>
             <CardSubtitle className="mb-2 text-muted" tag="h6">
-              NFT Title
+              Cameras Cinecapsule #6
             </CardSubtitle>
-            <CardText  className="mb-2 text-muted">
-            Art Blocks
-            </CardText>
-            <Button>View details</Button>
+            <CardText className="mb-2 text-muted">Art Blocks</CardText>
+            <Button
+              type="button"
+              class="btn btn-info"
+              href="https://testnets.opensea.io/assets/mumbai/0x8d5383b1fd33a1e78c4dfb23c4846bc7d038a246/6/"
+              target="_blank">
+              View details
+            </Button>
           </CardBody>
         </Card>
       </CardGroup>
     </div>
   );
-}
-
-{
-  /* <div className="interest_submit-proposal_xyz">
-        <span
-          className="interest_submit-proposal__image__1JcQq"
-          aria-label="Unicorn emoji"
-          role="img">
-          🛠
-        </span>
-        <br></br>
-        <div className="interest_submit-proposal__title__dZrRm">
-        Page under construction
-        </div>
-        <div className="interest_submit-proposal-slogan">
-        Back soon for a new collection of trendy NFTS.
-        </div>
-      </div> */
 }

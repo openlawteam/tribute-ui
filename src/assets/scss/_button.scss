@@ -51,10 +51,6 @@
   box-shadow: 0 0 1.5rem #ffc039;
 }
 
-
-
-
-
 .button.hover{
   background-color:$color-brightsalmon;
 }
@@ -99,4 +95,9 @@ background-color: $color-litesmoke;
   .button--help {
     font-size: 0.85rem;
   }
+}
+.btn-secondary {
+  color: black;
+  background-color: #6ef4fa;
+  border-color: #6c757d;
 }
