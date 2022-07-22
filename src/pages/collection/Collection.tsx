@@ -18,7 +18,7 @@ export default function Collection() {
       <div className="row">
         <h1>Collection</h1>
         <p>
-          Below are works selected by members for ProdCapsule's permanent
+          Below are works selected by members for CineCapsule's permanent
           collection.
         </p>
       </div>

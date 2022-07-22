@@ -106,7 +106,7 @@ export default function GetStarted() {
                 Looking for funding?
               </div>
               <div className="interest_submit-proposal-slogan">
-                ProdCapsule is a group of  enthusiasts and experts
+                CineCapsule is a group of  enthusiasts and experts
                 supporting the work of independent Film Festivals.
                 <br></br><strong>If you are a film producer or director, join the DAO and make a proposal
                 </strong></div>

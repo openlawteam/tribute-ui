@@ -92,14 +92,14 @@ function renderUnauthorizedMessage({
       <div className="proposalcard">
         <div className="proposalcard__content">
           <p>
-            ProdCapsule DAO aims to bring together members who wish to support
-            the work of Independent Film Festivals. ProdCapsule DAO will have up
+            CineCapsule DAO aims to bring together members who wish to support
+            the work of Independent Film Festivals. CineCapsule DAO will have up
             to a certain number of initial members, who will pool their capital
             to make investments. Each member can buy with DAO tokens. Please
             enter your preferred wallet address below and the amount of ETH you
-            wish to contribute to ProdCapsule DAO. Once you complete this form,
+            wish to contribute to CineCapsule DAO. Once you complete this form,
             you will be fully onboarded and will receive information about the
-            weekly ProdCapsule DAO call and its Discord community.
+            weekly CineCapsule DAO call and its Discord community.
           </p>
           <p style={{color: '#ff6f6f'}}>Connect your wallet to get started.</p>
         </div>
@@ -655,7 +655,7 @@ export default function CreateOnboardingProposal() {
         <div className="proposalcard">
           <div className="form__description">
             <p>
-              To become a member of ProdCapsule, each member can purchase{' '}
+              To become a member of CineCapsule, each member can purchase{' '}
               {minUnitsText} units for {minAmountText} {amountUnit} (up to{' '}
               {maxUnitsText} units for {maxAmountText} {amountUnit}). Please put
               your preferred ETH address below and the amount of {amountUnit}{' '}

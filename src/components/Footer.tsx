@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="footer_left__6CGtF grid__col-lg-6 grid__col-12">
           <span className="footer_item__PztHD org-footer-item">
             <span className="undefined org-copyright-symbol">
-              2022 @ProdCapsule DAO
+              2022 @CineCapsule DAO
             </span>
           </span>
           <a
