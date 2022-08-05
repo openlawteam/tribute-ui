@@ -12,10 +12,10 @@ export default function Footer() {
           </span>
           <a
             className="footer_item__PztHD org-footer-item"
-            href=""
+            href="https://cinecapsule-docs.vercel.app/"
             target="_blank"
             rel="noopener noreferrer">
-            Docs
+            DOCS
           </a>
           <a
             className="footer_item__PztHD org-footer-item"
