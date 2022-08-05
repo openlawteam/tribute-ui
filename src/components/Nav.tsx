@@ -202,7 +202,6 @@ export function NavHamburger() {
                       <span>🎥 Become a member</span>
                     </NavLink>
                   </li>
-                  ,
                   <li
                     onClick={() => {
                       handleMenuModalClose(false);
@@ -211,6 +210,14 @@ export function NavHamburger() {
                       <span>🎥 Members</span>
                     </NavLink>
                   </li>
+                  <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to="/collection">
+                        <span>🎥 Collection</span>
+                      </NavLink>
+                    </li>
                   {/* <li
                     onClick={() => {
                       handleMenuModalClose(false);
@@ -246,16 +253,6 @@ export function NavHamburger() {
                       }}>
                       <NavLink to="/transfers">
                         <span>🎥 Transfer</span>
-                      </NavLink>
-                    </li>
-                  )}
-                  {isCurrentMemberOrDelegateConnected && (
-                    <li
-                      onClick={() => {
-                        handleMenuModalClose(false);
-                      }}>
-                      <NavLink to="/collection">
-                        <span>🎥 Collection</span>
                       </NavLink>
                     </li>
                   )}
