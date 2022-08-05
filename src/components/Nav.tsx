@@ -202,6 +202,7 @@ export function NavHamburger() {
                       <span>🎥 Become a member</span>
                     </NavLink>
                   </li>
+                  ,
                   <li
                     onClick={() => {
                       handleMenuModalClose(false);
@@ -218,14 +219,6 @@ export function NavHamburger() {
                       <span>🎥 Onbording</span>
                     </NavLink>
                   </li> */}
-                  <li
-                    onClick={() => {
-                      handleMenuModalClose(false);
-                    }}>
-                    <NavLink to="/collection">
-                      <span>🎥 Collection</span>
-                    </NavLink>
-                  </li>
                   {isCurrentMemberOrDelegateConnected && (
                     <li
                       onClick={() => {
@@ -236,7 +229,6 @@ export function NavHamburger() {
                       </NavLink>
                     </li>
                   )}
-
                   {isCurrentMemberOrDelegateConnected && (
                     <li
                       onClick={() => {
@@ -257,7 +249,16 @@ export function NavHamburger() {
                       </NavLink>
                     </li>
                   )}
-                 
+                  {isCurrentMemberOrDelegateConnected && (
+                    <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to="/collection">
+                        <span>🎥 Collection</span>
+                      </NavLink>
+                    </li>
+                  )}
                   {/* The Profile link for the member account is available to both the connected member address and its delegate address.
                   {isCurrentMemberOrDelegateConnected && (
                     // <li
@@ -270,7 +271,6 @@ export function NavHamburger() {
                     //   </NavLink>
                     // </li>
                   )} */}
-
                   {/* @note Disabling DAO Manager for now because we paused on maintaining it. */}
                   {/* {isActiveMemberConnected && (
                     <li
