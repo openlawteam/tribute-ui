@@ -21,7 +21,7 @@ import Transfers from './pages/transfers/Transfers';
 import TributeDetails from './pages/tributes/TributeDetails';
 import Tributes from './pages/tributes/Tributes';
 import Privacy from './pages/privacy/Privacy';
-//import Collection from './pages/collection/Collection';
+// import Collection from './pages/collection/Collection';
 
 
 
