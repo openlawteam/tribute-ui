@@ -99,7 +99,7 @@ export default function CreateGovernanceProposal() {
     if (!isConnected) {
       return (
         <>
-          <p style={{color:"#ff6f6f"}}>Connect your wallet to submit a governance proposal</p>
+          <p style={{color:"#697FD4"}}>Connect your wallet to submit a governance proposal</p>
           </>
       )
       

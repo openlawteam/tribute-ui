@@ -101,7 +101,7 @@ function renderUnauthorizedMessage({
             you will be fully onboarded and will receive information about the
             weekly CineCapsule DAO call and its Discord community.
           </p>
-          <p style={{color: '#ff6f6f'}}>Connect your wallet to get started.</p>
+          <p style={{color: '#697FD4'}}>Connect your wallet to get started.</p>
         </div>
       </div>
     );

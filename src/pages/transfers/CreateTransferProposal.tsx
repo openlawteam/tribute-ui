@@ -558,7 +558,7 @@ export default function CreateTransferProposal() {
     if (!isConnected) {
       return (
         <>
-          <p style={{color: '#ff6f6f'}}>
+          <p style={{color: '#697FD4'}}>
             Connect your wallet to submit a transfer proposal
           </p>
         </>
