@@ -17,7 +17,7 @@ enum SocialMediaLinks {
    */
   GITHUB = 'https://github.com/CineCapsule',
   MEDIUM = 'https://medium.com/',
-  DISCORD= 'https://medium.com/'
+  DISCORD= 'https://discord.com/'
 }
 
 export default function SocialMedia() {
