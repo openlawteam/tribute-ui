@@ -88,7 +88,7 @@ export default function GetStarted() {
               </div>
               <br></br>
               <div className="landing__link">
-                <a href="https://medium.com/" target="_blank" rel="noopener noreferrer">
+                <a href="https://medium.com/@OpenLawOfficial/introducing-the-tribute-dao-framework-3f2f0ed50d62" target="_blank" rel="noopener noreferrer">
                   LEARN MORE
                 </a>
               </div>
