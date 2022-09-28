@@ -140,7 +140,8 @@ export const DEFAULT_CHAIN: typeof CHAINS[keyof typeof CHAINS] =
     ? CHAINS[REACT_APP_DEFAULT_CHAIN_NAME_LOCAL] // si l'utilisateur a choisi une chaine locale (ex: rinkeby) on l'utilise
     : CHAINS.GANACHE; // Defaults to a Ganache private network (1337) // ganache est le chain par défaut
 
-export const ETHERSCAN_URLS: {[chainId: number]: string} = { // c'est leur url pour chaque chain id 
+export const ETHERSCAN_URLS: {[chainId: number]: string} = {
+  // c'est leur url pour chaque chain id
   [CHAINS.MAINNET]: `https://etherscan.io`,
   [CHAINS.ROPSTEN]: `https://ropsten.etherscan.io`,
   [CHAINS.RINKEBY]: `https://rinkeby.etherscan.io`,
@@ -153,7 +154,7 @@ export const ETHERSCAN_URLS: {[chainId: number]: string} = { // c'est leur url p
   [CHAINS.AVALANCHE_TEST]: `https://testnet.snowtrace.io`,
   [CHAINS.AVALANCHE_MAIN]: `https://snowtrace.io`,
   [CHAINS.FUSE_TEST]: `https://explorer.fusespark.io/`,
-  [CHAINS.FUSE]: `https://explorer.fusespark.io/`,
+  [CHAINS.FUSE]: `https://explorer.fuse.io/`,
 };
 
 export const INFURA_WS_URLS: {[chainId: number]: string} = {
@@ -168,16 +169,16 @@ export const INFURA_WS_URLS: {[chainId: number]: string} = {
   [CHAINS.POLYGON]: `wss://ws-matic-mainnet.chainstacklabs.com`,
   [CHAINS.AVALANCHE_TEST]: `wss://api.avax-test.network:9650/ext/bc/C/ws`,
   [CHAINS.AVALANCHE_MAIN]: `wss://api.avax.network:9650/ext/bc/C/ws`,
-  [CHAINS.FUSE_TEST]: `https://rpc.fuse.io`,
-  [CHAINS.FUSE]: `https://rpc.fuse.io`,
+  [CHAINS.FUSE_TEST]: `wss://cinecapsule.cc:8546`,
+  [CHAINS.FUSE]: `wss://fuserpc_38546.app.runonflux.io:38546`,
 };
 
 // Infura Project Id
 export const INFURA_PROJECT_ID =
-  REACT_APP_ENVIRONMENT === 'production'// si on est en prod, on utilise le mainnet
+  REACT_APP_ENVIRONMENT === 'production' // si on est en prod, on utilise le mainnet
     ? REACT_APP_INFURA_PROJECT_ID_PROD // si on est en prod, on utilise le mainnet
-    : REACT_APP_ENVIRONMENT === 'development'// si on est en dev
-    ? REACT_APP_INFURA_PROJECT_ID_DEV 
+    : REACT_APP_ENVIRONMENT === 'development' // si on est en dev
+    ? REACT_APP_INFURA_PROJECT_ID_DEV
     : REACT_APP_INFURA_PROJECT_ID_LOCAL;
 
 // Ethereum Provider URL
