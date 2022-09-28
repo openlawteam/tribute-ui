@@ -11,7 +11,7 @@
 }
 
 .walletconnect__options-button {
-  color: $color-primary;
+  color: $color-darkblue;
   background-color: $color-background-primary;
   border: 1px solid $color-border-primary;
   border-radius: 12px;
@@ -67,8 +67,8 @@
 
 .walletconnect__connected-address-text {
   display: inline-block;
-  background-color: rgba(214, 216, 218, 0.2);
-  color: $color-primary;
+  background-color: $color-cirrus;
+  color: $color-deepsmoke;
   font-size: 1rem;
   margin: 1rem 0;
   font-family: $font-accent;
@@ -100,7 +100,7 @@
   justify-content: center;
 
   &--error {
-    color: $color-brightsalmon;
+    color: $color-hotpink;
     font-size: 0.85rem;
 
     > span:first-of-type {

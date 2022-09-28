@@ -20,6 +20,10 @@ import TransferDetails from './pages/transfers/TransferDetails';
 import Transfers from './pages/transfers/Transfers';
 import TributeDetails from './pages/tributes/TributeDetails';
 import Tributes from './pages/tributes/Tributes';
+import Privacy from './pages/privacy/Privacy';
+// import Collection from './pages/collection/Collection';
+
+
 
 const proposalIdParameter: string = ':proposalId';
 
@@ -116,12 +120,26 @@ export default function Routes() {
           path="/members"
           render={() => <Members />}
         />,
+
         <Route
           key="member-profile"
           exact
           path="/members/:ethereumAddress"
           render={() => <MemberProfile />}
         />,
+        // <Route
+        //   key="collection"
+        //   exact
+        //   path="/Collection"
+        //   render={() => <Collection />}
+        // />,
+        <Route
+        key="privacy"
+        exact
+        path="/Privacy"
+        render={() => <Privacy />}
+      />,
+        
         // @note Disabling DAO Manager for now because we paused on maintaining
         // it.
         // <Route

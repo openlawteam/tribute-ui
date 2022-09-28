@@ -28,7 +28,7 @@ type ProposalCardProps = {
   renderStatus?: () => React.ReactNode;
 };
 
-const DEFAULT_BUTTON_TEXT: string = 'View Proposal';
+const DEFAULT_BUTTON_TEXT: string = 'Review';
 
 const ResponsiveEllipsis = responsiveHOC()(LinesEllipsis);
 

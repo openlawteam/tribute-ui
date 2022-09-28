@@ -198,32 +198,8 @@ export function NavHamburger() {
                     onClick={() => {
                       handleMenuModalClose(false);
                     }}>
-                    <NavLink to="/onboarding">
-                      <span>Onboarding</span>
-                    </NavLink>
-                  </li>
-                  <li
-                    onClick={() => {
-                      handleMenuModalClose(false);
-                    }}>
-                    <NavLink to="/tributes">
-                      <span>Tribute</span>
-                    </NavLink>
-                  </li>
-                  <li
-                    onClick={() => {
-                      handleMenuModalClose(false);
-                    }}>
-                    <NavLink to="/transfers">
-                      <span>Transfer</span>
-                    </NavLink>
-                  </li>
-                  <li
-                    onClick={() => {
-                      handleMenuModalClose(false);
-                    }}>
-                    <NavLink to="/governance">
-                      <span>Governance</span>
+                    <NavLink to="/onboard">
+                      <span>🎥 Become a member</span>
                     </NavLink>
                   </li>
                   <li
@@ -231,21 +207,67 @@ export function NavHamburger() {
                       handleMenuModalClose(false);
                     }}>
                     <NavLink to="/members">
-                      <span>Members</span>
+                      <span>🎥 Members</span>
                     </NavLink>
                   </li>
-                  {/* The Profile link for the member account is available to both the connected member address and its delegate address. */}
+                  {/* <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to="/collection">
+                        <span>🎥 Collection</span>
+                      </NavLink>
+                    </li> */}
+                  {/* <li
+                    onClick={() => {
+                      handleMenuModalClose(false);
+                    }}>
+                    <NavLink to="/onboarding">
+                      <span>🎥 Onbording</span>
+                    </NavLink>
+                  </li> */}
                   {isCurrentMemberOrDelegateConnected && (
                     <li
                       onClick={() => {
                         handleMenuModalClose(false);
                       }}>
-                      <NavLink
-                        to={`/members/${connectedMember?.memberAddress}`}>
-                        <span>Profile</span>
+                      <NavLink to="/governance">
+                        <span>🎥 Governance</span>
                       </NavLink>
                     </li>
                   )}
+                  {isCurrentMemberOrDelegateConnected && (
+                    <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to="/tributes">
+                        <span>🎥 Tribute</span>
+                      </NavLink>
+                    </li>
+                  )}
+                  {isCurrentMemberOrDelegateConnected && (
+                    <li
+                      onClick={() => {
+                        handleMenuModalClose(false);
+                      }}>
+                      <NavLink to="/transfers">
+                        <span>🎥 Transfer</span>
+                      </NavLink>
+                    </li>
+                  )}
+                  {/* The Profile link for the member account is available to both the connected member address and its delegate address.
+                  {isCurrentMemberOrDelegateConnected && (
+                    // <li
+                    //   onClick={() => {
+                    //     handleMenuModalClose(false);
+                    //   }}>
+                    //   <NavLink
+                    //     to={`/members/${connectedMember?.memberAddress}`}>
+                    //     <span>🎥 Profile</span>
+                    //   </NavLink>
+                    // </li>
+                  )} */}
                   {/* @note Disabling DAO Manager for now because we paused on maintaining it. */}
                   {/* {isActiveMemberConnected && (
                     <li

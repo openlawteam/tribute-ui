@@ -5,6 +5,7 @@ import {DaoAdapterConstants} from '../../components/adapters-extensions/enums';
 import FadeIn from '../../components/common/FadeIn';
 import Proposals from '../../components/proposals/Proposals';
 import Wrap from '../../components/common/Wrap';
+import { Onboarded } from '../../abis/types/KycOnboardingContract';
 
 export default function Onboarding() {
   /**
@@ -56,7 +57,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
         <div className="titlebar">
           <h2 className="titlebar__title">Onboarding</h2>
           <button className="titlebar__action" onClick={goToNewProposal}>
-            Onboard
+            Become a member
           </button>
         </div>
 

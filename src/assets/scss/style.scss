@@ -93,8 +93,28 @@ p {
 }
 
 a {
-  color: $color-primary;
+  color: $color-babyblue;
 }
+a.landing__link{
+  
+  color: #6FD671;
+  margin-right: 60rem;
+}
+ul {
+  list-style: none;
+  list-style-type: circle;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+  
+  
+
+}
+li{
+  margin-bottom: 1rem;
+  
+}
+
 
 /* react mount point */
 
@@ -115,8 +135,12 @@ main {
 
 .section-wrapper {
   flex: 1 1;
-  margin: 0 auto 4rem;
+  //margin: 0 auto 4rem;
+  margin-left: 10rem;
   max-width: 75rem; // 1200px
+  margin-left: auto;
+  margin-right: auto;
+ 
 
   @media only screen and (max-width: calc(75rem + 4rem)) {
     margin: 0 2rem 4rem;
@@ -180,7 +204,7 @@ main {
 /* errors */
 
 .error-message {
-  color: $color-brightsalmon;
+  color: $color-hotpink;
   // the text needs to wrap as the JSON errors can be long
   word-break: break-word;
 }
@@ -190,6 +214,10 @@ main {
 .pulse {
   animation: pulse 0.9s infinite ease-in-out alternate;
 }
+hr{
+  max-width: 100px;
+  height: 3px;   border: 1px dashed #000;
+}
 @keyframes pulse {
   from {
     transform: scale(0.8);
@@ -198,3 +226,57 @@ main {
     transform: scale(1.2);
   }
 }
+//IMAGE HOME
+img.submit-space{
+  width: 30rem;
+  border-radius: 1.5em;
+  
+}
+//RESPONSIVE
+@media only screen and (max-width: 915px) {
+  .logo--large {
+    font-size:2.5rem;
+  }
+img.submit-space {
+  width:15rem;
+}
+}
+.card-group{
+  justify-content: center;
+    grid-template-columns: repeat(auto-fill,minmax(300px,1fr));
+    grid-column-gap: 2em;
+    -webkit-column-gap: 2em;
+    column-gap: 2em;
+    grid-row-gap: 2em;
+    row-gap: 2em;
+    margin-bottom: 2.75rem;
+}
+.card-body {
+  flex: 1 1 auto;
+  padding: 1rem 1rem;
+  text-align: center;
+}
+
+@keyframes laoFlicker {
+  0%,
+  19%,
+  21%,
+  23%,
+  25%,
+  54%,
+  56%,
+  100% {
+    text-shadow: -0.2rem -0.2rem 1rem #fff, 0.2rem 0.2rem 1rem #fff,
+      0 0 2rem $color-hotpink, 0 0 4rem $color-hotpink, 0 0 6rem $color-hotpink,
+      0 0 8rem $color-hotpink, 0 0 10rem $color-hotpink;
+  }
+
+  20%,
+  24%,
+  55% {
+    text-shadow: none;
+    box-shadow: none;
+  }
+}
+
+

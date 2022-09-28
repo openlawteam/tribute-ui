@@ -117,7 +117,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
       <FadeIn>
         <div className="titlebar">
           <h2 className="titlebar__title">Governance</h2>
-
+          
           <button className="titlebar__action" onClick={viewAll}>
             View all
           </button>

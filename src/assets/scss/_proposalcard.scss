@@ -3,15 +3,83 @@
 @use "./button";
 
 .proposalcard {
-  background-color: $color-background-primary;
+  background-color: $color-darkblue;
   border-radius: 15px;
   padding: 2rem;
   position: relative;
-  box-shadow: 0 2px 2px 0 $color-shadow-primary;
+  box-shadow: 0 2px 2px 0 $color-babyblue;
 
   &:hover {
     cursor: pointer;
   }
+ 
+
+  .proposalcard__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .proposalcard__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $color-offwhite;
+  }
+
+  .proposalcard__subtitle {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: $color-offwhite;
+  }
+
+  .proposalcard__body {
+    margin-bottom: 1rem;
+  }
+
+  .proposalcard__body-text {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: $color-offwhite;
+  }
+
+  .proposalcard__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+  }
+
+  .proposalcard__footer-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .proposalcard__footer-button {
+    margin-right: 1rem;
+  }
+
+  .proposalcard__footer-button--yes {
+    background-color: $color-hotpink;
+    border-radius: 15px;
+    padding: 0.5rem 1rem;
+    color: $color-offwhite;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: 0.4s linear;
+
+    &:hover {
+      background-color: $color-hotpink;
+    }
+  }
+
+  .proposalcard__footer-button--no {
+    background-color: $color-keylargo;
+    border-radius: 15px;
+    padding: 0.5rem 1rem;
+    color: $color-offwhite;
 }
 
 .proposalcard__title {
@@ -55,4 +123,5 @@
 
 .proposalcard__link {
   text-decoration: none;
+}
 }

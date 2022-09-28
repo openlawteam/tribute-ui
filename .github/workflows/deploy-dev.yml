@@ -1,10 +1,8 @@
 name: GitHub Pages development deployment
-
 on:
   push:
     branches:
-      - main
-
+      - css
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
@@ -24,24 +22,14 @@ jobs:
         with:
           path: node_modules
           key: node-modules_deploy-dev-${{ hashFiles('package-lock.json') }}
-
-      - name: Setup SSH to install dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        uses: webfactory/ssh-agent@v0.5.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Install dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: npm ci
-
+        
       - name: Create production build
         env:
-          REACT_APP_ENVIRONMENT: development
-          REACT_APP_INFURA_PROJECT_ID_DEV: ${{ secrets.REACT_APP_INFURA_PROJECT_ID_DEV }}
-          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0xF5C3EC4Af6212e11cA4D1A4e189A989A753C8fBd"
-          REACT_APP_MULTICALL_CONTRACT_ADDRESS: "0xc2FBEb9dEE044Fc16EE5e5498c79988bAcf6E6fF"
-          REACT_APP_SNAPSHOT_HUB_API_URL: https://snapshot-hub-erc712.dev.thelao.io
+          REACT_APP_ENVIRONMENT: local
+          REACT_APP_INFURA_PROJECT_ID_LOCAL: ${{ secrets.REACT_APP_INFURA_PROJECT_ID_LOCAL }}
+          REACT_APP_DAO_REGISTRY_CONTRACT_ADDRESS: "0x77a8c28200483f6fD378bc0202aEb2322Bc1fF13"
+          REACT_APP_MULTICALL_CONTRACT_ADDRESS: "0x2bc5aF39a2ae50b54dCb9689247659deEfCAA583"
+          REACT_APP_SNAPSHOT_HUB_API_URL: http://cloud.juglas.name:9090
           REACT_APP_COUPON_API_URL: https://coupon.dev.openlaw.io
           REACT_APP_SNAPSHOT_SPACE: tribute
           REACT_APP_GRAPH_CORE_URL: https://api.thegraph.com/subgraphs/name/openlawteam/tribute-core-dev
@@ -57,4 +45,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
           commit_message: ${{ github.event.head_commit.message }}
-          cname: demo.tributedao.com
+          cname: cinecapsule.github.io/tribute-ui/

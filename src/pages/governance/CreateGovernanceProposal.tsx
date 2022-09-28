@@ -97,7 +97,12 @@ export default function CreateGovernanceProposal() {
   function getUnauthorizedMessage() {
     // user is not connected
     if (!isConnected) {
-      return 'Connect your wallet to submit a governance proposal.';
+      return (
+        <>
+          <p style={{color:"#697FD4"}}>Connect your wallet to submit a governance proposal</p>
+          </>
+      )
+      
     }
 
     // user is on wrong network
@@ -282,9 +287,10 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
         <div className="form-wrapper">
           <div className="form__description">
             <p>
-              Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
-              consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut
-              lacus dictum fermentum vel tincidunt neque. Sed sed lacinia...
+              As a member, you can make proposals related to the governance of
+            CineCapsule. Describe the proposal in full so that others can make an
+              informed decision. Include links to any additional supporting
+              materials in the description to better explain your proposal.
             </p>
           </div>
 

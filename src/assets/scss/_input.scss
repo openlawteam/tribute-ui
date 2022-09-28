@@ -6,7 +6,7 @@
 %prefix-suffix-base {
   align-items: center;
   background: $color-background-primary;
-  color: $color-primary;
+  color: $color-deepsmoke;
   display: inline-flex;
   font-family: inherit;
   font-size: 1.125rem;
@@ -28,8 +28,8 @@ textarea,
 select {
   font-family: $font-body;
   color: $color-primary;
-  background-color: $color-background-primary;
-  border: 1px solid $color-border-primary;
+  background-color: $color-background-page;
+  border: 1px solid $color-hotpink;
   border-radius: 15px;
   margin: 0;
   outline: none;

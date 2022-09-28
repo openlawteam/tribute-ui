@@ -11,7 +11,6 @@
 }
 
 .modal-overlay {
-  background: rgba(248, 250, 253, 0.8);
   border: none;
   left: 0;
   margin: 0;
@@ -31,9 +30,9 @@
   max-height: calc(
     100vh - 10rem
   ); /* dynamic height, minus any surrounding margin + padding */
-  background-color: $color-background-primary;
+  background-color: $color-deepsmoke;
   border-radius: 15px;
-  border: 2px solid $color-border-primary;
+  border: 5px solid $color-babyblue;
   padding: 2rem 1rem;
   overflow-y: scroll;
 
@@ -55,6 +54,10 @@
   ); /* min font-size 1.125rem, max 1.5rem */
   letter-spacing: 1px;
   font-weight: 500;
+  color: #697FD4;
+}
+p.card {
+color:black;
 }
 
 .modal__subtitle {
@@ -66,6 +69,7 @@
     18px
   ); /* min font-size 1rem, max 1.125rem */
   margin-bottom: 1.5rem;
+color: $color-offwhite,
 }
 
 .modal__close-button {

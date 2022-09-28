@@ -213,7 +213,7 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
     <Wrap className="section-wrapper">
       <FadeIn>
         <div className="titlebar">
-          <h2 className="titlebar__title">Onboarding</h2>
+          <h2 className="titlebar__title">Onbording</h2>
           <button className="titlebar__action" onClick={goToAll}>
             View all
           </button>

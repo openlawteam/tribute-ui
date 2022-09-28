@@ -28,18 +28,37 @@
 .button {
   @extend %button;
 
-  background-color: $color-background-primary;
+  
   border-radius: 15px;
   border: 1px solid $color-border-primary;
   font-family: $font-accent;
   text-transform: lowercase;
   font-size: 1.25rem;
+  color: $color-darkblue;
+  text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    border-color: #697FD4;
+    color: #697FD4;
+    border-radius: 1.5em;
+    background-color: transparent;
+    border: 3px solid;
+    border-radius: 3em;
+    font-size: 1.125rem;
+    padding: 1em 1.75em;
+}
+.button:hover{
+  background: rgba(112,216,95,.15);
+  box-shadow: 0 0 1.5rem #697FD4;
+}
+
+.button.hover{
+  background-color:$color-hotpink;
 }
 
 .button--secondary {
   @extend %button;
 
-  background-color: $color-background-secondary;
+background-color: $color-litesmoke;
   border: none;
   border-radius: 12px;
   font-family: $font-body;
@@ -76,4 +95,9 @@
   .button--help {
     font-size: 0.85rem;
   }
+}
+.btn-secondary {
+  color: black;
+  background-color: #6FD671;
+  border-color: #6c757d;
 }

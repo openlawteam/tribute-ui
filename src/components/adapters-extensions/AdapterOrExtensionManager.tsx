@@ -668,9 +668,8 @@ export default function AdapterOrExtensionManager() {
         {renderDaoName()}
         {renderErrorMessage()}
         <p>
-          Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
-          consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut lacus
-          dictum fermentum vel tincidunt neque. Sed sed lacinia...
+          Select the adapters you want to add to the DAO. You can add multiple
+          adapters at once.
         </p>
         <div className="adapter-extension__selection">
           <div>

@@ -30,6 +30,8 @@
   font-size: 6em;
   font-weight: bold;
   letter-spacing: 6px;
+  text-align: center;
+  margin-left: 20px;
 
   &--small {
     @include fluid-type(
@@ -56,5 +58,35 @@
       43px,
       76px
     ); /* min font-size 2.6875rem, max 4.75rem */
+    animation: logo_laoFlicker__2DM99 1.8s infinite alternate;
+    animation-duration: 1.8s;
+    animation-timing-function: ease;
+    animation-delay: 0s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-fill-mode: none;
+    animation-play-state: running;
+    animation-name: logo_laoFlicker__2DM99;
+  }
+}
+@keyframes logo_laoFlicker__2DM99 {
+  0%,
+  19%,
+  21%,
+  23%,
+  25%,
+  54%,
+  56%,
+  100% {
+    text-shadow: -0.2rem -0.2rem 1rem #fff, 0.2rem 0.2rem 1rem #fff,
+      0 0 2rem $color-royal, 0 0 4rem $color-royal, 0 0 6rem $color-royal,
+      0 0 8rem $color-royal, 0 0 10rem $color-royal;
+  }
+
+  20%,
+  24%,
+  55% {
+    text-shadow: none;
+    box-shadow: none;
   }
 }

@@ -6,20 +6,24 @@ import '../../../node_modules/aos/dist/aos.css';
 import {CenterLogo} from '../../components/logo';
 import {NavHamburger} from '../../components/Nav';
 import FadeIn from '../../components/common/FadeIn';
-import SocialMedia from '../../components/common/SocialMedia';
+// import SocialMedia from '../../components/common/SocialMedia';
 import Wrap from '../../components/common/Wrap';
 import {ENABLE_KYC_ONBOARDING} from '../../config';
+import Footer from '../../components/Footer';
 
-const TributeCube = memo(() => {
+const TributeSpace = memo(() => {
   return (
-    <div
-      className="cube"
-      data-testid="cube"
-      data-aos="fade-up"
-      data-aos-delay="150">
-      <div className="cube__segment--top"></div>
-      <div className="cube__segment--left"></div>
-      <div className="cube__segment--right"></div>
+    <div className="interest_submit-container">
+      <div className="interest_submit_flower">
+        <img
+          className="submit-space"
+          src="https://res.cloudinary.com/cinecapsule/image/upload/v1653638127/Films-on-Mars_wfxgzm.png"
+          alt="astronaut"
+          aria-label="Space background"
+          role="presentation"
+        />
+        <br></br>
+      </div>
     </div>
   );
 });
@@ -27,7 +31,7 @@ const TributeCube = memo(() => {
 function GetStartedHeader() {
   return (
     <div data-testid="get-started-header" className="landing__header">
-      <SocialMedia />
+      {/*<SocialMedia ></SocialMedia>*/}
       <NavHamburger />
     </div>
   );
@@ -61,31 +65,63 @@ export default function GetStarted() {
   return (
     <>
       <GetStartedHeader />
-      <Wrap className="section-wrapper">
-        <FadeIn>
-          <CenterLogo />
 
-          <div className="landing">
-            <div className="landing__subtitle">
-              A next generation DAO framework
+      <div className="row">
+        <Wrap className="section-wrapper">
+          <FadeIn>
+            <CenterLogo />
+            <div className="landing">
+              <div className="landing__subtitle">
+                A DAO SUPPORTING INDEPENDENT CINEMA
+              </div>
+              <div className="landing__img">
+                <TributeSpace />
+              </div>
+              <div className="landing__button">
+                <button
+                  className="button"
+                  onClick={() => {
+                    history.push(ENABLE_KYC_ONBOARDING ? '/join' : '/onboard');
+                  }}>
+                  BECOME A MEMBER
+                </button>
+              </div>
+              <br></br>
+              <div className="landing__link">
+                <a href="https://medium.com/@OpenLawOfficial/introducing-the-tribute-dao-framework-3f2f0ed50d62" target="_blank" rel="noopener noreferrer">
+                  LEARN MORE
+                </a>
+              </div>
             </div>
-
-            <div className="landing__img">
-              <TributeCube />
-            </div>
-
-            <div className="landing__button">
+            <br></br>
+            <div className="interest_submit-proposal_xyz">
+              <span
+                className="interest_submit-proposal__image__1JcQq"
+                aria-label="Unicorn emoji"
+                role="img">
+                🎥
+              </span>
+              <br></br>
+              <div className="interest_submit-proposal__title__dZrRm">
+                Looking for funding?
+              </div>
+              <div className="interest_submit-proposal-slogan">
+                CineCapsule is a group of  enthusiasts and experts
+                supporting the work of independent Film Festivals.
+                <br></br><strong>If you are a film producer or director, join the DAO and make a proposal
+                </strong></div>
               <button
-                className="button"
+                className="button_submit_proposal"
                 onClick={() => {
-                  history.push(ENABLE_KYC_ONBOARDING ? '/join' : '/onboard');
+                  history.push(ENABLE_KYC_ONBOARDING ? '/onboard' : '/governance-proposal');
                 }}>
-                Join
+                Submit a proposal
               </button>
             </div>
-          </div>
-        </FadeIn>
-      </Wrap>
+          </FadeIn>
+        </Wrap>
+      </div>
+      <Footer />
     </>
   );
 }

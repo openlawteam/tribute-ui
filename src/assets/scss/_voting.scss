@@ -71,7 +71,7 @@ $bar-height: 14px;
     @extend %vote-segment;
 
     left: 0;
-    background-color: #96c0d6;
+    background-color:$color-hotpink
   }
 
   &__segment--no {

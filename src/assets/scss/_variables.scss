@@ -13,15 +13,16 @@ $width-wide: 1200px;
 $width-max-content: 1125px;
 
 // colors
-$color-babyblue: #6ef4fa;
+$color-darkblue: #191920;
+$color-babyblue: #6FD671;
 $color-babypink: #e083f6;
 $color-brightlime: #75f86a;
-$color-brightsalmon: #ff6f6f;
+$color-hotpink: #697FD4;
 $color-cirrus: #c5ddef;
 $color-darksmoke: #333333;
 $color-deepsmoke: #212121;
 $color-fadedsky: #5da8d2;
-$color-hotpink: #e83adc;
+$color-hotpink: #697FD4;
 $color-keylargo: #31cde7;
 $color-lightgreen: #83e5a4;
 $color-lilac: #4952a5;
@@ -32,9 +33,9 @@ $color-royal: #076ad2;
 $color-sunny: #f5f650;
 $color-wiltedlilac: #828092;
 
-$color-primary: #3c6b7e;
-$color-primary-hover: #2498bd;
-$color-background-page: #f8fafd;
+$color-primary: #ffffff;
+$color-primary-hover: #697FD4;
+$color-background-page: #191920;
 $color-background-primary: #ffffff;
 $color-background-secondary: #f4f4f4;
 $color-border-primary: #c3d6dc;
@@ -45,7 +46,7 @@ $colors: (
   "babyblue": $color-babyblue,
   "babypink": $color-babypink,
   "brightlime": $color-brightlime,
-  "brightsalmon": $color-brightsalmon,
+  "brightsalmon": $color-hotpink,
   "cirrus": $color-cirrus,
   "darksmoke": $color-darksmoke,
   "deepsmoke": $color-deepsmoke,

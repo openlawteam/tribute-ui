@@ -88,7 +88,23 @@ function renderUnauthorizedMessage({
 }) {
   // user is not connected
   if (!isConnected) {
-    return 'Connect your wallet to submit an onboarding proposal.';
+    return (
+      <div className="proposalcard">
+        <div className="proposalcard__content">
+          <p>
+            CineCapsule DAO aims to bring together members who wish to support
+            the work of Independent Film Festivals. CineCapsule DAO will have up
+            to a certain number of initial members, who will pool their capital
+            to make investments. Each member can buy with DAO tokens. Please
+            enter your preferred wallet address below and the amount of ETH you
+            wish to contribute to CineCapsule DAO. Once you complete this form,
+            you will be fully onboarded and will receive information about the
+            weekly CineCapsule DAO call and its Discord community.
+          </p>
+          <p style={{color: '#697FD4'}}>Connect your wallet to get started.</p>
+        </div>
+      </div>
+    );
   }
 
   // user is on wrong network
@@ -635,142 +651,148 @@ export default function CreateOnboardingProposal() {
 
   return (
     <RenderWrapper>
-      <div className="form__description">
-        <p>
-          Submit a proposal to join Tribute DAO. Each member can purchase{' '}
-          {minUnitsText} units for {minAmountText} {amountUnit} (up to{' '}
-          {maxUnitsText} units for {maxAmountText} {amountUnit}). Please put
-          your preferred ETH address below and the amount of {amountUnit}{' '}
-          you&apos;d like to contribute.
-        </p>
-        <p>
-          Following your submission, existing members will consider your
-          proposal. If approved by vote, your proposal will be processed and you
-          will finalize the transfer of your allocated {amountUnit} in exchange
-          for membership units.
-        </p>
-      </div>
-
-      <form className="form" onSubmit={(e) => e.preventDefault()}>
-        {/* ETH ADDRESS */}
-        <div className="form__input-row">
-          <label className="form__input-row-label" htmlFor={Fields.ethAddress}>
-            Applicant Address
-          </label>
-          <div className="form__input-row-fieldwrap">
-            {/* @note We don't need the default value as it's handled in the useEffect above. */}
-            <input
-              aria-describedby={`error-${Fields.ethAddress}`}
-              aria-invalid={errors.ethAddress ? 'true' : 'false'}
-              id={Fields.ethAddress}
-              name={Fields.ethAddress}
-              ref={register({
-                validate: (ethAddress: string): string | boolean => {
-                  return !ethAddress
-                    ? FormFieldErrors.REQUIRED
-                    : !isEthAddressValid(ethAddress)
-                    ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
-                    : true;
-                },
-              })}
-              type="text"
-              disabled={isInProcessOrDone}
-            />
-
-            <InputError
-              error={getValidationError(Fields.ethAddress, errors)}
-              id={`error-${Fields.ethAddress}`}
-            />
+      <div className="section-wrapper1">
+        <div className="proposalcard">
+          <div className="form__description">
+            <p>
+              To become a member of CineCapsule, each member can purchase{' '}
+              {minUnitsText} units for {minAmountText} {amountUnit} (up to{' '}
+              {maxUnitsText} units for {maxAmountText} {amountUnit}). Please put
+              your preferred ETH address below and the amount of {amountUnit}{' '}
+              you&apos;d like to contribute.
+            </p>
+            <p>
+              Following your submission, existing members will consider your
+              proposal. If approved by vote, your proposal will be processed and
+              you will finalize the transfer of your allocated {amountUnit} in
+              exchange for membership units.
+            </p>
           </div>
-        </div>
 
-        {/* AMOUNT SLIDER */}
-        <div className="form__input-row">
-          <label
-            className="form__input-row-label"
-            htmlFor={Fields.amount}
-            id={`${Fields.amount}-label`}>
-            Amount
-          </label>
-          <div className="form__input-row-fieldwrap--narrow">
-            <Controller
-              render={({onChange}) => (
-                <Slider
-                  data-testid="onboarding-slider"
-                  aria-labelledby={`${Fields.amount}-label`}
-                  defaultValue={sliderMin || 0}
-                  id={Fields.amount}
-                  max={sliderMax || 0}
-                  min={sliderMin || 0}
-                  step={sliderStep || 0}
-                  onChange={onChange}
+          <form className="form" onSubmit={(e) => e.preventDefault()}>
+            {/* ETH ADDRESS */}
+            <div className="form__input-row">
+              <label
+                className="form__input-row-label"
+                htmlFor={Fields.ethAddress}>
+                Applicant Address
+              </label>
+              <div className="form__input-row-fieldwrap">
+                {/* @note We don't need the default value as it's handled in the useEffect above. */}
+                <input
+                  aria-describedby={`error-${Fields.ethAddress}`}
+                  aria-invalid={errors.ethAddress ? 'true' : 'false'}
+                  id={Fields.ethAddress}
+                  name={Fields.ethAddress}
+                  ref={register({
+                    validate: (ethAddress: string): string | boolean => {
+                      return !ethAddress
+                        ? FormFieldErrors.REQUIRED
+                        : !isEthAddressValid(ethAddress)
+                        ? FormFieldErrors.INVALID_ETHEREUM_ADDRESS
+                        : true;
+                    },
+                  })}
+                  type="text"
                   disabled={isInProcessOrDone}
                 />
-              )}
-              defaultValue={sliderMin || 0}
-              control={control}
-              name={Fields.amount}
-              rules={{
-                validate: (value: string): string | boolean => {
-                  const amount = Number(value);
 
-                  return amount > Number(userAccountBalance)
-                    ? `Insufficient funds. ${renderUserAccountBalance(
-                        userAccountBalance
-                      )} ${amountUnit} available.`
-                    : true;
-                },
-              }}
-            />
+                <InputError
+                  error={getValidationError(Fields.ethAddress, errors)}
+                  id={`error-${Fields.ethAddress}`}
+                />
+              </div>
+            </div>
 
-            <InputError
-              error={getValidationError(Fields.amount, errors)}
-              id={`error-${Fields.amount}`}
-            />
-          </div>
-          <div className="form__input-addon">
-            {formatNumber(amountValue)} {amountUnit}
-          </div>
+            {/* AMOUNT SLIDER */}
+            <div className="form__input-row">
+              <label
+                className="form__input-row-label"
+                htmlFor={Fields.amount}
+                id={`${Fields.amount}-label`}>
+                Amount
+              </label>
+              <div className="form__input-row-fieldwrap--narrow">
+                <Controller
+                  render={({onChange}) => (
+                    <Slider
+                      data-testid="onboarding-slider"
+                      aria-labelledby={`${Fields.amount}-label`}
+                      defaultValue={sliderMin || 0}
+                      id={Fields.amount}
+                      max={sliderMax || 0}
+                      min={sliderMin || 0}
+                      step={sliderStep || 0}
+                      onChange={onChange}
+                      disabled={isInProcessOrDone}
+                    />
+                  )}
+                  defaultValue={sliderMin || 0}
+                  control={control}
+                  name={Fields.amount}
+                  rules={{
+                    validate: (value: string): string | boolean => {
+                      const amount = Number(value);
+
+                      return amount > Number(userAccountBalance)
+                        ? `Insufficient funds. ${renderUserAccountBalance(
+                            userAccountBalance
+                          )} ${amountUnit} available.`
+                        : true;
+                    },
+                  }}
+                />
+
+                <InputError
+                  error={getValidationError(Fields.amount, errors)}
+                  id={`error-${Fields.amount}`}
+                />
+              </div>
+              <div className="form__input-addon">
+                {formatNumber(amountValue)} {amountUnit}
+              </div>
+            </div>
+
+            {/* SUBMIT */}
+            <button
+              aria-label={isInProcess ? 'Submitting your proposal.' : ''}
+              className="button"
+              disabled={isInProcessOrDone}
+              onClick={
+                isInProcessOrDone
+                  ? () => {}
+                  : async () => {
+                      if (!(await trigger())) {
+                        return;
+                      }
+
+                      handleSubmit(getValues());
+                    }
+              }
+              type="submit">
+              {isInProcess ? <Loader /> : isDone ? 'Done' : 'Submit'}
+            </button>
+
+            {/* SUBMIT STATUS */}
+            {isInProcessOrDone && (
+              <div className="form__submit-status-container">
+                {renderSubmitStatus(proposalSignAndSendStatus)}
+              </div>
+            )}
+
+            {/* SUBMIT ERROR */}
+            {createOnboardError && (
+              <div className="form__submit-error-container">
+                <ErrorMessageWithDetails
+                  renderText="Something went wrong while submitting the proposal."
+                  error={createOnboardError}
+                  detailsProps={{open: true}}
+                />
+              </div>
+            )}
+          </form>
         </div>
-
-        {/* SUBMIT */}
-        <button
-          aria-label={isInProcess ? 'Submitting your proposal.' : ''}
-          className="button"
-          disabled={isInProcessOrDone}
-          onClick={
-            isInProcessOrDone
-              ? () => {}
-              : async () => {
-                  if (!(await trigger())) {
-                    return;
-                  }
-
-                  handleSubmit(getValues());
-                }
-          }
-          type="submit">
-          {isInProcess ? <Loader /> : isDone ? 'Done' : 'Submit'}
-        </button>
-
-        {/* SUBMIT STATUS */}
-        {isInProcessOrDone && (
-          <div className="form__submit-status-container">
-            {renderSubmitStatus(proposalSignAndSendStatus)}
-          </div>
-        )}
-
-        {/* SUBMIT ERROR */}
-        {createOnboardError && (
-          <div className="form__submit-error-container">
-            <ErrorMessageWithDetails
-              renderText="Something went wrong while submitting the proposal."
-              error={createOnboardError}
-              detailsProps={{open: true}}
-            />
-          </div>
-        )}
-      </form>
+      </div>
     </RenderWrapper>
   );
 }
@@ -784,8 +806,9 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
     <Wrap className="section-wrapper">
       <FadeIn>
         <div className="titlebar">
-          <h2 className="titlebar__title">Onboard</h2>
+          <h2 className="titlebar__title">BECOME A MEMBER</h2>
         </div>
+        <br></br>
 
         <div className="form-wrapper">
           {/* RENDER CHILDREN */}

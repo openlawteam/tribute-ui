@@ -20,16 +20,26 @@
 
 .landing__subtitle {
   font-size: 1.2rem;
+  font-family: "Lexend Exa", -apple-system, BlinkMacSystemFont, Segoe UI,
+    Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji,
+    Segoe UI Symbol;
   text-align: center;
   letter-spacing: 2px;
   line-height: 1.5;
   margin-top: 1.5rem;
-
-  @include size-medium-down {
-    font-size: 1.15rem;
-  }
+  font-size: 1.2rem;
+  letter-spacing: 0.2em;
+  line-height: 1.25;
+  margin: 2rem 0;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 1px #6fd671;
+  color: $color-hotpink;
 }
 
+// @include size-medium-down {
+//   font-size: 1.15rem;
+// }
 .landing__img {
   margin-top: 2rem;
 }
@@ -39,5 +49,94 @@
     font-size: 1.5rem;
     padding: 1rem 4rem;
     margin: 2.5rem 0 1rem;
+  }
+}
+.interest_submit-container {
+  padding: 0 1rem;
+  //width: 60rem;
+}
+.interest_submit-proposal__1cudS {
+  border: 3px solid rgba(32, 32, 32, 0.5);
+  border-radius: 2.5em;
+  padding: 1.5rem 5rem 2rem;
+  max-width: 56em;
+  text-align: center;
+  margin: 0 auto 4rem;
+  border-color: #6fd671;
+  box-sizing: border-box;
+  margin-right: 10rem;
+}
+
+.interest_submit-proposal__image__1JcQq {
+  display: inline-block;
+  font-size: 3rem;
+  margin-bottom: 0.25rem;
+}
+.interest_submit-proposal__title__dZrRm {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  margin-top: 1rem;
+}
+.interest_submit-proposal-slogan {
+  font-size: 1.3rem;
+}
+.button_submit_proposal {
+  text-transform: uppercase;
+  background-color: #242424;
+  border-color: #242424;
+  color: #6fd671;
+  border-radius: 1.5em;
+  font-size: 1.5rem;
+  padding: 1rem 4rem;
+  margin: 2.5rem 0 1rem;
+}
+.button_submit_proposal:hover {
+  background: rgba(112, 216, 95, 0.15);
+  box-shadow: 0 0 1.5rem #6fd671;
+}
+
+.row {
+  display: flex;
+  text-align: center;
+}
+.interest_submit_flower {
+  border: 3px solid rgba(32, 32, 32, 0.5);
+  border-radius: 2.5em;
+  padding: 1.5rem 2rem 2rem;
+  max-width: 56em;
+  text-align: center;
+  margin: 0 auto 4rem;
+  border-color: #6fd671;
+  box-sizing: border-box;
+}
+.interest_submit-proposal_xyz {
+  border: 3px solid rgba(32, 32, 32, 0.5);
+  border-radius: 2.5em;
+  padding: 1.5rem 5rem 2rem;
+  max-width: 56em;
+  text-align: center;
+  margin: 0 auto 4rem;
+  border-color: #8a8a8a09;
+  box-sizing: border-box;
+  margin-top: 5rem;
+}
+
+//RESPONSIVE//
+@media screen and (max-width: 915px) {
+  .row {
+    flex-direction: column;
+  }
+
+  .landing__button > button {
+    font-size: 1rem;
+  }
+  .button_submit_proposal {
+    font-size: small;
+    padding: 1rem;
+  }
+  .footer_left__6CGtF {
+    display: flex;
+    flex-direction: column;
   }
 }

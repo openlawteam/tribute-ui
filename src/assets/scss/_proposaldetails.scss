@@ -14,14 +14,14 @@
 }
 
 .proposaldetails {
-  background-color: $color-background-primary;
+  background-color: $color-darkblue;
   padding: 1rem;
   display: flex;
   flex: 1 100%;
   margin: 1rem 0;
-  border: 1px solid $color-border-secondary;
+  border: 1px solid $color-babyblue;
   border-radius: 15px;
-  box-shadow: 0 2px 2px 0 $color-shadow-primary;
+  box-shadow: 0 2px 2px 0 $color-babyblue;
 
   @include size-medium-down {
     flex-direction: column;
@@ -113,5 +113,6 @@
     display: inline-block;
     font-size: 0.9rem;
     font-weight: 500;
+    color: $color-deepsmoke;
   }
 }

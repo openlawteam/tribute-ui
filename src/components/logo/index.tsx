@@ -21,7 +21,7 @@ export function ModalLogo() {
 export function LeftLogo() {
   return (
     <div className="logo-container logo-container--header">
-      <Logo size="medium" />
+      <Logo size="small" />
     </div>
   );
 }

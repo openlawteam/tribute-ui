@@ -5,13 +5,13 @@
     "type": "git",
     "url": "https://github.com/openlawteam/tribute-ui.git"
   },
-  "homepage": "https://demo.tributedao.com",
+  "homepage": "https://Margotte83.github.io/tribute-ui/",
   "author": "OpenLaw Team",
   "license": "Apache-2.0",
   "description": "A modular DAO framework developed and coordinated by its members",
   "engines": {
-    "node": "^14.0.0",
-    "npm": "^7.0.0"
+    "node": "^16.14.0",
+    "npm": "^8.3.1"
   },
   "dependencies": {
     "@apollo/client": "3.4.17",
@@ -20,10 +20,11 @@
     "@openlaw/snapshot-js-erc712": "^1.3.0",
     "@walletconnect/web3-provider": "^1.7.0",
     "aos": "^2.3.4",
+    "bootstrap": "^5.1.3",
     "debounce": "^1.2.1",
     "ethers": "^5.5.4",
     "markdown-to-jsx": "^7.1.2",
-    "react": "^17.0.1",
+    "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
     "react-hook-form": "^6.15.4",
@@ -38,6 +39,7 @@
     "react-transition-group": "^4.4.1",
     "react-use": "^17.2.4",
     "react-use-clipboard": "^1.0.7",
+    "reactstrap": "^9.1.1",
     "redux": "^4.1.0",
     "redux-thunk": "^2.4.1",
     "tribute-contracts": "^2.3.5",
@@ -67,6 +69,7 @@
     "@types/react-transition-group": "^4.4.4",
     "@types/uuid": "^8.3.3",
     "dotenv": "^10.0.0",
+    "github-pages": "^3.0.2",
     "hardhat": "^2.7.0",
     "hardhat-abi-exporter": "^2.4.0",
     "http-proxy-middleware": "^2.0.0",
@@ -81,6 +84,8 @@
     "typescript": "4.5.5"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "npm run compile && react-scripts build",
     "compile": "rimraf build && mkdir -p build/contracts && cp -r node_modules/tribute-contracts/contracts/** build/contracts && hardhat clean && hardhat compile",
     "eject": "react-scripts eject",

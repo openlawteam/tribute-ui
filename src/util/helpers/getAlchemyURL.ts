@@ -37,8 +37,7 @@ export function getAlchemyURL(
 
     return;
   }
-
-  return `https://eth-${CHAIN_NAME[networkID]}.alchemyapi.io/v2/${
-    process.env.REACT_APP_ALCHEMY_API_KEY || ''
-  }`;
+  // return `https://eth-${CHAIN_NAME[networkID]}.alchemyapi.io/v2/${
+  //   process.env.REACT_APP_ALCHEMY_API_KEY || ''
+  // }`;
 }

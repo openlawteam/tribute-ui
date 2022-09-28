@@ -2,9 +2,9 @@
 @use "./mixins" as *; /* load without namespace for convenience */
 
 .membercard {
-  background-color: $color-background-primary;
+  background-color: $color-darkblue;
   border-radius: 15px;
-  box-shadow: 0 2px 2px 0 $color-shadow-primary;
+  box-shadow: 0 2px 2px 0 $color-babyblue;
   padding: 2rem;
 
   &:hover {
@@ -12,7 +12,7 @@
   }
 
   &--connected-account {
-    box-shadow: 0 2px 2px 0 $color-primary-hover;
+    box-shadow: 0 2px 2px 0 $color-babyblue;
   }
 }
 
@@ -38,6 +38,7 @@
   line-height: 1.6;
   margin: 0;
   text-align: center;
+  color: $color-primary;
 
   &:last-child {
     margin: 0;

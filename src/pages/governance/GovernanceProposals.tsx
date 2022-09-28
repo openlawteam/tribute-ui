@@ -54,6 +54,12 @@ function RenderWrapper(props: React.PropsWithChildren<any>): JSX.Element {
       <FadeIn>
         <div className="titlebar">
           <h2 className="titlebar__title">Governance</h2>
+          <p>
+            CineCapsule  is run entirely by its members.<br></br> 
+            Below are all the governance votes and proposals.
+          </p>
+          <p>Otherwise, you can submit a new proposal</p>
+
           <button className="titlebar__action" onClick={goToNewProposal}>
             New Proposal
           </button>
