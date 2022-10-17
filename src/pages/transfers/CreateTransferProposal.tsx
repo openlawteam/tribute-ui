@@ -1,3 +1,6 @@
+// @todo Remove this eslint disable after the OffchainVoting contract is
+// upgraded.
+/* eslint-disable no-unreachable */
 import {
   SnapshotType,
   SnapshotProposalData,
@@ -602,6 +605,19 @@ export default function CreateTransferProposal() {
       </RenderWrapper>
     );
   }
+
+  // @todo Remove this disabled message after the OffchainVoting contract is
+  // upgraded.
+  return (
+    <RenderWrapper>
+      <div className="form__description--unauthorized">
+        <p>
+          New transfer proposals are temporarily disabled while the DAO voting
+          contract is being upgraded.
+        </p>
+      </div>
+    </RenderWrapper>
+  );
 
   return (
     <RenderWrapper>
